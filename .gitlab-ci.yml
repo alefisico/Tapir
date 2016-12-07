@@ -16,7 +16,7 @@ before_script:
   - scramv1 project CMSSW $CMSSW_VERSION
   - cd $CMSSW_VERSION/src
   - eval `scramv1 runtime -sh`
-  - source setenv_sklearn_cmssw.sh
+  - source $CI_HOME/setenv_sklearn_cmssw.sh
   - cd $CI_HOME
 
 compile:
