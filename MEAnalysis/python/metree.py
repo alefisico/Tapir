@@ -41,16 +41,16 @@ jetType = NTupleObjectType("jetType", variables = [
     NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
     #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
     NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
-    NTupleVariable("mcFlavour", lambda x : x.mcFlavour, type=int, mcOnly=True),
-    NTupleVariable("mcMatchId", lambda x : x.mcMatchId, type=int, mcOnly=True),
-    NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int, mcOnly=True),
+    NTupleVariable("mcFlavour", lambda x : x.mcFlavour, the_type=int, mcOnly=True),
+    NTupleVariable("mcMatchId", lambda x : x.mcMatchId, the_type=int, mcOnly=True),
+    NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, the_type=int, mcOnly=True),
     NTupleVariable("matchFlag",
         lambda x : getattr(x, "tth_match_label_numeric", -1),
-        type=int,
+        the_type=int,
         mcOnly=True,
         help="0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs"
     ),
-    NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), type=int, mcOnly=True),
+    NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), the_type=int, mcOnly=True),
     NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
     NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
     NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
@@ -143,9 +143,9 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("p_err", lambda x : x.p_err),
     NTupleVariable("chi2", lambda x : x.chi2),
     NTupleVariable("time", lambda x : x.time),
-    NTupleVariable("error_code", lambda x : x.error_code, type=int),
+    NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
     NTupleVariable("efficiency", lambda x : x.efficiency),
-    NTupleVariable("nperm", lambda x : x.num_perm, type=int),
+    NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
 ])
 
 perm_vars = [
@@ -153,7 +153,7 @@ perm_vars = [
     for i in range(MEMPermutation.MAXOBJECTS)
 ]
 memPermType = NTupleObjectType("memPermType", variables = [
-    NTupleVariable("idx", lambda x : x.idx, type=int),
+    NTupleVariable("idx", lambda x : x.idx, the_type=int),
     NTupleVariable("p_mean", lambda x : x.p_mean),
     NTupleVariable("p_std", lambda x : x.p_std),
     NTupleVariable("p_tf_mean", lambda x : x.p_tf_mean),
@@ -173,9 +173,9 @@ commonMemType = NTupleObjectType("commonMemType", variables = [
 
 branType = NTupleObjectType("branType", variables = [
     NTupleVariable("p",        lambda x : x[0] ),
-    NTupleVariable("ntoys",    lambda x : x[1], type=int),
-    NTupleVariable("pass",     lambda x : x[2], type=int),
-    NTupleVariable("tag_id",   lambda x : x[3], type=int),
+    NTupleVariable("ntoys",    lambda x : x[1], the_type=int),
+    NTupleVariable("pass",     lambda x : x[2], the_type=int),
+    NTupleVariable("tag_id",   lambda x : x[3], the_type=int),
 ])
 
 #branvalType = NTupleObjectType("branvalType", variables = [
@@ -217,7 +217,7 @@ def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
     if systematic == "nominal":
         syst_suffix = ""
     return NTupleVariable(
-        name + syst_suffix, func, type=typ, help=hlp, mcOnly=mcOnly
+        name + syst_suffix, func, the_type=typ, help=hlp, mcOnly=mcOnly
     )
 
 topCandidateType = NTupleObjectType("topCandidateType", variables = [
@@ -262,7 +262,7 @@ topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
     NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
-    #NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
+    #NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), the_type=int, help="Index of the matched genTopHad" ),
 ])
 
 higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
@@ -476,36 +476,36 @@ def getTreeProducer(conf):
 
             NTupleVariable(
                "nGenBHiggs", lambda ev: len(getattr(ev, "b_quarks_h_nominal", [])),
-               type=int,
+               the_type=int,
                help="Number of generated b from higgs", mcOnly=True
             ),
 
             NTupleVariable(
                "nGenBTop", lambda ev: len(getattr(ev, "b_quarks_t_nominal", [])),
-               type=int,
+               the_type=int,
                help="Number of generated b from top", mcOnly=True
             ),
 
             NTupleVariable(
                "nGenQW", lambda ev: len(getattr(ev, "l_quarks_w_nominal", [])),
-               type=int,
+               the_type=int,
                help="Number of generated quarks from W", mcOnly=True
             ),
             
             NTupleVariable(
                "passPV", lambda ev: getattr(ev, "passPV", -1),
-               type=int,
+               the_type=int,
                help="First PV passes selection"
             ),
 
             NTupleVariable(
                "triggerDecision", lambda ev: getattr(ev, "triggerDecision", -1),
-               type=int,
+               the_type=int,
                help="Trigger selection"
             ),
             NTupleVariable(
                "triggerBitmask", lambda ev: getattr(ev, "triggerBitmask", -1),
-               type=int,
+               the_type=int,
                help="Bitmask of trigger decisions"
             ),
 
@@ -561,7 +561,7 @@ def getTreeProducer(conf):
                     trignames += [tn]
     for trig in trignames:
         treeProducer.globalVariables += [NTupleVariable(
-            trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False
+            trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
         )]
         
     for systematic in ["nominal", "raw", "JESUp", "JESDown", "JERUp", "JERDown"]:

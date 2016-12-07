@@ -25,7 +25,7 @@ compile:
     - cd $CMSSW_BASE/src
     - eval `scramv1 runtime -sh`
     - git cms-init
-    - git cms-merge-topic -u vhbb:vhbbHeppy80X
+    - git cms-merge-topic -u jpata:vhbbHeppy80X_heppy_8_0_19
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram b

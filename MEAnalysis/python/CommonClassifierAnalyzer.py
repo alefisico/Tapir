@@ -21,7 +21,7 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
         self.bdtcalc_sl = ROOT.BDTClassifier()
         self.bdtcalc_sl_mem1 = ROOT.MEMBDTClassifier()
         self.bdtcalc_sl_mem2 = ROOT.MEMBDTClassifierV2()
-        self.bdtcalc_dl = ROOT.DLBDTClassifier()
+        #self.bdtcalc_dl = ROOT.DLBDTClassifier()
         self.memcalc = ROOT.MEMClassifier()
 
     def process(self, event):
@@ -88,8 +88,9 @@ class CommonClassifierAnalyzer(FilterAnalyzer):
                         if "commonclassifier" in self.conf.general["verbosity"]:
                             autolog("Evaluated common mem: {0}, ".format(mem.p_sig, mem.p_bkg))
             elif event.category_string.startswith("dl_"):
-                bdt = self.bdtcalc_dl.GetBDTOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, met_p4)
-                event.common_bdt = bdt
+                #bdt = self.bdtcalc_dl.GetBDTOutput(selectedLeptonP4, selectedLeptonCharge, selectedJetsP4, selectedJetsCSV, met_p4)
+                #event.common_bdt = bdt
+                event.common_bdt = 0.0
                 
                 if self.conf.mem["calcMECommon"]:
                     if event.numJets>=4 and event.nBCSVM >= 4:
