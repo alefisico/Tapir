@@ -4,3 +4,6 @@
 [submodule "CommonClassifier"]
 	path = CommonClassifier
 	url = https://gitlab.cern.ch/jpata/CommonClassifier.git
+[submodule "GenLevel"]
+	path = GenLevel
+	url = https://gitlab.cern.ch/jpata/ttH-Hbb-GenLevel.git
