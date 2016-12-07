@@ -18,6 +18,8 @@ compile:
   stage: compile
   script:
     - cd $CMSSW_BASE/src
+    - git cms-init
+    - git cms-merge-topic -u vhbb:vhbbHeppy80X
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram b
@@ -37,4 +39,8 @@ test_MEAnalysis:
     - cd src
     - scram b python
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py | tee -i MEAnalysis.txt
+  artifacts:
+    paths:
+      - MEAnalysis.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
