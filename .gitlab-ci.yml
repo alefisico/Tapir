@@ -8,6 +8,7 @@ before_script:
   - git config --global user.email 'joosep.pata@cern.ch'
   - git config --global user.github jpata
   - git submodule update --init --recursive
+  - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc530"
   - export CMSSW_VERSION="CMSSW_8_0_19"
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
@@ -21,6 +22,7 @@ compile:
   stage: compile
   script:
     - cd $CMSSW_BASE/src
+    - eval `scramv1 runtime -sh`
     - git cms-init
     - git cms-merge-topic -u vhbb:vhbbHeppy80X
     - cp -r $CI_HOME TTH
