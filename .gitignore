@@ -16,8 +16,6 @@ VHbbAnalysis
 *.gz
 __init__.py
 *.log
-/MEIntegratorStandalone
-/MEAnalysis/gc/grid-control
 Plotting/Datacard-2015-09-08-1834
 MEAnalysis/crab_vhbb/cfg_*.py
 MEAnalysis/crab_vhbb/crab_projects
@@ -26,4 +24,3 @@ Plotting/interface/categories.h
 Plotting/interface/gen.h
 Plotting/bin/categories.cc
 Plotting/bin/gen.cc
-CommonClassifier

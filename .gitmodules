@@ -1,0 +1,6 @@
+[submodule "MEIntegratorStandalone"]
+	path = MEIntegratorStandalone
+	url = ssh://git@gitlab.cern.ch:7999/jpata/MEIntegratorStandalone.git
+[submodule "CommonClassifier"]
+	path = CommonClassifier
+	url = ssh://git@gitlab.cern.ch:7999/jpata/CommonClassifier.git
