@@ -382,6 +382,7 @@ class TaskSparseMerge(Task):
             s += " | ".join([str(res_by_sample[sample][k]) for k in ["queued", "started", "finished"]])
             stat.write(s + "\n")
         stat.close()
+
 class TaskCategories(Task):
     def __init__(self, workdir, name, analysis):
         super(TaskCategories, self).__init__(workdir, name, analysis)
@@ -457,12 +458,13 @@ class TaskLimits(Task):
 
         # Prepare jobs
         all_jobs = []
+        os.makedirs("{0}/limits".format(self.workdir))
         for group in self.analysis.groups.keys():
             all_jobs += [
                 qmain.enqueue_call(
                     func = makelimits,
                     args = [
-                        "{0}/limits".format(workdir),
+                        "{0}/limits".format(self.workdir),
                         self.analysis,
                         group
                     ],
@@ -470,7 +472,7 @@ class TaskLimits(Task):
                     result_ttl = 60*60,
                     meta = {"retries": 0, "args": ""})]
             
-        waitJobs(all_jobs, redis_conn)
+        waitJobs(all_jobs, redis_conn, qmain, qfail)
         self.save_state()
 
 def make_workdir():
@@ -551,19 +553,25 @@ if __name__ == "__main__":
     if len(qfail) > 0:
         logging.warning("fail queue has jobs, emptying")
         qfail.empty()
-
-    analysis = analysisFromConfig(args.config)
+    
+    if args.config.endswith("cfg"):
+        analysis = analysisFromConfig(args.config)
+    elif args.config.endswith("pickle"):
+        analysis = Analysis.deserialize(args.config)
+    else:
+        Exception("Unknown analysis input file")
 
     tasks = []
     tasks += [
-        TaskNumGen(workdir, "NGEN", analysis),
-        TaskSparsinator(workdir, "SPARSE", analysis),
-        TaskSparseMerge(workdir, "MERGE", analysis),
+        #TaskNumGen(workdir, "NGEN", analysis),
+        #TaskSparsinator(workdir, "SPARSE", analysis),
+        #TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
         TaskPlotting(workdir, "PLOT", analysis),
+        TaskLimits(workdir, "LIMIT", analysis),
     ]
 
-    inputs = []
+    inputs = "results/28efd210-1f0f-4da7-a4ff-62e16057bae7/merged.root" 
     for task in tasks:
         res = task.run(inputs, redis_conn, qmain, qfail)
         inputs = res
