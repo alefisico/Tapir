@@ -4,6 +4,9 @@ stages:
 
 before_script:
   - export CI_HOME="$( pwd )"
+  - git config --global user.name 'CERN CI'
+  - git config --global user.email 'joosep.pata@cern.ch'
+  - git config --global user.github jpata
   - git submodule update --init --recursive
   - export SCRAM_ARCH="slc6_amd64_gcc530"
   - export CMSSW_VERSION="CMSSW_8_0_19"
