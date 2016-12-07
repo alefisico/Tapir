@@ -19,7 +19,9 @@ compile:
   script:
     - cd $CMSSW_BASE/src
     - mkdir -p TTH
-    - cp -r $CI_HOME TTH/
+    - cp -r $CI_HOME/tthbb13 TTH
+    - ls
+    - ls TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram b
     - cd $CMSSW_BASE
