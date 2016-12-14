@@ -4,7 +4,11 @@ stages:
 
 before_script:
   - export CI_HOME="$( pwd )"
+  - git config --global user.name 'CERN CI'
+  - git config --global user.email 'joosep.pata@cern.ch'
+  - git config --global user.github jpata
   - git submodule update --init --recursive
+  - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc530"
   - export CMSSW_VERSION="CMSSW_8_0_19"
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
@@ -12,14 +16,17 @@ before_script:
   - scramv1 project CMSSW $CMSSW_VERSION
   - cd $CMSSW_VERSION/src
   - eval `scramv1 runtime -sh`
+  - source $CI_HOME/setenv_sklearn_cmssw.sh
   - cd $CI_HOME
 
 compile:
   stage: compile
   script:
     - cd $CMSSW_BASE/src
-    - mkdir -p TTH
-    - cp -r $CI_HOME TTH/
+    - eval `scramv1 runtime -sh`
+    - git cms-init
+    - git cms-merge-topic -u jpata:vhbbHeppy80X_heppy_8_0_19
+    - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram b
     - cd $CMSSW_BASE
@@ -29,3 +36,17 @@ compile:
       - cmssw.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
     expire_in: 10 minutes
+
+test_MEAnalysis:
+  stage: test
+  script:
+    - cd $CMSSW_BASE
+    - tar -xzf $CI_HOME/cmssw.tgz
+    - cd src
+    - scram b python
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py | tee -i MEAnalysis.txt
+  artifacts:
+    paths:
+      - MEAnalysis.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"

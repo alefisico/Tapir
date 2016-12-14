@@ -321,7 +321,7 @@ def main():
         #execute the code
         looper.loop()
 
-        tf = looper.setup.services["outputfile"].file 
+        tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file 
         tf.cd()
         ts = ROOT.TNamed("config", conf_to_str(Conf))
         ts.Write("", ROOT.TObject.kOverwrite)
