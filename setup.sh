@@ -1,8 +1,8 @@
-#export SCRAM_ARCH=slc6_amd64_gcc530
-#
-#scram project -n CMSSW CMSSW CMSSW_8_0_19
-#cd CMSSW/src/
-#eval `scramv1 runtime -sh`
+export SCRAM_ARCH=slc6_amd64_gcc530
+
+scram project -n CMSSW CMSSW CMSSW_8_0_21
+cd CMSSW/src/
+eval `scramv1 runtime -sh`
 
 git cms-init
 git cms-merge-topic -u vhbb:vhbbHeppy80X
