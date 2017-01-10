@@ -11,7 +11,7 @@ git cms-merge-topic -u vhbb:vhbbHeppy80X
 git clone https://github.com/jpata/tthbb13.git TTH --branch meanalysis-80x
 cd $CMSSW_BASE/src/TTH
 
-git clone https://github.com/jpata/ttH-bb-GenAnalysis.git GenLevel
+git submodule update --init --recursive
 
 cd $CMSSW_BASE/src
 
