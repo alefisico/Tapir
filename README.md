@@ -4,7 +4,7 @@ Setup on SLC6 in a clean directory (no CMSSW) on a **shared file system**
 ~~~
 $ mkdir -p ~/tth/sw
 $ cd ~/tth/sw
-$ wget --no-check-certificate https://raw.githubusercontent.com/jpata/tthbb13/meanalysis-80x/setup.sh
+$ wget --no-check-certificate https://gitlab.cern.ch/jpata/tthbb13/raw/meanalysis-80x/setup.sh
 $ source setup.sh
 ~~~
 This will download CMSSW, the tthbb code and all the dependencies.
