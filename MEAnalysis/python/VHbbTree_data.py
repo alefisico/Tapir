@@ -147,12 +147,16 @@ class trgObjects_hltBTagPFCSVp016SingleWithMatching:
     @staticmethod
     def make_array(input):
         return [trgObjects_hltBTagPFCSVp016SingleWithMatching(input, i) for i in range(input.ntrgObjects_hltBTagPFCSVp016SingleWithMatching)]
-class trgObjects_hltPFQuadJetLooseID15:
+class softActivityEWKJets:
     def __init__(self, tree, n):
+        self.pt = tree.softActivityEWKJets_pt[n];
+        self.eta = tree.softActivityEWKJets_eta[n];
+        self.phi = tree.softActivityEWKJets_phi[n];
+        self.mass = tree.softActivityEWKJets_mass[n];
         pass
     @staticmethod
     def make_array(input):
-        return [trgObjects_hltPFQuadJetLooseID15(input, i) for i in range(input.ntrgObjects_hltPFQuadJetLooseID15)]
+        return [softActivityEWKJets(input, i) for i in range(input.nsoftActivityEWKJets)]
 class softActivityVHJets:
     def __init__(self, tree, n):
         self.pt = tree.softActivityVHJets_pt[n];
@@ -192,6 +196,8 @@ class SubjetAK08softdrop:
         self.phi = tree.SubjetAK08softdrop_phi[n];
         self.mass = tree.SubjetAK08softdrop_mass[n];
         self.btag = tree.SubjetAK08softdrop_btag[n];
+        self.fromFJ = tree.SubjetAK08softdrop_fromFJ[n];
+        self.corr = tree.SubjetAK08softdrop_corr[n];
         pass
     @staticmethod
     def make_array(input):
@@ -247,6 +253,7 @@ class SubjetCA15subjetfiltered:
         self.btag = tree.SubjetCA15subjetfiltered_btag[n];
         self.jetID = tree.SubjetCA15subjetfiltered_jetID[n];
         self.fromFJ = tree.SubjetCA15subjetfiltered_fromFJ[n];
+        self.corr = tree.SubjetCA15subjetfiltered_corr[n];
         pass
     @staticmethod
     def make_array(input):
@@ -605,6 +612,12 @@ class aLeptons:
     @staticmethod
     def make_array(input):
         return [aLeptons(input, i) for i in range(input.naLeptons)]
+class trgObjects_hltPFQuadJetLooseID15:
+    def __init__(self, tree, n):
+        pass
+    @staticmethod
+    def make_array(input):
+        return [trgObjects_hltPFQuadJetLooseID15(input, i) for i in range(input.ntrgObjects_hltPFQuadJetLooseID15)]
 class trgObjects_hltQuadPFCentralJetLooseID45:
     def __init__(self, tree, n):
         pass
@@ -683,24 +696,23 @@ class FatjetAK08ungroomed:
         self.chargedEmEnergyFraction = tree.FatjetAK08ungroomed_chargedEmEnergyFraction[n];
         self.chargedHadronEnergyFraction = tree.FatjetAK08ungroomed_chargedHadronEnergyFraction[n];
         self.chargedMultiplicity = tree.FatjetAK08ungroomed_chargedMultiplicity[n];
+        self.electronMultiplicity = tree.FatjetAK08ungroomed_electronMultiplicity[n];
+        self.muonMultiplicity = tree.FatjetAK08ungroomed_muonMultiplicity[n];
+        self.puppi_pt = tree.FatjetAK08ungroomed_puppi_pt[n];
+        self.puppi_eta = tree.FatjetAK08ungroomed_puppi_eta[n];
+        self.puppi_phi = tree.FatjetAK08ungroomed_puppi_phi[n];
+        self.puppi_mass = tree.FatjetAK08ungroomed_puppi_mass[n];
+        self.puppi_tau1 = tree.FatjetAK08ungroomed_puppi_tau1[n];
+        self.puppi_tau2 = tree.FatjetAK08ungroomed_puppi_tau2[n];
+        self.puppi_msoftdrop = tree.FatjetAK08ungroomed_puppi_msoftdrop[n];
+        self.puppi_msoftdrop_corrL2L3 = tree.FatjetAK08ungroomed_puppi_msoftdrop_corrL2L3[n];
+        self.puppi_msoftdrop_raw = tree.FatjetAK08ungroomed_puppi_msoftdrop_raw[n];
         self.PFLepton_ptrel = tree.FatjetAK08ungroomed_PFLepton_ptrel[n];
-        self.z_ratio = tree.FatjetAK08ungroomed_z_ratio[n];
         self.PFLepton_IP2D = tree.FatjetAK08ungroomed_PFLepton_IP2D[n];
         self.nSL = tree.FatjetAK08ungroomed_nSL[n];
-        self.tau1_trackEtaRel_0 = tree.FatjetAK08ungroomed_tau1_trackEtaRel_0[n];
-        self.tau1_trackEtaRel_1 = tree.FatjetAK08ungroomed_tau1_trackEtaRel_1[n];
-        self.tau1_trackEtaRel_2 = tree.FatjetAK08ungroomed_tau1_trackEtaRel_2[n];
-        self.tau0_trackEtaRel_0 = tree.FatjetAK08ungroomed_tau0_trackEtaRel_0[n];
-        self.tau0_trackEtaRel_1 = tree.FatjetAK08ungroomed_tau0_trackEtaRel_1[n];
-        self.tau0_trackEtaRel_2 = tree.FatjetAK08ungroomed_tau0_trackEtaRel_2[n];
-        self.tau_vertexMass_0 = tree.FatjetAK08ungroomed_tau_vertexMass_0[n];
-        self.tau_vertexEnergyRatio_0 = tree.FatjetAK08ungroomed_tau_vertexEnergyRatio_0[n];
-        self.tau_vertexDeltaR_0 = tree.FatjetAK08ungroomed_tau_vertexDeltaR_0[n];
-        self.tau_flightDistance2dSig_0 = tree.FatjetAK08ungroomed_tau_flightDistance2dSig_0[n];
-        self.tau_vertexMass_1 = tree.FatjetAK08ungroomed_tau_vertexMass_1[n];
-        self.tau_vertexEnergyRatio_1 = tree.FatjetAK08ungroomed_tau_vertexEnergyRatio_1[n];
-        self.tau_flightDistance2dSig_1 = tree.FatjetAK08ungroomed_tau_flightDistance2dSig_1[n];
-        self.nSV = tree.FatjetAK08ungroomed_nSV[n];
+        self.nVtx = tree.FatjetAK08ungroomed_nVtx[n];
+        self.VtxMass_1 = tree.FatjetAK08ungroomed_VtxMass_1[n];
+        self.VtxMass_2 = tree.FatjetAK08ungroomed_VtxMass_2[n];
         pass
     @staticmethod
     def make_array(input):
@@ -897,6 +909,7 @@ class httCandidates:
         self.sjW1masscal = tree.httCandidates_sjW1masscal[n];
         self.sjW1mass = tree.httCandidates_sjW1mass[n];
         self.sjW1btag = tree.httCandidates_sjW1btag[n];
+        self.sjW1corr = tree.httCandidates_sjW1corr[n];
         self.sjW2ptcal = tree.httCandidates_sjW2ptcal[n];
         self.sjW2pt = tree.httCandidates_sjW2pt[n];
         self.sjW2eta = tree.httCandidates_sjW2eta[n];
@@ -904,6 +917,7 @@ class httCandidates:
         self.sjW2masscal = tree.httCandidates_sjW2masscal[n];
         self.sjW2mass = tree.httCandidates_sjW2mass[n];
         self.sjW2btag = tree.httCandidates_sjW2btag[n];
+        self.sjW2corr = tree.httCandidates_sjW2corr[n];
         self.sjNonWptcal = tree.httCandidates_sjNonWptcal[n];
         self.sjNonWpt = tree.httCandidates_sjNonWpt[n];
         self.sjNonWeta = tree.httCandidates_sjNonWeta[n];
@@ -911,6 +925,7 @@ class httCandidates:
         self.sjNonWmasscal = tree.httCandidates_sjNonWmasscal[n];
         self.sjNonWmass = tree.httCandidates_sjNonWmass[n];
         self.sjNonWbtag = tree.httCandidates_sjNonWbtag[n];
+        self.sjNonWcorr = tree.httCandidates_sjNonWcorr[n];
         pass
     @staticmethod
     def make_array(input):
@@ -925,6 +940,7 @@ class Jet:
     def __init__(self, tree, n):
         self.id = tree.Jet_id[n];
         self.puId = tree.Jet_puId[n];
+        self.btagCSV = tree.Jet_btagCSV[n];
         self.btagCMVA = tree.Jet_btagCMVA[n];
         self.rawPt = tree.Jet_rawPt[n];
         self.corr_JECUp = tree.Jet_corr_JECUp[n];
@@ -943,9 +959,16 @@ class Jet:
         self.btagBProb = tree.Jet_btagBProb[n];
         self.btagSoftEl = tree.Jet_btagSoftEl[n];
         self.btagSoftMu = tree.Jet_btagSoftMu[n];
-        self.btagCMVAV2 = tree.Jet_btagCMVAV2[n];
+        self.btagDeepCSVdusg = tree.Jet_btagDeepCSVdusg[n];
+        self.btagDeepCSVb = tree.Jet_btagDeepCSVb[n];
+        self.btagDeepCSVc = tree.Jet_btagDeepCSVc[n];
+        self.btagDeepCSVbb = tree.Jet_btagDeepCSVbb[n];
+        self.btagDeepCMVAdusg = tree.Jet_btagDeepCMVAdusg[n];
+        self.btagDeepCMVAb = tree.Jet_btagDeepCMVAb[n];
+        self.btagDeepCMVAc = tree.Jet_btagDeepCMVAc[n];
+        self.btagDeepCMVAbb = tree.Jet_btagDeepCMVAbb[n];
         self.btagCSVV0 = tree.Jet_btagCSVV0[n];
-        self.btagCMVAV2NoHipMitigation = tree.Jet_btagCMVAV2NoHipMitigation[n];
+        self.btagCMVAV2 = tree.Jet_btagCMVAV2[n];
         self.chHEF = tree.Jet_chHEF[n];
         self.neHEF = tree.Jet_neHEF[n];
         self.chEmEF = tree.Jet_chEmEF[n];
@@ -980,8 +1003,6 @@ class Jet:
         self.mcIdx = tree.Jet_mcIdx[n];
         self.blike_VBF = tree.Jet_blike_VBF[n];
         self.pt_puppi = tree.Jet_pt_puppi[n];
-        self.btagCSV = tree.Jet_btagCSV[n];
-        self.btagNoHipMitigation = tree.Jet_btagNoHipMitigation[n];
         self.pt_reg = tree.Jet_pt_reg[n];
         self.pt_regVBF = tree.Jet_pt_regVBF[n];
         self.pt_reg_corrJECUp = tree.Jet_pt_reg_corrJECUp[n];
@@ -1559,6 +1580,23 @@ class l1ET:
         self.pt = pt #
         self.phi = phi #
         pass
+class softActivityEWK:
+    """
+    
+    """
+    @staticmethod
+    def make_obj(tree):
+        _njets2 = getattr(tree, "softActivityEWK_njets2", None)
+        _njets5 = getattr(tree, "softActivityEWK_njets5", None)
+        _njets10 = getattr(tree, "softActivityEWK_njets10", None)
+        _HT = getattr(tree, "softActivityEWK_HT", None)
+        return softActivityEWK(_njets2, _njets5, _njets10, _HT)
+    def __init__(self, njets2,njets5,njets10,HT):
+        self.njets2 = njets2 #number of jets from soft activity with pt>2Gev
+        self.njets5 = njets5 #number of jets from soft activity with pt>5Gev
+        self.njets10 = njets10 #number of jets from soft activity with pt>10Gev
+        self.HT = HT #sum pt of sa jets
+        pass
 class met_shifted_JetResDown:
     """
     
@@ -1699,211 +1737,228 @@ class EventAnalyzer(Analyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(EventAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
     def process(self, event):
-        event.trgObjects_hltMET70 = trgObjects_hltMET70.make_array(event.input)
-        event.trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet = trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet.make_array(event.input)
-        event.trgObjects_hltBTagPFCSVp11DoubleWithMatching = trgObjects_hltBTagPFCSVp11DoubleWithMatching.make_array(event.input)
-        event.ajidxaddJetsdR08 = ajidxaddJetsdR08.make_array(event.input)
-        event.SubjetCA15softdrop = SubjetCA15softdrop.make_array(event.input)
-        event.trgObjects_hltIsoMu20 = trgObjects_hltIsoMu20.make_array(event.input)
-        event.aJCMVAV2idx = aJCMVAV2idx.make_array(event.input)
-        event.trgObjects_hltQuadCentralJet30 = trgObjects_hltQuadCentralJet30.make_array(event.input)
-        event.l1EGammas = l1EGammas.make_array(event.input)
-        event.hJidx_sortcsv = hJidx_sortcsv.make_array(event.input)
-        event.primaryVertices = primaryVertices.make_array(event.input)
-        event.aJCidx = aJCidx.make_array(event.input)
-        event.SubjetCA15softdropz2b1 = SubjetCA15softdropz2b1.make_array(event.input)
-        event.hJCidx = hJCidx.make_array(event.input)
-        event.l1Taus = l1Taus.make_array(event.input)
-        event.aJidx = aJidx.make_array(event.input)
-        event.trgObjects_hltPFDoubleJetLooseID76 = trgObjects_hltPFDoubleJetLooseID76.make_array(event.input)
-        event.trgObjects_hltBTagPFCSVp016SingleWithMatching = trgObjects_hltBTagPFCSVp016SingleWithMatching.make_array(event.input)
-        event.trgObjects_hltPFQuadJetLooseID15 = trgObjects_hltPFQuadJetLooseID15.make_array(event.input)
-        event.softActivityVHJets = softActivityVHJets.make_array(event.input)
-        event.trgObjects_hltQuadPFCentralJetLooseID30 = trgObjects_hltQuadPFCentralJetLooseID30.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp087Triple = trgObjects_hltBTagCaloCSVp087Triple.make_array(event.input)
-        event.trgObjects_hltEle25eta2p1WPLoose = trgObjects_hltEle25eta2p1WPLoose.make_array(event.input)
-        event.SubjetAK08softdrop = SubjetAK08softdrop.make_array(event.input)
-        event.trgObjects_caloJets = trgObjects_caloJets.make_array(event.input)
-        event.hJCMVAV2idx = hJCMVAV2idx.make_array(event.input)
-        event.trgObjects_hltPFSingleJetLooseID92 = trgObjects_hltPFSingleJetLooseID92.make_array(event.input)
-        event.trgObjects_hltDoubleCentralJet90 = trgObjects_hltDoubleCentralJet90.make_array(event.input)
-        event.trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60 = trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60.make_array(event.input)
-        event.trgObjects_hltEle25WPTight = trgObjects_hltEle25WPTight.make_array(event.input)
-        event.SubjetCA15subjetfiltered = SubjetCA15subjetfiltered.make_array(event.input)
-        event.vLeptons = vLeptons.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp014DoubleWithMatching = trgObjects_hltBTagCaloCSVp014DoubleWithMatching.make_array(event.input)
-        event.trgObjects_pfJets = trgObjects_pfJets.make_array(event.input)
-        event.trgObjects_pfMht = trgObjects_pfMht.make_array(event.input)
-        event.trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT = trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT.make_array(event.input)
-        event.FatjetCA15pruned = FatjetCA15pruned.make_array(event.input)
-        event.trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5 = trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5.make_array(event.input)
-        event.trgObjects_caloMht = trgObjects_caloMht.make_array(event.input)
-        event.FatjetCA15softdropz2b1filt = FatjetCA15softdropz2b1filt.make_array(event.input)
-        event.trgObjects_hltDoublePFCentralJetLooseID90 = trgObjects_hltDoublePFCentralJetLooseID90.make_array(event.input)
-        event.trgObjects_hltDoublePFJetsC100 = trgObjects_hltDoublePFJetsC100.make_array(event.input)
-        event.SubjetCA15pruned = SubjetCA15pruned.make_array(event.input)
-        event.trgObjects_caloMet = trgObjects_caloMet.make_array(event.input)
-        event.FatjetCA15ungroomed = FatjetCA15ungroomed.make_array(event.input)
-        event.trgObjects_pfMet = trgObjects_pfMet.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp067Single = trgObjects_hltBTagCaloCSVp067Single.make_array(event.input)
-        event.dRaddJetsdR08 = dRaddJetsdR08.make_array(event.input)
-        event.l1Jets = l1Jets.make_array(event.input)
-        event.SubjetCA15softdropz2b1filt = SubjetCA15softdropz2b1filt.make_array(event.input)
-        event.trgObjects_hltDoubleJet65 = trgObjects_hltDoubleJet65.make_array(event.input)
-        event.FatjetCA15trimmed = FatjetCA15trimmed.make_array(event.input)
-        event.SubjetCA15softdropfilt = SubjetCA15softdropfilt.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp026DoubleWithMatching = trgObjects_hltBTagCaloCSVp026DoubleWithMatching.make_array(event.input)
-        event.aLeptons = aLeptons.make_array(event.input)
-        event.trgObjects_hltQuadPFCentralJetLooseID45 = trgObjects_hltQuadPFCentralJetLooseID45.make_array(event.input)
-        event.trgObjects_pfHt = trgObjects_pfHt.make_array(event.input)
-        event.trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2 = trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2.make_array(event.input)
-        event.hjidxaddJetsdR08 = hjidxaddJetsdR08.make_array(event.input)
-        event.FatjetCA15softdropfilt = FatjetCA15softdropfilt.make_array(event.input)
-        event.l1Muons = l1Muons.make_array(event.input)
-        event.trgObjects_hltMHTNoPU90 = trgObjects_hltMHTNoPU90.make_array(event.input)
         event.FatjetAK08ungroomed = FatjetAK08ungroomed.make_array(event.input)
-        event.trgObjects_hltPFMHTTightID90 = trgObjects_hltPFMHTTightID90.make_array(event.input)
-        event.trgObjects_hltQuadCentralJet45 = trgObjects_hltQuadCentralJet45.make_array(event.input)
-        event.trgObjects_hltBTagCaloCSVp022Single = trgObjects_hltBTagCaloCSVp022Single.make_array(event.input)
-        event.selLeptons = selLeptons.make_array(event.input)
-        event.trgObjects_hltPFMET90 = trgObjects_hltPFMET90.make_array(event.input)
-        event.trgObjects_hltQuadJet15 = trgObjects_hltQuadJet15.make_array(event.input)
-        event.TauGood = TauGood.make_array(event.input)
-        event.hJidx = hJidx.make_array(event.input)
-        event.FatjetCA15softdropz2b1 = FatjetCA15softdropz2b1.make_array(event.input)
-        event.trgObjects_hltTripleJet50 = trgObjects_hltTripleJet50.make_array(event.input)
-        event.trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1 = trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1.make_array(event.input)
-        event.httCandidates = httCandidates.make_array(event.input)
-        event.trgObjects_hltMHT70 = trgObjects_hltMHT70.make_array(event.input)
-        event.Jet = Jet.make_array(event.input)
+        event.FatjetCA15pruned = FatjetCA15pruned.make_array(event.input)
         event.FatjetCA15softdrop = FatjetCA15softdrop.make_array(event.input)
-        event.trgObjects_hltPFTripleJetLooseID64 = trgObjects_hltPFTripleJetLooseID64.make_array(event.input)
-        event.trgObjects_caloMhtNoPU = trgObjects_caloMhtNoPU.make_array(event.input)
-        event.softActivityJets = softActivityJets.make_array(event.input)
+        event.FatjetCA15softdropfilt = FatjetCA15softdropfilt.make_array(event.input)
+        event.FatjetCA15softdropz2b1 = FatjetCA15softdropz2b1.make_array(event.input)
+        event.FatjetCA15softdropz2b1filt = FatjetCA15softdropz2b1filt.make_array(event.input)
         event.FatjetCA15subjetfiltered = FatjetCA15subjetfiltered.make_array(event.input)
-        event.trgObjects_hltSingleJet80 = trgObjects_hltSingleJet80.make_array(event.input)
-        event.l1MHT = l1MHT.make_obj(event.input)
-        event.HCMVAV2_reg_corrJECDown = HCMVAV2_reg_corrJECDown.make_obj(event.input)
-        event.HCMVAV2_reg_corrJERDown = HCMVAV2_reg_corrJERDown.make_obj(event.input)
-        event.l1MET = l1MET.make_obj(event.input)
-        event.V = V.make_obj(event.input)
-        event.H_reg = H_reg.make_obj(event.input)
-        event.HCSV_reg_corrJERDown = HCSV_reg_corrJERDown.make_obj(event.input)
-        event.HCSV = HCSV.make_obj(event.input)
-        event.l1HT = l1HT.make_obj(event.input)
-        event.fakeMET = fakeMET.make_obj(event.input)
-        event.HCSV_reg_corrJERUp = HCSV_reg_corrJERUp.make_obj(event.input)
-        event.HCMVAV2_reg_corrJERUp = HCMVAV2_reg_corrJERUp.make_obj(event.input)
-        event.HCSV_reg_corrJECUp = HCSV_reg_corrJECUp.make_obj(event.input)
-        event.met_shifted_UnclusteredEnUp = met_shifted_UnclusteredEnUp.make_obj(event.input)
-        event.met_shifted_UnclusteredEnDown = met_shifted_UnclusteredEnDown.make_obj(event.input)
-        event.HCSV_reg = HCSV_reg.make_obj(event.input)
-        event.H_reg_corrJERUp = H_reg_corrJERUp.make_obj(event.input)
-        event.H_reg_corrJECUp = H_reg_corrJECUp.make_obj(event.input)
-        event.HCMVAV2_reg = HCMVAV2_reg.make_obj(event.input)
+        event.FatjetCA15trimmed = FatjetCA15trimmed.make_array(event.input)
+        event.FatjetCA15ungroomed = FatjetCA15ungroomed.make_array(event.input)
         event.H = H.make_obj(event.input)
-        event.softActivityVH = softActivityVH.make_obj(event.input)
-        event.met_shifted_JetResUp = met_shifted_JetResUp.make_obj(event.input)
-        event.met = met.make_obj(event.input)
-        event.met_shifted_JetEnUp = met_shifted_JetEnUp.make_obj(event.input)
-        event.met_shifted_JetEnDown = met_shifted_JetEnDown.make_obj(event.input)
-        event.met_shifted_MuonEnUp = met_shifted_MuonEnUp.make_obj(event.input)
-        event.met_shifted_MuonEnDown = met_shifted_MuonEnDown.make_obj(event.input)
-        event.met_shifted_ElectronEnUp = met_shifted_ElectronEnUp.make_obj(event.input)
-        event.met_shifted_ElectronEnDown = met_shifted_ElectronEnDown.make_obj(event.input)
-        event.met_shifted_TauEnUp = met_shifted_TauEnUp.make_obj(event.input)
-        event.met_shifted_TauEnDown = met_shifted_TauEnDown.make_obj(event.input)
-        event.l1ET = l1ET.make_obj(event.input)
-        event.met_shifted_JetResDown = met_shifted_JetResDown.make_obj(event.input)
-        event.HaddJetsdR08 = HaddJetsdR08.make_obj(event.input)
-        event.H_reg_corrJERDown = H_reg_corrJERDown.make_obj(event.input)
-        event.HCMVAV2_reg_corrJECUp = HCMVAV2_reg_corrJECUp.make_obj(event.input)
-        event.softActivity = softActivity.make_obj(event.input)
-        event.HCSV_reg_corrJECDown = HCSV_reg_corrJECDown.make_obj(event.input)
         event.HCMVAV2 = HCMVAV2.make_obj(event.input)
+        event.HCMVAV2_reg = HCMVAV2_reg.make_obj(event.input)
+        event.HCMVAV2_reg_corrJECDown = HCMVAV2_reg_corrJECDown.make_obj(event.input)
+        event.HCMVAV2_reg_corrJECUp = HCMVAV2_reg_corrJECUp.make_obj(event.input)
+        event.HCMVAV2_reg_corrJERDown = HCMVAV2_reg_corrJERDown.make_obj(event.input)
+        event.HCMVAV2_reg_corrJERUp = HCMVAV2_reg_corrJERUp.make_obj(event.input)
+        event.HCSV = HCSV.make_obj(event.input)
+        event.HCSV_reg = HCSV_reg.make_obj(event.input)
+        event.HCSV_reg_corrJECDown = HCSV_reg_corrJECDown.make_obj(event.input)
+        event.HCSV_reg_corrJECUp = HCSV_reg_corrJECUp.make_obj(event.input)
+        event.HCSV_reg_corrJERDown = HCSV_reg_corrJERDown.make_obj(event.input)
+        event.HCSV_reg_corrJERUp = HCSV_reg_corrJERUp.make_obj(event.input)
+        event.HVdPhi = getattr(event.input, "HVdPhi", None)
+        event.H_reg = H_reg.make_obj(event.input)
         event.H_reg_corrJECDown = H_reg_corrJECDown.make_obj(event.input)
-        event.puWeightUp = getattr(event.input, "puWeightUp", None)
-        event.puWeightDown = getattr(event.input, "puWeightDown", None)
-        event.json = getattr(event.input, "json", None)
-        event.json_silver = getattr(event.input, "json_silver", None)
-        event.nPU0 = getattr(event.input, "nPU0", None)
-        event.nPVs = getattr(event.input, "nPVs", None)
+        event.H_reg_corrJECUp = H_reg_corrJECUp.make_obj(event.input)
+        event.H_reg_corrJERDown = H_reg_corrJERDown.make_obj(event.input)
+        event.H_reg_corrJERUp = H_reg_corrJERUp.make_obj(event.input)
+        event.HaddJetsdR08 = HaddJetsdR08.make_obj(event.input)
+        event.Jet = Jet.make_array(event.input)
+        event.SubjetAK08softdrop = SubjetAK08softdrop.make_array(event.input)
+        event.SubjetCA15pruned = SubjetCA15pruned.make_array(event.input)
+        event.SubjetCA15softdrop = SubjetCA15softdrop.make_array(event.input)
+        event.SubjetCA15softdropfilt = SubjetCA15softdropfilt.make_array(event.input)
+        event.SubjetCA15softdropz2b1 = SubjetCA15softdropz2b1.make_array(event.input)
+        event.SubjetCA15softdropz2b1filt = SubjetCA15softdropz2b1filt.make_array(event.input)
+        event.SubjetCA15subjetfiltered = SubjetCA15subjetfiltered.make_array(event.input)
+        event.TauGood = TauGood.make_array(event.input)
+        event.V = V.make_obj(event.input)
+        event.VMt = getattr(event.input, "VMt", None)
         event.Vtype = getattr(event.input, "Vtype", None)
         event.VtypeSim = getattr(event.input, "VtypeSim", None)
-        event.VMt = getattr(event.input, "VMt", None)
-        event.HVdPhi = getattr(event.input, "HVdPhi", None)
-        event.fakeMET_sumet = getattr(event.input, "fakeMET_sumet", None)
+        event.ZllKinFit_corrJECDown_mass = getattr(event.input, "ZllKinFit_corrJECDown_mass", None)
+        event.ZllKinFit_corrJECDown_njet = getattr(event.input, "ZllKinFit_corrJECDown_njet", None)
+        event.ZllKinFit_corrJECDown_status = getattr(event.input, "ZllKinFit_corrJECDown_status", None)
+        event.ZllKinFit_corrJECUp_mass = getattr(event.input, "ZllKinFit_corrJECUp_mass", None)
+        event.ZllKinFit_corrJECUp_njet = getattr(event.input, "ZllKinFit_corrJECUp_njet", None)
+        event.ZllKinFit_corrJECUp_status = getattr(event.input, "ZllKinFit_corrJECUp_status", None)
+        event.ZllKinFit_corrJERDown_mass = getattr(event.input, "ZllKinFit_corrJERDown_mass", None)
+        event.ZllKinFit_corrJERDown_njet = getattr(event.input, "ZllKinFit_corrJERDown_njet", None)
+        event.ZllKinFit_corrJERDown_status = getattr(event.input, "ZllKinFit_corrJERDown_status", None)
+        event.ZllKinFit_corrJERUp_mass = getattr(event.input, "ZllKinFit_corrJERUp_mass", None)
+        event.ZllKinFit_corrJERUp_njet = getattr(event.input, "ZllKinFit_corrJERUp_njet", None)
+        event.ZllKinFit_corrJERUp_status = getattr(event.input, "ZllKinFit_corrJERUp_status", None)
+        event.ZllKinFit_mass = getattr(event.input, "ZllKinFit_mass", None)
+        event.ZllKinFit_njet = getattr(event.input, "ZllKinFit_njet", None)
+        event.ZllKinFit_status = getattr(event.input, "ZllKinFit_status", None)
+        event.aJCMVAV2idx = aJCMVAV2idx.make_array(event.input)
+        event.aJCidx = aJCidx.make_array(event.input)
+        event.aJidx = aJidx.make_array(event.input)
+        event.aLeptons = aLeptons.make_array(event.input)
+        event.ajidxaddJetsdR08 = ajidxaddJetsdR08.make_array(event.input)
+        event.btagWeightCMVAV2 = getattr(event.input, "btagWeightCMVAV2", None)
+        event.btagWeightCMVAV2_down_cferr1 = getattr(event.input, "btagWeightCMVAV2_down_cferr1", None)
+        event.btagWeightCMVAV2_down_cferr2 = getattr(event.input, "btagWeightCMVAV2_down_cferr2", None)
+        event.btagWeightCMVAV2_down_hf = getattr(event.input, "btagWeightCMVAV2_down_hf", None)
+        event.btagWeightCMVAV2_down_hfstats1 = getattr(event.input, "btagWeightCMVAV2_down_hfstats1", None)
+        event.btagWeightCMVAV2_down_hfstats2 = getattr(event.input, "btagWeightCMVAV2_down_hfstats2", None)
+        event.btagWeightCMVAV2_down_jes = getattr(event.input, "btagWeightCMVAV2_down_jes", None)
+        event.btagWeightCMVAV2_down_lf = getattr(event.input, "btagWeightCMVAV2_down_lf", None)
+        event.btagWeightCMVAV2_down_lfstats1 = getattr(event.input, "btagWeightCMVAV2_down_lfstats1", None)
+        event.btagWeightCMVAV2_down_lfstats2 = getattr(event.input, "btagWeightCMVAV2_down_lfstats2", None)
+        event.btagWeightCMVAV2_up_cferr1 = getattr(event.input, "btagWeightCMVAV2_up_cferr1", None)
+        event.btagWeightCMVAV2_up_cferr2 = getattr(event.input, "btagWeightCMVAV2_up_cferr2", None)
+        event.btagWeightCMVAV2_up_hf = getattr(event.input, "btagWeightCMVAV2_up_hf", None)
+        event.btagWeightCMVAV2_up_hfstats1 = getattr(event.input, "btagWeightCMVAV2_up_hfstats1", None)
+        event.btagWeightCMVAV2_up_hfstats2 = getattr(event.input, "btagWeightCMVAV2_up_hfstats2", None)
+        event.btagWeightCMVAV2_up_jes = getattr(event.input, "btagWeightCMVAV2_up_jes", None)
+        event.btagWeightCMVAV2_up_lf = getattr(event.input, "btagWeightCMVAV2_up_lf", None)
+        event.btagWeightCMVAV2_up_lfstats1 = getattr(event.input, "btagWeightCMVAV2_up_lfstats1", None)
+        event.btagWeightCMVAV2_up_lfstats2 = getattr(event.input, "btagWeightCMVAV2_up_lfstats2", None)
+        event.btagWeightCSV = getattr(event.input, "btagWeightCSV", None)
+        event.btagWeightCSV_down_cferr1 = getattr(event.input, "btagWeightCSV_down_cferr1", None)
+        event.btagWeightCSV_down_cferr2 = getattr(event.input, "btagWeightCSV_down_cferr2", None)
+        event.btagWeightCSV_down_hf = getattr(event.input, "btagWeightCSV_down_hf", None)
+        event.btagWeightCSV_down_hfstats1 = getattr(event.input, "btagWeightCSV_down_hfstats1", None)
+        event.btagWeightCSV_down_hfstats2 = getattr(event.input, "btagWeightCSV_down_hfstats2", None)
+        event.btagWeightCSV_down_jes = getattr(event.input, "btagWeightCSV_down_jes", None)
+        event.btagWeightCSV_down_lf = getattr(event.input, "btagWeightCSV_down_lf", None)
+        event.btagWeightCSV_down_lfstats1 = getattr(event.input, "btagWeightCSV_down_lfstats1", None)
+        event.btagWeightCSV_down_lfstats2 = getattr(event.input, "btagWeightCSV_down_lfstats2", None)
+        event.btagWeightCSV_up_cferr1 = getattr(event.input, "btagWeightCSV_up_cferr1", None)
+        event.btagWeightCSV_up_cferr2 = getattr(event.input, "btagWeightCSV_up_cferr2", None)
+        event.btagWeightCSV_up_hf = getattr(event.input, "btagWeightCSV_up_hf", None)
+        event.btagWeightCSV_up_hfstats1 = getattr(event.input, "btagWeightCSV_up_hfstats1", None)
+        event.btagWeightCSV_up_hfstats2 = getattr(event.input, "btagWeightCSV_up_hfstats2", None)
+        event.btagWeightCSV_up_jes = getattr(event.input, "btagWeightCSV_up_jes", None)
+        event.btagWeightCSV_up_lf = getattr(event.input, "btagWeightCSV_up_lf", None)
+        event.btagWeightCSV_up_lfstats1 = getattr(event.input, "btagWeightCSV_up_lfstats1", None)
+        event.btagWeightCSV_up_lfstats2 = getattr(event.input, "btagWeightCSV_up_lfstats2", None)
         event.bx = getattr(event.input, "bx", None)
-        event.caloMetPt = getattr(event.input, "caloMetPt", None)
         event.caloMetPhi = getattr(event.input, "caloMetPhi", None)
-        event.rho = getattr(event.input, "rho", None)
-        event.rhoN = getattr(event.input, "rhoN", None)
-        event.rhoCHPU = getattr(event.input, "rhoCHPU", None)
-        event.rhoCentral = getattr(event.input, "rhoCentral", None)
+        event.caloMetPt = getattr(event.input, "caloMetPt", None)
+        event.dRaddJetsdR08 = dRaddJetsdR08.make_array(event.input)
         event.deltaR_jj = getattr(event.input, "deltaR_jj", None)
-        event.lheNj = getattr(event.input, "lheNj", None)
+        event.fakeMET = fakeMET.make_obj(event.input)
+        event.fakeMET_sumet = getattr(event.input, "fakeMET_sumet", None)
+        event.genHiggsDecayMode = getattr(event.input, "genHiggsDecayMode", None)
+        event.genTTHtoTauTauDecayMode = getattr(event.input, "genTTHtoTauTauDecayMode", None)
+        event.hJCMVAV2idx = hJCMVAV2idx.make_array(event.input)
+        event.hJCidx = hJCidx.make_array(event.input)
+        event.hJidx = hJidx.make_array(event.input)
+        event.hJidx_sortcsv = hJidx_sortcsv.make_array(event.input)
+        event.heavyFlavourCategory = getattr(event.input, "heavyFlavourCategory", None)
+        event.hjidxaddJetsdR08 = hjidxaddJetsdR08.make_array(event.input)
+        event.htJet30 = getattr(event.input, "htJet30", None)
+        event.httCandidates = httCandidates.make_array(event.input)
+        event.isrJetVH = getattr(event.input, "isrJetVH", None)
+        event.json = getattr(event.input, "json", None)
+        event.json_silver = getattr(event.input, "json_silver", None)
+        event.l1EGammas = l1EGammas.make_array(event.input)
+        event.l1ET = l1ET.make_obj(event.input)
+        event.l1HT = l1HT.make_obj(event.input)
+        event.l1Jets = l1Jets.make_array(event.input)
+        event.l1MET = l1MET.make_obj(event.input)
+        event.l1MHT = l1MHT.make_obj(event.input)
+        event.l1Muons = l1Muons.make_array(event.input)
+        event.l1Taus = l1Taus.make_array(event.input)
+        event.lheHT = getattr(event.input, "lheHT", None)
         event.lheNb = getattr(event.input, "lheNb", None)
         event.lheNc = getattr(event.input, "lheNc", None)
         event.lheNg = getattr(event.input, "lheNg", None)
+        event.lheNj = getattr(event.input, "lheNj", None)
         event.lheNl = getattr(event.input, "lheNl", None)
         event.lheV_pt = getattr(event.input, "lheV_pt", None)
-        event.lheHT = getattr(event.input, "lheHT", None)
-        event.genTTHtoTauTauDecayMode = getattr(event.input, "genTTHtoTauTauDecayMode", None)
-        event.ttCls = getattr(event.input, "ttCls", None)
-        event.heavyFlavourCategory = getattr(event.input, "heavyFlavourCategory", None)
-        event.mhtJet30 = getattr(event.input, "mhtJet30", None)
-        event.mhtPhiJet30 = getattr(event.input, "mhtPhiJet30", None)
-        event.htJet30 = getattr(event.input, "htJet30", None)
-        event.met_sig = getattr(event.input, "met_sig", None)
+        event.met = met.make_obj(event.input)
+        event.metPuppi_phi = getattr(event.input, "metPuppi_phi", None)
+        event.metPuppi_pt = getattr(event.input, "metPuppi_pt", None)
+        event.metPuppi_rawpt = getattr(event.input, "metPuppi_rawpt", None)
+        event.metType1p2_pt = getattr(event.input, "metType1p2_pt", None)
         event.met_covXX = getattr(event.input, "met_covXX", None)
         event.met_covXY = getattr(event.input, "met_covXY", None)
         event.met_covYY = getattr(event.input, "met_covYY", None)
         event.met_rawpt = getattr(event.input, "met_rawpt", None)
-        event.metPuppi_pt = getattr(event.input, "metPuppi_pt", None)
-        event.metPuppi_phi = getattr(event.input, "metPuppi_phi", None)
-        event.metPuppi_rawpt = getattr(event.input, "metPuppi_rawpt", None)
-        event.metType1p2_pt = getattr(event.input, "metType1p2_pt", None)
-        event.tkMet_pt = getattr(event.input, "tkMet_pt", None)
-        event.tkMet_phi = getattr(event.input, "tkMet_phi", None)
-        event.isrJetVH = getattr(event.input, "isrJetVH", None)
+        event.met_shifted_ElectronEnDown = met_shifted_ElectronEnDown.make_obj(event.input)
+        event.met_shifted_ElectronEnUp = met_shifted_ElectronEnUp.make_obj(event.input)
+        event.met_shifted_JetEnDown = met_shifted_JetEnDown.make_obj(event.input)
+        event.met_shifted_JetEnUp = met_shifted_JetEnUp.make_obj(event.input)
+        event.met_shifted_JetResDown = met_shifted_JetResDown.make_obj(event.input)
+        event.met_shifted_JetResUp = met_shifted_JetResUp.make_obj(event.input)
+        event.met_shifted_MuonEnDown = met_shifted_MuonEnDown.make_obj(event.input)
+        event.met_shifted_MuonEnUp = met_shifted_MuonEnUp.make_obj(event.input)
+        event.met_shifted_TauEnDown = met_shifted_TauEnDown.make_obj(event.input)
+        event.met_shifted_TauEnUp = met_shifted_TauEnUp.make_obj(event.input)
+        event.met_shifted_UnclusteredEnDown = met_shifted_UnclusteredEnDown.make_obj(event.input)
+        event.met_shifted_UnclusteredEnUp = met_shifted_UnclusteredEnUp.make_obj(event.input)
+        event.met_sig = getattr(event.input, "met_sig", None)
+        event.mhtJet30 = getattr(event.input, "mhtJet30", None)
+        event.mhtPhiJet30 = getattr(event.input, "mhtPhiJet30", None)
+        event.nPU0 = getattr(event.input, "nPU0", None)
+        event.nPVs = getattr(event.input, "nPVs", None)
+        event.primaryVertices = primaryVertices.make_array(event.input)
+        event.puWeightDown = getattr(event.input, "puWeightDown", None)
+        event.puWeightUp = getattr(event.input, "puWeightUp", None)
+        event.rho = getattr(event.input, "rho", None)
+        event.rhoCHPU = getattr(event.input, "rhoCHPU", None)
+        event.rhoCentral = getattr(event.input, "rhoCentral", None)
+        event.rhoN = getattr(event.input, "rhoN", None)
+        event.selLeptons = selLeptons.make_array(event.input)
         event.simPrimaryVertex_z = getattr(event.input, "simPrimaryVertex_z", None)
-        event.genHiggsDecayMode = getattr(event.input, "genHiggsDecayMode", None)
+        event.softActivity = softActivity.make_obj(event.input)
+        event.softActivityEWK = softActivityEWK.make_obj(event.input)
+        event.softActivityEWKJets = softActivityEWKJets.make_array(event.input)
+        event.softActivityJets = softActivityJets.make_array(event.input)
+        event.softActivityVH = softActivityVH.make_obj(event.input)
+        event.softActivityVHJets = softActivityVHJets.make_array(event.input)
+        event.tkMet_phi = getattr(event.input, "tkMet_phi", None)
+        event.tkMet_pt = getattr(event.input, "tkMet_pt", None)
+        event.trgObjects_caloJets = trgObjects_caloJets.make_array(event.input)
+        event.trgObjects_caloMet = trgObjects_caloMet.make_array(event.input)
+        event.trgObjects_caloMht = trgObjects_caloMht.make_array(event.input)
+        event.trgObjects_caloMhtNoPU = trgObjects_caloMhtNoPU.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp014DoubleWithMatching = trgObjects_hltBTagCaloCSVp014DoubleWithMatching.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp022Single = trgObjects_hltBTagCaloCSVp022Single.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp026DoubleWithMatching = trgObjects_hltBTagCaloCSVp026DoubleWithMatching.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp067Single = trgObjects_hltBTagCaloCSVp067Single.make_array(event.input)
+        event.trgObjects_hltBTagCaloCSVp087Triple = trgObjects_hltBTagCaloCSVp087Triple.make_array(event.input)
+        event.trgObjects_hltBTagPFCSVp016SingleWithMatching = trgObjects_hltBTagPFCSVp016SingleWithMatching.make_array(event.input)
+        event.trgObjects_hltBTagPFCSVp11DoubleWithMatching = trgObjects_hltBTagPFCSVp11DoubleWithMatching.make_array(event.input)
+        event.trgObjects_hltDoubleCentralJet90 = trgObjects_hltDoubleCentralJet90.make_array(event.input)
+        event.trgObjects_hltDoubleJet65 = trgObjects_hltDoubleJet65.make_array(event.input)
+        event.trgObjects_hltDoublePFCentralJetLooseID90 = trgObjects_hltDoublePFCentralJetLooseID90.make_array(event.input)
+        event.trgObjects_hltDoublePFJetsC100 = trgObjects_hltDoublePFJetsC100.make_array(event.input)
+        event.trgObjects_hltEle25WPTight = trgObjects_hltEle25WPTight.make_array(event.input)
+        event.trgObjects_hltEle25eta2p1WPLoose = trgObjects_hltEle25eta2p1WPLoose.make_array(event.input)
+        event.trgObjects_hltIsoMu20 = trgObjects_hltIsoMu20.make_array(event.input)
+        event.trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60 = trgObjects_hltL1sETM50ToETM100IorETM60Jet60dPhiMin0p4IorDoubleJetC60ETM60.make_array(event.input)
+        event.trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT = trgObjects_hltL1sQuadJetCIorTripleJetVBFIorHTT.make_array(event.input)
+        event.trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet = trgObjects_hltL1sTripleJetVBFIorHTTIorDoubleJetCIorSingleJet.make_array(event.input)
+        event.trgObjects_hltMET70 = trgObjects_hltMET70.make_array(event.input)
+        event.trgObjects_hltMHT70 = trgObjects_hltMHT70.make_array(event.input)
+        event.trgObjects_hltMHTNoPU90 = trgObjects_hltMHTNoPU90.make_array(event.input)
+        event.trgObjects_hltPFDoubleJetLooseID76 = trgObjects_hltPFDoubleJetLooseID76.make_array(event.input)
+        event.trgObjects_hltPFMET90 = trgObjects_hltPFMET90.make_array(event.input)
+        event.trgObjects_hltPFMHTTightID90 = trgObjects_hltPFMHTTightID90.make_array(event.input)
+        event.trgObjects_hltPFQuadJetLooseID15 = trgObjects_hltPFQuadJetLooseID15.make_array(event.input)
+        event.trgObjects_hltPFSingleJetLooseID92 = trgObjects_hltPFSingleJetLooseID92.make_array(event.input)
+        event.trgObjects_hltPFTripleJetLooseID64 = trgObjects_hltPFTripleJetLooseID64.make_array(event.input)
+        event.trgObjects_hltQuadCentralJet30 = trgObjects_hltQuadCentralJet30.make_array(event.input)
+        event.trgObjects_hltQuadCentralJet45 = trgObjects_hltQuadCentralJet45.make_array(event.input)
+        event.trgObjects_hltQuadJet15 = trgObjects_hltQuadJet15.make_array(event.input)
+        event.trgObjects_hltQuadPFCentralJetLooseID30 = trgObjects_hltQuadPFCentralJetLooseID30.make_array(event.input)
+        event.trgObjects_hltQuadPFCentralJetLooseID45 = trgObjects_hltQuadPFCentralJetLooseID45.make_array(event.input)
+        event.trgObjects_hltSingleJet80 = trgObjects_hltSingleJet80.make_array(event.input)
+        event.trgObjects_hltTripleJet50 = trgObjects_hltTripleJet50.make_array(event.input)
+        event.trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5 = trgObjects_hltVBFCaloJetEtaSortedMqq150Deta1p5.make_array(event.input)
+        event.trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2 = trgObjects_hltVBFPFJetCSVSortedMqq200Detaqq1p2.make_array(event.input)
+        event.trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1 = trgObjects_hltVBFPFJetCSVSortedMqq460Detaqq4p1.make_array(event.input)
+        event.trgObjects_pfHt = trgObjects_pfHt.make_array(event.input)
+        event.trgObjects_pfJets = trgObjects_pfJets.make_array(event.input)
+        event.trgObjects_pfMet = trgObjects_pfMet.make_array(event.input)
+        event.trgObjects_pfMht = trgObjects_pfMht.make_array(event.input)
         event.triggerEmulationWeight = getattr(event.input, "triggerEmulationWeight", None)
-        event.btagWeightCSV_down_cferr1 = getattr(event.input, "btagWeightCSV_down_cferr1", None)
-        event.btagWeightCMVAV2_down_hfstats1 = getattr(event.input, "btagWeightCMVAV2_down_hfstats1", None)
-        event.btagWeightCMVAV2_down_hfstats2 = getattr(event.input, "btagWeightCMVAV2_down_hfstats2", None)
-        event.btagWeightCSV_down_cferr2 = getattr(event.input, "btagWeightCSV_down_cferr2", None)
-        event.btagWeightCSV_down_jes = getattr(event.input, "btagWeightCSV_down_jes", None)
-        event.btagWeightCSV_down_lf = getattr(event.input, "btagWeightCSV_down_lf", None)
-        event.btagWeightCSV_up_lf = getattr(event.input, "btagWeightCSV_up_lf", None)
-        event.btagWeightCSV_down_lfstats2 = getattr(event.input, "btagWeightCSV_down_lfstats2", None)
-        event.btagWeightCSV_down_lfstats1 = getattr(event.input, "btagWeightCSV_down_lfstats1", None)
-        event.btagWeightCSV_down_hf = getattr(event.input, "btagWeightCSV_down_hf", None)
-        event.btagWeightCSV_up_lfstats1 = getattr(event.input, "btagWeightCSV_up_lfstats1", None)
-        event.btagWeightCMVAV2_down_lf = getattr(event.input, "btagWeightCMVAV2_down_lf", None)
-        event.btagWeightCSV_up_lfstats2 = getattr(event.input, "btagWeightCSV_up_lfstats2", None)
-        event.btagWeightCSV = getattr(event.input, "btagWeightCSV", None)
-        event.btagWeightCSV_up_cferr2 = getattr(event.input, "btagWeightCSV_up_cferr2", None)
-        event.btagWeightCSV_up_cferr1 = getattr(event.input, "btagWeightCSV_up_cferr1", None)
-        event.btagWeightCSV_up_hf = getattr(event.input, "btagWeightCSV_up_hf", None)
-        event.btagWeightCMVAV2_down_hf = getattr(event.input, "btagWeightCMVAV2_down_hf", None)
-        event.btagWeightCMVAV2_up_lfstats2 = getattr(event.input, "btagWeightCMVAV2_up_lfstats2", None)
-        event.btagWeightCMVAV2_up_hfstats2 = getattr(event.input, "btagWeightCMVAV2_up_hfstats2", None)
-        event.btagWeightCMVAV2_up_hfstats1 = getattr(event.input, "btagWeightCMVAV2_up_hfstats1", None)
-        event.btagWeightCMVAV2 = getattr(event.input, "btagWeightCMVAV2", None)
-        event.btagWeightCMVAV2_up_lfstats1 = getattr(event.input, "btagWeightCMVAV2_up_lfstats1", None)
-        event.btagWeightCMVAV2_down_cferr2 = getattr(event.input, "btagWeightCMVAV2_down_cferr2", None)
-        event.btagWeightCMVAV2_up_hf = getattr(event.input, "btagWeightCMVAV2_up_hf", None)
-        event.btagWeightCMVAV2_down_cferr1 = getattr(event.input, "btagWeightCMVAV2_down_cferr1", None)
-        event.btagWeightCSV_up_jes = getattr(event.input, "btagWeightCSV_up_jes", None)
-        event.btagWeightCMVAV2_up_jes = getattr(event.input, "btagWeightCMVAV2_up_jes", None)
-        event.btagWeightCMVAV2_up_lf = getattr(event.input, "btagWeightCMVAV2_up_lf", None)
-        event.btagWeightCSV_down_hfstats2 = getattr(event.input, "btagWeightCSV_down_hfstats2", None)
-        event.btagWeightCSV_down_hfstats1 = getattr(event.input, "btagWeightCSV_down_hfstats1", None)
-        event.btagWeightCMVAV2_up_cferr1 = getattr(event.input, "btagWeightCMVAV2_up_cferr1", None)
-        event.btagWeightCMVAV2_up_cferr2 = getattr(event.input, "btagWeightCMVAV2_up_cferr2", None)
-        event.btagWeightCMVAV2_down_lfstats1 = getattr(event.input, "btagWeightCMVAV2_down_lfstats1", None)
-        event.btagWeightCMVAV2_down_lfstats2 = getattr(event.input, "btagWeightCMVAV2_down_lfstats2", None)
-        event.btagWeightCSV_up_hfstats1 = getattr(event.input, "btagWeightCSV_up_hfstats1", None)
-        event.btagWeightCMVAV2_down_jes = getattr(event.input, "btagWeightCMVAV2_down_jes", None)
-        event.btagWeightCSV_up_hfstats2 = getattr(event.input, "btagWeightCSV_up_hfstats2", None)
+        event.ttCls = getattr(event.input, "ttCls", None)
+        event.vLeptons = vLeptons.make_array(event.input)

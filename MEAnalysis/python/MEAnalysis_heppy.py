@@ -241,6 +241,7 @@ output_service = cfg.Service(
 )
 
 #finalization of the configuration object.
+#need this config in order to import it later from crab_vhbb
 from PhysicsTools.HeppyCore.framework.chain import Chain as Events
 config = cfg.Config(
     #Run across these inputs
@@ -259,75 +260,50 @@ config = cfg.Config(
 def main():
     print "Running MEAnalysis heppy main loop"
     
-    #input component
-    #several input components can be declared,
-    #and added to the list of selected components
-    def prepareInputSamples(sampleFile=conf.general["sampleFile"]):
-        print "loading samples from", sampleFile
-        samplefile = imp.load_source("samplefile", sampleFile)
-        from samplefile import samples_dict
-        inputSamples = []
-        for sn in sorted(samples_dict.keys()):
-            s = samples_dict[sn]
-            inputSample = cfg.Component(
-                s.name.value(),
-                files = map(getSitePrefix, s.subFiles.value()),
-                tree_name = s.treeName.value(),
-            )
-            inputSample.isMC = s.isMC.value()
-            inputSamples.append(inputSample)
-        return inputSamples, samples_dict
+    samp = cfg.Component(
+        "tth",
+        files = "Output/tree.root",
+        tree_name = "tree",
+    )
+    config = cfg.Config(
+        #Run across these inputs
+        components = [samp],
+
+        #Using this sequence
+        sequence = sequence,
+
+        #save output to these services
+        services = [output_service],
+
+        #This defines how events are loaded
+        events_class = Events
+    )
+
+    #Configure the number of events to run
+    from PhysicsTools.HeppyCore.framework.looper import Looper
+    nEvents = 200
+
+    kwargs = {}
+    if conf.general.get("eventWhitelist", None) is None:
+        kwargs["nEvents"] = nEvents
+    kwargs["firstEvent"] = conf.general.get("firstEvent", 0)
+    looper = Looper(
+        'Loop_'+samp.name,
+        config,
+        nPrint = 0,
+        **kwargs
+    )
+
+    #execute the code
+    looper.loop()
+
+    tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file 
+    tf.cd()
+    ts = ROOT.TNamed("config", conf_to_str(Conf))
+    ts.Write("", ROOT.TObject.kOverwrite)
     
-    inputSamples, samples_dict = prepareInputSamples(conf.general["sampleFile"])
-    
-    #Process all samples in the sample list
-    for samp in inputSamples:
-        if not samp.isMC:
-            from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
-            evs = cfg.Analyzer(
-                EventAnalyzer,
-                'events',
-            )
-            sequence[2] = evs 
-        config = cfg.Config(
-            #Run across these inputs
-            components = [samp],
-
-            #Using this sequence
-            sequence = sequence,
-
-            #save output to these services
-            services = [output_service],
-
-            #This defines how events are loaded
-            events_class = Events
-        )
-
-        #Configure the number of events to run
-        from PhysicsTools.HeppyCore.framework.looper import Looper
-        nEvents = 200
-
-        kwargs = {}
-        if conf.general.get("eventWhitelist", None) is None:
-            kwargs["nEvents"] = nEvents
-        kwargs["firstEvent"] = conf.general.get("firstEvent", 0)
-        looper = Looper(
-            'Loop_'+samp.name,
-            config,
-            nPrint = 0,
-            **kwargs
-        )
-
-        #execute the code
-        looper.loop()
-
-        tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file 
-        tf.cd()
-        ts = ROOT.TNamed("config", conf_to_str(Conf))
-        ts.Write("", ROOT.TObject.kOverwrite)
-        
-        #write the output
-        looper.write()
+    #write the output
+    looper.write()
 
 if __name__ == "__main__":
     main()
