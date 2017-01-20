@@ -582,3 +582,11 @@ tthbb13=9274c07
 CommonClassifier=bcd56ba
 MEIntegratorStandalone=7bb8b79
 CMSSW=05fe1a9
+
+
+Jan19_leptonic_nome
+-------------
+tthbb13=6b26cb0
+CommonClassifier=49bc51f
+MEIntegratorStandalone=7589ff3
+CMSSW=1bb9f72

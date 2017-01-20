@@ -262,8 +262,8 @@ def main():
     
     samp = cfg.Component(
         "tth",
-        files = "Output/tree.root",
-        tree_name = "tree",
+        files = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Jan19_leptonic_nome/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Jan19_leptonic_nome/170119_145327/0000/tree_10.root"],
+        tree_name = "vhbb/tree",
     )
     config = cfg.Config(
         #Run across these inputs
