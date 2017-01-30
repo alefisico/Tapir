@@ -441,6 +441,7 @@ for k in [
     ]:
     D = deepcopy(datasets[k])
 
+    D["maxlumis"] = 1000
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["leptonic_nome"][k] = D
 
@@ -639,7 +640,6 @@ env
         'data.tar.gz',
         "MEAnalysis_heppy.py",
         tth_data_dir + '/BDT.pickle',
-        vhbb_dir + '/MVAJetTags_620SLHCX_Phase1And2Upgrade.db',
         vhbb_dir + '/combined_cmssw.py',
         vhbb_dir + '/vhbb.py',
         vhbb_dir + '/vhbb_combined.py',
@@ -650,12 +650,8 @@ env
         vhbb_dir + '/puMC.root',
         vhbb_dir + '/json.txt',
         vhbb_dir + '/triggerEmulation.root',
-        vhbb_dir + "/Zll-spring15.weights.xml",
-        vhbb_dir + "/Wln-spring15.weights.xml",
-        vhbb_dir + "/Znn-spring15.weights.xml",
-        vhbb_dir + "/VBF-spring15.weights.xml",
         vhbb_dir + '/TMVA_blikelihood_vbf_cmssw76_h21trained.weights.xml',
-        vhbb_dir + '/ttbar-pumoriond17--500k-13d-300t.weights.xml',
+        vhbb_dir + '/ttbar-G25-500k-13d-300t.weights.xml',
     ]
 
     config.Data.inputDBS = 'global'
@@ -702,4 +698,3 @@ env
             except Exception as e:
                 print e
                 print "skipping"
-                                                                                                                                                                                                                   
