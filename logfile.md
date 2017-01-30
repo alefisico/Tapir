@@ -590,3 +590,11 @@ tthbb13=6b26cb0
 CommonClassifier=49bc51f
 MEIntegratorStandalone=7589ff3
 CMSSW=1bb9f72
+
+
+Jan30_1k_v1
+-------------
+tthbb13=4020e85
+CommonClassifier=49bc51f
+MEIntegratorStandalone=e5018a9
+CMSSW=9cc8df8
