@@ -1,0 +1,21 @@
+[Jan30_1k_v1__TT_TuneCUETP8M2T4_13TeV-powheg-pythia8]
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_1.root = 7787
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_10.root = 7782
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_11.root = 7791
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_12.root = 7793
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_13.root = 7746
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_14.root = 7773
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_15.root = 7784
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_16.root = 7798
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_17.root = 7775
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_18.root = 7792
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_19.root = 7790
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_2.root = 7783
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_20.root = 7766
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_3.root = 7784
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_4.root = 7777
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_5.root = 7773
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_6.root = 7787
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_7.root = 7761
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_8.root = 7803
+/store/user/jpata/tth/Jan30_1k_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151330/0000/tree_9.root = 7784
