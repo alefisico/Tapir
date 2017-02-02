@@ -139,7 +139,12 @@ metType = NTupleObjectType("metType", variables = [
 
 factorized_dw_vars = [
     NTupleVariable("dw_" + fc, lambda x,fc=fc : getattr(x, "dw", {}).get(fc, 0.0), the_type=float)
-    for fc in ["corr_TotalUp", "corr_TotalDown"]
+    for fc in ["corr_JECUp", "corr_JECDown"]
+]
+
+variated_vars = [
+    NTupleVariable("var_" + fc, lambda x,i=i : x.variated.at(i) if x.variated.size()>i else 0.0, the_type=float)
+    for (i, fc) in enumerate(["corr_JECUp", "corr_JECDown"])
 ]
 
 memType = NTupleObjectType("memType", variables = [
@@ -150,7 +155,7 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
     NTupleVariable("efficiency", lambda x : x.efficiency),
     NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
-] + factorized_dw_vars)
+] + factorized_dw_vars + variated_vars)
 
 perm_vars = [
     NTupleVariable("perm_{0}".format(i), lambda x : getattr(x, "perm_{0}".format(i)))

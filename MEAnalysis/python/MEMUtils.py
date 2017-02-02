@@ -111,6 +111,7 @@ def add_obj(integrator, objtype, **kwargs):
         v = ROOT.TLorentzVector(*kwargs.pop("p4c"))
     obs_dict = kwargs.pop("obs_dict", {})
     tf_dict = kwargs.pop("tf_dict", {})
+    corrs = kwargs.pop("corrections", [])
 
     o = MEM.Object(v, objtype)
 
@@ -119,4 +120,6 @@ def add_obj(integrator, objtype, **kwargs):
         o.addObs(k, v)
     for k, v in tf_dict.items():
         o.addTransferFunction(k, v)
+    for c in corrs:
+        o.p4_variations.push_back(c)
     integrator.push_back_object(o)

@@ -199,6 +199,7 @@ class MEAnalyzer(FilterAnalyzer):
         cfg = MEMConfig(self.conf)
         #cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
+        cfg.cfg.num_jet_variations = 2
         self.integrator = MEM.Integrand(
             0,
             cfg.cfg
@@ -211,6 +212,7 @@ class MEAnalyzer(FilterAnalyzer):
         # self.inputCounterNegWeight = ROOT.TH1F("MEAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
 
     def configure_mem(self, event, mem_cfg):
+        mem_cfg.cfg.num_jet_variations = 2
         self.integrator.set_cfg(mem_cfg.cfg)
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
@@ -252,7 +254,8 @@ class MEAnalyzer(FilterAnalyzer):
                     },
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
-                }
+                },
+                corrections = [jet.corr_JECUp/jet.corr, jet.corr_JECDown/jet.corr],
             )
         
         for lep in mem_cfg.lepton_candidates(event):
@@ -436,7 +439,7 @@ class MEAnalyzer(FilterAnalyzer):
                     )
                     autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
                     
-                    factorized_sources = ["corr_TotalUp", "corr_TotalDown"]
+                    factorized_sources = ["corr_JECUp", "corr_JECDown"]
                     dw = {fc: 0.0 for fc in factorized_sources}
                     if getattr(event, "systematic", "nominal") and self.cfg_comp.isMC:
                         for ijet, jet in enumerate(event.mem_jets):
@@ -448,9 +451,10 @@ class MEAnalyzer(FilterAnalyzer):
                                 new_corr = getattr(jet, fc)
                                 new_pt = new_corr * old_pt / old_corr
                                 delta_pt = (new_pt - old_pt)
-                                print "grad", delta_pt, r.grad.at(ijet)
+                                print "grad", delta_pt, r.grad.at(ijet), r.p
                                 dw[fc] += r.grad.at(ijet) * delta_pt
-                    r.dw = dw 
+                    r.dw = dw
+                    print r.variated.size()
                     res[(hypo, confname)] = r
                 else:
                     skipped += [confname]
