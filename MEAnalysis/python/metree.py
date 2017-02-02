@@ -137,6 +137,11 @@ metType = NTupleObjectType("metType", variables = [
     NTupleVariable("genPhi", lambda x : x.genPhi, mcOnly=True),
 ])
 
+factorized_dw_vars = [
+    NTupleVariable("dw_" + fc, lambda x,fc=fc : getattr(x, "dw", {}).get(fc, 0.0), the_type=float)
+    for fc in ["corr_TotalUp", "corr_TotalDown"]
+]
+
 memType = NTupleObjectType("memType", variables = [
     NTupleVariable("p", lambda x : x.p),
     NTupleVariable("p_err", lambda x : x.p_err),
@@ -145,7 +150,7 @@ memType = NTupleObjectType("memType", variables = [
     NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
     NTupleVariable("efficiency", lambda x : x.efficiency),
     NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
-])
+] + factorized_dw_vars)
 
 perm_vars = [
     NTupleVariable("perm_{0}".format(i), lambda x : getattr(x, "perm_{0}".format(i)))
@@ -161,29 +166,6 @@ memPermType = NTupleObjectType("memPermType", variables = [
     NTupleVariable("p_me_std", lambda x : x.p_me_std),
 ] + perm_vars)
 
-commonMemType = NTupleObjectType("commonMemType", variables = [
-    NTupleVariable("p", lambda x : x.p),
-    NTupleVariable("p_sig", lambda x : x.p_sig),
-    NTupleVariable("p_bkg", lambda x : x.p_bkg),
-    NTupleVariable("blr_4b", lambda x : x.blr_4b),
-    NTupleVariable("blr_2b", lambda x : x.blr_2b),
-])
-
-
-branType = NTupleObjectType("branType", variables = [
-    NTupleVariable("p",        lambda x : x[0] ),
-    NTupleVariable("ntoys",    lambda x : x[1], the_type=int),
-    NTupleVariable("pass",     lambda x : x[2], the_type=int),
-    NTupleVariable("tag_id",   lambda x : x[3], the_type=int),
-])
-
-#branvalType = NTupleObjectType("branvalType", variables = [
-#    NTupleVariable("btagCSVRnd",        lambda x : x ),
-#])
-
-#binpvalType = NTupleObjectType("branvalType", variables = [
-#    NTupleVariable("btagCSVInp",        lambda x : x ),
-#])
 
 FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
     NTupleVariable("v", lambda x : x),
@@ -648,9 +630,6 @@ def getTreeProducer(conf):
             ("passes_btag",         int,        ""),
             ("passes_mem",          int,        "MEM was evaluated"),
             ("tth_mva",             float,      "ttH vs tt+jets bdt"),
-            ("common_bdt",          float,      "KIT BDT (SL/DL)"),
-            ("common_bdt_withmem1", float,      "KIT BDT, MEM in 3t"),
-            ("common_bdt_withmem2", float,      "KIT BDT, MEM in 3t, 4t"),
         ]:
 
             is_mc_only = False
@@ -670,10 +649,6 @@ def getTreeProducer(conf):
                 syst_suffix2 = ""
             #These are collections which are variated in a systematic loop and saved to the event in TreeVarAnalyzer
             treeProducer.collections.update({
-                "common_mem" + syst_suffix: NTupleCollection(
-                    "common_mem" + syst_suffix2, commonMemType, 1,
-                    help="Single common MEM result array", mcOnly=is_mc_only
-                ),
                 "fw_h_alljets" + syst_suffix: NTupleCollection(
                     "fw_aj" + syst_suffix2, FoxWolframType, 8,
                     help="Fox-Wolfram momenta calculated with all jets", mcOnly=is_mc_only
@@ -697,26 +672,13 @@ def getTreeProducer(conf):
                             mcOnly = is_mc_only
                         ),
                     })
-                    treeProducer.collections.update({
-                        name + "_perm" + syst_suffix: NTupleCollection(
-                            name + "_perm" + syst_suffix2, memPermType, 50,
-                            help="MEM result permutations for proc={0} hypo={1}".format(proc, hypo),
-                            mcOnly = is_mc_only
-                    ),
-                    })
-            if conf.bran["enabled"]:
-                for cat in conf.bran["jetCategories"].items():
-                    treeProducer.globalObjects.update({ 
-                            "b_rnd_results_" + cat[0] + syst_suffix: NTupleObject(
-                                "bRnd_rnd_"+ cat[0] + syst_suffix2, branType,
-                                help="BTagrRandomizer results (p,ntoys,pass,tag_id)", mcOnly=True
-                                ),
-                            "b_inp_results_" + cat[0] + syst_suffix: NTupleObject(
-                                "bRnd_inp_"+ cat[0] + syst_suffix2, branType,
-                                help="BTagrRandomizer input results (p,ntoys,pass,tag_id)", mcOnly=True
-                                )                                                
-                            })
-
+                    #treeProducer.collections.update({
+                    #    name + "_perm" + syst_suffix: NTupleCollection(
+                    #        name + "_perm" + syst_suffix2, memPermType, 50,
+                    #        help="MEM result permutations for proc={0} hypo={1}".format(proc, hypo),
+                    #        mcOnly = is_mc_only
+                    #),
+                    #})
 
     for vtype in [
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),

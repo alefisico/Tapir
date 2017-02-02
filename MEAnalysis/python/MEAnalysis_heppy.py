@@ -183,18 +183,6 @@ mva = cfg.Analyzer(
     _conf = conf
 )
 
-brnd = cfg.Analyzer(
-    MECoreAnalyzers.BTagRandomizerAnalyzer,
-    'brand',
-    _conf = conf
-)
-
-commoncls = cfg.Analyzer(
-    MECoreAnalyzers.CommonClassifierAnalyzer,
-    'brand',
-    _conf = conf
-)
-
 treevar = cfg.Analyzer(
     MECoreAnalyzers.TreeVarAnalyzer,
     'treevar',
@@ -213,7 +201,6 @@ sequence = cfg.Sequence([
     trigger,
     leps,
     jets,
-    brnd,
     btaglr,
     #btaglr_bdt,
     qglr,
@@ -223,7 +210,6 @@ sequence = cfg.Sequence([
     gentth,
     subjet_analyzer,
     multiclass_analyzer,
-    commoncls,
     mem_analyzer,
     mva,
     treevar,
@@ -260,9 +246,9 @@ config = cfg.Config(
 def main():
     print "Running MEAnalysis heppy main loop"
     
-    samp = cfg.Component(
+    samp = cfg.MCComponent(
         "tth",
-        files = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Jan19_leptonic_nome/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Jan19_leptonic_nome/170119_145327/0000/tree_10.root"],
+        files = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Jan30_1k_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Jan30_1k_v1/170130_151528/0000/tree_1.root"],
         tree_name = "vhbb/tree",
     )
     config = cfg.Config(
@@ -281,7 +267,7 @@ def main():
 
     #Configure the number of events to run
     from PhysicsTools.HeppyCore.framework.looper import Looper
-    nEvents = 200
+    nEvents = 400
 
     kwargs = {}
     if conf.general.get("eventWhitelist", None) is None:

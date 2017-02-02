@@ -238,6 +238,7 @@ class MEAnalyzer(FilterAnalyzer):
                 print "Dropping jet", q.pt, q.eta
             lquarks = lquarks[:mem_cfg.maxLJets]
         
+        event.mem_jets = bquarks + lquarks
         ##Only take up to 4 candidates, otherwise runtimes become too great
         for jet in bquarks + lquarks:
             add_obj(
@@ -253,15 +254,7 @@ class MEAnalyzer(FilterAnalyzer):
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 }
             )
-            if "meminput" in self.conf.general["verbosity"]:
-                print "memBQuark" if jet in bquarks else "memLQuark",\
-                    jet.pt, jet.eta, jet.phi, jet.mass,\
-                    ", Flag: ", jet.btagFlag,\
-                    ", CSV: ",  getattr(jet, mem_cfg.btagMethod, -1),\
-                    ", PDGID: ",  getattr(jet, "PDGID", -1),\
-                    ", Match: ", jet.tth_match_label, jet.tth_match_index
-                
-                
+        
         for lep in mem_cfg.lepton_candidates(event):
             add_obj(
                 self.integrator,
@@ -269,12 +262,8 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
             )
-            if "meminput" in self.conf.general["verbosity"]:
-                print "memLepton", lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
 
         met_cand = mem_cfg.met_candidates(event)
-        if "meminput" in self.conf.general["verbosity"]:
-            print "memMET", met_cand.pt, met_cand.phi
         add_obj(
             self.integrator,
             MEM.ObjectType.MET,
@@ -373,14 +362,20 @@ class MEAnalyzer(FilterAnalyzer):
         res = {}
         
         if "meminput" in self.conf.general["verbosity"]:
-            print "-----"
-            print "MEM id={0},{1},{2} cat={3} cat_b={4} nj={5} nt={6} nel={7} nmu={8} syst={9}".format(
-                event.input.run, event.input.lumi, event.input.evt,
-                event.is_sl, event.is_dl,
-                event.cat, event.cat_btag, event.numJets, event.nBCSVM,
-                event.n_el_SL, event.n_mu_SL, getattr(event, "systematic", None),
-                getattr(event, "systematic", None),
-            )
+            autolog("MEM id={run},{lumi},{evt} cat={cat} cat_b={cat_btag} nj={nj} nt={nb} nel={n_el} nmu={n_mu} syst={syst}".format(
+                run=event.input.run,
+                lumi=event.input.lumi,
+                evt=event.input.evt,
+                is_sl=event.is_sl,
+                is_dl=event.is_dl,
+                cat=event.cat,
+                cat_btag=event.cat_btag,
+                nj=event.numJets,
+                nb=event.nBCSVM,
+                n_el=event.n_el_SL,
+                n_mu=event.n_mu_SL,
+                syst=getattr(event, "systematic", None),
+            ))
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
             skipped = []
@@ -439,15 +434,30 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_integrate,
                         self.vars_to_marginalize
                     )
-                    print "Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat) #DS
-
+                    autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
+                    
+                    factorized_sources = ["corr_TotalUp", "corr_TotalDown"]
+                    dw = {fc: 0.0 for fc in factorized_sources}
+                    if getattr(event, "systematic", "nominal") and self.cfg_comp.isMC:
+                        for ijet, jet in enumerate(event.mem_jets):
+                            if not (ijet < r.grad.size()):
+                                continue
+                            old_pt = jet.pt
+                            old_corr = jet.corr
+                            for fc in factorized_sources:
+                                new_corr = getattr(jet, fc)
+                                new_pt = new_corr * old_pt / old_corr
+                                delta_pt = (new_pt - old_pt)
+                                print "grad", delta_pt, r.grad.at(ijet)
+                                dw[fc] += r.grad.at(ijet) * delta_pt
+                    r.dw = dw 
                     res[(hypo, confname)] = r
                 else:
                     skipped += [confname]
                     r = MEM.MEMOutput()
                     res[(hypo, confname)] = r
             if "meminput" in self.conf.general["verbosity"]:
-                print "skipped confs", skipped
+                autolog("skipped confs", skipped)
         
         #Add MEM results to event
         for key in self.memkeysToRun:
@@ -478,9 +488,6 @@ class MEAnalyzer(FilterAnalyzer):
         #print out the JSON format for the standalone integrator
         for confname in self.memkeysToRun:
             mem_cfg = self.mem_configs[confname]
-            if "commoninput" in self.conf.general["verbosity"] and mem_cfg.do_calculate(event, mem_cfg):
-                self.printInputs(event, confname)
-        
 
         event.passes_mem = True
         return event

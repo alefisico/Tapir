@@ -49,12 +49,12 @@ samples_dict = {
         #    subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Sep14_leptonic_nome/SingleMuon.txt")),
         #),
      
-        "ttHTobb_M125_13TeV_powheg_pythia8": cms.PSet(
-            name     = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),
-            nickname = cms.string("ttHTobb_M125_13TeV_powheg_pythia8"),
+        "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8": cms.PSet(
+            name     = cms.string("ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"),
+            nickname = cms.string("ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"),
             isMC     = cms.bool(True),
             treeName = cms.string("vhbb/tree"),
-            subFiles = cms.vstring(get_files("$CMSSW_BASE/src/TTH/MEAnalysis/gc/datasets/Sep29_v1/ttHTobb_M125_13TeV_powheg_pythia8.txt")[:10]),
+            subFiles = cms.vstring(),
         ),
      
         #"ttHToNonbb_M125_13TeV_powheg_pythia8": cms.PSet(

@@ -190,10 +190,9 @@ class Conf:
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
-        #"systematics": ["nominal"],
         "systematics": [
             "nominal",
-            #"JESUp", "JESDown",
+            "JESUp", "JESDown",
             #"JERUp", "JERDown"
         ],
         
@@ -209,7 +208,7 @@ class Conf:
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            #"meminput", #info about particles used for MEM input
+            "meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
         ],
@@ -221,18 +220,6 @@ class Conf:
 
     multiclass = {
         "bdtPickleFile": os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/BDT.pickle"
-    }
-
-    bran = {
-      
-        "enabled": False,
-        "pdfFile" :  general["controlPlotsFile"], #os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/ControlPlotsV6_finerPt_722sync.root",
-
-        "jetCategories" : {
-            #"2t"   : (2, 2, 0),
-            "3t"   : (3, 3, 1),
-            "ge4t" : (4, 6, 2), # needed for timing 
-        }
     }
 
     tth_mva = {
@@ -277,7 +264,6 @@ class Conf:
         #Actually run the ME calculation
         #If False, all ME values will be 0
         "calcME": False,
-        "calcMECommon": False,
         "n_integration_points_mult": 1.0,
 
         "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
@@ -325,9 +311,9 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            "SL_0w2h2t",
-            "DL_0w2h2t",
-            "SL_1w2h2t",
+            #"SL_0w2h2t",
+            #"DL_0w2h2t",
+            #"SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
@@ -337,8 +323,8 @@ class Conf:
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"DL_0w2h2t_Rndge4t",
-            "FH_4w2h2t", #8j,4b
-            "FH_3w2h2t", #7j,4b
+            #"FH_4w2h2t", #8j,4b
+            #"FH_3w2h2t", #7j,4b
             #"FH_4w2h1t", #7j,3b & 8j,3b
             #"FH_0w0w2h2t", #all 4b cats
             #"FH_0w0w2h1t", #all cats

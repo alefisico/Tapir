@@ -118,8 +118,6 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
         #btag algos for which to calculate btag LR
         btagalgos = ["btagCSV", "btagCMVA_log", "btagCMVA"]
-        if self.conf.bran["enabled"]:
-            btagalgos += ["btagCSVRndge4t", "btagCSVInpge4t", "btagCSVRnd3t", "btagCSVInp3t"]
         jets_for_btag_lr, jet_probs = self.getJetProbs(self.csv_pdfs, event, btagalgos )
 
         btag_likelihood_results = {}
