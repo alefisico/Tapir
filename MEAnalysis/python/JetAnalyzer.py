@@ -232,12 +232,12 @@ class JetAnalyzer(FilterAnalyzer):
 
         #Require at least 2 good resolved jets to continue analysis
         passes = True
-        if event.is_sl and len(event.good_jets) < 3:
+        if event.is_sl and not (len(event.good_jets) >= 4 and event.nBCSVM>=3):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("fails because SL NJ<3")
             passes = False
         elif event.is_dl:
-            if len(event.good_jets) < 2:
+            if not (len(event.good_jets) >= 4 and event.nBCSVM>=3):
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False

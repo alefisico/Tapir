@@ -119,7 +119,7 @@ class Conf:
             "pt_leading": 20,
             "pt_subleading": 15,
         },
-        "selection": lambda event: event.is_sl or event.is_dl or event.is_fh
+        "selection": lambda event: event.is_sl or event.is_dl
         #"selection": lambda event: event.is_fh #DS
     }
 
@@ -202,7 +202,7 @@ class Conf:
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
         "verbosity": [
-            #"eventboundary", #print run:lumi:event
+            "eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
@@ -214,7 +214,7 @@ class Conf:
         ],
 
         #"eventWhitelist": [
-        #    (1, 144279, 14372670)
+        #    (1, 45, 6199)
         #]
     }
 

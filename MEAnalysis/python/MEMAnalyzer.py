@@ -257,7 +257,11 @@ class MEAnalyzer(FilterAnalyzer):
                 },
                 corrections = [jet.corr_JECUp/jet.corr, jet.corr_JECDown/jet.corr],
             )
-        
+            if "meminput" in self.conf.general["verbosity"]:
+                autolog("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4}".format(
+                    jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag
+                ))
+
         for lep in mem_cfg.lepton_candidates(event):
             add_obj(
                 self.integrator,
@@ -265,6 +269,10 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
             )
+            if "meminput" in self.conf.general["verbosity"]:
+                autolog("adding lep: pt={0} eta={1} phi={2} mass={3} charge={4}".format(
+                    lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
+                ))
 
         met_cand = mem_cfg.met_candidates(event)
         add_obj(
@@ -273,6 +281,10 @@ class MEAnalyzer(FilterAnalyzer):
             #MET is caused by massless object
             p4s=(met_cand.pt, 0, met_cand.phi, 0),
         )
+        if "meminput" in self.conf.general["verbosity"]:
+            autolog("adding met: pt={0} phi={1}".format(
+                met_cand.pt, met_cand.phi
+            ))
 
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
@@ -421,15 +433,15 @@ class MEAnalyzer(FilterAnalyzer):
                         confname in self.memkeysToRun
                     ):
                     
-                    print "Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6}".format(
+                    autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6}".format(
                         hypo, confname,
                         event.input.run, event.input.lumi, event.input.evt,
                         event.category_string, event.btag_LR_4b_2b
-                    )
-                    print "Integrator conf: b={0} l={1}".format(
+                    ))
+                    autolog("Integrator conf: b={0} l={1}".format(
                         len(mem_cfg.b_quark_candidates(event)),
                         len(mem_cfg.l_quark_candidates(event))
-                    )
+                    ))
                     self.configure_mem(event, mem_cfg)
                     r = self.integrator.run(
                         fstate,
@@ -438,7 +450,7 @@ class MEAnalyzer(FilterAnalyzer):
                         self.vars_to_marginalize
                     )
                     autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
-                    
+
                     factorized_sources = ["corr_JECUp", "corr_JECDown"]
                     dw = {fc: 0.0 for fc in factorized_sources}
                     if getattr(event, "systematic", "nominal") and self.cfg_comp.isMC:

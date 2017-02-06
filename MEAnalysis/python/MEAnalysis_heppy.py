@@ -157,11 +157,11 @@ subjet_analyzer = cfg.Analyzer(
     _conf = conf
 )
 
-multiclass_analyzer = cfg.Analyzer(
-    MECoreAnalyzers.MulticlassAnalyzer,
-    'multiclass',
-    _conf = conf
-)
+#multiclass_analyzer = cfg.Analyzer(
+#    MECoreAnalyzers.MulticlassAnalyzer,
+#    'multiclass',
+#    _conf = conf
+#)
 
 #Calls the C++ MEM integrator with good_jets, good_leptons and
 #the ME category
@@ -209,7 +209,7 @@ sequence = cfg.Sequence([
     genrad,
     gentth,
     subjet_analyzer,
-    multiclass_analyzer,
+    #multiclass_analyzer,
     mem_analyzer,
     mva,
     treevar,
@@ -267,7 +267,7 @@ def main():
 
     #Configure the number of events to run
     from PhysicsTools.HeppyCore.framework.looper import Looper
-    nEvents = 400
+    nEvents = 1000
 
     kwargs = {}
     if conf.general.get("eventWhitelist", None) is None:

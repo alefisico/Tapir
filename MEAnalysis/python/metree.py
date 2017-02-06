@@ -429,36 +429,36 @@ def getTreeProducer(conf):
             ),
             #--END OF USED BY SUBJETANALYZER--#
 
-            NTupleVariable(
-                "multiclass_class",
-                lambda ev: getattr(ev, "multiclass_class_nominal", -1),
-                help="Predicted tt class"
-            ),
+            #NTupleVariable(
+            #    "multiclass_class",
+            #    lambda ev: getattr(ev, "multiclass_class_nominal", -1),
+            #    help="Predicted tt class"
+            #),
 
-            NTupleVariable(
-                "multiclass_proba_ttb",
-                lambda ev: getattr(ev, "multiclass_proba_ttb_nominal", -1),
-                help="Predicted score for ttb"
-            ),
+            #NTupleVariable(
+            #    "multiclass_proba_ttb",
+            #    lambda ev: getattr(ev, "multiclass_proba_ttb_nominal", -1),
+            #    help="Predicted score for ttb"
+            #),
 
-            NTupleVariable(
-                "multiclass_proba_tt2bAndBb",
-                lambda ev: getattr(ev, "multiclass_proba_tt2bAndBb_nominal", -1),
-                help="Predicted score for tt2b and ttbb"
-            ),
+            #NTupleVariable(
+            #    "multiclass_proba_tt2bAndBb",
+            #    lambda ev: getattr(ev, "multiclass_proba_tt2bAndBb_nominal", -1),
+            #    help="Predicted score for tt2b and ttbb"
+            #),
 
 
-            NTupleVariable(
-                "multiclass_proba_ttcc",
-                lambda ev: getattr(ev, "multiclass_proba_ttcc_nominal", -1),
-                help="Predicted score for ttcc"
-            ),
+            #NTupleVariable(
+            #    "multiclass_proba_ttcc",
+            #    lambda ev: getattr(ev, "multiclass_proba_ttcc_nominal", -1),
+            #    help="Predicted score for ttcc"
+            #),
 
-            NTupleVariable(
-                "multiclass_proba_ttll",
-                lambda ev: getattr(ev, "multiclass_proba_ttll_nominal", -1),
-                help="Predicted score for ttll"
-            ),
+            #NTupleVariable(
+            #    "multiclass_proba_ttll",
+            #    lambda ev: getattr(ev, "multiclass_proba_ttll_nominal", -1),
+            #    help="Predicted score for ttll"
+            #),
 
             NTupleVariable(
                "nGenBHiggs", lambda ev: len(getattr(ev, "b_quarks_h_nominal", [])),
