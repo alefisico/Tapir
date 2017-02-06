@@ -417,9 +417,9 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
 
 workflow_datasets["leptonic_nome"] = {}
 for k in [
-        "ttHTobb",
+        #"ttHTobb",
         #"ttHToNonbb",
-        #"TTbar_inc",
+        "TTbar_inc",
         #"TTbar_sl",
         #"TTbar_dl",
         #"ww", "wz", "zz",
@@ -441,7 +441,6 @@ for k in [
     ]:
     D = deepcopy(datasets[k])
 
-    #D["maxlumis"] = 10000
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["leptonic_nome"][k] = D
 

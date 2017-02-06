@@ -22,6 +22,63 @@ def mu_baseline_tight(mu):
 def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
 
+factorizedJetCorrections = [
+        "AbsoluteStat",
+        "AbsoluteScale",
+        "AbsoluteFlavMap",
+        "AbsoluteMPFBias",
+        "Fragmentation",
+        "SinglePionECAL",
+        "SinglePionHCAL",
+        "FlavorQCD",
+        "TimePtEta",
+        "RelativeJEREC1",
+        "RelativeJEREC2",
+        "RelativeJERHF",
+        "RelativePtBB",
+        "RelativePtEC1",
+        "RelativePtEC2",
+        "RelativePtHF",
+        "RelativeBal",
+        "RelativeFSR",
+        "RelativeStatFSR",
+        "RelativeStatEC",
+        "RelativeStatHF",
+        "PileUpDataMC",
+        "PileUpPtRef",
+        "PileUpPtBB",
+        "PileUpPtEC1",
+        "PileUpPtEC2",
+        "PileUpPtHF",
+        "PileUpMuZero",
+        "PileUpEnvelope",
+        "SubTotalPileUp",
+        "SubTotalRelative",
+        "SubTotalPt",
+        "SubTotalScale",
+        "SubTotalAbsolute",
+        "SubTotalMC",
+        "Total",
+        "TotalNoFlavor",
+        "TotalNoTime",
+        "TotalNoFlavorNoTime",
+        "FlavorZJet",
+        "FlavorPhotonJet",
+        "FlavorPureGluon",
+        "FlavorPureQuark",
+        "FlavorPureCharm",
+        "FlavorPureBottom",
+        "TimeRunBCD",
+        "TimeRunEF",
+        "TimeRunG",
+        "TimeRunH",
+        "CorrelationGroupMPFInSitu",
+        "CorrelationGroupIntercalibration",
+        "CorrelationGroupbJES",
+        "CorrelationGroupFlavor",
+        "CorrelationGroupUncorrelated",
+]
+
 def el_baseline_medium(el):
 
     #ele MVA ID preselection
@@ -265,6 +322,7 @@ class Conf:
         #If False, all ME values will be 0
         "calcME": False,
         "n_integration_points_mult": 1.0,
+        "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
 
         "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
 

@@ -137,25 +137,6 @@ metType = NTupleObjectType("metType", variables = [
     NTupleVariable("genPhi", lambda x : x.genPhi, mcOnly=True),
 ])
 
-factorized_dw_vars = [
-    NTupleVariable("dw_" + fc, lambda x,fc=fc : getattr(x, "dw", {}).get(fc, 0.0), the_type=float)
-    for fc in ["corr_JECUp", "corr_JECDown"]
-]
-
-variated_vars = [
-    NTupleVariable("var_" + fc, lambda x,i=i : x.variated.at(i) if x.variated.size()>i else 0.0, the_type=float)
-    for (i, fc) in enumerate(["corr_JECUp", "corr_JECDown"])
-]
-
-memType = NTupleObjectType("memType", variables = [
-    NTupleVariable("p", lambda x : x.p),
-    NTupleVariable("p_err", lambda x : x.p_err),
-    NTupleVariable("chi2", lambda x : x.chi2),
-    NTupleVariable("time", lambda x : x.time),
-    NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
-    NTupleVariable("efficiency", lambda x : x.efficiency),
-    NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
-] + factorized_dw_vars + variated_vars)
 
 perm_vars = [
     NTupleVariable("perm_{0}".format(i), lambda x : getattr(x, "perm_{0}".format(i)))
@@ -383,6 +364,26 @@ SubjetCA15prunedType = NTupleObjectType("SubjetCA15prunedType", variables = [
 ])
 
 def getTreeProducer(conf):
+    factorized_dw_vars = [
+        NTupleVariable("dw_" + fc, lambda x,fc=fc : getattr(x, "dw", {}).get(fc, 0.0), the_type=float)
+        for fc in conf.mem["jet_corrections"]
+    ]
+    
+    variated_vars = [
+        NTupleVariable("var_" + fc, lambda x,i=i : x.variated.at(i) if x.variated.size()>i else 0.0, the_type=float)
+        for (i, fc) in enumerate(conf.mem["jet_corrections"])
+    ]
+    
+    memType = NTupleObjectType("memType", variables = [
+        NTupleVariable("p", lambda x : x.p),
+        NTupleVariable("p_err", lambda x : x.p_err),
+        NTupleVariable("chi2", lambda x : x.chi2),
+        NTupleVariable("time", lambda x : x.time),
+        NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
+        NTupleVariable("efficiency", lambda x : x.efficiency),
+        NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
+    ] + factorized_dw_vars + variated_vars)
+
     #Create the output TTree writer
     #Here we define all the variables that we want to save in the output TTree
     treeProducer = cfg.Analyzer(

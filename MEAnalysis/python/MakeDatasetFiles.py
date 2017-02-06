@@ -104,7 +104,7 @@ if __name__ == "__main__":
         # /TTTo2L2Nu_13TeV-powheg/jpata-VHBBHeppyV21_tthbbV6_TTTo2L2Nu_13TeV-powheg__fall15MAv2-pu25ns15v1_76r2as_v12_ext1-v1-827a43512a0ceecb1e2aee5987443e5a/USER
         # Yields:
         # sample = TTTo2L2Nu_13TeV-powheg
-        sample  = ds.split("/")[1]
+        sample  = "_".join(ds.split("/")[1:3])
         if sample in samples_processed:
             raise Exception("Duplicate sample {0}".format(sample))
         samples_processed += [sample]
