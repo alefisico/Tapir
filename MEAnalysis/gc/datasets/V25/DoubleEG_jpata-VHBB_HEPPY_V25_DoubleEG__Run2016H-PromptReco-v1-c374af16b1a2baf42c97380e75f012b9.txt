@@ -1,0 +1,6 @@
+[V25__DoubleEG_jpata-VHBB_HEPPY_V25_DoubleEG__Run2016H-PromptReco-v1-c374af16b1a2baf42c97380e75f012b9]
+/store/user/jpata/VHBBHeppyV25/DoubleEG/VHBB_HEPPY_V25_DoubleEG__Run2016H-PromptReco-v1/170130_125909/0000/tree_1.root = 58
+/store/user/jpata/VHBBHeppyV25/DoubleEG/VHBB_HEPPY_V25_DoubleEG__Run2016H-PromptReco-v1/170130_125909/0000/tree_2.root = 225
+/store/user/jpata/VHBBHeppyV25/DoubleEG/VHBB_HEPPY_V25_DoubleEG__Run2016H-PromptReco-v1/170130_125909/0000/tree_3.root = 60
+/store/user/jpata/VHBBHeppyV25/DoubleEG/VHBB_HEPPY_V25_DoubleEG__Run2016H-PromptReco-v1/170130_125909/0000/tree_4.root = 0
+/store/user/jpata/VHBBHeppyV25/DoubleEG/VHBB_HEPPY_V25_DoubleEG__Run2016H-PromptReco-v1/170130_125909/0000/tree_5.root = 0
