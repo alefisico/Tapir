@@ -10,11 +10,6 @@
 
 source common.sh
 
-#here we use @...@ to give grid-control the possibility to substitute the configuration file name
-#comment this line when testing locally
-#export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/cfg_withME.py
-export ME_CONF=$CMSSW_BASE/src/TTH/MEAnalysis/python/@me_conf@
-
 #go to work directory
 cd $GC_SCRATCH
 
@@ -26,7 +21,7 @@ cd $GC_SCRATCH
 #print out the environment
 env
 
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py
+python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/config_sldl.cfg
 
 mv $GC_SCRATCH/Loop/tree.root tree.root
 

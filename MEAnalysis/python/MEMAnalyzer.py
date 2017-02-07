@@ -201,22 +201,19 @@ class MEAnalyzer(FilterAnalyzer):
         cfg.configure_transfer_function(self.conf)
         cfg.cfg.num_jet_variations = len(self.conf.mem["jet_corrections"])
         self.integrator = MEM.Integrand(
-            0,
+            2,
             cfg.cfg
         )
 
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
-        # self.inputCounter = ROOT.TH1F("MEAnalyzer_Count","Count",1,0,2)
-        # self.inputCounterPosWeight = ROOT.TH1F("MEAnalyzer_CountPosWeight","Count genWeight>0",1,0,2)
-        # self.inputCounterNegWeight = ROOT.TH1F("MEAnalyzer_CountNegWeight","Count genWeight<0",1,0,2)
 
     def configure_mem(self, event, mem_cfg):
         mem_cfg.cfg.num_jet_variations = len(self.conf.mem["jet_corrections"])
-        self.integrator.set_cfg(mem_cfg.cfg)
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
         self.integrator.next_event()
+        self.integrator.set_cfg(mem_cfg.cfg)
 
         set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
         
@@ -425,12 +422,15 @@ class MEAnalyzer(FilterAnalyzer):
                         confname in self.memkeysToRun,
                         self.cfg_comp.isMC
                     ))
-                    
+                   
+
                 #Run MEM if we did not explicitly disable it
-                if (self.conf.mem["calcME"] and
+                if (
                         mem_cfg.do_calculate(event, mem_cfg) and
                         self.conf.mem["selection"](event) and
-                        confname in self.memkeysToRun
+                        confname in self.memkeysToRun and
+                        ((event.systematic in self.conf.mem["enabled_systematics"]
+                        and event.changes_jet_category) or event.systematic == "nominal")
                     ):
                     
                     autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6}".format(
@@ -443,12 +443,15 @@ class MEAnalyzer(FilterAnalyzer):
                         len(mem_cfg.l_quark_candidates(event))
                     ))
                     self.configure_mem(event, mem_cfg)
-                    r = self.integrator.run(
-                        fstate,
-                        hypo,
-                        self.vars_to_integrate,
-                        self.vars_to_marginalize
-                    )
+                    if self.conf.mem["calcME"]:
+                        r = self.integrator.run(
+                            fstate,
+                            hypo,
+                            self.vars_to_integrate,
+                            self.vars_to_marginalize
+                        )
+                    else:
+                        r = MEM.MEMOutput()
                     autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
 
                     dw = {fc: 0.0 for fc in self.conf.mem["jet_corrections"]}

@@ -4,7 +4,7 @@ from TTH.MEAnalysis.vhbb_utils import *
 from copy import deepcopy
 import numpy as np
 import copy
-
+from collections import OrderedDict
 
 #FIXME: understand the effect of cropping the transfer functions
 def attach_jet_transfer_function(jet, conf):
@@ -22,6 +22,7 @@ def attach_jet_transfer_function(jet, conf):
     jet.tf_l.SetNpx(10000)
     jet.tf_l.SetRange(0, 500)
 
+
 class JetAnalyzer(FilterAnalyzer):
     """
     Performs jet selection and b-tag counting.
@@ -35,7 +36,7 @@ class JetAnalyzer(FilterAnalyzer):
         super(JetAnalyzer, self).beginLoop(setup)
 
     def variateJets(self, jets, systematic, sigma):
-        newjets = deepcopy(jets)
+        newjets = [SystematicObject(jet, {"pt": jet.pt, "mass": jet.mass}) for jet in jets]
         if self.cfg_comp.isMC and systematic == "JES":
             for i in range(len(jets)):
                 if sigma > 0:
@@ -65,6 +66,25 @@ class JetAnalyzer(FilterAnalyzer):
 
                 newjets[i].pt *= cf
                 newjets[i].mass *= cf
+        elif self.cfg_comp.isMC:
+            for i in range(len(jets)):
+                if sigma > 0:
+                    sdir = "Up"
+                elif sigma < 0:
+                    sdir = "Down"
+                    sigma = abs(sigma)
+                else:
+                    raise Exception("sigma must be != 0")
+                new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
+                old_corr = newjets[i].corr
+
+                if new_corr > 0:
+                    cf =  sigma * new_corr / old_corr
+                else:
+                    cf = 0.0
+
+                newjets[i].pt *= cf
+                newjets[i].mass *= cf
         return newjets
 
     def process(self, event):
@@ -72,32 +92,36 @@ class JetAnalyzer(FilterAnalyzer):
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
        
-        evdict = {}
+        evdict = OrderedDict()
+        
+        #We create a wrapper around the base event with nominal quantities
+        if "nominal" in self.conf.general["systematics"]:
+            evdict["nominal"] = SystematicObject(event, {"systematic": "nominal"})
+
+        #add events with variated jets
         if self.cfg_comp.isMC:
             jets_raw = self.variateJets(event.Jet, "JES", 0)
             jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
             jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
             jets_JER_Up = self.variateJets(event.Jet, "JER", 1)
             jets_JER_Down = self.variateJets(event.Jet, "JER", -1)
+            jets_variated = {}
+            for fjc in self.conf.mem["factorized_sources"]:
+                for sdir, sigma in [("Up", 1.0), ("Down", -1.0)]:
+                    jet_var = self.variateJets(event.Jet, fjc, sigma)
+                    jets_variated[fjc+sdir] = jet_var
             for name, jets in [
                     ("raw", jets_raw),
                     ("JESUp", jets_JES_Up),
                     ("JESDown", jets_JES_Down),
                     ("JERUp", jets_JER_Up),
                     ("JERDown", jets_JER_Down)
-                ]:
+                ] + jets_variated.items():
                 if not name in self.conf.general["systematics"]:
                     continue
 
-                ev = FakeEvent(event)
-                ev.Jet = jets
-                ev.systematic = name
+                ev = SystematicObject(event, {"Jet": jets, "systematic": name})
                 evdict[name] = ev
-
-        #We create a wrapper around the base event with nominal quantities
-        if "nominal" in self.conf.general["systematics"]:
-            evdict["nominal"] = FakeEvent(event)
-            evdict["nominal"].systematic = "nominal"
 
         for syst, event_syst in evdict.items():
             if "debug" in self.conf.general["verbosity"]:
@@ -105,7 +129,16 @@ class JetAnalyzer(FilterAnalyzer):
             res = self._process(event_syst)
             evdict[syst] = res
         event.systResults = evdict
-
+        
+        event.systResults["nominal"].changes_jet_category = False
+        nj_nominal = event.systResults["nominal"].numJets
+        nt_nominal = event.systResults["nominal"].nBCSVM
+        for syst in evdict.keys():
+            nj = evdict[syst].numJets
+            nt = evdict[syst].nBCSVM
+            evdict[syst].changes_jet_category = False
+            if nj != nj_nominal or nt != nt_nominal:
+                evdict[syst].changes_jet_category = True
         return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
     def _process(self, event):

@@ -65,7 +65,6 @@ class Sample(object):
         self.name = kwargs.get("name")
         self.schema = kwargs.get("schema")
         self.process = kwargs.get("process")
-        self.is_data = bool(kwargs.get("is_data"))
         self.files_load = kwargs.get("files_load")
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
@@ -74,14 +73,10 @@ class Sample(object):
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
         self.xsec = kwargs.get("xsec")
-        
-        #temporary workaround for old way of specifying xs in python file
-        if not self.xsec:
-            self.xsec = samples_base.xsec_sample[self.name]
-
         self.classifier_db_path = kwargs.get("classifier_db_path")
         self.skim_file = kwargs.get("skim_file")
-
+        self.vhbb_tree_name = kwargs.get("vhbb_tree_name", "vhbb/tree")
+        
     @staticmethod
     def fromConfigParser(config, sample_name):
         sample = Sample(
@@ -221,6 +216,7 @@ class Category:
 
 class Analysis:
     def __init__(self, **kwargs):
+        self.mem_python_config = kwargs.get("mem_python_config")
         self.config = kwargs.get("config")
         self.debug = kwargs.get("debug", False)
         self.samples = kwargs.get("samples", [])
@@ -235,10 +231,10 @@ class Analysis:
         self.groups = kwargs.get("groups", {})
         self.do_fake_data = kwargs.get("do_fake_data", False)
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
+        self.sample_d = dict([(s.name, s) for s in self.samples])
 
     def get_sample(self, sample_name):
-        sample_d = dict([(s.name, s) for s in self.samples])
-        return sample_d[sample_name]
+        return self.sample_d[sample_name]
 
     def to_JSON(self):
         return json.dumps(self.__dict__, indent=2)

@@ -50,11 +50,14 @@ class MET:
     def make_array(event):
         return [MET(tree=event.input)]
 
-class FakeEvent:
-    def __init__(self, event):
-        src = deepcopy(event.__dict__)
-        self.__dict__.update(src)
-        self.input = event.input
+class SystematicObject(object):
+    def __init__(self, orig, variated_values):
+        self.orig = orig
+        for k, v in variated_values.items():
+            setattr(self, k, v)
+
+    def __getattr__(self, attr):
+        return getattr(self.__dict__["orig"], attr)
 
 from TTH.MEAnalysis.VHbbTree import Jet
 

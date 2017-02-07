@@ -531,29 +531,27 @@ def getTreeProducer(conf):
         }
     )
     
+    #add HLT bits to final tree
+    #trignames = []
+    #for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
+    #    for pref in ["HLT", "HLT2"]:
+    #        #add trigger path (combination of trigger)
+    #        _pathname = "_".join([pref, pathname])
+    #        if not _pathname in trignames:
+    #            trignames += [_pathname]
 
-    trignames = []
-    for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-        for pref in ["HLT", "HLT2"]:
-            #add trigger path (combination of trigger)
-            _pathname = "_".join([pref, pathname])
-            if not _pathname in trignames:
-                trignames += [_pathname]
-
-            #add individual trigger bits
-            for tn in trigs:
-                #strip the star
-                tn = pref + "_BIT_" + tn[:-1]
-                if not tn in trignames:
-                    trignames += [tn]
-    for trig in trignames:
-        treeProducer.globalVariables += [NTupleVariable(
-            trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
-        )]
+    #        #add individual trigger bits
+    #        for tn in trigs:
+    #            #strip the star
+    #            tn = pref + "_BIT_" + tn[:-1]
+    #            if not tn in trignames:
+    #                trignames += [tn]
+    #for trig in trignames:
+    #    treeProducer.globalVariables += [NTupleVariable(
+    #        trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
+    #    )]
         
-    for systematic in ["nominal", "raw", "JESUp", "JESDown", "JERUp", "JERDown"]:
-        if not (systematic in conf.general["systematics"]):
-            continue
+    for systematic in conf.general["systematics"]:
 
         #scalar variables that have systematic variations
         for vtype in [
@@ -635,7 +633,8 @@ def getTreeProducer(conf):
             ("passes_jet",          int,        ""),
             ("passes_btag",         int,        ""),
             ("passes_mem",          int,        "MEM was evaluated"),
-            ("tth_mva",             float,      "ttH vs tt+jets bdt"),
+            ("changes_jet_category",int,        "Jet category changed on systematic"),
+            #("tth_mva",             float,      "ttH vs tt+jets bdt"),
         ]:
 
             is_mc_only = False

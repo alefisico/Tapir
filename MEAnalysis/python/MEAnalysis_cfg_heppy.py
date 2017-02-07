@@ -109,15 +109,6 @@ def el_baseline_medium(el):
 
     return ret
 
-#def el_baseline_loose(el):
-#
-#    sca = abs(el.etaSc)
-#    ret = not (sca > 1.4442 and sca < 1.5660)
-#
-#    #Loose ID
-#    ret = ret and el.eleCutIdSpring15_25ns_v1 >= 2
-#    return ret
-
 def print_el(el):
     print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s, mvaIdFlag=%s, mvaId=%s, ecalIso=%s, hcalIso=%s)" % (
         el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
@@ -211,13 +202,13 @@ class Conf:
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
         "btagWPs": {
-            "CSVM": ("btagCSV", 0.800),
-            "CSVL": ("btagCSV", 0.460),
-            "CSVT": ("btagCSV", 0.935),
+            "CSVL": ("btagCSV", 0.5426),
+            "CSVM": ("btagCSV", 0.8484),
+            "CSVT": ("btagCSV", 0.9535),
             
-            "CMVAM": ("btagCMVA", 0.185),
-            "CMVAL": ("btagCMVA", -0.715),
-            "CMVAT": ("btagCMVA", 0.875)
+            "CMVAL": ("btagCMVA", -0.5884),
+            "CMVAM": ("btagCMVA", 0.4432),
+            "CMVAT": ("btagCMVA", 0.9432)
         },
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
@@ -250,6 +241,8 @@ class Conf:
         "systematics": [
             "nominal",
             "JESUp", "JESDown",
+            "RelativeJEREC1Up",
+            "RelativeJEREC2Down",
             #"JERUp", "JERDown"
         ],
         
@@ -275,46 +268,46 @@ class Conf:
         #]
     }
 
-    multiclass = {
-        "bdtPickleFile": os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/BDT.pickle"
-    }
+    #multiclass = {
+    #    "bdtPickleFile": os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/BDT.pickle"
+    #}
 
-    tth_mva = {
-        "filename": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/tth_bdt.pkl",
-        "varlist": [
-            "is_sl",
-            "is_dl",
-            "lep0_pt",
-            "lep0_aeta",
-            "lep1_pt",
-            "lep1_aeta",
-            "jet0_pt",
-            "jet0_btag",
-            "jet0_aeta",
-            "jet1_pt",
-            "jet1_btag",
-            "jet1_aeta",
-            "jet2_pt",
-            "jet2_btag",
-            "jet2_aeta",
-            "mean_bdisc",
-            "mean_bdisc_btag",
-            "min_dr_btag",
-            "mean_dr_btag",
-            "std_dr_btag",
-            "momentum_eig0",
-            "momentum_eig1",
-            "momentum_eig2",
-            "fw_h0",
-            "fw_h1",
-            "fw_h2",
-            "aplanarity",
-            "isotropy",
-            "numJets",
-            "nBCSVM",
-            "Wmass"
-        ]
-    }
+    #tth_mva = {
+    #    "filename": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/root/tth_bdt.pkl",
+    #    "varlist": [
+    #        "is_sl",
+    #        "is_dl",
+    #        "lep0_pt",
+    #        "lep0_aeta",
+    #        "lep1_pt",
+    #        "lep1_aeta",
+    #        "jet0_pt",
+    #        "jet0_btag",
+    #        "jet0_aeta",
+    #        "jet1_pt",
+    #        "jet1_btag",
+    #        "jet1_aeta",
+    #        "jet2_pt",
+    #        "jet2_btag",
+    #        "jet2_aeta",
+    #        "mean_bdisc",
+    #        "mean_bdisc_btag",
+    #        "min_dr_btag",
+    #        "mean_dr_btag",
+    #        "std_dr_btag",
+    #        "momentum_eig0",
+    #        "momentum_eig1",
+    #        "momentum_eig2",
+    #        "fw_h0",
+    #        "fw_h1",
+    #        "fw_h2",
+    #        "aplanarity",
+    #        "isotropy",
+    #        "numJets",
+    #        "nBCSVM",
+    #        "Wmass"
+    #    ]
+    #}
     
     mem = {
 
@@ -322,7 +315,9 @@ class Conf:
         #If False, all ME values will be 0
         "calcME": False,
         "n_integration_points_mult": 1.0,
+        "factorized_sources": factorizedJetCorrections,
         "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
+        "enabled_systematics": ["nominal"],
 
         "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
 
@@ -371,7 +366,7 @@ class Conf:
         "methodsToRun": [
             #"SL_0w2h2t",
             #"DL_0w2h2t",
-            #"SL_1w2h2t",
+            "SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",

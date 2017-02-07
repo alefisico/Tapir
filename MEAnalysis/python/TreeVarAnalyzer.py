@@ -32,7 +32,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
             event_syst.fw_h_untagjets = getattr(event_syst, "fw_h_untagjets", [])
             
             #add all variated quantities to event with a suffix
-            for k, v in event_syst.__dict__.items():
+            for k, v in event_syst.__dict__.items() + event_syst.orig.__dict__.items():
                 event.__dict__[k + "_" + syst] = v
         
         for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "topCandidatesSync", "higgsCandidate"]:

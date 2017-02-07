@@ -55,26 +55,27 @@ class BufferedTree:
     """
     def __init__(self, tree):
         self.tree = tree
-        self.tree.SetCacheSize(100*1024*1024)
+        self.tree.SetCacheSize(1*1024*1024)
         self.branches = {}
         for br in self.tree.GetListOfBranches():
             self.branches[br.GetName()] = br
+        self.tree.AddBranchToCache("*")
         self.buf = {}
         self.iEv = 0
         self.maxEv = int(self.tree.GetEntries())
         
-    def __getattr__(self, attr):
-        if self.branches.has_key(attr):
-            if self.buf.has_key(attr):
-                return self.buf[attr]
+    def __getattr__(self, attr, defval=None):
+        if self.__dict__["branches"].has_key(attr):
+            if self.__dict__["buf"].has_key(attr):
+                return self.__dict__["buf"][attr]
             else:
-                val = getattr(self.tree, attr)
-                self.buf[attr] = val
+                val = getattr(self.__dict__["tree"], attr)
+                self.__dict__["buf"][attr] = val
                 return val
         else:
-            raise KeyError(
-                "Could not find key={0}".format(attr)
-            )
+            if not defval is None:
+                return defval
+            raise Exception("Could not find branch with key: {0}".format(attr))
     
     def __iter__(self):
         return self
@@ -89,6 +90,11 @@ class BufferedTree:
 
     def GetEntries(self):
         return self.tree.GetEntries()
+    
+    def GetEntry(self, idx):
+        self.buf = {}
+        self.iEv = idx
+        return self.tree.GetEntry(idx)
 
 
 def assign_process_label(process, event):

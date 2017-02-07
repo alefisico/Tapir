@@ -11,6 +11,26 @@ class FilterAnalyzer(Analyzer):
         super(FilterAnalyzer, self).beginLoop(setup)
 
 
+class PrefilterAnalyzer(Analyzer):
+    """
+    Performs a very basic prefiltering of the event before fully
+    loading the event from disk into memory.
+    """
+    
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(PrefilterAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.conf = cfg_ana._conf
+    
+    def process(self, event):
+        njet = event.input.nJet
+        btag_csv = [getattr(event.input, "Jet_btagCSV")[nj] for nj in range(njet)]
+        btag_cmva = [getattr(event.input, "Jet_btagCMVA")[nj] for nj in range(njet)]
+        btag_csv_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CSVM"][1]: x>=wp, btag_csv)
+        btag_cmva_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CMVAM"][1]: x>=wp, btag_cmva)
+        if not (len(btag_csv_m) >= 3 or len(btag_cmva_m) >= 3):
+            return False
+        return True
+
 class CounterAnalyzer(FilterAnalyzer):
     
     def __init__(self, cfg_ana, cfg_comp, looperName):

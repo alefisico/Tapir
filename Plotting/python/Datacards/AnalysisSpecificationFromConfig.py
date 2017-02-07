@@ -78,10 +78,6 @@ def analysisFromConfig(config_file_path):
     # Get information on sparse input
     lumi = {k: float(v) for (k, v) in config.items("lumi")}
     #blr_cuts = {k: float(v) for (k, v) in config.items("blr_cuts")}
-    
-    do_stat_variations = config.getboolean("general", "do_stat_variations")    
-    do_fake_data = config.getboolean("general", "do_fake_data")
-    DEBUG = config.getboolean("general", "debug")
 
     ########################################
     # Samples
@@ -160,7 +156,7 @@ def analysisFromConfig(config_file_path):
                 process_lists[process_list],
                 lumi,
                 cuts_dict
-            )    
+            )
     # End loop over processes lists
 
     # Prepare the process list for the analysis object
@@ -266,16 +262,17 @@ def analysisFromConfig(config_file_path):
     ########################################
 
     analysis = Analysis(
+        mem_python_config = config.get("general", "mem_python_config"),
         config = config,
-        debug = DEBUG,
+        debug = config.getboolean("general", "debug"),
         samples = samples,
         cuts = cuts_dict,
         processes = processes,
         processes_unsplit = processes_original,
         categories = all_cats,
         groups = analysis_groups,
-        do_fake_data = do_fake_data,
-        do_stat_variations = do_stat_variations
+        do_fake_data = config.getboolean("general", "do_fake_data"),
+        do_stat_variations = config.getboolean("general", "do_stat_variations")
      )   
 
     return analysis
