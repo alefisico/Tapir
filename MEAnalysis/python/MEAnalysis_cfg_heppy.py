@@ -313,11 +313,16 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         "n_integration_points_mult": 1.0,
         "factorized_sources": factorizedJetCorrections,
         "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
-        "enabled_systematics": ["nominal"],
+        "enabled_systematics": [
+            "nominal",
+            "JESUp", "JESDown",
+            "RelativeJEREC1Up",
+            "RelativeJEREC2Down",
+        ],
 
         "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
 
@@ -434,10 +439,10 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     len(mcfg.l_quark_candidates(ev)) >= 1 and
-    ev.numJets == 5
+    ev.numJets == 5 and ev.systematic != "nominal"
 )
 c.mem_assumptions.add("sl")
-c.mem_assumptions.add("1w2h2t")
+c.mem_assumptions.add("1qW")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)
@@ -492,7 +497,7 @@ c.do_calculate = lambda ev, mcfg: (
     ev.numJets == 4
 )
 c.mem_assumptions.add("sl")
-c.mem_assumptions.add("0w2h2t")
+c.mem_assumptions.add("0qW")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)

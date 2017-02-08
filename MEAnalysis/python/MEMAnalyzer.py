@@ -201,7 +201,7 @@ class MEAnalyzer(FilterAnalyzer):
         cfg.configure_transfer_function(self.conf)
         cfg.cfg.num_jet_variations = len(self.conf.mem["jet_corrections"])
         self.integrator = MEM.Integrand(
-            2,
+            0,
             cfg.cfg
         )
 
@@ -406,23 +406,6 @@ class MEAnalyzer(FilterAnalyzer):
                     else:
                         res[(hypo, confname)] = MEM.MEMOutput()
                         continue
-
-                #if "meminput" in self.conf.general["verbosity"]:
-                if ("meminput" in self.conf.general["verbosity"] or
-                    "debug" in self.conf.general["verbosity"]):
-                    autolog("MEMconf={0} fstate={1} MEMCand[l={2} b={3} q={4}] Reco[j={5} b={6} bLR={7}] MEMconf.doCalc={8} event.selection={9} toBeRun={10} isMC={11}".format(
-                        confname,
-                        fstate,
-                        len(mem_cfg.lepton_candidates(event)),
-                        len(mem_cfg.b_quark_candidates(event)),
-                        len(mem_cfg.l_quark_candidates(event)),
-                        event.numJets, event.nBCSVM, event.btag_LR_4b_2b,
-                        mem_cfg.do_calculate(event, mem_cfg),
-                        self.conf.mem["selection"](event),
-                        confname in self.memkeysToRun,
-                        self.cfg_comp.isMC
-                    ))
-                   
 
                 #Run MEM if we did not explicitly disable it
                 if (
