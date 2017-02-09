@@ -448,10 +448,8 @@ class MEAnalyzer(FilterAnalyzer):
                                 new_corr = getattr(jet, fc)
                                 new_pt = new_corr * old_pt / old_corr
                                 delta_pt = (new_pt - old_pt)
-                                print "grad", delta_pt, r.grad.at(ijet), r.p
                                 dw[fc] += r.grad.at(ijet) * delta_pt
                     r.dw = dw
-                    print r.variated.size()
                     res[(hypo, confname)] = r
                 else:
                     skipped += [confname]

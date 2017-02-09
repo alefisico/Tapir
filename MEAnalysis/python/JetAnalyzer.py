@@ -127,10 +127,13 @@ class JetAnalyzer(FilterAnalyzer):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("processing systematic", syst)
             res = self._process(event_syst)
+            if syst != "nominal":
+                res.nominal_event = evdict["nominal"]
             evdict[syst] = res
         event.systResults = evdict
         
         event.systResults["nominal"].changes_jet_category = False
+        event.systResults["nominal"].nominal_event = event.systResults["nominal"]
         nj_nominal = event.systResults["nominal"].numJets
         nt_nominal = event.systResults["nominal"].nBCSVM
         for syst in evdict.keys():

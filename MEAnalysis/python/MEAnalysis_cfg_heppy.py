@@ -314,7 +314,7 @@ class Conf:
         #Actually run the ME calculation
         #If False, all ME values will be 0
         "calcME": True,
-        "n_integration_points_mult": 1.0,
+        "n_integration_points_mult": 5.0,
         "factorized_sources": factorizedJetCorrections,
         "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
         "enabled_systematics": [
@@ -359,12 +359,9 @@ class Conf:
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
-            event.pass_category_blr and (
-                (event.is_sl and event.nBCSVM >= 2)
-                or (event.is_dl and event.nBCSVM >= 2)
-            ) or
-            (event.is_fh and event.cat in ["cat7","cat8"]
-            and event.btag_LR_4b_2b > 0.95)
+                (event.is_sl and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 3)
+            #(event.is_fh and event.cat in ["cat7","cat8"]
+            #and event.btag_LR_4b_2b > 0.95)
         ),
 
         #This configures the MEMs to actually run, the rest will be set to 0
