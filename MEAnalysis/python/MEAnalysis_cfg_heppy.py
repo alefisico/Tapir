@@ -314,7 +314,7 @@ class Conf:
         #Actually run the ME calculation
         #If False, all ME values will be 0
         "calcME": True,
-        "n_integration_points_mult": 5.0,
+        "n_integration_points_mult": 1.0,
         "factorized_sources": factorizedJetCorrections,
         "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
         "enabled_systematics": [
@@ -366,7 +366,7 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            "SL_0w2h2t",
+            #"SL_0w2h2t",
             #"DL_0w2h2t",
             "SL_1w2h2t",
             #"SL_2w2h1t_l",
