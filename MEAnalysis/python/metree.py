@@ -374,7 +374,7 @@ def getTreeProducer(conf):
         for (i, fc) in enumerate(conf.mem["jet_corrections"])
     ]
     
-    memType = NTupleObjectType("memType", variables = [
+    memType_nominal = NTupleObjectType("memType", variables = [
         NTupleVariable("p", lambda x : x.p),
         NTupleVariable("p_err", lambda x : x.p_err),
         NTupleVariable("chi2", lambda x : x.chi2),
@@ -383,6 +383,16 @@ def getTreeProducer(conf):
         NTupleVariable("efficiency", lambda x : x.efficiency),
         NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
     ] + factorized_dw_vars + variated_vars)
+    
+    memType_syst = NTupleObjectType("memType", variables = [
+        NTupleVariable("p", lambda x : x.p),
+        NTupleVariable("p_err", lambda x : x.p_err),
+        NTupleVariable("chi2", lambda x : x.chi2),
+        NTupleVariable("time", lambda x : x.time),
+        NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
+        NTupleVariable("efficiency", lambda x : x.efficiency),
+        NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
+    ])
 
     #Create the output TTree writer
     #Here we define all the variables that we want to save in the output TTree
@@ -672,7 +682,7 @@ def getTreeProducer(conf):
                     name = "mem_{0}_{1}".format(proc, hypo) 
                     treeProducer.globalObjects.update({
                         name + syst_suffix: NTupleObject(
-                            name + syst_suffix2, memType,
+                            name + syst_suffix2, memType_nominal if systematic == "nominal" else memType_syst,
                             help="MEM result for proc={0} hypo={1}".format(proc, hypo),
                             mcOnly = is_mc_only
                         ),

@@ -29,4 +29,4 @@ if __name__ == "__main__":
     fns = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     dataset = os.environ["DATASETPATH"].split("__")[-1]
 
-    main(an, dataset, firstEvent=firstEvent, numEvents=nEvents, output_name="Loop", files=fns)
+    main(an, sample_name=dataset, firstEvent=firstEvent, numEvents=nEvents, output_name="Loop", files=fns)

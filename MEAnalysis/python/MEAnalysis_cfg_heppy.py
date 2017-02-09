@@ -264,7 +264,7 @@ class Conf:
         ],
 
         #"eventWhitelist": [
-        #    (1, 45, 6199)
+        #    (1, 1094, 152572)
         #]
     }
 
@@ -366,7 +366,7 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            #"SL_0w2h2t",
+            "SL_0w2h2t",
             #"DL_0w2h2t",
             "SL_1w2h2t",
             #"SL_2w2h1t_l",
@@ -436,7 +436,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     len(mcfg.l_quark_candidates(ev)) >= 1 and
-    ev.numJets == 5 and ev.systematic != "nominal"
+    ev.numJets == 5
 )
 c.mem_assumptions.add("sl")
 c.mem_assumptions.add("1qW")

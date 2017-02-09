@@ -1,4 +1,4 @@
-[Feb6_leptonic_nome__TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_jpata-Feb6_leptonic_nome-73161cecf545d5628b07ac5ac6fd2e49]
+[Feb6_leptonic_nome__TT_TuneCUETP8M2T4_13TeV-powheg-pythia8]
 /store/user/jpata/tth/Feb6_leptonic_nome/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Feb6_leptonic_nome/170206_161748/0000/tree_1.root = 7774
 /store/user/jpata/tth/Feb6_leptonic_nome/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Feb6_leptonic_nome/170206_161748/0000/tree_10.root = 7762
 /store/user/jpata/tth/Feb6_leptonic_nome/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Feb6_leptonic_nome/170206_161748/0000/tree_100.root = 7803

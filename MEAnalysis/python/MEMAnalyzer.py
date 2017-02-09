@@ -252,7 +252,7 @@ class MEAnalyzer(FilterAnalyzer):
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 },
-                corrections = [getattr(jet, x)/jet.corr for x in self.conf.mem["jet_corrections"]],
+                corrections = [getattr(jet, x)/jet.corr for x in self.conf.mem["jet_corrections"]] if event.systematic == "nominal" else [],
             )
             if "meminput" in self.conf.general["verbosity"]:
                 autolog("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4}".format(

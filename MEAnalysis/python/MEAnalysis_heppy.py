@@ -64,7 +64,7 @@ class BufferedChain( object ):
         return self
 
 
-def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], output_name=""):
+def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=1000, files=[], output_name=None):
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])  
     #Create python configuration object based on path
     if len(mem_python_config) > 0:
@@ -98,12 +98,29 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
     pi_file = open(python_conf.general["transferFunctions_sj_Pickle"] , 'rb')
     python_conf.tf_sj_matrix = pickle.load(pi_file)
     pi_file.close()
-        
-    
+  
+    if sample_name:
+        an_sample = analysis_cfg.get_sample(sample_name)
+        sample_name = an_sample.name
+        vhbb_tree_name = an_sample.vhbb_tree_name
+        schema = an_sample.schema
+        files = an_sample.file_names[:an_sample.debug_max_files]
+        if not output_name: 
+            output_name = "Loop_" + sample_name
+    elif schema:
+        sample_name = "sample"
+        vhbb_tree_name = "tree"
+        pass
+    else:
+        raise Exception("Must specify either sample name or schema")
+
     #Event contents are defined here
     #This is work in progress
-    from TTH.MEAnalysis.VHbbTree import EventAnalyzer
-    
+    if schema == "mc":
+        from TTH.MEAnalysis.VHbbTree import EventAnalyzer
+    else:
+        from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+
     #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
     evs = cfg.Analyzer(
         EventAnalyzer,
@@ -276,19 +293,15 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         fname='tree.root',
         option='recreate'
     )
-    
-    #finalization of the configuration object.
-    #need this config in order to import it later from crab_vhbb
-    an_sample = analysis_cfg.get_sample(sample_name)
 
     comp_cls = cfg.MCComponent
-    if an_sample.schema == "data":
+    if schema == "data":
         comp_cls = cfg.DataComponent
 
     comp = comp_cls(
-        an_sample.name,
-        files = an_sample.file_names[:an_sample.debug_max_files] if len(files) == 0 else files,
-        tree_name = an_sample.vhbb_tree_name,
+        sample_name,
+        files = files,
+        tree_name = vhbb_tree_name,
     )
 
     from PhysicsTools.HeppyCore.framework.chain import Chain
@@ -316,7 +329,7 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         kwargs["nEvents"] = numEvents
     kwargs["firstEvent"] = firstEvent
     looper = Looper(
-        'Loop_'+samp.name if len(output_name) == 0 else output_name,
+        output_name,
         heppy_config,
         nPrint = 0,
         **kwargs
@@ -356,4 +369,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args(sys.argv[2:])
 
-    main(an, args.sample, numEvents=args.numEvents)
+    main(an, sample_name=args.sample, numEvents=args.numEvents)

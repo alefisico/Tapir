@@ -124,9 +124,8 @@ class JetAnalyzer(FilterAnalyzer):
                 evdict[name] = ev
 
         for syst, event_syst in evdict.items():
-            if "debug" in self.conf.general["verbosity"]:
-                autolog("processing systematic", syst)
-            res = self._process(event_syst)
+            event_syst.systematic = syst 
+            res = self._process(event_syst, evdict)
             if syst != "nominal":
                 res.nominal_event = evdict["nominal"]
             evdict[syst] = res
@@ -144,7 +143,7 @@ class JetAnalyzer(FilterAnalyzer):
                 evdict[syst].changes_jet_category = True
         return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
-    def _process(self, event):
+    def _process(self, event, evdict):
         
         #FIXME: why discarded jets no longer in vhbb?
         #injets = event.Jet+event.DiscardedJet
@@ -268,12 +267,16 @@ class JetAnalyzer(FilterAnalyzer):
 
         #Require at least 2 good resolved jets to continue analysis
         passes = True
-        if event.is_sl and not (len(event.good_jets) >= 4 and event.nBCSVM>=3):
+        if event.systematic == "nominal":
+            event_proxy = event
+        else:
+            event_proxy = evdict["nominal"]
+        if event.is_sl and not (len(event_proxy.good_jets) >= 4 and event_proxy.nBCSVM>=3):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("fails because SL NJ<3")
             passes = False
         elif event.is_dl:
-            if not (len(event.good_jets) >= 4 and event.nBCSVM>=3):
+            if not (len(event_proxy.good_jets) >= 4 and event_proxy.nBCSVM>=3):
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False
