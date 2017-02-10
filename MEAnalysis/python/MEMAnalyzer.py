@@ -411,9 +411,9 @@ class MEAnalyzer(FilterAnalyzer):
                 if (
                         mem_cfg.do_calculate(event, mem_cfg) and
                         self.conf.mem["selection"](event) and
-                        confname in self.memkeysToRun and
-                        ((event.systematic in self.conf.mem["enabled_systematics"]
-                        and event.changes_jet_category) or event.systematic == "nominal")
+                        confname in self.memkeysToRun
+                        #((event.systematic in self.conf.mem["enabled_systematics"]
+                        #and event.changes_jet_category) or event.systematic == "nominal")
                     ):
                     
                     autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6}".format(

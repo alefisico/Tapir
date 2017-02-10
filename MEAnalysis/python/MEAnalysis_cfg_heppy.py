@@ -315,11 +315,15 @@ class Conf:
         #If False, all ME values will be 0
         "calcME": True,
         "n_integration_points_mult": 1.0,
+         
         "factorized_sources": factorizedJetCorrections,
+        #compute MEM variations for these sources
         "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
+        #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            "JESUp", "JESDown",
+            "JESUp",
+            "JESDown",
             "RelativeJEREC1Up",
             "RelativeJEREC2Down",
         ],

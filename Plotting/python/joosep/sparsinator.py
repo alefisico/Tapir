@@ -25,6 +25,8 @@ FUNCTION_TABLE = {
     "btag_LR_4b_2b_btagCSV_logit": lambda ev: logit(ev["btag_LR_4b_2b_btagCSV"]) if ev["btag_LR_4b_2b_btagCSV"]>0.0 else -50,
     "common_mem": lambda ev: ev["common_mem"],
     "common_bdt": lambda ev: ev["common_bdt"],
+    "mem_SL_2w2h2t_p": lambda ev: ev["mem_SL_2w2h2t_p"],
+    "mem_SL_1w2h2t_p": lambda ev: ev["mem_SL_1w2h2t_p"],
 }
 
 def vec_from_list(vec_type, src):
@@ -417,24 +419,24 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         #systematics with weight
 
-        #create b-tagging systematics
-        for sdir in ["up", "down"]:
-            for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-                for tagger in ["CSV", "CMVAV2"]:
-                    bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
-                    #make systematic outputs consistent in Up/Down naming
-                    sdir_cap = sdir.capitalize()
-                    systematic_weights += [
-                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight:
-                            ev["puWeight"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev[bweight])
-                    ]
-                    btag_weights += [bweight]
+        ##create b-tagging systematics
+        #for sdir in ["up", "down"]:
+        #    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+        #        for tagger in ["CSV", "CMVAV2"]:
+        #            bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
+        #            #make systematic outputs consistent in Up/Down naming
+        #            sdir_cap = sdir.capitalize()
+        #            systematic_weights += [
+        #                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight:
+        #                    ev["puWeight"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev[bweight])
+        #            ]
+        #            btag_weights += [bweight]
 
-        systematic_weights += [
-                ("puUp", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightUp"]),
-                ("puDown", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightDown"]),
-                ("unweighted", lambda ev: 1.0)
-        ]
+        #systematic_weights += [
+        #        ("puUp", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightUp"]),
+        #        ("puDown", lambda ev: ev["btagWeightCSV"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev["puWeightDown"]),
+        #        ("unweighted", lambda ev: 1.0)
+        #]
 
 
     extra_vars =  ["topCandidate_fRec",
@@ -558,43 +560,43 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         ),
 
         Var(name="mem_SL_0w2h2t_p",
-            nominal=Func("mem_p_SL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_0w2h2t_p/(ev.mem_tth_SL_0w2h2t_p + sf*ev.mem_ttbb_SL_0w2h2t_p) if getattr(ev,"mem_tth_SL_0w2h2t_p",0)>0 else 0.0),
+            nominal=Func("mem_SL_0w2h2t_p", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_0w2h2t_p/(ev.mem_tth_SL_0w2h2t_p + sf*ev.mem_ttbb_SL_0w2h2t_p) if getattr(ev,"mem_tth_SL_0w2h2t_p",0)>0 else 0.0),
         ),
         Var(name="mem_SL_1w2h2t_p",
-            nominal=Func("mem_p_SL_1w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_1w2h2t_p/(ev.mem_tth_SL_1w2h2t_p + sf*ev.mem_ttbb_SL_1w2h2t_p) if getattr(ev,"mem_tth_SL_1w2h2t_p",0)>0 else 0.0),
+            nominal=Func("mem_SL_1w2h2t_p", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_1w2h2t_p/(ev.mem_tth_SL_1w2h2t_p + sf*ev.mem_ttbb_SL_1w2h2t_p) if getattr(ev,"mem_tth_SL_1w2h2t_p",0)>0 else 0.0),
         ),
         Var(name="mem_SL_2w2h2t_p",
-            nominal=Func("mem_p_SL_2w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_2w2h2t_p/(ev.mem_tth_SL_2w2h2t_p + sf*ev.mem_ttbb_SL_2w2h2t_p) if getattr(ev,"mem_tth_SL_2w2h2t_p",0)>0 else 0.0),
+            nominal=Func("mem_SL_2w2h2t_p", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_2w2h2t_p/(ev.mem_tth_SL_2w2h2t_p + sf*ev.mem_ttbb_SL_2w2h2t_p) if getattr(ev,"mem_tth_SL_2w2h2t_p",0)>0 else 0.0),
         ),
-        Var(name="mem_DL_0w2h2t_p",
-            nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
-        ),
-        Var(name="mem_FH_4w2h2t_p",
-            nominal=Func("mem_p_FH_4w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h2t_p/(ev.mem_tth_FH_4w2h2t_p + sf*ev.mem_ttbb_FH_4w2h2t_p) if getattr(ev,"mem_tth_FH_4w2h2t_p",0)>0 else 0.0),
-        ),
-        Var(name="mem_FH_3w2h2t_p",
-            nominal=Func("mem_p_FH_3w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_3w2h2t_p/(ev.mem_tth_FH_3w2h2t_p + sf*ev.mem_ttbb_FH_3w2h2t_p) if getattr(ev,"mem_tth_FH_3w2h2t_p",0)>0 else 0.0),
-        ),
-        Var(name="mem_FH_4w2h1t_p",
-            nominal=Func("mem_p_FH_4w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h1t_p/(ev.mem_tth_FH_4w2h1t_p + sf*ev.mem_ttbb_FH_4w2h1t_p) if getattr(ev,"mem_tth_FH_4w2h1t_p",0)>0 else 0.0),
-        ),
-        Var(name="mem_FH_0w0w2h2t_p",
-            nominal=Func("mem_p_FH_0w0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h2t_p/(ev.mem_tth_FH_0w0w2h2t_p + sf*ev.mem_ttbb_FH_0w0w2h2t_p) if getattr(ev,"mem_tth_FH_0w0w2h2t_p",0)>0 else 0.0),
-        ),
-        Var(name="mem_FH_0w0w2h1t_p",
-            nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
-        ),
+#        Var(name="mem_DL_0w2h2t_p",
+#            nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
+#        ),
+#        Var(name="mem_FH_4w2h2t_p",
+#            nominal=Func("mem_p_FH_4w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h2t_p/(ev.mem_tth_FH_4w2h2t_p + sf*ev.mem_ttbb_FH_4w2h2t_p) if getattr(ev,"mem_tth_FH_4w2h2t_p",0)>0 else 0.0),
+#        ),
+#        Var(name="mem_FH_3w2h2t_p",
+#            nominal=Func("mem_p_FH_3w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_3w2h2t_p/(ev.mem_tth_FH_3w2h2t_p + sf*ev.mem_ttbb_FH_3w2h2t_p) if getattr(ev,"mem_tth_FH_3w2h2t_p",0)>0 else 0.0),
+#        ),
+#        Var(name="mem_FH_4w2h1t_p",
+#            nominal=Func("mem_p_FH_4w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h1t_p/(ev.mem_tth_FH_4w2h1t_p + sf*ev.mem_ttbb_FH_4w2h1t_p) if getattr(ev,"mem_tth_FH_4w2h1t_p",0)>0 else 0.0),
+#        ),
+#        Var(name="mem_FH_0w0w2h2t_p",
+#            nominal=Func("mem_p_FH_0w0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h2t_p/(ev.mem_tth_FH_0w0w2h2t_p + sf*ev.mem_ttbb_FH_0w0w2h2t_p) if getattr(ev,"mem_tth_FH_0w0w2h2t_p",0)>0 else 0.0),
+#        ),
+#        Var(name="mem_FH_0w0w2h1t_p",
+#            nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
+#        ),
 
-        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
-        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elel}),
-        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
-        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_el}),
-        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
-        Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
+#        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
+#        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elel}),
+#        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
+#        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_el}),
+#        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
+#        Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
 
-        Var(name="lep_SF_weight", 
-            funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
-                          "data": lambda ev: 1.0}),
+#        Var(name="lep_SF_weight", 
+#            funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
+#                          "data": lambda ev: 1.0}),
 
 
     #MC-only branches
@@ -604,13 +606,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Var(name="puWeightDown", schema=["mc"]),
         Var(name="triggerEmulationWeight", schema=["mc"]),
 
-
-
         #nominal b-tag weight, systematic weights added later
         Var(name="btagWeightCSV", schema=["mc"]),
         Var(name="btagWeightCMVAV2", schema=["mc"]),
-        ] +
-        [Var(name=bw, schema=["mc"]) for bw in btag_weights] + [Var(name=br) for br in extra_vars]
+        ]
+        #[Var(name=bw, schema=["mc"]) for bw in btag_weights] + [Var(name=br) for br in extra_vars]
     )
 
     if len(file_names) == 0:
@@ -682,8 +682,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         proc.outdict_cuts = outdict_cuts
 
     nevents = 0
-    counters = OrderedDict()
-    counters["triggerPath"] = {}
 
     break_file_loop = False
 
@@ -713,9 +711,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             #apply some basic preselection
             if not (event.is_sl or event.is_dl or event.is_fh):
                 continue
-            if not event.numJets >= 3:
+            if not event.numJets >= 4:
                 continue
-            if not (event.nBCSVM>=2 or event.nBCMVAM>=2):
+            if not (event.nBCSVM>=3 or event.nBCMVAM>=3):
                 continue
             if schema == "data" and not event.json:
                 continue
@@ -732,14 +730,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ret["syst"] = syst
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
-                ret["triggerPath"] = triggerPath(ret)
-                if not counters["triggerPath"].has_key(ret["triggerPath"]):
-                    counters["triggerPath"][ret["triggerPath"]] = 0
-                counters["triggerPath"][ret["triggerPath"]] += 1
+                #ret["triggerPath"] = triggerPath(ret)
 
                 ret["weight_nominal"] = 1.0
-                if schema == "mc":
-                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"] * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
+                #if schema == "mc":
+                #    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]# * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
            
                 #get MEM
                 ret["common_mem"] = -99
@@ -802,7 +797,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #Fill the base histogram
                 for proc in matched_processes:
                     for (k, v) in proc.outdict_syst[syst].items():
-                        weight = ret["weight_nominal"] * proc.xs_weight
+                        #weight = ret["weight_nominal"] * proc.xs_weight
+                        weight = ret["weight_nominal"]
                         if v.cut(ret):
                             v.fill(ret, weight)
                 
@@ -830,9 +826,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     print("processed {0} events".format(nevents))
     print("writing output")
-    # print(counters)
-    # outfile.Write()
-    # outfile.Close()
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
@@ -842,15 +835,16 @@ if __name__ == "__main__":
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
         skip_events = int(os.environ.get("SKIP_EVENTS", 0))
         max_events = int(os.environ.get("MAX_EVENTS", 0))
-        an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
+        analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
         file_names = [
-            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Sep14_leptonic_nome_v1/SingleMuon/Sep14_leptonic_nome_v1/160914_135655/0000/tree_1.root',
+            #'root://t3dcachedb03.psi.ch/pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/Feb1_leptonic_nome/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb1_leptonic_nome/170201_171753/0000/tree_100.root'
+            'file:///mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/tth_reopt2.root'
         ] 
         prefix = ""
-        sample = "SingleMuon"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 100
-        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
+        max_events = 10000
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

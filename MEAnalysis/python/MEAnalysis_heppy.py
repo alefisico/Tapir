@@ -104,7 +104,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
         sample_name = an_sample.name
         vhbb_tree_name = an_sample.vhbb_tree_name
         schema = an_sample.schema
-        files = an_sample.file_names[:an_sample.debug_max_files]
+        if len(files) == 0:
+            files = an_sample.file_names[:an_sample.debug_max_files]
         if not output_name: 
             output_name = "Loop_" + sample_name
     elif schema:
@@ -342,8 +343,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
 
     tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file 
     tf.cd()
-    ts = ROOT.TNamed("config", conf_to_str(python_conf))
-    ts.Write("", ROOT.TObject.kOverwrite)
+    #ts = ROOT.TNamed("config", conf_to_str(python_conf))
+    #ts.Write("", ROOT.TObject.kOverwrite)
     
     #write the output
     looper.write()
