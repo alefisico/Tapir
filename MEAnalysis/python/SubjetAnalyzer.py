@@ -757,50 +757,48 @@ class SubjetAnalyzer(FilterAnalyzer):
             objs1_orig = [ objs1_orig ]
         if hasattr( objs2_orig, 'eta' ) and hasattr( objs2_orig, 'phi' ):
             objs2_orig = [ objs2_orig ]
-    
-        # Create copies of the list, since entries will be popped
-        objs1 = copy.deepcopy( objs1_orig )
-        objs2 = copy.deepcopy( objs2_orig )
 
-        # Save the original objecs as attributes of the workable objects
-        for ( obj1, obj1_orig ) in zip( objs1, objs1_orig ):
-            setattr( obj1, 'orig_obj', obj1_orig )
-        for ( obj2, obj2_orig ) in zip( objs2, objs2_orig ):
-            setattr( obj2, 'orig_obj', obj2_orig )
-
+        # Create list of indices
+        objs1 = range(len(objs1_orig))
+        objs2 = range(len(objs2_orig))
+            
         # Attempt matching until the shortest list is depleted, or until there are
         # no more matches with delR < delR_cut
         n_matches = min( len(objs1), len(objs2) )
 
         for i_match in range(n_matches):
 
-            # Attempt a match
-            (i1, i2, delR) = self.Get_min_delR( objs1, objs2, R_cut )
+            # Attempt a match (map indices to objects first)
+            tmp1 = [objs1_orig[i] for i in objs1]
+            tmp2 = [objs2_orig[i] for i in objs2]
+            (i1, i2, delR) = self.Get_min_delR( tmp1, tmp2, R_cut )
 
             # Return the attempt number if no more matches could be made
             if i1 == 'No link':
                 return i_match
 
-            # Pop the matched objs from the lists for the next iteration
+            # Pop the matched indices from the lists for the next iteration
             matched_obj1 = objs1.pop(i1)
             matched_obj2 = objs2.pop(i2)
 
             # Record the match in the original objs
-            setattr( matched_obj1.orig_obj,
-                     'matched_{0}'.format( label2 ),
-                     matched_obj2.orig_obj )
-            setattr( matched_obj2.orig_obj,
-                     'matched_{0}'.format( label1 ),
-                     matched_obj1.orig_obj )
+            setattr(objs1_orig[matched_obj1],
+                    'matched_{0}'.format( label2 ),
+                    objs2_orig[matched_obj2])
+
+            setattr(objs2_orig[matched_obj2],
+                    'matched_{0}'.format( label1 ),
+                    objs1_orig[matched_obj1])
 
             # Record the delR value in the original objs
-            setattr( matched_obj1.orig_obj,
-                     'matched_{0}_delR'.format( label2 ),
-                     delR )
-            setattr( matched_obj2.orig_obj,
-                     'matched_{0}_delR'.format( label1 ),
-                     delR )
+            setattr(objs1_orig[matched_obj1],
+                    'matched_{0}_delR'.format( label2 ),
+                    delR)
 
+            setattr(objs2_orig[matched_obj2],
+                    'matched_{0}_delR'.format( label1 ),
+                    delR)
+            
         return n_matches
 
     # ==============================================================================
