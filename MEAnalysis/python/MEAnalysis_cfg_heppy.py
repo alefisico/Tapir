@@ -240,11 +240,7 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
         "systematics": [
             "nominal",
-            "JESUp", "JESDown",
-            "RelativeJEREC1Up",
-            "RelativeJEREC2Down",
-            #"JERUp", "JERDown"
-        ],
+        ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
         
         
         #If the list contains:
@@ -317,15 +313,13 @@ class Conf:
         "n_integration_points_mult": 1.0,
          
         "factorized_sources": factorizedJetCorrections,
-        #compute MEM variations for these sources
-        "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
+        #compute MEM variations for these sources in the nominal case
+        "jet_corrections": ["{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            "JESUp",
-            "JESDown",
-            "RelativeJEREC1Up",
-            "RelativeJEREC2Down",
+            "TotalUp",
+            "TotalDown",
         ],
 
         "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)

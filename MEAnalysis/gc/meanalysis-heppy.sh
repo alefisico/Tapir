@@ -21,7 +21,7 @@ cd $GC_SCRATCH
 #print out the environment
 env
 
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/config_sldl.cfg
+python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py ${CMSSW_BASE}/src/TTH/MEAnalysis/data/default.cfg
 
 mv $GC_SCRATCH/Loop/tree.root tree.root
 

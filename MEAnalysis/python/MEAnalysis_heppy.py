@@ -277,7 +277,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
         mecat,
         genrad,
         gentth,
-        subjet_analyzer,
+        #subjet_analyzer,
         #multiclass_analyzer,
         mem_analyzer,
         #mva,

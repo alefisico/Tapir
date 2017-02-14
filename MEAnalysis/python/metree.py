@@ -508,10 +508,10 @@ def getTreeProducer(conf):
 
         ],
         globalObjects = {
-           "MET_nominal" : NTupleObject("met", metType, help="Reconstructed MET"),
-           "MET_gen_nominal" : NTupleObject("met_gen", metType, help="Generated MET", mcOnly=True),
-           "MET_jetcorr_nominal" : NTupleObject("met_jetcorr", metType, help="Reconstructed MET, corrected to gen-level jets"),
-           "MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
+           "MET" : NTupleObject("met", metType, help="Reconstructed MET"),
+           #"MET_gen_nominal" : NTupleObject("met_gen", metType, help="Generated MET", mcOnly=True),
+           #"MET_jetcorr_nominal" : NTupleObject("met_jetcorr", metType, help="Reconstructed MET, corrected to gen-level jets"),
+           #"MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
            "primaryVertex" : NTupleObject("pv", pvType, help="First PV"),
            "dilepton_p4" : NTupleObject("ll", p4type, help="Dilepton system"),
         },
@@ -533,10 +533,10 @@ def getTreeProducer(conf):
             
             "loose_jets_nominal" : NTupleCollection("loose_jets", jetType, 6, help="Additional jets with 20<pt<30"),
             
-            "topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
-            "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
-            "topCandidatesSync_nominal": NTupleCollection("topCandidatesSync" , topCandidateType, 4, help=""),
-            "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates"),
+            #"topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
+            #"othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
+            #"topCandidatesSync_nominal": NTupleCollection("topCandidatesSync" , topCandidateType, 4, help=""),
+            #"higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates"),
 
         }
     )
@@ -657,43 +657,30 @@ def getTreeProducer(conf):
                 is_mc_only = True
 
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=is_mc_only)]
-
-            syst_suffix = "_" + systematic
-            syst_suffix2 = syst_suffix
-            if systematic == "nominal":
-                syst_suffix2 = ""
-            #These are collections which are variated in a systematic loop and saved to the event in TreeVarAnalyzer
-            treeProducer.collections.update({
-                "fw_h_alljets" + syst_suffix: NTupleCollection(
-                    "fw_aj" + syst_suffix2, FoxWolframType, 8,
-                    help="Fox-Wolfram momenta calculated with all jets", mcOnly=is_mc_only
+        #end of loop over syst variables 
+        
+        syst_suffix = "_" + systematic
+        syst_suffix2 = syst_suffix
+        if systematic == "nominal":
+            syst_suffix2 = ""
+        
+        for hypo in conf.mem["methodsToRun"]:
+            for proc in ["tth", "ttbb"]:
+                name = "mem_{0}_{1}".format(proc, hypo) 
+                treeProducer.globalObjects.update({
+                    name + syst_suffix: NTupleObject(
+                        name + syst_suffix2, memType_nominal if systematic == "nominal" else memType_syst,
+                        help="MEM result for proc={0} hypo={1}".format(proc, hypo),
+                        mcOnly = is_mc_only
+                    ),
+                })
+            treeProducer.globalVariables.append(
+                NTupleVariable(
+                    "mem_" + hypo + "_p" + syst_suffix2,
+                    lambda ev, s="mem_" + hypo + "_p" + syst_suffix: getattr(ev, s, 0.0),
+                    mcOnly = False,
                 ),
-                "fw_h_btagjets" + syst_suffix: NTupleCollection(
-                    "fw_bj" + syst_suffix2, FoxWolframType, 8,
-                    help="Fox-Wolfram momenta calculated with b-tagged jets", mcOnly=is_mc_only
-                ),
-                "fw_h_untagjets" + syst_suffix: NTupleCollection(
-                    "fw_uj" + syst_suffix2, FoxWolframType, 8,
-                    help="Fox-Wolfram momenta calculated with untagged jets", mcOnly=is_mc_only
-                ),
-            })
-            for hypo in conf.mem["methodsToRun"]:
-                for proc in ["tth", "ttbb"]:
-                    name = "mem_{0}_{1}".format(proc, hypo) 
-                    treeProducer.globalObjects.update({
-                        name + syst_suffix: NTupleObject(
-                            name + syst_suffix2, memType_nominal if systematic == "nominal" else memType_syst,
-                            help="MEM result for proc={0} hypo={1}".format(proc, hypo),
-                            mcOnly = is_mc_only
-                        ),
-                    })
-                    #treeProducer.collections.update({
-                    #    name + "_perm" + syst_suffix: NTupleCollection(
-                    #        name + "_perm" + syst_suffix2, memPermType, 50,
-                    #        help="MEM result permutations for proc={0} hypo={1}".format(proc, hypo),
-                    #        mcOnly = is_mc_only
-                    #),
-                    #})
+            )
 
     for vtype in [
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),

@@ -1,4 +1,5 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
+from TTH.MEAnalysis.vhbb_utils import autolog
 
 class TreeVarAnalyzer(FilterAnalyzer):
     """
@@ -11,6 +12,8 @@ class TreeVarAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
 
     def process(self, event):
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("TreeVarAnalyzer started")
         setattr( event, 'boosted_bjets', [] )
         setattr( event, 'boosted_ljets', [] )
         setattr( event, 'topCandidate', [] )
@@ -23,19 +26,20 @@ class TreeVarAnalyzer(FilterAnalyzer):
         #in order to correctly ntuplize, we need to define event.genTopLep = event.systResults["nominal"].genTopLep etc
         event.genTopLep = getattr(event.systResults["nominal"], "genTopLep", [])
         event.genTopHad = getattr(event.systResults["nominal"], "genTopHad", [])
-        
+       
+        orig_items = event.systResults["nominal"].__dict__.items() + event.__dict__.items()
+        for k, v in orig_items:
+            event.__dict__[k + "_nominal"] = v
         for syst, event_syst in event.systResults.items():
-            event_syst.common_mem = getattr(event_syst, "common_mem", [])
-            event_syst.common_bdt = getattr(event_syst, "common_bdt", -1)
-            event_syst.fw_h_alljets = getattr(event_syst, "fw_h_alljets", [])
-            event_syst.fw_h_btagjets = getattr(event_syst, "fw_h_btagjets", [])
-            event_syst.fw_h_untagjets = getattr(event_syst, "fw_h_untagjets", [])
-            
+            all_items = event_syst.__dict__.items()
             #add all variated quantities to event with a suffix
-            for k, v in event_syst.__dict__.items() + event_syst.orig.__dict__.items():
+            for k, v in all_items:
                 event.__dict__[k + "_" + syst] = v
-        
-        for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "topCandidatesSync", "higgsCandidate"]:
-            if not hasattr(event, br+"_nominal"):
-                setattr(event, br + "_nominal", [])
+                if "mem_SL_2w2h2t_p" in k:
+                    print k + "_" + syst, v
+        #for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "topCandidatesSync", "higgsCandidate"]:
+        #    if not hasattr(event, br+"_nominal"):
+        #        setattr(event, br + "_nominal", [])
+        if "debug" in self.conf.general["verbosity"]:
+            autolog("TreeVarAnalyzer ended")
         return True
