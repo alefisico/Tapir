@@ -505,6 +505,21 @@ def getTreeProducer(conf):
                the_type=int,
                help="Bitmask of trigger decisions"
             ),
+            NTupleVariable(
+               "is_sl", lambda ev: ev.is_sl,
+               the_type=int,
+               help="is single-leptonic"
+            ),
+            NTupleVariable(
+               "is_dl", lambda ev: ev.is_dl,
+               the_type=int,
+               help="is di-leptonic"
+            ),
+            NTupleVariable(
+               "is_fh", lambda ev: ev.is_fh,
+               the_type=int,
+               help="is fully hadronic"
+            ),
 
         ],
         globalObjects = {
@@ -565,15 +580,15 @@ def getTreeProducer(conf):
 
         #scalar variables that have systematic variations
         for vtype in [
-            ("is_sl",               int,        "Passes single lepton cuts"),
-            ("is_dl",               int,        "Passes dilepton cuts"),
-            ("is_fh",               int,        "Passes all-hadronic cuts"),
-            ("Wmass",               float,      "Best reconstructed W candidate mass"),
-            ("cat",                 int,        "ME category", "catn"),
-            ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
-            ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
-            ("btag_lr_4b",          float,      "4b, N-4 light, probability, 3D binning"),
-            ("btag_lr_2b",          float,      "2b, N-2 Nlight probability, 3D binning"),
+            #("is_sl",               int,        "Passes single lepton cuts"),
+            #("is_dl",               int,        "Passes dilepton cuts"),
+            #("is_fh",               int,        "Passes all-hadronic cuts"),
+            #("Wmass",               float,      "Best reconstructed W candidate mass"),
+            #("cat",                 int,        "ME category", "catn"),
+            #("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
+            #("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
+            #("btag_lr_4b",          float,      "4b, N-4 light, probability, 3D binning"),
+            #("btag_lr_2b",          float,      "2b, N-2 Nlight probability, 3D binning"),
             #("btag_lr_4b_Rndge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t random"),
             #("btag_lr_2b_Rndge4t",  float,      "2b, N-2 Nlight probability, 3D binning, ge4t random"),
             #("btag_lr_4b_Inpge4t",  float,      "4b, N-4 light, probability, 3D binning, ge4t input"),
@@ -584,7 +599,7 @@ def getTreeProducer(conf):
             #("btag_lr_2b_Inp3t",    float,      "2b, N-2 Nlight probability, 3D binning, 3t   input"),
 
             #("btag_LR_4b_2b",        float,      ""),
-            ("btag_LR_4b_2b_btagCMVA_log",        float,      ""),
+            #("btag_LR_4b_2b_btagCMVA_log",        float,      ""),
             ("btag_LR_4b_2b_btagCMVA",        float,      ""),
             ("btag_LR_4b_2b_btagCSV",        float,      ""),
             #("btag_LR_4b_2b_ded",        float,      ""),
@@ -592,57 +607,57 @@ def getTreeProducer(conf):
             #("btag_LR_4b_2b_Inpge4t",float,      ""),
             #("btag_LR_4b_2b_Rnd3t",  float,      ""),
             #("btag_LR_4b_2b_Inp3t",  float,      ""),
-            ("qg_LR_flavour_4q_0q", float,      ""),
-            ("qg_LR_flavour_4q_1q", float,      ""), 
-            ("qg_LR_flavour_4q_2q", float,      ""),
-            ("qg_LR_flavour_4q_3q", float,      ""),
-            ("qg_LR_flavour_4q_0q_1q", float,      ""), 
-            ("qg_LR_flavour_4q_1q_2q", float,      ""),
-            ("qg_LR_flavour_4q_2q_3q", float,      ""),
-            ("qg_LR_flavour_4q_0q_1q_2q", float,      ""), 
-            ("qg_LR_flavour_4q_1q_2q_3q", float,      ""),
-            ("qg_LR_flavour_4q_0q_1q_2q_3q", float,      ""),
+            #("qg_LR_flavour_4q_0q", float,      ""),
+            #("qg_LR_flavour_4q_1q", float,      ""), 
+            #("qg_LR_flavour_4q_2q", float,      ""),
+            #("qg_LR_flavour_4q_3q", float,      ""),
+            #("qg_LR_flavour_4q_0q_1q", float,      ""), 
+            #("qg_LR_flavour_4q_1q_2q", float,      ""),
+            #("qg_LR_flavour_4q_2q_3q", float,      ""),
+            #("qg_LR_flavour_4q_0q_1q_2q", float,      ""), 
+            #("qg_LR_flavour_4q_1q_2q_3q", float,      ""),
+            #("qg_LR_flavour_4q_0q_1q_2q_3q", float,      ""),
             ("nBCSVM",              int,      ""),
-            ("nBCSVT",              int,      ""),
-            ("nBCSVL",              int,      ""),
-            ("nCSVv2IVFM",              int,      ""),                
+            #("nBCSVT",              int,      ""),
+            #("nBCSVL",              int,      ""),
+            #("nCSVv2IVFM",              int,      ""),                
             ("nBCMVAM",             int,      "Number of good jets that pass cMVAv2 Medium WP"),
-            ("nBCMVAT",             int,      "Number of good jets that pass cMVAv2 Tight WP"),
-            ("nBCMVAL",             int,      "Number of good jets that pass cMVAv2 Loose WP"),
+            #("nBCMVAT",             int,      "Number of good jets that pass cMVAv2 Tight WP"),
+            #("nBCMVAL",             int,      "Number of good jets that pass cMVAv2 Loose WP"),
             ("numJets",             int,        "Total number of good jets that pass jet ID"),
-            ("nMatchSimB",          int,        ""),
-            ("nMatchSimC",          int,        ""),
-            ("nSelected_wq",        int,        ""),
-            ("nSelected_tb",        int,        ""),
-            ("nSelected_hb",        int,        ""),
-            ("nMatch_wq",           int,        ""),
-            ("nMatch_wq_btag",      int,        ""),
-            ("nMatch_tb",           int,        ""),
-            ("nMatch_tb_btag",      int,        ""),
-            ("nMatch_hb",           int,        ""),
-            ("nMatch_hb_btag",      int,        ""),
-            ("isotropy",            float,      ""),
-            ("sphericity",          float,      ""),
-            ("C",                   float,      ""),
-            ("D",                   float,      ""),
-            ("aplanarity",          float,      ""),
-            ("mean_bdisc",          float,      ""),
-            ("mean_bdisc_btag",     float,      ""),
-            ("std_bdisc",           float,      ""),
-            ("std_bdisc_btag",      float,      ""),
-            ("mean_dr_btag",        float,      ""),
-            ("std_dr_btag",         float,      ""),
-            ("min_dr_btag",         float,      ""),
-            ("ht",                  float,      ""),
-            ("momentum_eig0",       float,      ""),
-            ("momentum_eig1",       float,      ""),
-            ("momentum_eig2",       float,      ""),
-            ("mass_drpair_btag",    float,      ""),
-            ("eta_drpair_btag",     float,      ""),
-            ("pt_drpair_btag",      float,      ""),
-            ("passes_jet",          int,        ""),
-            ("passes_btag",         int,        ""),
-            ("passes_mem",          int,        "MEM was evaluated"),
+            #("nMatchSimB",          int,        ""),
+            #("nMatchSimC",          int,        ""),
+            #("nSelected_wq",        int,        ""),
+            #("nSelected_tb",        int,        ""),
+            #("nSelected_hb",        int,        ""),
+            #("nMatch_wq",           int,        ""),
+            #("nMatch_wq_btag",      int,        ""),
+            #("nMatch_tb",           int,        ""),
+            #("nMatch_tb_btag",      int,        ""),
+            #("nMatch_hb",           int,        ""),
+            #("nMatch_hb_btag",      int,        ""),
+            #("isotropy",            float,      ""),
+            #("sphericity",          float,      ""),
+            #("C",                   float,      ""),
+            #("D",                   float,      ""),
+            #("aplanarity",          float,      ""),
+            #("mean_bdisc",          float,      ""),
+            #("mean_bdisc_btag",     float,      ""),
+            #("std_bdisc",           float,      ""),
+            #("std_bdisc_btag",      float,      ""),
+            #("mean_dr_btag",        float,      ""),
+            #("std_dr_btag",         float,      ""),
+            #("min_dr_btag",         float,      ""),
+            #("ht",                  float,      ""),
+            #("momentum_eig0",       float,      ""),
+            #("momentum_eig1",       float,      ""),
+            #("momentum_eig2",       float,      ""),
+            #("mass_drpair_btag",    float,      ""),
+            #("eta_drpair_btag",     float,      ""),
+            #("pt_drpair_btag",      float,      ""),
+            #("passes_jet",          int,        ""),
+            #("passes_btag",         int,        ""),
+            #("passes_mem",          int,        "MEM was evaluated"),
             ("changes_jet_category",int,        "Jet category changed on systematic"),
             #("tth_mva",             float,      "ttH vs tt+jets bdt"),
         ]:
@@ -665,15 +680,6 @@ def getTreeProducer(conf):
             syst_suffix2 = ""
         
         for hypo in conf.mem["methodsToRun"]:
-            for proc in ["tth", "ttbb"]:
-                name = "mem_{0}_{1}".format(proc, hypo) 
-                treeProducer.globalObjects.update({
-                    name + syst_suffix: NTupleObject(
-                        name + syst_suffix2, memType_nominal if systematic == "nominal" else memType_syst,
-                        help="MEM result for proc={0} hypo={1}".format(proc, hypo),
-                        mcOnly = is_mc_only
-                    ),
-                })
             treeProducer.globalVariables.append(
                 NTupleVariable(
                     "mem_" + hypo + "_p" + syst_suffix2,
@@ -681,6 +687,16 @@ def getTreeProducer(conf):
                     mcOnly = False,
                 ),
             )
+    for hypo in conf.mem["methodsToRun"]:
+        for proc in ["tth", "ttbb"]:
+            name = "mem_{0}_{1}".format(proc, hypo) 
+            treeProducer.globalObjects.update({
+                name + "_nominal": NTupleObject(
+                    name, memType_nominal,
+                    help="MEM result for proc={0} hypo={1}".format(proc, hypo),
+                    mcOnly = False
+                ),
+            })
 
     for vtype in [
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),

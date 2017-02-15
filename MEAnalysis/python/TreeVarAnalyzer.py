@@ -35,8 +35,6 @@ class TreeVarAnalyzer(FilterAnalyzer):
             #add all variated quantities to event with a suffix
             for k, v in all_items:
                 event.__dict__[k + "_" + syst] = v
-                if "mem_SL_2w2h2t_p" in k:
-                    print k + "_" + syst, v
         #for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "topCandidatesSync", "higgsCandidate"]:
         #    if not hasattr(event, br+"_nominal"):
         #        setattr(event, br + "_nominal", [])
