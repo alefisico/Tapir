@@ -110,7 +110,8 @@ if not "--nostep2" in args:
     
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
-    an = analysisFromConfig("tth.cfg")
+    an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+    an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
     tth_main(
         an,
         schema="mc" if cfo.sample.isMC else "data",

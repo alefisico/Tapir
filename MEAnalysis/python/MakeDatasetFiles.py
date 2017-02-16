@@ -24,7 +24,7 @@ from FWCore.PythonUtilities.LumiList import LumiList
 #    "bin",
 #    "das_client.py"
 #)
-das_client = "/afs/cern.ch/user/v/valya/public/das_client.py"
+das_client = "/cvmfs/cms.cern.ch/common/das_client"
 output_base = os.path.join(
     os.environ["CMSSW_BASE"],
     "src/TTH/MEAnalysis/gc/datasets/",
@@ -115,14 +115,14 @@ if __name__ == "__main__":
         ofile.write("[{0}__{1}]\n".format(version, sample))
             
         files_json = subprocess.Popen([
-            "python {0} --query='file dataset={1} instance={2}' --format=json --limit={3}".format(
+            "{0} --query='file dataset={1} instance={2}' --format=json --limit={3}".format(
             das_client, ds, args.instance, args.limit)
             ], stdout=subprocess.PIPE, shell=True
         ).stdout.read()
         files_di = json.loads(files_json)
         
         files_run_lumi_json = subprocess.Popen([
-            "python {0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3}".format(
+            "{0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3}".format(
             das_client, ds, args.instance, args.limit)
             ], stdout=subprocess.PIPE, shell=True
         ).stdout.read()

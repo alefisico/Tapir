@@ -1,12 +1,10 @@
-from TTH.MEAnalysis.vhbb_utils import lvec, autolog
+from TTH.MEAnalysis.vhbb_utils import autolog
 
 import ROOT
-import copy
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
 
 import numpy as np
-import json
 
 from TTH.MEAnalysis.MEMUtils import set_integration_vars, add_obj
 from TTH.MEAnalysis.MEMConfig import MEMConfig
@@ -72,7 +70,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
             autolog("MECategoryAnalyzer started")
 
         cat = "NOCAT"
-        
+
         pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
             len(event.selected_btagged_jets_high) >= 4
         )
@@ -128,7 +126,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
         event.cat_btag = cat_btag
         event.catn = self.cat_map.get(cat, -1)
         event.cat_btag_n = self.btag_cat_map.get(cat_btag, -1)
-       
+
         #always pass ME category analyzer
         event.passes_mecat = True
 
@@ -191,11 +189,11 @@ class MEAnalyzer(FilterAnalyzer):
             v.configure_transfer_function(self.conf)
 
         self.memkeysToRun = self.conf.mem["methodsToRun"]
-        
+
         #Create an empty vector for the integration variables
         self.vars_to_integrate   = CvectorPSVar()
         self.vars_to_marginalize = CvectorPSVar()
-        
+
         cfg = MEMConfig(self.conf)
         #cfg.configure_btag_pdf(self.conf)
         cfg.configure_transfer_function(self.conf)
@@ -216,7 +214,7 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.set_cfg(mem_cfg.cfg)
 
         set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
-        
+
         bquarks = sorted(list(mem_cfg.b_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
 
         if len(bquarks) > mem_cfg.maxBJets:
@@ -226,7 +224,7 @@ class MEAnalyzer(FilterAnalyzer):
             for q in bquarks[mem_cfg.maxBJets:]:
                 print "Dropping jet", q.pt, q.eta
             bquarks = bquarks[:mem_cfg.maxBJets]
-        
+
         lquarks = sorted(list(mem_cfg.l_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
 
         if len(lquarks) > mem_cfg.maxLJets:
@@ -236,7 +234,7 @@ class MEAnalyzer(FilterAnalyzer):
             for q in lquarks[mem_cfg.maxLJets:]:
                 print "Dropping jet", q.pt, q.eta
             lquarks = lquarks[:mem_cfg.maxLJets]
-        
+
         event.mem_jets = bquarks + lquarks
         ##Only take up to 4 candidates, otherwise runtimes become too great
         for jet in bquarks + lquarks:
@@ -300,75 +298,18 @@ class MEAnalyzer(FilterAnalyzer):
 
         return self.conf.general["passall"] or np.any([v.passes_mem for v in event.systResults.values()])
 
-    #def printInputs(self, event, confname):
-    #    inputs = {
-    #        "selectedJetsP4": [
-    #            (j.pt, j.eta, j.phi, j.mass) for j in event.good_jets
-    #        ],
-    #        "selectedJetsCSV": [
-    #            (j.btagCSV) for j in event.good_jets
-    #        ],
-    #        "selectedJetsBTag": [
-    #            (j.btagFlag) for j in event.good_jets
-    #        ],
-    #        "selectedLeptonsP4": [
-    #            (l.pt, l.eta, l.phi, l.mass) for l in event.good_leptons
-    #        ],
-    #        "selectedLeptonsCharge": [
-    #            (l.charge) for l in event.good_leptons
-    #        ],
-    #        "metP4": (event.MET.pt, event.MET.phi)
-    #    }
-    #    outobjects = {"input": inputs}
-    #    outobjects["event"] = {
-    #        "run": event.input.run,
-    #        "lumi":event.input.lumi,
-    #        "event": event.input.evt,
-    #        "cat": event.category_string,
-    #        "blr": event.btag_LR_4b_2b,
-    #        "match_btag": "{0}w_{1}h_{2}h".format(
-    #            event.nMatch_wq_btag,
-    #            event.nMatch_hb_btag,
-    #            event.nMatch_tb_btag,
-    #        ),
-    #        "match": "{0}w_{1}h_{2}h".format(
-    #            event.nMatch_wq,
-    #            event.nMatch_hb,
-    #            event.nMatch_tb,
-    #        )
-    #    }
-    #    #FIXME: make independent of methodOrder
-    #    try:
-    #        memidx = self.conf.mem["methodOrder"].index(confname)
-    #        outobjects["output"] = {
-    #            "mem_cfg": confname,
-    #            "p_tth": event.mem_results_tth[memidx].p,
-    #            "p_ttbb": event.mem_results_ttbb[memidx].p,
-    #            "p": event.mem_results_tth[memidx].p / (
-    #                event.mem_results_tth[memidx].p + self.conf.mem["weight"]*event.mem_results_ttbb[memidx].p
-    #            ) if event.mem_results_tth[memidx].p > 0 else 0.0
-    #        }
-    #    except:
-    #        print "Potential error!! self.conf.mem['methodOrder'] is missing"
-    #    #end FIXME
-    #    self.jsonout = open("events.json", "a")
-    #    self.jsonout.write(
-    #        json.dumps(outobjects) + "\n"
-    #    )
-    #    self.jsonout.close()
 
     def _process(self, event):
-        
+
         if "debug" in self.conf.general["verbosity"]:
             autolog("MEMAnalyzer started")
-        
+
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
         self.integrator.next_event()
-
         event.res = {}
-        
+
         if "meminput" in self.conf.general["verbosity"]:
             autolog("MEM id={run},{lumi},{evt} cat={cat} cat_b={cat_btag} nj={nj} nt={nb} nel={n_el} nmu={n_mu} syst={syst}".format(
                 run=event.input.run,
@@ -394,7 +335,7 @@ class MEAnalyzer(FilterAnalyzer):
                 if "dl" in mem_cfg.mem_assumptions:
                     fstate = MEM.FinalState.LL
                 elif "sl" in mem_cfg.mem_assumptions:
-                    fstate = MEM.FinalState.LH 
+                    fstate = MEM.FinalState.LH
                 elif "fh" in mem_cfg.mem_assumptions:
                     fstate = MEM.FinalState.HH
                 else:
@@ -410,9 +351,9 @@ class MEAnalyzer(FilterAnalyzer):
                         self.conf.mem["selection"](event) and
                         confname in self.memkeysToRun and
                         ((event.systematic in self.conf.mem["enabled_systematics"]
-                        and event.changes_jet_category) or event.systematic == "nominal")
+                        or event.changes_jet_category) or event.systematic == "nominal")
                     ):
-                    
+
                     autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6}".format(
                         hypo, confname,
                         event.input.run, event.input.lumi, event.input.evt,
@@ -435,7 +376,9 @@ class MEAnalyzer(FilterAnalyzer):
                         r = MEM.MEMOutput()
                     autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
 
-                    dw = {fc: 0.0 for fc in self.conf.mem["jet_corrections"]}
+                    dw = {}
+                    for fc in self.conf.mem["jet_corrections"]:
+                        dw[fc] = 0.0
                     if getattr(event, "systematic", "nominal") and self.cfg_comp.isMC:
                         for ijet, jet in enumerate(event.mem_jets):
                             if not (ijet < r.grad.size()):
@@ -455,24 +398,26 @@ class MEAnalyzer(FilterAnalyzer):
                     event.res[(hypo, confname)] = r
             if "meminput" in self.conf.general["verbosity"]:
                 autolog("skipped confs", skipped)
-        
+
         #Add MEM results to event
         for key in self.memkeysToRun:
             p0 = 0.0
             p1 = 0.0
+
+            #if it was a systematic event
+            #AND the variation changed the jet category
+            #AND the nominal MEM was computed, get the variation off of that
             if event.systematic != "nominal" and not event.changes_jet_category and key in event.nominal_event.was_run.keys():
                 icorr = self.conf.mem["jet_corrections"].index(event.systematic)
                 r1 = event.nominal_event.res[(MEM.Hypothesis.TTH, key)].variated
                 r2 = event.nominal_event.res[(MEM.Hypothesis.TTBB, key)].variated
                 p0 = r1.at(icorr) if icorr < r1.size() else 0.0
                 p1 = r2.at(icorr) if icorr < r2.size() else 0.0
+            #MEM was recomputed
             else:
                 p0 = event.res[(MEM.Hypothesis.TTH, key)].p
                 p1 = event.res[(MEM.Hypothesis.TTBB, key)].p
-            mem_p = p0 / (p0 + 0.1*p1) if p0 > 0 else 0.0
-            #print key, event.systematic, mem_p
-            #import pdb
-            #pdb.set_trace()
+            mem_p = p0 / (p0 + self.conf.mem["weight"]*p1) if p0 > 0 else 0.0
             setattr(event, "mem_{0}_p".format(key), mem_p)
 
             for (hypo_name, hypo) in [
@@ -481,23 +426,7 @@ class MEAnalyzer(FilterAnalyzer):
             ]:
                 mem_res = event.res[(hypo, key)]
                 setattr(event, "mem_{0}_{1}".format(hypo_name, key), mem_res)
-                ##Create MEM permutations
-                #perms = []
-                #for iperm in range(mem_res.num_perm):
-                #    perm = mem_res.permutation_indexes[iperm]
-                #    v_p = normalize_proba([v for v in mem_res.permutation_probas[iperm]])
-                #    v_p_tf = normalize_proba([v for v in mem_res.permutation_probas_transfer[iperm]])
-                #    v_p_me = normalize_proba([v for v in mem_res.permutation_probas_me[iperm]])
-                #    mem_perm = MEMPermutation(
-                #        iperm,
-                #        [_p for _p in perm],
-                #        np.mean(v_p), np.std(v_p), 
-                #        np.mean(v_p_tf), np.std(v_p_tf), 
-                #        np.mean(v_p_me), np.std(v_p_me),
-                #    )
-                #    perms += [mem_perm]
-                #setattr(event, "mem_{0}_{1}_perm".format(hypo_name, key), perms)
-       
+
         #print out the JSON format for the standalone integrator
         for confname in self.memkeysToRun:
             mem_cfg = self.mem_configs[confname]
