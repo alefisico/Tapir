@@ -68,7 +68,11 @@ class Sample(object):
         self.files_load = kwargs.get("files_load")
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
-        self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
+        try:
+            self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
+        except Exception as e:
+            print "ERROR: could not load sample file {0}".format(files_load)
+            self.file_names = []
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
