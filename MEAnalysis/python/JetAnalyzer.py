@@ -53,7 +53,6 @@ class JetAnalyzer(FilterAnalyzer):
                 cf =  _sigma * new_corr / old_corr
             else:
                 cf = 0.0
-            print newjets[i].pt, cf, sdir, _sigma, old_corr, new_corr
 
             newjets[i].pt *= cf
             newjets[i].mass *= cf

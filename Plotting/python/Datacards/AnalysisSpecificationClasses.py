@@ -71,7 +71,7 @@ class Sample(object):
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
         except Exception as e:
-            print "ERROR: could not load sample file {0}".format(files_load)
+            print "ERROR: could not load sample file {0}".format(self.files_load)
             self.file_names = []
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]

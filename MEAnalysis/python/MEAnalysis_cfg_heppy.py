@@ -309,7 +309,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         "n_integration_points_mult": 1.0,
 
         "factorized_sources": factorizedJetCorrections,
@@ -322,7 +322,7 @@ class Conf:
             "TotalDown",
         ],
 
-        "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
+        "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)
 
         "blr_cuts": {
             "sl_j4_t2": 20,
@@ -357,7 +357,7 @@ class Conf:
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
-                ((event.is_sl or event.is_dl) and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 3)
+                ((event.is_sl or event.is_dl) and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 4)
             #(event.is_fh and event.cat in ["cat7","cat8"]
             #and event.btag_LR_4b_2b > 0.95)
         ),
@@ -366,7 +366,7 @@ class Conf:
         "methodsToRun": [
             #"SL_0w2h2t",
             "DL_0w2h2t",
-            #"SL_1w2h2t",
+            "SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
             "SL_2w2h2t",
