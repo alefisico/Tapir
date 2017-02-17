@@ -309,7 +309,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
         "n_integration_points_mult": 1.0,
 
         "factorized_sources": factorizedJetCorrections,
