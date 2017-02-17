@@ -46,14 +46,14 @@ edmProvDump
 
 # Update library path
 # Needed so recompiled modules are found
-#export LD_LIBRARY_PATH=./lib/slc6_amd64_gcc481:$LD_LIBRARY_PATH 
+export LD_LIBRARY_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc530/external/gsl/2.2.1/lib:$LD_LIBRARY_PATH 
 cd $CMSSW_BASE
 eval `scram runtime -sh`
 cd -
 echo "LD LIBRARY PATH IS"
 echo $LD_LIBRARY_PATH
 
-export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
+export ROOT_INCLUDE_PATH=.:./src:/cvmfs/cms.cern.ch/slc6_amd64_gcc530/external/gsl/2.2.1/include:$ROOT_INCLUDE_PATH
 
 echo "tth_hashes"
 cat hash
