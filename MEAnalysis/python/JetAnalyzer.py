@@ -37,54 +37,26 @@ class JetAnalyzer(FilterAnalyzer):
 
     def variateJets(self, jets, systematic, sigma):
         newjets = [SystematicObject(jet, {"pt": jet.pt, "mass": jet.mass}) for jet in jets]
-        if self.cfg_comp.isMC and systematic == "JES":
-            for i in range(len(jets)):
-                if sigma > 0:
-                    cf = sigma * newjets[i].corr_JECUp / newjets[i].corr
-                elif sigma < 0:
-                    cf = abs(sigma) * newjets[i].corr_JECDown / newjets[i].corr
-                
-                #get the uncorrected jets
-                elif sigma == 0:
-                    cf = 1.0 / newjets[i].corr
+        for i in range(len(jets)):
+            if sigma > 0:
+                sdir = "Up"
+                _sigma = sigma
+            elif sigma < 0:
+                sdir = "Down"
+                _sigma = abs(sigma)
+            else:
+                raise Exception("sigma must be != 0")
+            new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
+            old_corr = newjets[i].corr
 
-                newjets[i].pt *= cf
-                newjets[i].mass *= cf
-        elif self.cfg_comp.isMC and systematic == "JER":
-            for i in range(len(jets)):
-                if newjets[i].corr_JER > 0:
-                    if sigma > 0:
-                        cf =  sigma * newjets[i].corr_JERUp / newjets[i].corr_JER
-                    elif sigma < 0:
-                        cf = abs(sigma) * newjets[i].corr_JERDown / newjets[i].corr_JER
-                    
-                    #get the uncorrected jets
-                    elif sigma == 0:
-                        cf = 1.0 / newjets[i].corr_JER
-                else:
-                    cf = 0.0
+            if new_corr > 0:
+                cf =  _sigma * new_corr / old_corr
+            else:
+                cf = 0.0
+            print newjets[i].pt, cf, sdir, _sigma, old_corr, new_corr
 
-                newjets[i].pt *= cf
-                newjets[i].mass *= cf
-        elif self.cfg_comp.isMC:
-            for i in range(len(jets)):
-                if sigma > 0:
-                    sdir = "Up"
-                elif sigma < 0:
-                    sdir = "Down"
-                    sigma = abs(sigma)
-                else:
-                    raise Exception("sigma must be != 0")
-                new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
-                old_corr = newjets[i].corr
-
-                if new_corr > 0:
-                    cf =  sigma * new_corr / old_corr
-                else:
-                    cf = 0.0
-
-                newjets[i].pt *= cf
-                newjets[i].mass *= cf
+            newjets[i].pt *= cf
+            newjets[i].mass *= cf
         return newjets
 
     def process(self, event):
@@ -100,23 +72,13 @@ class JetAnalyzer(FilterAnalyzer):
 
         #add events with variated jets
         if self.cfg_comp.isMC:
-            jets_raw = self.variateJets(event.Jet, "JES", 0)
-            jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
-            jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
-            jets_JER_Up = self.variateJets(event.Jet, "JER", 1)
-            jets_JER_Down = self.variateJets(event.Jet, "JER", -1)
             jets_variated = {}
             for fjc in self.conf.mem["factorized_sources"]:
                 for sdir, sigma in [("Up", 1.0), ("Down", -1.0)]:
                     jet_var = self.variateJets(event.Jet, fjc, sigma)
                     jets_variated[fjc+sdir] = jet_var
-            for name, jets in [
-                    ("raw", jets_raw),
-                    ("JESUp", jets_JES_Up),
-                    ("JESDown", jets_JES_Down),
-                    ("JERUp", jets_JER_Up),
-                    ("JERDown", jets_JER_Down)
-                ] + jets_variated.items():
+            for name, jets in jets_variated.items():
+                #skip processing of systematics that are not enabled
                 if not name in self.conf.general["systematics"]:
                     continue
 
