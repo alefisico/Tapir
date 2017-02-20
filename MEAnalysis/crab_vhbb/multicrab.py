@@ -103,8 +103,8 @@ for sd in sets_data:
     datasets[name] = {
         "ds": sd,
         "maxlumis": -1,
-        "perjob": 10,
-        "runtime": 10,
+        "perjob": 10, #each lumisection is 200 MC events
+        "runtime": 10, #hours
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'
     }
@@ -138,8 +138,8 @@ datasets.update({
     'TTbar_sl': {
         "ds": '/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 20,
-        "runtime": 10,
+        "perjob": 150,
+        "runtime": 20,
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
     },
@@ -147,8 +147,8 @@ datasets.update({
     'TTbar_dl': {
         "ds": '/TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 20,
-        "runtime": 10,
+        "perjob": 150,
+        "runtime": 20,
         "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script.sh'
     },
@@ -400,11 +400,11 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        "ttHTobb",
+        #"ttHTobb",
         #"ttHToNonbb",
         #"TTbar_inc",
-        #"TTbar_sl",
-        #"TTbar_dl"
+        "TTbar_sl",
+        "TTbar_dl"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -535,7 +535,7 @@ for k in ["mc", "data"]:
     workflow_datasets["localtesting_withme"][k] = D
 
 workflow_datasets["testing_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v1"]:
+for k in ["ttHTobb", "TTbar_inc"]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(D["perjob"]/10)
     D["maxlumis"] = 100 * D["perjob"]
@@ -613,7 +613,7 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 2500
+    config.JobType.maxMemoryMB = 3000
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")

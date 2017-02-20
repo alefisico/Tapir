@@ -1,6 +1,8 @@
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
-from TTH.MEAnalysis.vhbb_utils import lvec
+from TTH.MEAnalysis.vhbb_utils import lvec, autolog
+import resource
 import ROOT
+import logging
 
 class FilterAnalyzer(Analyzer):
     """
@@ -10,6 +12,16 @@ class FilterAnalyzer(Analyzer):
     def beginLoop(self, setup):
         super(FilterAnalyzer, self).beginLoop(setup)
 
+class MemoryAnalyzer(Analyzer):
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(MemoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.conf = cfg_ana._conf
+        self.logger = logging.getLogger("MemoryAnalyzer")
+
+    def process(self, event):
+        memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        autolog("memory usage at event {0}: {1:.2f} MB".format(event.iEv, memory/1024.0))
+        return True
 
 class PrefilterAnalyzer(Analyzer):
     """

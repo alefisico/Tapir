@@ -105,6 +105,7 @@ if __name__ == "__main__":
         # Yields:
         # sample = TTTo2L2Nu_13TeV-powheg
         sample  = "_".join(ds.split("/")[1:3])
+        sample_short  = ds.split("/")[1]
         if sample in samples_processed:
             raise Exception("Duplicate sample {0}".format(sample))
         samples_processed += [sample]
@@ -112,7 +113,7 @@ if __name__ == "__main__":
         ofile_fn = os.path.join(outdir, sample + ".txt")
         ofile = open(ofile_fn, "w")
     
-        ofile.write("[{0}__{1}]\n".format(version, sample))
+        ofile.write("[{0}]\n".format(sample_short))
             
         files_json = subprocess.Popen([
             "{0} --query='file dataset={1} instance={2}' --format=json --limit={3}".format(

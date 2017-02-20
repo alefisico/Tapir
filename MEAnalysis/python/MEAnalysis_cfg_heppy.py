@@ -248,13 +248,13 @@ class Conf:
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
         "verbosity": [
-            "eventboundary", #print run:lumi:event
+            #"eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            "meminput", #info about particles used for MEM input
+            #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
         ],
@@ -357,7 +357,8 @@ class Conf:
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
-                ((event.is_sl or event.is_dl) and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 4)
+                ((event.is_sl or event.is_dl) and
+                (event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 4))
             #(event.is_fh and event.cat in ["cat7","cat8"]
             #and event.btag_LR_4b_2b > 0.95)
         ),
