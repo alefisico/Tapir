@@ -77,6 +77,7 @@ factorizedJetCorrections = [
         "CorrelationGroupbJES",
         "CorrelationGroupFlavor",
         "CorrelationGroupUncorrelated",
+        "JER"
 ]
 
 def el_baseline_medium(el):
@@ -240,8 +241,6 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
         "systematics": [
             "nominal",
-            "JERUp",
-            "JERDown",
         ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
 
 
