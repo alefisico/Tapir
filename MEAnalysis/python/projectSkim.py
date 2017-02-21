@@ -16,6 +16,7 @@ for fi in sys.argv[2:]:
 tt.SetBranchStatus("*", False)
 tt.SetBranchStatus("mem_*", True)
 tt.SetBranchStatus("nMatch*", True)
+tt.SetBranchStatus("nGen*", True)
 tt.SetBranchStatus("is_*", True)
 tt.SetBranchStatus("numJets*", True)
 tt.SetBranchStatus("nB*", True)

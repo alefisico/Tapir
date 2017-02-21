@@ -194,10 +194,10 @@ class Conf:
         "minjets_fh": 6,
 
         #The default b-tagging algorithm (branch name)
-        "btagAlgo": "btagCSV",
+        "btagAlgo": "btagCMVA",
 
         #The default b-tagging WP
-        "btagWP": "CSVM",
+        "btagWP": "CMVAM",
 
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
@@ -213,7 +213,7 @@ class Conf:
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
         #if btagLR, selection is done by the btag likelihood ratio permutation
-        #"untaggedSelection": "btagCSV",
+        #"untaggedSelection": "btagCMVA",
         "untaggedSelection": "btagLR",
 
         #how many jets to consider for the btag LR permutations
@@ -240,6 +240,8 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
         "systematics": [
             "nominal",
+            "JERUp",
+            "JERDown",
         ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
 
 
@@ -309,7 +311,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
         "n_integration_points_mult": 1.0,
 
         "factorized_sources": factorizedJetCorrections,

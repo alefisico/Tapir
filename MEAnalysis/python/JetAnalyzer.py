@@ -72,7 +72,7 @@ class JetAnalyzer(FilterAnalyzer):
         #add events with variated jets
         if self.cfg_comp.isMC:
             jets_variated = {}
-            for fjc in self.conf.mem["factorized_sources"]:
+            for fjc in self.conf.mem["factorized_sources"] + ["JER"]:
                 for sdir, sigma in [("Up", 1.0), ("Down", -1.0)]:
                     jet_var = self.variateJets(event.Jet, fjc, sigma)
                     jets_variated[fjc+sdir] = jet_var

@@ -28,41 +28,6 @@ for sdir in ["up", "down"]:
         for tagger in ["CSV", "CMVAV2"]:
             bweights += ["btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)]
 
-#Specifies what to save for jets
-jetType = NTupleObjectType("jetType", variables = [
-    NTupleVariable("pt", lambda x : x.pt),
-    NTupleVariable("eta", lambda x : x.eta),
-    NTupleVariable("phi", lambda x : x.phi),
-    NTupleVariable("mass", lambda x : x.mass),
-    NTupleVariable("id", lambda x : x.id, mcOnly=True),  
-    NTupleVariable("qgl", lambda x : x.qgl),
-    NTupleVariable("btagCSV", lambda x : x.btagCSV),
-    NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
-    #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
-    NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
-    NTupleVariable("mcFlavour", lambda x : x.mcFlavour, the_type=int, mcOnly=True),
-    NTupleVariable("mcMatchId", lambda x : x.mcMatchId, the_type=int, mcOnly=True),
-    NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, the_type=int, mcOnly=True),
-    NTupleVariable("matchFlag",
-        lambda x : getattr(x, "tth_match_label_numeric", -1),
-        the_type=int,
-        mcOnly=True,
-        help="0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs"
-    ),
-    NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), the_type=int, mcOnly=True),
-    NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
-    NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
-    NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
-    NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
-    NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-    NTupleVariable("corr", lambda x : x.corr, mcOnly=True),
-    NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
-    NTupleVariable("corr_JESUp", lambda x : x.corr_JECUp, mcOnly=True),
-    NTupleVariable("corr_JESDown", lambda x : x.corr_JECDown, mcOnly=True),
-    NTupleVariable("corr_JERUp", lambda x : x.corr_JERUp, mcOnly=True),
-    NTupleVariable("corr_JERDown", lambda x : x.corr_JERDown, mcOnly=True),
-])
 
 lepton_sf_kind = [
     "SF_HLT_RunD4p2",
@@ -377,22 +342,55 @@ def getTreeProducer(conf):
     memType_nominal = NTupleObjectType("memType", variables = [
         NTupleVariable("p", lambda x : x.p),
         NTupleVariable("p_err", lambda x : x.p_err),
-        NTupleVariable("chi2", lambda x : x.chi2),
+        #NTupleVariable("chi2", lambda x : x.chi2),
         NTupleVariable("time", lambda x : x.time),
-        NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
-        NTupleVariable("efficiency", lambda x : x.efficiency),
+        #NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
+        #NTupleVariable("efficiency", lambda x : x.efficiency),
         NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
     ] + factorized_dw_vars + variated_vars)
     
     memType_syst = NTupleObjectType("memType", variables = [
         NTupleVariable("p", lambda x : x.p),
         NTupleVariable("p_err", lambda x : x.p_err),
-        NTupleVariable("chi2", lambda x : x.chi2),
-        NTupleVariable("time", lambda x : x.time),
-        NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
-        NTupleVariable("efficiency", lambda x : x.efficiency),
-        NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
+        #NTupleVariable("chi2", lambda x : x.chi2),
+        #NTupleVariable("time", lambda x : x.time),
+        #NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
+        #NTupleVariable("efficiency", lambda x : x.efficiency),
+        #NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
     ])
+   
+    #create jet up/down variations
+    corrs = [NTupleVariable("corr_"+c, lambda x,c="corr_"+c : getattr(x, c), mcOnly=True) for c in conf.mem["jet_corrections"]]
+    #Specifies what to save for jets
+    jetType = NTupleObjectType("jetType", variables = [
+        NTupleVariable("pt", lambda x : x.pt),
+        NTupleVariable("eta", lambda x : x.eta),
+        NTupleVariable("phi", lambda x : x.phi),
+        NTupleVariable("mass", lambda x : x.mass),
+        NTupleVariable("id", lambda x : x.id, mcOnly=True),  
+        NTupleVariable("qgl", lambda x : x.qgl),
+        NTupleVariable("btagCSV", lambda x : x.btagCSV),
+        NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
+        #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
+        NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
+        NTupleVariable("mcFlavour", lambda x : x.mcFlavour, the_type=int, mcOnly=True),
+        NTupleVariable("mcMatchId", lambda x : x.mcMatchId, the_type=int, mcOnly=True),
+        NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, the_type=int, mcOnly=True),
+        NTupleVariable("matchFlag",
+            lambda x : getattr(x, "tth_match_label_numeric", -1),
+            the_type=int,
+            mcOnly=True,
+            help="0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs"
+        ),
+        NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), the_type=int, mcOnly=True),
+        NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
+        NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
+        NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
+        NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
+        NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+        NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+        NTupleVariable("corr", lambda x : x.corr, mcOnly=True),
+    ] + corrs)
 
     #Create the output TTree writer
     #Here we define all the variables that we want to save in the output TTree
@@ -549,7 +547,7 @@ def getTreeProducer(conf):
 
         #scalar variables that have systematic variations
         for vtype in [
-            #("Wmass",               float,      "Best reconstructed W candidate mass"),
+            ("Wmass",               float,      "Best reconstructed W candidate mass"),
             #("cat",                 int,        "ME category", "catn"),
             #("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
             #("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
@@ -568,7 +566,7 @@ def getTreeProducer(conf):
             ("nBCSVM",              int,      "Number of good jets that pass the CSV Medium WP"),
             ("nBCMVAM",             int,      "Number of good jets that pass cMVAv2 Medium WP"),
             ("numJets",             int,        "Total number of good jets that pass jet ID"),
-            #("ht",                  float,      ""),
+            ("ht",                  float,      ""),
             ("changes_jet_category",int,        "Jet category changed on systematic"),
         ]:
 
@@ -598,7 +596,7 @@ def getTreeProducer(conf):
             )
     #add full MEM output struct for nominal and the systematic case where we
     #explicitly recomputed the MEM
-    for systematic in conf.mem["enabled_systematics"]:
+    for systematic in conf.general["systematics"]:
         syst_suffix = "_" + systematic
         syst_suffix2 = syst_suffix
         memType = memType_syst

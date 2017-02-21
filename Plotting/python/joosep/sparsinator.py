@@ -169,6 +169,8 @@ class Var:
         for syst in systematics:
             for sdir in ["Up", "Down"]:
                 suffix = syst + sdir
+                import pdb
+                pdb.set_trace()
                 self.systematics_funcs[suffix] = Func(
                     self.name + "_" + suffix,
                     func=lambda ev, suff=suffix, fallback=self.name: getattr(ev, suff, fallback)
@@ -182,8 +184,9 @@ class Var:
                     return self.funcs_schema.get(schema, self.nominal_func)(event)
                 else:
                     return self.systematics_funcs[systematic](event)
-            except:  
+            except Exception as e:  
                 print (self.name + " " + systematic + " DEACTIVATED")
+                print (e)
                 self.present = False
                 return 0
         else:            
@@ -483,11 +486,16 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Var(name="leps_pt"),
         Var(name="leps_eta"),
 
-        Var(name="numJets", systematics="suffix"),
-        Var(name="nBCSVM", systematics="suffix"),
-        Var(name="nBCMVAM", systematics="suffix"),
-        
-        Var(name="Wmass", systematics="suffix"),
+        Var(name="numJets", systematics = {
+            "CMS_scale_jUp": Func("numJets_TotalUp", func=lambda ev: ev.numJets_TotalUp),
+            "CMS_scale_jDown": Func("numJets_TotalDown", func=lambda ev: ev.numJets_TotalDown),
+            }
+        ),
+        Var(name="nBCSVM", systematics = {
+            "CMS_scale_jUp": Func("nBCSVM_TotalUp", func=lambda ev: ev.nBCSVM_TotalUp),
+            "CMS_scale_jDown": Func("nBCSVM_TotalDown", func=lambda ev: ev.nBCSVM_TotalDown),
+            }
+        ),
 
         Var(name="btag_LR_4b_2b_btagCSV",
             nominal=Func("blr_CSV", func=lambda ev: ev.btag_LR_4b_2b_btagCSV),
@@ -516,21 +524,21 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             ),
             systematics = {
                 "CMS_scale_jUp": Func(
-                    "jets_p4_JESUp",
+                    "jets_p4_TotalUp",
                     func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESUp[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
                 ),
                 "CMS_scale_jDown": Func(
-                    "jets_p4_JESDown",
+                    "jets_p4_TotalDown",
                     func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JESDown[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
                 ),
-                "CMS_res_jUp": Func(
-                    "jets_p4_JERUp",
-                    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERUp[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
-                ),
-                "CMS_res_jDown": Func(
-                    "jets_p4_JERDown",
-                    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
-                )
+                #"CMS_res_jUp": Func(
+                #    "jets_p4_JERUp",
+                #    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERUp[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                #),
+                #"CMS_res_jDown": Func(
+                #    "jets_p4_JERDown",
+                #    func=lambda ev: [lv_p4s(ev.jets_pt[i]*float(ev.jets_corr_JERDown[i])/float(ev.jets_corr_JER[i]) if ev.jets_corr_JER[i]>0 else 0.0, ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
+                #)
             }
         ),
 
@@ -541,32 +549,32 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             ),
             systematics = {
                 "CMS_scale_jUp": Func(
-                    "loose_jets_p4_JESUp",
+                    "loose_jets_p4_TotalUp",
                     func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JESUp[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
                 ),
                 "CMS_scale_jDown": Func(
-                    "loose_jets_p4_JESDown",
+                    "loose_jets_p4_TotalDown",
                     func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JESDown[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
                 ),
-                "CMS_res_jUp": Func(
-                    "loose_jets_p4_JERUp",
-                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERUp[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-                ),
-                "CMS_res_jDown": Func(
-                    "loose_jets_p4_JERDown",
-                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERDown[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-                )
+                #"CMS_res_jUp": Func(
+                #    "loose_jets_p4_JERUp",
+                #    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERUp[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                #),
+                #"CMS_res_jDown": Func(
+                #    "loose_jets_p4_JERDown",
+                #    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERDown[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+                #)
             }
         ),
 
         Var(name="mem_SL_0w2h2t_p",
-            nominal=Func("mem_SL_0w2h2t_p", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_0w2h2t_p/(ev.mem_tth_SL_0w2h2t_p + sf*ev.mem_ttbb_SL_0w2h2t_p) if getattr(ev,"mem_tth_SL_0w2h2t_p",0)>0 else 0.0),
+            nominal=Func("mem_SL_0w2h2t_p", func=lambda ev: ev.mem_SL_0w2h2t_p),
         ),
         Var(name="mem_SL_1w2h2t_p",
-            nominal=Func("mem_SL_1w2h2t_p", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_1w2h2t_p/(ev.mem_tth_SL_1w2h2t_p + sf*ev.mem_ttbb_SL_1w2h2t_p) if getattr(ev,"mem_tth_SL_1w2h2t_p",0)>0 else 0.0),
+            nominal=Func("mem_SL_1w2h2t_p", func=lambda ev: ev.mem_SL_1w2h2t_p),
         ),
         Var(name="mem_SL_2w2h2t_p",
-            nominal=Func("mem_SL_2w2h2t_p", func=lambda ev, sf=MEM_SF: ev.mem_tth_SL_2w2h2t_p/(ev.mem_tth_SL_2w2h2t_p + sf*ev.mem_ttbb_SL_2w2h2t_p) if getattr(ev,"mem_tth_SL_2w2h2t_p",0)>0 else 0.0),
+            nominal=Func("mem_SL_2w2h2t_p", func=lambda ev: ev.mem_SL_2w2h2t_p),
         ),
 #        Var(name="mem_DL_0w2h2t_p",
 #            nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
@@ -717,6 +725,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 continue
             if schema == "data" and not event.json:
                 continue
+
             #print(nevents)
 
             #Found a monster event in ttH (bug?)
@@ -839,12 +848,19 @@ if __name__ == "__main__":
 
     else:
         file_names = [
-            #'root://t3dcachedb03.psi.ch/pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/Feb1_leptonic_nome/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb1_leptonic_nome/170201_171753/0000/tree_100.root'
-            'file:///mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/tth_reopt2.root'
-        ] 
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_1.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_2.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_3.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_4.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_6.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_7.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_8.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_9.root',
+            'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/jpata/tth/Feb18/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb18/170218_051844/0000/tree_10.root',
+        ]
         prefix = ""
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 10000
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
