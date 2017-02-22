@@ -2,6 +2,7 @@ import PhysicsTools.HeppyCore.framework.config as cfg
 import os
 from PhysicsTools.Heppy.physicsutils.BTagWeightCalculator import BTagWeightCalculator
 from TTH.MEAnalysis.MEMAnalyzer import MEMPermutation
+from TTH.MEAnalysis.vhbb_utils import *
 
 #Defines the output TTree branch structures
 from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
@@ -18,15 +19,26 @@ def fillCoreVariables(self, tr, event, isMC):
             tr.fill(x, getattr(event.input, x))
 
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
-  
-bweights = [
-    "btagWeightCSV", "btagWeightCMVAV2"
-]
 
-for sdir in ["up", "down"]:
-    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-        for tagger in ["CSV", "CMVAV2"]:
-            bweights += ["btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)]
+#bweights = [
+#    "btagWeightCSV", "btagWeightCMVAV2"
+#]
+#
+#for sdir in ["up", "down"]:
+#    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+#        for tagger in ["CSV", "CMVAV2"]:
+#            bweights += ["btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)]
+
+from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
+#recompute b-tag weights
+btag_weights = {}
+for algo in ["CSV", "CMVAV2"]:
+    for syst in ["central", "up_jes", "down_jes", "up_lf", "down_lf", "up_hf", "down_hf", "up_hfstats1", "down_hfstats1", "up_hfstats2", "down_hfstats2", "up_lfstats1", "down_lfstats1", "up_lfstats2", "down_lfstats2", "up_cferr1", "down_cferr1", "up_cferr2", "down_cferr2"]:
+        syst_name = "" if syst=="central" else ("_"+syst) 
+        btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
+            lambda ev, get_event_SF=get_event_SF, syst=syst, algo=algo, btagSFhandle=btagSFhandle : get_event_SF(map(JetWrapper, ev.good_jets_nominal), syst, algo, btagSFhandle)
+            , float, mcOnly=True, help="b-tag "+algo+"continuous  weight, variating "+syst
+        )
 
 
 lepton_sf_kind = [
@@ -521,6 +533,7 @@ def getTreeProducer(conf):
 
         }
     )
+    treeProducer.globalVariables += list(btag_weights.values())
     
     #add HLT bits to final tree
     #trignames = []
@@ -633,10 +646,10 @@ def getTreeProducer(conf):
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
    
-    for bweight in bweights:
-        treeProducer.globalVariables += [
-            makeGlobalVariable((bweight, float, ""), "nominal", mcOnly=True)
-        ]
+    #for bweight in bweights:
+    #    treeProducer.globalVariables += [
+    #        makeGlobalVariable((bweight, float, ""), "nominal", mcOnly=True)
+    #    ]
 
     for vtype in [
         ("rho",                     float,  ""),

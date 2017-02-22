@@ -441,7 +441,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     systematics_list = [
         ("CMS_scale_j", "Total"),
         ("CMS_scaleSubTotalPileUp_j", "SubTotalPileUp"),
-        #("CMS_res_j", "JER")
+        ("CMS_res_j", "JER")
     ]
 
     #create the event description
@@ -495,24 +495,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 "loose_jets_p4",
                 func=lambda ev: [lv_p4s(ev.loose_jets_pt[i], ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
             ),
-            systematics = {
-                "CMS_scale_jUp": Func(
-                    "loose_jets_p4_TotalUp",
-                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_TotalUp[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-                ),
-                "CMS_scale_jDown": Func(
-                    "loose_jets_p4_TotalDown",
-                    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_TotalDown[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-                ),
-                #"CMS_res_jUp": Func(
-                #    "loose_jets_p4_JERUp",
-                #    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERUp[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-                #),
-                #"CMS_res_jDown": Func(
-                #    "loose_jets_p4_JERDown",
-                #    func=lambda ev: [lv_p4s(ev.loose_jets_pt[i]*float(ev.loose_jets_corr_JERDown[i])/float(ev.loose_jets_corr_JER[i]) if ev.loose_jets_corr_JER[i]>0 else 0.0, ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-                #)
-            }
+            systematics = generateSystematicsSuffix("loose_jets_corr", systematics_list, func=lambda x, ev: [lv_p4s(ev.loose_jets_pt[i]*float(x[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)])
         ),
 
         Var(name="mem_SL_0w2h2t_p",
@@ -800,11 +783,11 @@ if __name__ == "__main__":
 
     else:
         file_names = [
-            "/mnt/t3nfs01/data01/shome/jpata/tth/gc/nome/GCbb5f9b5db688/Feb1_leptonic_nome__ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8.root"
+            "/mnt/t3nfs01/data01/shome/jpata/tth/gc/nome/GC7a43d25a65fc/Feb1_leptonic_nome__ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8.root"
         ]
         prefix = ""
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 5000
+        max_events = 10000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
