@@ -238,6 +238,7 @@ def make_datacard(analysis, categories, outdir, hdict):
     for cat in categories:
         event_counts[cat.full_name] = {}
         hdict_cat[cat.full_name] = {}
+        logging.info("category {0} with processes {1}".format(cat.full_name, cat.out_processes))
         for proc in cat.out_processes:
             k = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
@@ -269,7 +270,7 @@ def make_datacard(analysis, categories, outdir, hdict):
     category_files = {}
 
     #save the histograms into per-category files
-    logging.info("main: saving categories")
+    logging.info("main: saving {0} categories".format(len(categories)))
     for catname in hdict_cat.keys():
         hfile = os.path.join(outdir, "{0}.root".format(catname))
         logging.debug("saving {0} histograms to {1}".format(
@@ -293,7 +294,7 @@ def make_datacard(analysis, categories, outdir, hdict):
         from utils import makeStatVariations
         for cat in categories:
             hfile = category_files[cat.full_name]
-            c = ROOT.TFile(hfile, "UPDATE")
+            tf = ROOT.TFile(hfile, "UPDATE")
             stathist_names = makeStatVariations(tf, tf, [cat])
             tf.Close()
             

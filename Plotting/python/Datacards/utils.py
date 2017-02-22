@@ -5,6 +5,7 @@ import math
 from collections import OrderedDict
 
 import logging
+import sparse
 
 def PrintDatacard(categories, event_counts, filenames, dcof):
     number_of_bins = len(categories)
@@ -148,14 +149,14 @@ def fakeData(infile, outfile, categories):
                 continue
             h.Add(h2)
 
-        outdir = "data_obs/{0}".format(cat.name)
-        dircache[outdir] = h
+        outname = "data_obs__{0}__{1}".format(cat.name, cat.discriminator.name)
+        dircache[outname] = h
 
     # End of loop over categories
+
+    outfile.cd()
     for (k, v) in dircache.items():
-        if outfile.Get(k) == None:
-            outfile.mkdir(k)
-        k = outfile.Get(k)
-        v.SetDirectory(k)
-        k.Write("", ROOT.TObject.kOverwrite)
+        v.SetName(k)
+        outfile.Add(v)
+        outfile.Write("", ROOT.TObject.kOverwrite)
 #end of fakeData

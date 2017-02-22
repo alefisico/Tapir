@@ -64,7 +64,6 @@ class Sample(object):
         self.debug = kwargs.get("debug")
         self.name = kwargs.get("name")
         self.schema = kwargs.get("schema")
-        self.process = kwargs.get("process")
         self.files_load = kwargs.get("files_load")
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
@@ -86,7 +85,6 @@ class Sample(object):
         sample = Sample(
             debug = config.getboolean("general", "debug"),
             name = sample_name,
-            process = config.get(sample_name, "process"),
             files_load = config.get(sample_name, "files_load"),
             schema = config.get(sample_name, "schema"),
             is_data = config.get(sample_name, "is_data"),
@@ -107,21 +105,19 @@ class Sample(object):
 
 class Process(object):
     """
-    Defines how an input process should be mapped to an output histogram.
+    Defines how an input sample should be mapped to an output histogram.
+    Possibly applies cuts on the event to separate a sample into processes
+    based on some event-level quantity such as ttCls
     """
     def __init__(self, *args, **kwargs):
         self.input_name = kwargs.get("input_name")
         self.output_name = kwargs.get("output_name")
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
+        self.index = kwargs.get("index", -1)
     
     def __repr__(self):
-        s = "Process: maps {0}->{1} with cuts=[{2}], xsw={3}".format(
-            self.input_name,
-            self.output_name,
-            ",".join(map(str, self.cuts)),
-            self.xs_weight
-        )
+        s = "Process({0}, {1})".format(self.input_name, self.output_name)
         return s
 
 class DataProcess(Process):

@@ -18,21 +18,21 @@ from TTH.MEAnalysis import samples_base
 
 #For tt+jets, we need to apply the selection that splits the processes into
 #different tt+jets categories (ttbarPlusBBbar, ttbarPlusCCbar etc)
-def processCut(proc):
-    n = PROCESS_MAP[proc]
-    return ("process", n, n+1)
+# def processCut(proc):
+#     n = PROCESS_MAP[proc]
+#     return ("process", n, n+1)
 
-def processCutTree(proc):
-    if proc == "ttbarPlusB":
-        return "(ttCls == 51)"
-    elif proc == "ttbarPlus2B":
-        return "(ttCls == 52)"
-    elif proc == "ttbarPlusBBbar":
-        return "(ttCls >= 53)"
-    elif proc == "ttbarPlusCCbar":
-        return "(ttCls >= 41 && ttCls <= 45)"
-    elif proc == "ttbarOther":
-        return "(ttCls == 0)"
+# def processCutTree(proc):
+#     if proc == "ttbarPlusB":
+#         return "(ttCls == 51)"
+#     elif proc == "ttbarPlus2B":
+#         return "(ttCls == 52)"
+#     elif proc == "ttbarPlusBBbar":
+#         return "(ttCls >= 53)"
+#     elif proc == "ttbarPlusCCbar":
+#         return "(ttCls >= 41 && ttCls <= 45)"
+#     elif proc == "ttbarOther":
+#         return "(ttCls == 0)"
 
 def splitByTriggerPath(processes, lumi, cuts_dict):
     """
@@ -145,7 +145,10 @@ def analysisFromConfig(config_file_path):
                         input_name = in_name,
                         output_name = out_name,
                         cuts = cuts,
-                        xs_weight = samples_dict[in_name].xsec/samples_dict[in_name].ngen))
+                        xs_weight = samples_dict[in_name].xsec/samples_dict[in_name].ngen,
+                        index = config.getint(process, "index")
+                    )
+                )
         # End loop over processes
 
         #post-processing of processes
@@ -269,6 +272,7 @@ def analysisFromConfig(config_file_path):
         cuts = cuts_dict,
         processes = processes,
         processes_unsplit = processes_original,
+        process_map = processes_original,
         categories = all_cats,
         groups = analysis_groups,
         do_fake_data = config.getboolean("general", "do_fake_data"),
