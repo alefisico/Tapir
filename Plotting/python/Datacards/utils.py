@@ -10,7 +10,7 @@ import sparse
 def PrintDatacard(categories, event_counts, filenames, dcof):
     number_of_bins = len(categories)
     number_of_backgrounds = len(list(set(reduce(lambda x,y:x+y, [c.out_processes for c in categories], [])))) - 1
-    analysis_categories = list(set([c.name for c in categories]))
+    analysis_categories = list(set([c.full_name for c in categories]))
 
 
     dcof.write("imax {0}\n".format(number_of_bins))
@@ -19,12 +19,10 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     dcof.write("---------------\n")
 
     for cat in categories:
-        analysis_var = cat.discriminator
-        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(
-            cat.name,
-            os.path.basename(filenames[cat.full_name]),
-            analysis_var)
-        )
+        dcof.write("shapes * {0} {1} $PROCESS__$CHANNEL $PROCESS__$CHANNEL__$SYSTEMATIC\n".format(
+            cat.full_name,
+            os.path.basename(filenames[cat.full_name])
+        ))
 
     dcof.write("---------------\n")
 

@@ -249,19 +249,22 @@ class Conf:
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
         "verbosity": [
-            #"eventboundary", #print run:lumi:event
+            "eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            #"meminput", #info about particles used for MEM input
+            "meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
         ],
 
         #"eventWhitelist": [
-        #    (1, 1094, 152572)
+        #    (1, 8471, 1181605),
+        #    (1, 10785, 1504514),
+        #    (1, 11359, 1584590),
+        #    (1, 4034, 562719),
         #]
     }
 

@@ -417,7 +417,7 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
 
 workflow_datasets["leptonic_nome"] = {}
 for k in [
-        #"ttHTobb",
+        "ttHTobb",
         #"ttHToNonbb",
         "TTbar_inc",
         #"TTbar_sl",

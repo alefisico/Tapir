@@ -302,7 +302,7 @@ def make_datacard(analysis, categories, outdir, hdict):
             for proc in cat.out_processes:
                 for syst in stathist_names[cat.full_name][proc]:
                     cat.shape_uncertainties[proc][syst] = 1.0
-                
+    
     from utils import PrintDatacard
     #make combine datacards (.txt) for individual categories 
     for cat in categories:

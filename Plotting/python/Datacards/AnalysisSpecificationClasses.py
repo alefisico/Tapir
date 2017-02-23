@@ -70,7 +70,7 @@ class Sample(object):
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
         except Exception as e:
-            print "ERROR: could not load sample file {0}".format(self.files_load)
+            print "ERROR: could not load sample file {0}: {1}".format(self.files_load, e)
             self.file_names = []
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
@@ -154,7 +154,7 @@ class Category:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.discriminator = kwargs.get("discriminator")
-        self.full_name = "{0}_{1}".format(self.name, self.discriminator.name)
+        self.full_name = "{0}__{1}".format(self.name, self.discriminator.name)
         self.src_histogram = kwargs.get("src_histogram")
         self.rebin = kwargs.get("rebin", 1)
         self.do_limit = kwargs.get("do_limit", True)

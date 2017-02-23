@@ -147,9 +147,6 @@ class Var:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.typ = kwargs.get("type")
-        
-        #if this variable was found in the tree
-        self.present = True
 
         #in case function not defined, just use variable name
         self.nominal_func = kwargs.get("nominal", Func(self.name))
@@ -158,18 +155,22 @@ class Var:
         self.systematics_funcs = kwargs.get("systematics", {})
         self.schema = kwargs.get("schema", ["mc", "data"])
 
+        self.present_syst = {}
+
     def getValue(self, event, schema, systematic="nominal"):
-                
-        if self.present:
+        
+        if self.present_syst.get(systematic, True): 
             try:
                 if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
                     return self.funcs_schema.get(schema, self.nominal_func)(event)
                 else:
                     return self.systematics_funcs[systematic](event)
+                self.present_syst[systematic] = True
             except Exception as e:
+                #deactivate variable only in case of a systematic uncertainty
                 LOG_MODULE_NAME.error(self.name + " " + systematic + " DEACTIVATED")
                 LOG_MODULE_NAME.error(e)
-                self.present = False
+                self.present_syst[systematic] = False
                 return 0
         else:
             return 0
@@ -383,7 +384,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         cls_bdt_dl = ROOT.DLBDTClassifier()
 
     #Optionally add systematics
-    if analysis.config.get("sparsinator", "add_systematics"):
+    if analysis.config.getboolean("sparsinator", "add_systematics"):
 
         #Get the list of systematics that modify the event topology
         systematics_event = analysis.config.get("systematics", "event").split()
@@ -615,6 +616,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         #Loop over events
         for event in events:
+
+            nevents += 1
+            iEv += 1
+
             if nevents < skip_events:
                 continue
             if max_events > 0:
@@ -629,7 +634,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 LOG_MODULE_NAME.info("processed {0} events".format(nevents))
 
             #apply some basic preselection
-            if not (event.is_sl or event.is_dl or event.is_fh):
+            if not (event.is_sl or event.is_dl):
                 continue
             if not event.numJets >= 4:
                 continue
@@ -637,8 +642,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 continue
             if schema == "data" and not event.json:
                 continue
-
-            #print(nevents)
 
             #Found a monster event in ttH (bug?)
             if event.jets_pt[0] > 10000:
@@ -732,8 +735,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                                     v.fill(ret, weight * proc.xs_weight)
 
             #end of loop over event systematics
-            nevents += 1
-            iEv += 1
         #end of loop over events
         tf.Close()
     #end of loop over file names
@@ -758,11 +759,11 @@ if __name__ == "__main__":
 
     else:
         file_names = [
-            "/mnt/t3nfs01/data01/shome/jpata/tth/gc/nome/GC7a43d25a65fc/Feb6_leptonic_nome__TT_TuneCUETP8M2T4_13TeV-powheg-pythia8.root"
+            "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Feb1_leptonic_nome/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb1_leptonic_nome/170201_171753/0000/tree_104.root"
         ]
         prefix = ""
-        sample = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 2000
+        max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

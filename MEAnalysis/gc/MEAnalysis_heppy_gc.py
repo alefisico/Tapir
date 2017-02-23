@@ -21,7 +21,8 @@ from TTH.MEAnalysis.MEAnalysis_heppy import main
 import FWCore.ParameterSet.Config as cms
 from TTH.MEAnalysis.samples_base import getSitePrefix
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
-
+import TTH.MEAnalysis.counts as counts
+ 
 if __name__ == "__main__":
     an = analysisFromConfig(sys.argv[1])
     firstEvent = int(os.environ["SKIP_EVENTS"])
@@ -30,3 +31,4 @@ if __name__ == "__main__":
     dataset = os.environ["DATASETPATH"].split("__")[-1]
 
     main(an, sample_name=dataset, firstEvent=firstEvent, numEvents=nEvents, output_name="Loop", files=fns)
+    counts.main(os.environ["FILE_NAMES"].split(), "counts.root")

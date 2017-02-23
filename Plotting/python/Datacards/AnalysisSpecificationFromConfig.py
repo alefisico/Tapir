@@ -140,12 +140,17 @@ def analysisFromConfig(config_file_path):
                         lumi = lumi[config.get(process,"lumi")]))
             # SIMULATION
             else:
+                lumi = 1.0
+                #if not splitting by trigger path, use a common lumi for every sample
+                if not config.getboolean(process_list, "split_by_trigger_path"):
+                    lumi = config.getfloat("lumi", "Common")
+                    
                 process_lists[process_list].append(
                     Process(
                         input_name = in_name,
                         output_name = out_name,
                         cuts = cuts,
-                        xs_weight = samples_dict[in_name].xsec/samples_dict[in_name].ngen,
+                        xs_weight = lumi * samples_dict[in_name].xsec/samples_dict[in_name].ngen,
                         index = config.getint(process, "index")
                     )
                 )
@@ -153,7 +158,7 @@ def analysisFromConfig(config_file_path):
 
         #post-processing of processes
         #split by trigger path
-        if config.get(process_list, "split_by_trigger_path") == "True":
+        if config.getboolean(process_list, "split_by_trigger_path"):
             process_lists_original[process_list] = process_lists[process_list]
             process_lists[process_list] = splitByTriggerPath(
                 process_lists[process_list],

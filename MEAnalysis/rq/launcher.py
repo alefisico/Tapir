@@ -219,6 +219,7 @@ class TaskNumGen(Task):
                 [j.result["Count"] for j in jobs[sample.name]]
             )
             sample.ngen = int(ngen)
+            logging.info("sample.ngen {0} = {1}".format(sample.name, sample.ngen))
         self.save_state()
         return jobs
 
@@ -257,6 +258,8 @@ class TaskSparsinator(Task):
         super(TaskSparsinator, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+
         all_jobs = []
         jobs = {}
         for sample in self.analysis.samples:
@@ -327,6 +330,8 @@ class TaskSparseMerge(Task):
         super(TaskSparseMerge, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+
         all_jobs = []
         jobs_by_sample = {}
 
@@ -394,6 +399,8 @@ class TaskCategories(Task):
         super(TaskCategories, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+
         hdict = {}
 
         logging.info("Opening {0}".format(inputs))
@@ -446,6 +453,7 @@ class TaskPlotting(Task):
 
     def run(self, inputs, redis_conn, qmain, qfail):
         from plots import run_plots
+        self.load_state(self.workdir)
        
         run_plots(
             workdir,
@@ -461,10 +469,15 @@ class TaskLimits(Task):
         super(TaskLimits, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
 
         # Prepare jobs
         all_jobs = []
         os.makedirs("{0}/limits".format(self.workdir))
+        #copy datacard files and root input files to limit directory 
+        os.system("cp {0}/categories/shapes*.txt {0}/limits/".format(self.workdir))
+        os.system("cp {0}/categories/*/*/*.root {0}/limits/".format(self.workdir))
+        
         for group in self.analysis.groups.keys():
             all_jobs += [
                 qmain.enqueue_call(
@@ -562,16 +575,17 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        TaskNumGen(workdir, "NGEN", analysis),
+        #TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
         #TaskPlotting(workdir, "PLOT", analysis),
-        #TaskLimits(workdir, "LIMIT", analysis),
+        TaskLimits(workdir, "LIMIT", analysis),
     ]
 
     #inputs = "results/28efd210-1f0f-4da7-a4ff-62e16057bae7/merged.root" 
     inputs = []
+    tasks[0].save_state()
     for task in tasks:
         res = task.run(inputs, redis_conn, qmain, qfail)
         inputs = res

@@ -65,6 +65,9 @@ class LimitGetter(object):
                            "-t", "-1",
                            datacard_name + ".txt"]
         
+        print "running combine"
+        print " ".join(combine_command)
+        
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
                                    cwd=datacard_path,
@@ -77,8 +80,11 @@ class LimitGetter(object):
                                             GENREFLEX = GENREFLEX
                                         ))
         
-        output = process.communicate()[0]
-        
+        output, stderr = process.communicate()
+        if process.returncode != 0:
+            print "error running limit", stderr
+        print output
+
         # Put the output file in the corrrect place..
         # ..root file
         output_rootfile_name = "higgsCombine{0}.Asymptotic.mH120.root".format(process_name)
@@ -90,11 +96,9 @@ class LimitGetter(object):
         of = open(os.path.join(self.output_path, output_textfile_name), "w")
         of.write(output)
         
-        # And extact the lmit
-        limit = 1000
+        # And extact the limit
         lims, quantiles = get_limits(targetpath)
-        limit = lims[2]
-        print datacard_name, ":", limit
+        print datacard_name, ":", lims[1], lims[2], lims[3]
         return lims, quantiles
     # End of get_limit
 

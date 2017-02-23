@@ -226,7 +226,7 @@ def getSitePrefix(fn=""):
     elif fn.startswith("file://") or fn.startswith("root://"):
         return fn
     else:
-        raise Exception("Could not open file: {0}".format(fn))
+        raise Exception("Could not open file: {0} due to unknown path format".format(fn))
 
 def get_prefix_sample(datasetpath):
     spl = datasetpath.split("__")

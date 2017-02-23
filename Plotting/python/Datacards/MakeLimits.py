@@ -62,7 +62,9 @@ def main(
             input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]
             add_dcard_command = ["combineCards.py"] + input_dcard_names 
 
-            print "Command:", add_dcard_command 
+            print "running combineCards.py"
+            print " ".join(add_dcard_command)
+            
             process = subprocess.Popen(add_dcard_command, 
                                        stdout=subprocess.PIPE, 
                                        cwd=inout_dir,
@@ -72,8 +74,11 @@ def main(
                                                 PYTHONPATH=PYTHONPATH
                                             ))
 
-            group_dcard = process.communicate()[0]
-
+            group_dcard, stderr = process.communicate()
+            if process.returncode != 0:
+                print "Error running combineCards.py"
+                print stderr
+                raise Exception("Could not run combineCards command")
             print "Finished with group_card making"
 
             # Write the group datacard to a file
