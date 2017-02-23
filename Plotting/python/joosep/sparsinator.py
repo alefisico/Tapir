@@ -403,7 +403,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                    sdir_cap = sdir.capitalize()
                    systematic_weights += [
                        ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight:
-                           ev["puWeight"] * ev["triggerEmulationWeight"] * ev[bweight])
+                           ev["puWeight"] * ev[bweight])
                    ]
                    btag_weights += [bweight]
 

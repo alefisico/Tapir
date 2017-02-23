@@ -138,7 +138,7 @@ def plot_worker(kwargs):
         for samp, sampname in procs:
             hnom = ret["nominal"][samp]
             for systUp, systDown in kwargs["systematics"]:
-                syst_name = systUp[1:-2]
+                syst_name = systUp[2:-2]
                 hup = ret["systematic"][systUp][samp]
                 hdown = ret["systematic"][systDown][samp]
                 plot_syst_updown(hnom, hup, hdown)
