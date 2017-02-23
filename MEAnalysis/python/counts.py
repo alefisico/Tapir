@@ -24,6 +24,8 @@ def main(filenames, ofname):
         print "good file", infn, tf
         good_filenames += [infn]
         vhbb_dir = tf.Get("vhbb")
+        if not vhbb_dir:
+            vhbb_dir = tf
         for k in vhbb_dir.GetListOfKeys():
             kn = k.GetName()
             if "Count" in kn:

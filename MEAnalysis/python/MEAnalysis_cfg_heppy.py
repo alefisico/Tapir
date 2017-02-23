@@ -195,10 +195,10 @@ class Conf:
         "minjets_fh": 6,
 
         #The default b-tagging algorithm (branch name)
-        "btagAlgo": "btagCMVA",
+        "btagAlgo": "btagCSV",
 
         #The default b-tagging WP
-        "btagWP": "CMVAM",
+        "btagWP": "CSVM",
 
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
@@ -241,7 +241,7 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
         "systematics": [
             "nominal",
-        ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
+        ],# + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
 
 
         #If the list contains:
@@ -260,12 +260,12 @@ class Conf:
             #"commonclassifier",
         ],
 
-        #"eventWhitelist": [
-        #    (1, 8471, 1181605),
-        #    (1, 10785, 1504514),
-        #    (1, 11359, 1584590),
+        # "eventWhitelist": [
+        #    # (1, 8471, 1181605),
+        #    # (1, 10785, 1504514),
+        #    # (1, 11359, 1584590),
         #    (1, 4034, 562719),
-        #]
+        # ]
     }
 
     #multiclass = {
@@ -313,7 +313,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         "n_integration_points_mult": 1.0,
 
         "factorized_sources": factorizedJetCorrections,
@@ -322,8 +322,8 @@ class Conf:
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            "TotalUp",
-            "TotalDown",
+            #"TotalUp",
+            #"TotalDown",
         ],
 
         "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)
@@ -371,10 +371,10 @@ class Conf:
         "methodsToRun": [
             #"SL_0w2h2t",
             "DL_0w2h2t",
-            "SL_1w2h2t",
+            #"SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
-            "SL_2w2h2t",
+            #"SL_2w2h2t",
             #"SL_2w2h2t_1j",
             #"SL_2w2h2t_sj",
             #"SL_0w2h2t_sj",
@@ -509,7 +509,7 @@ Conf.mem_configs["SL_0w2h2t"] = c
 ### DL_0w2h2t
 ###
 c = MEMConfig(Conf)
-c.b_quark_candidates = lambda ev: ev.good_jets
+#c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 2 and

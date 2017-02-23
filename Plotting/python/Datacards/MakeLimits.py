@@ -39,6 +39,7 @@ def main(
 
     analyses = [analysis_cfg]
 
+    limits = {}
     for analysis in analyses:
 
         # Decide what to run on
@@ -50,6 +51,7 @@ def main(
         # Prepare the limit getter
         lg = LimitGetter(inout_dir)
 
+        limits[analysis] = {}
         for group_name in groups:
 
             group = [x for x in analysis.groups[group_name] if x.do_limit]
@@ -64,7 +66,7 @@ def main(
 
             print "running combineCards.py"
             print " ".join(add_dcard_command)
-            
+
             process = subprocess.Popen(add_dcard_command, 
                                        stdout=subprocess.PIPE, 
                                        cwd=inout_dir,
@@ -90,10 +92,11 @@ def main(
             print "Written to file, running limit setting"
 
             # And run limit setting on it
-            lg(group_dcard_filename)
+            limits[analysis][group_name] = lg(group_dcard_filename)[0][2]
 
         # End loop over groups
     # End of loop over analyses
+    return limits
 
 
 #if __name__ == "__main__":

@@ -477,8 +477,9 @@ class TaskLimits(Task):
         #copy datacard files and root input files to limit directory 
         os.system("cp {0}/categories/shapes*.txt {0}/limits/".format(self.workdir))
         os.system("cp {0}/categories/*/*/*.root {0}/limits/".format(self.workdir))
-        
+
         for group in self.analysis.groups.keys():
+            logger.info("submitting limit jobs for {0}".format(group))
             all_jobs += [
                 qmain.enqueue_call(
                     func = makelimits,
@@ -491,7 +492,8 @@ class TaskLimits(Task):
                     result_ttl = 60*60,
                     meta = {"retries": 0, "args": ""})]
             
-        waitJobs(all_jobs, redis_conn, qmain, qfail)
+        limits = waitJobs(all_jobs, redis_conn, qmain, qfail)
+        print limits
         self.save_state()
 
 def make_workdir():
@@ -579,7 +581,7 @@ if __name__ == "__main__":
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
-        #TaskPlotting(workdir, "PLOT", analysis),
+        TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
     ]
 

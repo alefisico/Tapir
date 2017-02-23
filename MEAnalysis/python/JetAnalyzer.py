@@ -49,6 +49,10 @@ class JetAnalyzer(FilterAnalyzer):
             new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
             old_corr = newjets[i].corr
 
+            #for JER need to uncorrect by a different factor
+            if systematic == "JER":
+                old_corr = newjets[i].corr_JER
+
             if new_corr > 0:
                 cf =  _sigma * new_corr / old_corr
             else:

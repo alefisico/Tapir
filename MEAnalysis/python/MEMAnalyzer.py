@@ -218,6 +218,8 @@ class MEAnalyzer(FilterAnalyzer):
         bquarks = sorted(list(mem_cfg.b_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
 
         if len(bquarks) > mem_cfg.maxBJets:
+            import pdb
+            pdb.set_trace()
             autolog("More than {0} b-quarks supplied, dropping last {1} from MEM".format(
                 mem_cfg.maxBJets, len(bquarks) - mem_cfg.maxBJets)
             )

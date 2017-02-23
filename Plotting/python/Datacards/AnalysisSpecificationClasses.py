@@ -236,21 +236,12 @@ class Analysis:
     def get_sample(self, sample_name):
         return self.sample_d[sample_name]
 
-    def to_JSON(self):
-        return json.dumps(self.__dict__, indent=2)
-    
     def __repr__(self):
-        s = "Analysis:\n"
-        s += "  processes:\n"
-        for proc in self.processes:
-            s += "    {0}\n".format(proc)
-        s += "  categories:\n"
-        for cat in self.categories:
-            s += "    {0}\n".format(cat)
-        
-        s += "  groups for combine:\n"
-        for groupname, cats in self.groups.items():
-            s += "    {0}: {1}\n".format(groupname, [c.name for c in self.groups[groupname]])
+        s = "Analysis(processes={0}, categories={1}, groups={2})".format(
+            len(self.processes),
+            len(self.categories),
+            len(self.groups),
+        )
         return s
 
     @staticmethod

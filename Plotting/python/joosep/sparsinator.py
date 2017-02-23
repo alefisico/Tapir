@@ -373,10 +373,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     # ...
     
     systematic_weights = []
-    #btag_weights = []
 
     systematics_event = []
     systematics_suffix_list = []
+
+    btag_weights = []
 
     calculate_bdt = analysis.config.getboolean("sparsinator", "calculate_bdt")
     if calculate_bdt:
@@ -394,21 +395,21 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         
         #systematics with weight
         ##create b-tagging systematics
-        #for sdir in ["up", "down"]:
-        #    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-        #        for tagger in ["CSV", "CMVAV2"]:
-        #            bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
-        #            #make systematic outputs consistent in Up/Down naming
-        #            sdir_cap = sdir.capitalize()
-        #            systematic_weights += [
-        #                ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight:
-        #                    ev["puWeight"] * ev["triggerEmulationWeight"] * ev["lep_SF_weight"] * ev[bweight])
-        #            ]
-        #            btag_weights += [bweight]
+        for sdir in ["up", "down"]:
+           for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
+               for tagger in ["CSV", "CMVAV2"]:
+                   bweight = "btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)
+                   #make systematic outputs consistent in Up/Down naming
+                   sdir_cap = sdir.capitalize()
+                   systematic_weights += [
+                       ("CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir_cap), lambda ev, bweight=bweight:
+                           ev["puWeight"] * ev["triggerEmulationWeight"] * ev[bweight])
+                   ]
+                   btag_weights += [bweight]
 
         systematic_weights += [
-                ("puUp", lambda ev: ev["puWeightUp"] ),
-                ("puDown", lambda ev: ev["puWeightDown"]),
+                ("puUp", lambda ev: ev["puWeightUp"] * ev["btagWeightCSV"] ),
+                ("puDown", lambda ev: ev["puWeightDown"] * ev["btagWeightCSV"]),
                 #("unweighted", lambda ev: 1.0)
         ]
 
@@ -525,7 +526,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         #nominal b-tag weight, systematic weights added later
         Var(name="btagWeightCSV", schema=["mc"]),
         Var(name="btagWeightCMVAV2", schema=["mc"]),
-        ]
+        ] + [Var(name=n, schema=["mc"]) for n in btag_weights]
     )
 
     if len(file_names) == 0:
@@ -658,7 +659,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
-                    ret["weight_nominal"] *= ret["puWeight"]# * ret["btagWeightCSV"]# * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
+                    ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]# * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
            
                 #get MEM from the classifier database
                 ret["common_mem"] = -99
