@@ -633,12 +633,15 @@ def getTreeProducer(conf):
 
     #MC-only global variables
     for vtype in [
-        ("nMatch_wq",                   int,    ""),
-        ("nMatch_wq_btag",                   int,    ""),
-        ("nMatch_tb",                   int,    ""),
-        ("nMatch_tb_btag",                   int,    ""),
-        ("nMatch_hb",                   int,    ""),
-        ("nMatch_hb_btag",                   int,    ""),
+        ("nMatch_wq",               int,    ""),
+        ("nMatch_wq_btag",          int,    ""),
+        ("nMatch_tb",               int,    ""),
+        ("nMatch_tb_btag",          int,    ""),
+        ("nMatch_hb",               int,    ""),
+        ("nMatch_hb_btag",          int,    ""),
+        ("nMatch_q_htt",            int,    "number of light quarks matched to HEPTopTagger subjets"),
+        ("nMatch_b_htt",            int,    "number of b-quarks matched to HEPTopTagger subjets"),
+        ("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
         ("puWeight",                float,    ""),

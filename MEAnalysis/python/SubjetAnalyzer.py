@@ -529,8 +529,10 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.higgsCandidate = higgsCandidates
     
         if len(higgsCandidates):
-            event.higgs_subjets = [higgsCandidates[0].sj1b_subjetfiltered, 
-                                   higgsCandidates[0].sj2b_subjetfiltered]
+            for sj in [higgsCandidates[0].sj1b_subjetfiltered, higgsCandidates[0].sj2b_subjetfiltered]:
+                if not hasattr(sj, "pt"):
+                    continue                
+                event.higgs_subjets += [sj]
 
         all_tops_to_add = []
 

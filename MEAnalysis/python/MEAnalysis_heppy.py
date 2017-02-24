@@ -106,7 +106,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
         vhbb_tree_name = an_sample.vhbb_tree_name
         schema = an_sample.schema
         if len(files) == 0:
-            files = an_sample.file_names[:an_sample.debug_max_files]
+            files = an_sample.file_names_step1[:an_sample.debug_max_files]
         if not output_name:
             output_name = "Loop_" + sample_name
     elif schema:
@@ -281,9 +281,9 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
         qglr,
         wtag,
         mecat,
+        subjet_analyzer,
         genrad,
         gentth,
-        #subjet_analyzer,
         #multiclass_analyzer,
         mem_analyzer,
         #mva,

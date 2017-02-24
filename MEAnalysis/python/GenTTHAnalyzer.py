@@ -21,7 +21,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
-            if event_syst.passes_btag:
+            if event_syst.passes_btag and syst == "nominal":
                 res = self._process(event_syst)
                 event.systResults[syst] = res
         return True
@@ -202,11 +202,10 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 b.from_had_t = -1
             
 
-        #Store for each jet, specified by it's index in the jet
-        #vector, if it is matched to any gen-level quarks
-        matched_pairs = {}
+
 
         def match_jets_to_quarks(jetcoll, quarkcoll, label, label_numeric):
+            matched_pairs = {}
             for ij, j in enumerate(jetcoll):        
                 for iq, q in enumerate(quarkcoll):
 
@@ -224,6 +223,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
                         numeric_b_from_had_t = -1
 
                     #find DeltaR between jet and quark
+                    print q, j
                     l1 = lvec(q)
                     l2 = lvec(j)
                     dr = l1.DeltaR(l2)
@@ -232,19 +232,28 @@ class GenTTHAnalyzer(FilterAnalyzer):
                         if not matched_pairs.has_key(ij):
                             matched_pairs[ij] = []
                         matched_pairs[ij] += [(label, iq, dr, label_numeric, numeric_b_from_had_t)]
+            return matched_pairs
 
         #Find the best possible match for each individual jet
 
+        #Store for each jet, specified by it's index in the jet
+        #vector, if it is matched to any gen-level quarks
+        matched_pairs = {}
+
         #light-quarks from W
-        match_jets_to_quarks(event.good_jets, event.l_quarks_gen, "wq", 0)
+        matched_pairs.update(match_jets_to_quarks(event.good_jets, event.l_quarks_gen, "wq", 0))
         #b-quarks from top
-        match_jets_to_quarks(event.good_jets, event.b_quarks_gen_t, "tb", 1)
+        matched_pairs.update(match_jets_to_quarks(event.good_jets, event.b_quarks_gen_t, "tb", 1))
         #b-quarks from Higgs
-        match_jets_to_quarks(event.good_jets, event.b_quarks_gen_h, "hb", 2)
+        matched_pairs.update(match_jets_to_quarks(event.good_jets, event.b_quarks_gen_h, "hb", 2))
         #gluons from top
-        match_jets_to_quarks(event.good_jets, event.GenGluonFromTop, "tg", 3)
+        matched_pairs.update(match_jets_to_quarks(event.good_jets, event.GenGluonFromTop, "tg", 3))
         #gluons from b
-        match_jets_to_quarks(event.good_jets, event.GenGluonFromB, "bg", 4)
+        matched_pairs.update(match_jets_to_quarks(event.good_jets, event.GenGluonFromB, "bg", 4))
+
+        matches_q_htt = match_jets_to_quarks(event.htt_subjets_W, event.l_quarks_gen, "q_htt", 6)
+        matches_b_htt = match_jets_to_quarks(event.htt_subjets_b, event.b_quarks_gen_t, "b_htt", 5)
+        matches_b_higgstagger = match_jets_to_quarks(event.higgs_subjets, event.b_quarks_gen_h, "b_higgstagger", 7)
 
         #Number of reco jets matched to quarks from W, top, higgs
         event.nMatch_wq = 0
@@ -254,7 +263,11 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.nMatch_wq_btag = 0
         event.nMatch_tb_btag = 0
         event.nMatch_hb_btag = 0
-        
+
+        event.nMatch_q_htt = 0
+        event.nMatch_b_htt = 0
+        event.nMatch_b_higgs = 0
+
         #Now check what each jet was matched to
         for ij, jet in enumerate(event.good_jets):
 
@@ -313,27 +326,35 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 if jet.btagFlag == 1.0:
                     event.nMatch_hb_btag += 1
 
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("nSel {0}_{1}_{2} nMatch {3}_{4}_{5} nMatch_btag {6}_{7}_{8}".format(
-                event.nSelected_wq,
-                event.nSelected_tb,
-                event.nSelected_hb,
-                event.nMatch_wq,
-                event.nMatch_tb,
-                event.nMatch_hb,
-                event.nMatch_wq_btag,
-                event.nMatch_tb_btag,
-                event.nMatch_hb_btag,
-            ))
-        
-        if "matching" in self.conf.general["verbosity"]:
-            matches = {"wq":event.l_quarks_w, "tb": event.b_quarks_t, "hb":event.b_quarks_h}
+        for ij, jet in enumerate(event.htt_subjets_W):
+            if matches_q_htt.has_key(ij):
+                event.nMatch_q_htt += 1
 
-            for ij, jet in enumerate(event.good_jets):
-                if not matched_pairs.has_key(ij):
-                    continue
-                mlabel, midx, mdr, mlabel_num = matched_pairs[ij]
-                autolog("jet match", ij, mlabel, midx, mdr, jet.pt, matches[mlabel][midx].pt)
+        for ij, jet in enumerate(event.htt_subjets_b):
+            if matches_b_htt.has_key(ij):
+                event.nMatch_b_htt += 1
+
+        for ij, jet in enumerate(event.higgs_subjets):
+            if matches_b_higgstagger.has_key(ij):
+                event.nMatch_b_higgs += 1
+
+        if "matching" in self.conf.general["verbosity"]:
+            autolog("Selected quarks W={nsel_wq} t={nsel_tb} h={nsel_hb} nMatch W={nMatch_wq} t={nMatch_tb} h={nMatch_hb} nMatch_btag W={nMatch_wq_btag} t={nMatch_tb_btag} h={nMatch_hb_btag}".format(
+                nsel_wq = event.nSelected_wq,
+                nsel_tb = event.nSelected_tb,
+                nsel_hb = event.nSelected_hb,
+                nMatch_wq = event.nMatch_wq,
+                nMatch_tb = event.nMatch_tb,
+                nMatch_hb= event.nMatch_hb,
+                nMatch_wq_btag = event.nMatch_wq_btag,
+                nMatch_tb_btag = event.nMatch_tb_btag,
+                nMatch_hb_btag = event.nMatch_hb_btag,
+            ))
+            autolog("Subjet match W={nMatch_q_htt} t={nMatch_b_htt} h={nMatch_b_higgs}".format(
+                nMatch_q_htt = event.nMatch_q_htt,
+                nMatch_b_htt = event.nMatch_b_htt,
+                nMatch_b_higgs = event.nMatch_b_higgs,
+            ))
 
         #reco-level tth-matched system
         spx = 0.0

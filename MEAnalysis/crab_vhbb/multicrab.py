@@ -112,7 +112,7 @@ datasets.update({
     'ttHTobb': {
         "ds": '/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 20,
+        "perjob": 10,
         "runtime": 10,
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
@@ -400,11 +400,11 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        #"ttHTobb",
+        "ttHTobb",
         #"ttHToNonbb",
-        #"TTbar_inc",
-        "TTbar_sl",
-        "TTbar_dl"
+        "TTbar_inc",
+        #"TTbar_sl",
+        #"TTbar_dl"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -613,7 +613,7 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 3000
+    config.JobType.maxMemoryMB = 2000
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")

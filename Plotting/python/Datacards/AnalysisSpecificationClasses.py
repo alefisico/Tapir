@@ -49,10 +49,6 @@ class Cut(object):
             skim = config.get(name, "skim")
         )
 
-    def updateConfig(self, config):
-        config.set(self.name, "sparsinator", Cut.cuts_to_string(self.sparsinator))
-        config.set(self.name, "skim", Cut.cuts_to_string(self.skim))
-
     def __str__(self):
         s = []
         for c in self.sparsinator:
@@ -65,13 +61,25 @@ class Sample(object):
         self.name = kwargs.get("name")
         self.schema = kwargs.get("schema")
         self.files_load = kwargs.get("files_load")
+        self.files_load_step1 = kwargs.get("files_load_step1", None)
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
+
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
         except Exception as e:
             print "ERROR: could not load sample file {0}: {1}".format(self.files_load, e)
             self.file_names = []
+
+        if self.files_load_step1 is None:
+            self.file_names_step1 = self.file_names
+        else:
+            try:
+                self.file_names_step1 = [getSitePrefix(fn) for fn in get_files(self.files_load_step1)]
+            except Exception as e:
+                print "ERROR: could not load sample file {0}: {1}".format(self.files_load_step1, e)
+                self.file_names_step1 = []
+
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
@@ -86,6 +94,7 @@ class Sample(object):
             debug = config.getboolean("general", "debug"),
             name = sample_name,
             files_load = config.get(sample_name, "files_load"),
+            files_load_step1 = config.get(sample_name, "files_load_step1"),
             schema = config.get(sample_name, "schema"),
             is_data = config.get(sample_name, "is_data"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
@@ -96,12 +105,6 @@ class Sample(object):
             xsec = config.getfloat(sample_name, "xsec"),
         )
         return sample
-
-    def updateConfig(self, config):
-        for field in dir(self):
-            if field.startswith("__"):
-                continue
-            config.set(self.name, field, str(getattr(self, field)))
 
 class Process(object):
     """

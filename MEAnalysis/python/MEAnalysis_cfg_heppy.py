@@ -249,13 +249,14 @@ class Conf:
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
         "verbosity": [
-            "eventboundary", #print run:lumi:event
+            #"eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
+            #"matching", 
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            "meminput", #info about particles used for MEM input
+            #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
         ],
@@ -313,7 +314,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         "n_integration_points_mult": 1.0,
 
         "factorized_sources": factorizedJetCorrections,
@@ -369,12 +370,12 @@ class Conf:
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            #"SL_0w2h2t",
+            "SL_0w2h2t",
             "DL_0w2h2t",
-            #"SL_1w2h2t",
+            "SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
-            #"SL_2w2h2t",
+            "SL_2w2h2t",
             #"SL_2w2h2t_1j",
             #"SL_2w2h2t_sj",
             #"SL_0w2h2t_sj",
