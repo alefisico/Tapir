@@ -136,19 +136,19 @@ def plot_worker(kwargs):
     plt.clf()
 
     if do_syst:
-        # for samp, sampname in procs:
-        #     hnom = ret["nominal"][samp]
-        #     for systUp, systDown in kwargs["systematics"]:
-        #         syst_name = systUp[2:-2]
-        #         hup = ret["systematic"][systUp][samp]
-        #         hdown = ret["systematic"][systDown][samp]
-        #         plot_syst_updown(hnom, hup, hdown)
-        #         plt.suptitle(escape_string(systUp.replace("Up", "")) + " " + sampname)
-        #         plt.xlabel(kwargs["xlabel"]) 
-        #         outname_syst = os.path.join(outname, syst_name, samp)
-        #         logging.info("saving systematic {0}".format(outname_syst))
-        #         plotlib.svfg(outname_syst + ".pdf")
-        #         plt.clf()
+        for samp, sampname in procs:
+            hnom = ret["nominal"][samp]
+            for systUp, systDown in kwargs["systematics"]:
+                syst_name = systUp[2:-2]
+                hup = ret["systematic"][systUp][samp]
+                hdown = ret["systematic"][systDown][samp]
+                plot_syst_updown(hnom, hup, hdown)
+                plt.suptitle(escape_string(systUp.replace("Up", "")) + " " + sampname)
+                plt.xlabel(kwargs["xlabel"]) 
+                outname_syst = os.path.join(outname, syst_name, samp)
+                logging.info("saving systematic {0}".format(outname_syst))
+                plotlib.svfg(outname_syst + ".pdf")
+                plt.clf()
 
 
         plt.figure(figsize=(6,6))

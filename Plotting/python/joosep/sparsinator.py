@@ -489,7 +489,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         ),
 
         Var(name="mem_DL_0w2h2t_p",
-            nominal=Func("mem_DL_0w2h2t_p", func=lambda ev: ev.mem_SL_0w2h2t_p),
+            nominal=Func("mem_DL_0w2h2t_p", func=lambda ev: ev.mem_DL_0w2h2t_p),
             systematics = generateSystematicsSuffix("mem_DL_0w2h2t_p", systematics_suffix_list)
         ),
         Var(name="mem_SL_0w2h2t_p",

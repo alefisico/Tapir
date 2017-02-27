@@ -541,9 +541,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         ylabel = "events / {0:.2f} {1}".format(histogram_signal.get_bin_width(1), xunit)
     plt.ylabel(ylabel)
 
-    #hide x ticks on main panel
-    ticks = a1.get_xticks()
-    a1.get_xaxis().set_visible(False)
+    if data:
+        #hide x ticks on main panel
+        ticks = a1.get_xticks()
+        a1.get_xaxis().set_visible(False)
     
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
