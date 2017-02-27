@@ -306,8 +306,11 @@ def make_datacard(analysis, categories, outdir, hdict):
     from utils import PrintDatacard
     #make combine datacards (.txt) for individual categories 
     for cat in categories:
-        if not cat.do_limit:
-            continue
+        print cat.full_name, cat.do_limit
+        # import pdb
+        # pdb.set_trace()
+        # if not cat.do_limit:
+        #     continue
         fn = os.path.join(outdir, "shapes_{0}.txt".format(cat.full_name))
         logging.debug("main: writing shape file {0}".format(fn))
         dcof = open(fn, "w")

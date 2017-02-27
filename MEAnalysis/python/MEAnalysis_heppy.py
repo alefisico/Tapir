@@ -268,6 +268,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
     # definition of a sequence of analyzers,
     # the analyzers will process each event in this order
     sequence = cfg.Sequence([
+        memory_ana,
         counter,
         evtid_filter,
         prefilter,
@@ -288,7 +289,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
         mem_analyzer,
         #mva,
         treevar,
-        memory_ana,
         treeProducer
     ])
 

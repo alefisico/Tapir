@@ -17,10 +17,30 @@ class MemoryAnalyzer(Analyzer):
         super(MemoryAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
         self.logger = logging.getLogger("MemoryAnalyzer")
+        self.hpy = None
+        self.do_heapy = False 
+        if self.do_heapy:
+            try:
+                from guppy import hpy
+                self.hpy = hpy()
+                self.hpy.setrelheap()
+            except Exception as e:
+                autolog("Could not import guppy, skipping")
+
+        self.heap_prev = None
 
     def process(self, event):
         memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         autolog("memory usage at event {0}: {1:.2f} MB".format(event.iEv, memory/1024.0))
+        
+        if not self.hpy is None:
+            heap = self.hpy.heap() 
+            if not self.heap_prev is None:
+                diff = heap - self.heap_prev
+                print diff
+                import pdb
+                pdb.set_trace()
+            self.heap_prev = heap
         return True
 
 class PrefilterAnalyzer(Analyzer):

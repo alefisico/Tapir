@@ -25,6 +25,8 @@ FUNCTION_TABLE = {
     "jetsByPt_0_eta": lambda ev: ev["jets_p4"][0].Eta(),
     "jetsByPt_0_pt": lambda ev: ev["jets_p4"][0].Pt(),
     "leps_0_pt": lambda ev: ev["leps_pt"][0],
+    "mem_DL_0w2h2t_p": lambda ev: ev["mem_DL_0w2h2t_p"],
+    "mem_SL_0w2h2t_p": lambda ev: ev["mem_SL_0w2h2t_p"],
     "mem_SL_1w2h2t_p": lambda ev: ev["mem_SL_1w2h2t_p"],
     "mem_SL_2w2h2t_p": lambda ev: ev["mem_SL_2w2h2t_p"],
     "Wmass": lambda ev: ev["Wmass"]
@@ -88,7 +90,9 @@ class BufferedTree:
             raise StopIteration
         self.buf = {}
         self.iEv += 1
-        self.tree.GetEntry(self.iEv)
+        bytes = self.tree.GetEntry(self.iEv)
+        if bytes < 0:
+            raise Exception("Could not read entry {0}".format(self.iEv))
         return self
 
     def GetEntries(self):
@@ -388,11 +392,19 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     if analysis.config.getboolean("sparsinator", "add_systematics"):
 
         #Get the list of systematics that modify the event topology
-        systematics_event = analysis.config.get("systematics", "event").split()
+        systematics_event_nosdir = analysis.config.get("systematics", "event").split()
         #map the nice systematics names to a suffix in the ntuple
-        for syst_event in systematics_event:
-            systematics_suffix_list += [(syst_event, analysis.config.get(syst_event, "suffix"))]
-        
+        for syst_event in systematics_event_nosdir:
+
+            for sdir in ["Up", "Down"]:
+
+                syst_event_sdir = syst_event + sdir
+                systematics_event += [syst_event_sdir]
+                if analysis.config.has_section(syst_event_sdir):
+                    systematics_suffix_list += [(syst_event_sdir, analysis.config.get(syst_event_sdir, "suffix"))]
+                else:
+                    systematics_suffix_list += [(syst_event_sdir, syst_event_sdir.replace("CMS_scale", "").replace("_j", ""))]
+
         #systematics with weight
         ##create b-tagging systematics
         for sdir in ["up", "down"]:
@@ -476,14 +488,22 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             systematics = generateSystematicsSuffix("loose_jets_corr", systematics_suffix_list, func=lambda x, ev: [lv_p4s(ev.loose_jets_pt[i]*float(x[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)])
         ),
 
+        Var(name="mem_DL_0w2h2t_p",
+            nominal=Func("mem_DL_0w2h2t_p", func=lambda ev: ev.mem_SL_0w2h2t_p),
+            systematics = generateSystematicsSuffix("mem_DL_0w2h2t_p", systematics_suffix_list)
+        ),
         Var(name="mem_SL_0w2h2t_p",
             nominal=Func("mem_SL_0w2h2t_p", func=lambda ev: ev.mem_SL_0w2h2t_p),
+            systematics = generateSystematicsSuffix("mem_SL_0w2h2t_p", systematics_suffix_list)
+
         ),
         Var(name="mem_SL_1w2h2t_p",
             nominal=Func("mem_SL_1w2h2t_p", func=lambda ev: ev.mem_SL_1w2h2t_p),
+            systematics = generateSystematicsSuffix("mem_SL_1w2h2t_p", systematics_suffix_list)
         ),
         Var(name="mem_SL_2w2h2t_p",
             nominal=Func("mem_SL_2w2h2t_p", func=lambda ev: ev.mem_SL_2w2h2t_p),
+            systematics = generateSystematicsSuffix("mem_SL_2w2h2t_p", systematics_suffix_list)
         ),
 #        Var(name="mem_DL_0w2h2t_p",
 #            nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
@@ -760,7 +780,7 @@ if __name__ == "__main__":
 
     else:
         file_names = [
-            "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Feb1_leptonic_nome/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb1_leptonic_nome/170201_171753/0000/tree_104.root"
+            "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/meanalysis/GCea653641effb/Feb1_leptonic_nome__ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_99_out.root"
         ]
         prefix = ""
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"

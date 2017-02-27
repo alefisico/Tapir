@@ -18,7 +18,7 @@ print "MakeLimits.py called from cwd={0}".format(os.getcwd())
 
 def main(
         inout_dir,
-        analysis_cfg,
+        analysis,
         group
 ):
     
@@ -37,64 +37,62 @@ def main(
 #
 #    else:
 
-    analyses = [analysis_cfg]
+    limits = {}
+
+    # Decide what to run on
+    if group:
+        groups = [group]
+    else:
+        groups = analysis.groups.keys()
+
+    # Prepare the limit getter
+    lg = LimitGetter(inout_dir)
 
     limits = {}
-    for analysis in analyses:
+    for group_name in groups:
 
-        # Decide what to run on
-        if group:
-            groups = [group]
-        else:
-            groups = analysis.groups.keys()
+        group = [x for x in analysis.groups[group_name] if x.do_limit]
 
-        # Prepare the limit getter
-        lg = LimitGetter(inout_dir)
+        print group
+        
+        print "Doing {0} consisting of {1} categories".format(group_name, len(group))    
 
-        limits[analysis] = {}
-        for group_name in groups:
+        # Get all the per-category datacards and use combineCards to merge into one "group datacard"
+        input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]
+        add_dcard_command = ["combineCards.py"] + input_dcard_names 
 
-            group = [x for x in analysis.groups[group_name] if x.do_limit]
+        print "running combineCards.py"
+        print " ".join(add_dcard_command)
 
-            print group
-            
-            print "Doing {0} consisting of {1} categories".format(group_name, len(group))    
+        process = subprocess.Popen(add_dcard_command, 
+                                   stdout=subprocess.PIPE, 
+                                   cwd=inout_dir,
+                                   env=dict(os.environ, 
+                                            PATH=PATH,
+                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                            PYTHONPATH=PYTHONPATH
+                                        ))
 
-            # Get all the per-category datacards and use combineCards to merge into one "group datacard"
-            input_dcard_names = ["shapes_{0}.txt".format(c.full_name) for c in group]
-            add_dcard_command = ["combineCards.py"] + input_dcard_names 
+        group_dcard, stderr = process.communicate()
+        if process.returncode != 0:
+            print "Error running combineCards.py"
+            print stderr
+            raise Exception("Could not run combineCards command")
+        print "Finished with group_card making"
 
-            print "running combineCards.py"
-            print " ".join(add_dcard_command)
+        # Write the group datacard to a file
+        group_dcard_filename = os.path.join(inout_dir, "shapes_group_{0}.txt".format(group_name))
+        group_dcard_file = open(group_dcard_filename, "w")
+        group_dcard_file.write(group_dcard)
+        group_dcard_file.close()
 
-            process = subprocess.Popen(add_dcard_command, 
-                                       stdout=subprocess.PIPE, 
-                                       cwd=inout_dir,
-                                       env=dict(os.environ, 
-                                                PATH=PATH,
-                                                LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-                                                PYTHONPATH=PYTHONPATH
-                                            ))
+        print "Written to file, running limit setting"
 
-            group_dcard, stderr = process.communicate()
-            if process.returncode != 0:
-                print "Error running combineCards.py"
-                print stderr
-                raise Exception("Could not run combineCards command")
-            print "Finished with group_card making"
+        # And run limit setting on it
+        limits[group_name] = lg(group_dcard_filename)[0][2]
 
-            # Write the group datacard to a file
-            group_dcard_filename = os.path.join(inout_dir, "shapes_group_{0}.txt".format(group_name))
-            group_dcard_file = open(group_dcard_filename, "w")
-            group_dcard_file.write(group_dcard)
-            group_dcard_file.close()
+    # End loop over groups
 
-            print "Written to file, running limit setting"
-
-            # And run limit setting on it
-            limits[analysis][group_name] = lg(group_dcard_filename)[0][2]
-
-        # End loop over groups
     # End of loop over analyses
     return limits
 

@@ -19,6 +19,7 @@ from plotlib import escape_string, zero_error
 import rootpy
 from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
+import sklearn 
 
 DO_PARALLEL = False
 
@@ -135,19 +136,37 @@ def plot_worker(kwargs):
     plt.clf()
 
     if do_syst:
+        # for samp, sampname in procs:
+        #     hnom = ret["nominal"][samp]
+        #     for systUp, systDown in kwargs["systematics"]:
+        #         syst_name = systUp[2:-2]
+        #         hup = ret["systematic"][systUp][samp]
+        #         hdown = ret["systematic"][systDown][samp]
+        #         plot_syst_updown(hnom, hup, hdown)
+        #         plt.suptitle(escape_string(systUp.replace("Up", "")) + " " + sampname)
+        #         plt.xlabel(kwargs["xlabel"]) 
+        #         outname_syst = os.path.join(outname, syst_name, samp)
+        #         logging.info("saving systematic {0}".format(outname_syst))
+        #         plotlib.svfg(outname_syst + ".pdf")
+        #         plt.clf()
+
+
+        plt.figure(figsize=(6,6))
+        plt.plot([0,1],[0,1], color="black")
+        hsig = sum([ret["nominal"][s] for s in signal_procs])
+        #draw rocs
         for samp, sampname in procs:
-            hnom = ret["nominal"][samp]
-            for systUp, systDown in kwargs["systematics"]:
-                syst_name = systUp[2:-2]
-                hup = ret["systematic"][systUp][samp]
-                hdown = ret["systematic"][systDown][samp]
-                plot_syst_updown(hnom, hup, hdown)
-                plt.suptitle(escape_string(systUp.replace("Up", "")) + " " + sampname)
-                plt.xlabel(kwargs["xlabel"]) 
-                outname_syst = os.path.join(outname, syst_name, samp)
-                logging.info("saving systematic {0}".format(outname_syst))
-                plotlib.svfg(outname_syst + ".pdf")
-                plt.clf()
+            if samp in signal_procs:
+                continue
+            hbkg = ret["nominal"][samp]
+            r, e = plotlib.calc_roc(hsig, hbkg)
+            plt.plot(r[:, 0], r[:, 1], marker=".", label=sampname + " AUC={0:.2f}".format(sklearn.metrics.auc(r[:, 0], r[:, 1])))
+        plt.legend(loc="best", fontsize=8)
+        plt.xlim(0,1)
+        plt.ylim(0,1)
+        outname_roc = outname + "_roc"
+        plotlib.svfg(outname_roc + ".pdf")
+        plt.clf()
 
     inf.Close()
 

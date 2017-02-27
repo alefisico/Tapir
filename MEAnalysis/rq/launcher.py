@@ -236,6 +236,8 @@ class TaskNumGen(Task):
             list of rq jobs: The jobs that will return the result
         """
         jobs = []
+        if len(sample.file_names) == 0:
+            raise Exception("No files specified for sample {0}".format(sample.name))
 
         #split the sample input files into a number of chunks based on the prescribed size
         for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
@@ -340,21 +342,25 @@ class TaskSparseMerge(Task):
             if not sample.name in inputs.keys():
                 continue
 
+            jobs_by_sample[sample.name] = []
             sample_results = [os.path.abspath(job.result) for job in inputs[sample.name]]
             logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(sample_results), sample.name))
             outfile = os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, sample.name))
-            job = enqueue_memoize(
-                qmain,
-                func = mergeFiles,
-                args = (outfile, sample_results),
-                timeout = 20*60,
-                result_ttl = 60*60,
-                meta = {"retries": 0, "args": sample.name}
-            )
-            jobs_by_sample[sample.name] = job
-            all_jobs += [job]
+
+            for ijob, sample_inputs in enumerate(chunks(sample_results, 100)):
+                job = enqueue_memoize(
+                    qmain,
+                    func = mergeFiles,
+                    args = (outfile + "." + str(ijob), sample_inputs),
+                    timeout = 20*60,
+                    result_ttl = 60*60,
+                    meta = {"retries": 0, "args": sample_inputs}
+                )
+                jobs_by_sample[sample.name] += [job]
+            all_jobs += jobs_by_sample[sample.name]
         waitJobs(all_jobs, redis_conn, qmain, qfail, callback=TaskSparseMerge.status_callback)
         results = [j.result for j in all_jobs]
+        logger.info("sparsemerge: {0}".format(results))
         logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results)))
         final_merge = os.path.abspath("{0}/merged.root".format(workdir))
         job = enqueue_memoize(
@@ -363,7 +369,7 @@ class TaskSparseMerge(Task):
             args = (final_merge, results),
             timeout = 20*60,
             result_ttl = 60*60,
-            meta = {"retries": 0, "args": ("final", final_merge, results)}
+            meta = {"retries": 2, "args": ("final", final_merge, results)}
         )
         waitJobs([job], redis_conn, qmain, qfail, callback=TaskSparseMerge.status_callback)
         self.save_state()
@@ -418,7 +424,8 @@ class TaskCategories(Task):
                 workdir, cat.name, cat.discriminator.name
             )
             logging.info("creating category to {0}".format(category_dir))
-            os.makedirs(category_dir)
+            if not os.path.exists(category_dir):
+                os.makedirs(category_dir)
             make_datacard(self.analysis, [cat], category_dir, hdict)
 
         # hadd Results        
@@ -493,7 +500,13 @@ class TaskLimits(Task):
                     meta = {"retries": 0, "args": ""})]
             
         limits = waitJobs(all_jobs, redis_conn, qmain, qfail)
-        print limits
+        lims_tot = {}
+        for lim in limits:
+            lims_tot.update(lim)
+
+        for k in sorted(lims_tot.keys()):
+            print k, lims_tot[k]
+
         self.save_state()
 
 def make_workdir():
@@ -577,7 +590,7 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        #TaskNumGen(workdir, "NGEN", analysis),
+        TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),

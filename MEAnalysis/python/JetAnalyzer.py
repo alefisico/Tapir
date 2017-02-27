@@ -53,7 +53,7 @@ class JetAnalyzer(FilterAnalyzer):
             if systematic == "JER":
                 old_corr = newjets[i].corr_JER
 
-            if new_corr > 0:
+            if new_corr > 0 and old_corr > 0:
                 cf =  _sigma * new_corr / old_corr
             else:
                 cf = 0.0

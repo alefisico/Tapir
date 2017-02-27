@@ -216,21 +216,23 @@ def analysisFromConfig(config_file_path):
             else:
                 rebin = 1
 
-            cats.append(
-                Category(
-                    name = cat,
-                    cuts = [cut],
-                    processes = mc_processes,
-                    data_processes = data_processes,
-                    signal_processes = signal_processes, 
-                    common_shape_uncertainties = common_shape_uncertainties, 
-                    common_scale_uncertainties = common_scale_uncertainties, 
-                    scale_uncertainties = scale_uncertainties, 
-                    discriminator = Histogram.from_string(config.get(cat, "discriminator")),
-                    rebin = rebin,
-                    do_limit = True
-                )
+            cat = Category(
+                name = cat,
+                cuts = [cut],
+                processes = mc_processes,
+                data_processes = data_processes,
+                signal_processes = signal_processes, 
+                common_shape_uncertainties = common_shape_uncertainties, 
+                common_scale_uncertainties = common_scale_uncertainties, 
+                scale_uncertainties = scale_uncertainties, 
+                discriminator = Histogram.from_string(config.get(cat, "discriminator")),
+                rebin = rebin,
+                do_limit = True
             )
+            cats.append(cat)
+
+            #a group consisting of only this category
+            analysis_groups[cat.full_name] = [cat] 
 
             # Also add control variables as separate categories
             if config.has_option(cat, "control_variables"):
@@ -261,8 +263,11 @@ def analysisFromConfig(config_file_path):
         all_cats.extend(cats)
     # End loop over groups of categories
 
-    # Uniquify all categories
-    all_cats = list(set(all_cats))
+    # If the same category is defined in multiple groups, it will exist multiple times
+    # We need to define each category uniquely, so do this here via the dictionary
+    all_cats_uniq = {}
+    all_cats_uniq = {c.full_name: c for c in all_cats}
+    all_cats = sorted(all_cats_uniq.values(), key=lambda x: x.full_name)
 
 
     ########################################

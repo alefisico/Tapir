@@ -400,11 +400,11 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        "ttHTobb",
-        #"ttHToNonbb",
-        "TTbar_inc",
-        #"TTbar_sl",
-        #"TTbar_dl"
+        #"ttHTobb",
+        "ttHToNonbb",
+        #"TTbar_inc",
+        "TTbar_sl",
+        "TTbar_dl"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -613,7 +613,7 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 2000
+    config.JobType.maxMemoryMB = 3000
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")
