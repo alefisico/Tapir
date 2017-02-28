@@ -134,9 +134,15 @@ def makeStatVariations(tf, of, categories):
 def fakeData(infile, outfile, categories):
     dircache = {}
     for cat in categories:
-        h = infile.Get("{0}__{1}__{2}".format(
+
+        #get first histogram
+        hn = "{0}__{1}__{2}".format(
             cat.out_processes[0], cat.name, cat.discriminator.name
-        )).Clone()
+        )
+        h = infile.Get(hn)
+        if not h or h.IsZombie():
+            raise Exception("Could not get histo {0}".format(hn)) 
+        h = h.Clone()
         for proc in cat.out_processes[1:]:
             name = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
@@ -155,6 +161,7 @@ def fakeData(infile, outfile, categories):
     outfile.cd()
     for (k, v) in dircache.items():
         v.SetName(k)
-        outfile.Add(v)
-        outfile.Write("", ROOT.TObject.kOverwrite)
+        v.SetDirectory(outfile)
+        outfile.Append(v, True)
+    outfile.Write()
 #end of fakeData

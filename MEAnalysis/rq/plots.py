@@ -23,17 +23,17 @@ procs_names = [
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-    ("diboson", "diboson"),
-    ("stop", "single top"),
-    ("ttv", "tt+V"),
-    ("wjets", "w+jets"),
-    ("dy", "dy")
+    #("diboson", "diboson"),
+    #("stop", "single top"),
+    #("ttv", "tt+V"),
+    #("wjets", "w+jets"),
+    #("dy", "dy")
 ]
 procs = [x[0] for x in procs_names]
 
 syst_pairs = [
     ("__puUp", "__puDown"),
-    #("__CMS_scale_jUp", "__CMS_scale_jDown"),
+    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
     ("__CMS_res_jUp", "__CMS_res_jDown"),
     ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
     ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
@@ -51,6 +51,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
     return {
         "infile": s + ".root",
         "histname": "__".join([category, variable]),
+        "category": category,
         "outname": os.path.abspath("/".join([outpath, category, variable])),
         "procs": procs_names,
         "signal_procs": ["ttH_hbb"],
@@ -96,6 +97,7 @@ def run_plots(workdir, analysis, path_to_files, redis_conn, qmain, qfail):
         ]
 
     waitJobs(all_jobs, redis_conn, qmain, qfail)
+    return [j.result for j in all_jobs]
 
 if __name__ == "__main__":
 

@@ -323,8 +323,8 @@ class Conf:
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            #"TotalUp",
-            #"TotalDown",
+            "TotalUp",
+            "TotalDown",
         ],
 
         "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)
@@ -363,7 +363,7 @@ class Conf:
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
                 ((event.is_sl or event.is_dl) and
-                (event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 4))
+                (event.numJets>=4 and event.nBCSVM >= 4))
             #(event.is_fh and event.cat in ["cat7","cat8"]
             #and event.btag_LR_4b_2b > 0.95)
         ),

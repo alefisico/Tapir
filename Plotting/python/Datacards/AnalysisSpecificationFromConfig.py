@@ -188,11 +188,11 @@ def analysisFromConfig(config_file_path):
     for group in config.get("general","analysis_groups").split():
 
         cats = []
-        for cat in config.get(group,"categories").split():
+        for category_name in config.get(group,"categories").split():
 
-            template = config.get(cat, "template")
+            template = config.get(category_name, "template")
 
-            cut = Cut(sparsinator = Cut.string_to_cuts(config.get(cat, "cuts").split()))
+            cut = Cut(sparsinator = Cut.string_to_cuts(config.get(category_name, "cuts").split()))
 
             mc_processes = sum([process_lists[x] for x in config.get(template, "mc_processes").split()], [])
             data_processes = sum([process_lists[x] for x in config.get(template, "data_processes").split()], [])
@@ -211,13 +211,13 @@ def analysisFromConfig(config_file_path):
                 for name, uncert in pairwise(v.split()):
                     scale_uncertainties[k][name] = float(uncert)
 
-            if config.has_option(cat, "rebin"):
-                rebin = int(config.get(cat,"rebin"))
+            if config.has_option(category_name, "rebin"):
+                rebin = int(config.get(category_name,"rebin"))
             else:
                 rebin = 1
 
-            cat = Category(
-                name = cat,
+            category = Category(
+                name = category_name,
                 cuts = [cut],
                 processes = mc_processes,
                 data_processes = data_processes,
@@ -225,23 +225,23 @@ def analysisFromConfig(config_file_path):
                 common_shape_uncertainties = common_shape_uncertainties, 
                 common_scale_uncertainties = common_scale_uncertainties, 
                 scale_uncertainties = scale_uncertainties, 
-                discriminator = Histogram.from_string(config.get(cat, "discriminator")),
+                discriminator = Histogram.from_string(config.get(category_name, "discriminator")),
                 rebin = rebin,
                 do_limit = True
             )
-            cats.append(cat)
+            cats.append(category)
 
             #a group consisting of only this category
-            analysis_groups[cat.full_name] = [cat] 
+            analysis_groups[category.full_name] = [category] 
 
             # Also add control variables as separate categories
-            if config.has_option(cat, "control_variables"):
-                for cv in config.get(cat, "control_variables").split('\n'):
+            if config.has_option(category_name, "control_variables"):
+                for cv in config.get(category_name, "control_variables").split('\n'):
                     if len(cv) == 0:
                         continue
                     cats.append(
                         Category(
-                            name = cat,
+                            name = category_name,
                             cuts = [cut],
                             processes = mc_processes,
                             data_processes = data_processes,

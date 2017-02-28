@@ -1,4 +1,4 @@
-import pdb
+import math
 
 import ROOT
 import logging
@@ -25,13 +25,13 @@ DO_PARALLEL = False
 
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
-    ("ttH_nonhbb", "tt+H(non-bb)"),
+    #("ttH_nonhbb", "tt+H(non-bb)"),
     ("ttbarOther", "tt+light"),
     ("ttbarPlusBBbar", "tt+bb"),
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-    ("diboson", "diboson"),
+    #("diboson", "diboson"),
 ]
 
 procs = [x[0] for x in procs_names]
@@ -40,18 +40,18 @@ procs = [x[0] for x in procs_names]
 syst_pairs = []
 
 syst_pairs.extend([
-    ("_puUp", "_puDown"),
-    ("_CMS_scale_jUp", "_CMS_scale_jDown"),
-    ("_CMS_res_jUp", "_CMS_res_jDown"),
-    ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
-    ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
-    ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
-    ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
-    ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
-    ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
-    ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
-    ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
-    ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
+    ("__puUp", "__puDown"),
+    # ("_CMS_scale_jUp", "_CMS_scale_jDown"),
+    # ("_CMS_res_jUp", "_CMS_res_jDown"),
+    # ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
+    # ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
+    # ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
+    # ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
+    # ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
+    # ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
+    # ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
+    # ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
+    # ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -136,6 +136,7 @@ def plot_worker(kwargs):
     plt.clf()
 
     if do_syst:
+        #systematic shapes
         for samp, sampname in procs:
             hnom = ret["nominal"][samp]
             for systUp, systDown in kwargs["systematics"]:
@@ -151,34 +152,57 @@ def plot_worker(kwargs):
                 plt.clf()
 
 
-        plt.figure(figsize=(6,6))
-        plt.plot([0,1],[0,1], color="black")
-        hsig = sum([ret["nominal"][s] for s in signal_procs])
-        #draw rocs
-        for samp, sampname in procs:
-            if samp in signal_procs:
-                continue
-            hbkg = ret["nominal"][samp]
-            r, e = plotlib.calc_roc(hsig, hbkg)
-            plt.plot(r[:, 0], r[:, 1], marker=".", label=sampname + " AUC={0:.2f}".format(sklearn.metrics.auc(r[:, 0], r[:, 1])))
-        plt.legend(loc="best", fontsize=8)
-        plt.xlim(0,1)
-        plt.ylim(0,1)
-        outname_roc = outname + "_roc"
-        plotlib.svfg(outname_roc + ".pdf")
-        plt.clf()
+    #ROC plots
+    plt.figure(figsize=(6,6))
+    plt.plot([0,1],[0,1], color="black")
+    hsig = sum([ret["nominal"][s] for s in signal_procs])
+    #draw rocs
+    for samp, sampname in procs:
+        if samp in signal_procs:
+            continue
+        hbkg = ret["nominal"][samp]
+        r, e = plotlib.calc_roc(hsig, hbkg)
+        plt.plot(r[:, 0], r[:, 1], marker=".", label=sampname + " AUC={0:.2f}".format(sklearn.metrics.auc(r[:, 0], r[:, 1])))
+    plt.legend(loc="best", fontsize=8)
+    plt.xlim(0,1)
+    plt.ylim(0,1)
+    outname_roc = outname + "_roc"
+    plotlib.svfg(outname_roc + ".pdf")
+    plt.clf()
+
+    #pie plot
+    plt.figure(figsize=(3,3))
+    yields = [ret["nominal"][samp].Integral() for samp, sampname in procs]
+    plt.pie(
+        yields,
+        colors=kwargs.get("colors"),
+        labels=[s[1] + "\n{0:.1f}".format(y) for s, y in zip(procs, yields)]
+    )
+    yield_s = 0.0
+    yield_b = 0.0
+    for y, (samp, sampname) in zip(yields, procs):
+        if samp in signal_procs:
+            yield_s += y
+        else:
+            yield_b += y
+
+    plt.title(kwargs.get("category", "unknown category") + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
+    plotlib.svfg(outname + "_pie.pdf")
+    plt.clf()
 
     inf.Close()
+    #return ret["nominal"]
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
     s = "{0}/{1}/{2}".format(basepath, analysis, category)
     return {
         "infile": s + ".root",
-        "histname": "/".join([category, variable]),
+        "histname": "__".join([category, variable]),
         "outname": "/".join(["out", outpath, analysis, category, variable]),
+        "category": category,
         "procs": procs_names,
         "signal_procs": ["ttH_hbb"],
-        "dataname": "data", #data_obs for fake data
+        "dataname": None,#"data", #data_obs for fake data
         "rebin": 1,
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
@@ -189,7 +213,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "show_overflow": True,
         "title_extended": r"$,\ \mathcal{L}=00.0\ \mathrm{fb}^{-1}$, ",
         "systematics": syst_pairs,
-        "do_syst": True,
+        "do_syst": False,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
     }
 
@@ -201,7 +225,7 @@ if __name__ == "__main__":
         "jetsByPt_0_pt",
         "leps_0_pt",
         "btag_LR_4b_2b_btagCSV_logit",
-        "common_mem"
+        #"common_mem"
     ]
 
     cats = [
@@ -212,7 +236,7 @@ if __name__ == "__main__":
     args = []
 
     args += [get_base_plot(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/6a20e79f-22b9-466a-ae9a-2741b93743e1/",
+        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/c85d8a67-ca1a-4b0f-ba9e-d3695589f9c7/",
         "test", "categories", cat, var) for cat in cats for var in simple_vars 
     ]
 
