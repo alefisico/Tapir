@@ -116,7 +116,7 @@ def analysisFromConfig(config_file_path):
         process_lists[process_list] = []
 
 
-        is_data =  config.get(process_list, "is_data")
+        schema =  config.get(process_list, "schema")
 
         for process in config.get(process_list,"processes").split():
 
@@ -131,7 +131,7 @@ def analysisFromConfig(config_file_path):
                     cuts.append(cuts_dict[cut])
 
             # DATA
-            if is_data == "True":
+            if schema == "data":
                 process_lists[process_list].append(
                     DataProcess(
                         input_name = in_name,

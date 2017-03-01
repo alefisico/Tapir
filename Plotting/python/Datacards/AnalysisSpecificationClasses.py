@@ -96,7 +96,6 @@ class Sample(object):
             files_load = config.get(sample_name, "files_load"),
             files_load_step1 = config.get(sample_name, "files_load_step1"),
             schema = config.get(sample_name, "schema"),
-            is_data = config.get(sample_name, "is_data"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen"),

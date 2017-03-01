@@ -38,6 +38,11 @@ def getLumisProcessed(vlumiblock):
         lumidict[run] += [i for i in range(lumi1, lumi2 + 1)]
     return lumidict
 
+dumpfile = open("dump.txt", "w")
+
+dumpfile.write(PSet.process.dumpPython())
+dumpfile.write("\n")
+
 t0 = time.time()
 print "ARGV:",sys.argv
 
@@ -68,7 +73,6 @@ for i in xrange(0,len(crabFiles)) :
     else:
         print "data is not local" 
         crabFiles_pfn[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
-print "timeto_convertPFN ",(time.time()-t0)
 
 ###
 ### VHBB code
@@ -85,7 +89,6 @@ if hasattr(PSet.process.source, "lumisToProcess"):
     config.preprocessor.options["lumisToProcess"] = PSet.process.source.lumisToProcess
     lumidict = getLumisProcessed(lumisToProcess)
 handle.close()
-print "timeto_setLumis ",(time.time()-t0)
 
 #replace files with crab ones
 config.components[0].files=crabFiles_pfn
@@ -110,42 +113,17 @@ if not "--nostep2" in args:
     
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
+    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
     an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
     an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
-    tth_main(
+    mem_python_conf = tth_main(
         an,
         schema="mc" if cfo.sample.isMC else "data",
         output_name="Output_tth",
         files="Output/tree.root"
     )
-    #import cPickle as pickle
-    #import TTH.MEAnalysis.TFClasses as TFClasses
-    #sys.modules["TFClasses"] = TFClasses
-    #os.environ["ME_CONF"] = os.environ["CMSSW_BASE"] + "/python/TTH/MEAnalysis/" + me_conf_name
-    #handle = open("MEAnalysis_heppy.py", 'r')
-    #cfo2 = imp.load_source("heppy_config", "MEAnalysis_heppy.py", handle)
-    #config = cfo2.config
-    #from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-    #print "MEM config", conf_to_str(cfo2.conf)
-    #config.components = [cfg.Component(
-    #    "dummy",
-    #    files = ["Output/tree.root"],
-    #    tree_name = "tree",
-    #    n_gen = 1,
-    #    xs = 1,
-    #)]
-    #config.components[0].isMC = cfo.sample.isMC
-    #
-    #if not cfo.sample.isMC:
-    #    from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
-    #    evs = cfg.Analyzer(
-    #        EventAnalyzer,
-    #        'events',
-    #    )
-    #    config.sequence[2] = evs
-    #looper = Looper('Output_tth', config, nPrint=0)
-    #looper.loop()
-    #looper.write()
+    dumpfile.write(conf_to_str(mem_python_conf))
+    dumpfile.write("\n")
     print "timeto_doMEM ",(time.time()-t0)
 
 #Now we need to copy both the vhbb and tth outputs to the same file
@@ -170,9 +148,8 @@ def copyTo(src, dst, keys=[]):
 
 copyTo(inf1, vhbb_dir)
 copyTo(inf2, tof)
-dump = ROOT.TNamed("PSet_process_dumpPython", PSet.process.dumpPython())
-dump.Write()
 tof.Close()
+
 
 def getEntries(inf, tree):
     tf = ROOT.TFile(inf)
@@ -288,3 +265,4 @@ report=open('./FrameworkJobReport.xml', 'w+')
 report.write(getFJR(lumidict, crabFiles, crabFiles_pfn, "tree.root"))
 report.close()
 print "timeto_totalJob ",(time.time()-t0)
+dumpfile.close()

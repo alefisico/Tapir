@@ -422,7 +422,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         systematic_weights += [
                 ("puUp", lambda ev: ev["puWeightUp"] * ev["btagWeightCSV"] ),
                 ("puDown", lambda ev: ev["puWeightDown"] * ev["btagWeightCSV"]),
-                #("unweighted", lambda ev: 1.0)
+                ("unweighted", lambda ev: 1.0)
         ]
 
     #Generates accessor functions for systematically variatied values
@@ -780,10 +780,12 @@ if __name__ == "__main__":
 
     else:
         file_names = [
-            "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/meanalysis/GCea653641effb/Feb1_leptonic_nome__ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_99_out.root"
+            getSitePrefix("/store/user/jpata/tth/Feb6_leptonic_nome/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Feb6_leptonic_nome/170206_161748/0000/tree_{0}.root".format(i))
+            #getSitePrefix("/store/user/jpata/tth/Feb23_mem_v2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Feb23_mem_v2/170223_192407/0000/tree_{0}.root".format(i))
+            for i in range(1, 10)
         ]
         prefix = ""
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")

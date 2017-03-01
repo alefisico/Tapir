@@ -31,4 +31,6 @@ if __name__ == "__main__":
     dataset = os.environ["DATASETPATH"].split("__")[-1]
 
     main(an, sample_name=dataset, firstEvent=firstEvent, numEvents=nEvents, output_name="Loop", files=fns)
-    counts.main(os.environ["FILE_NAMES"].split(), "counts.root")
+    
+    #NB! in case of using event-based splitting in grid-control, the counting will be wrong!
+    #counts.main(os.environ["FILE_NAMES"].split(), "counts.root")

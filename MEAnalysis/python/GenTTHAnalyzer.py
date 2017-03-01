@@ -223,7 +223,6 @@ class GenTTHAnalyzer(FilterAnalyzer):
                         numeric_b_from_had_t = -1
 
                     #find DeltaR between jet and quark
-                    print q, j
                     l1 = lvec(q)
                     l2 = lvec(j)
                     dr = l1.DeltaR(l2)

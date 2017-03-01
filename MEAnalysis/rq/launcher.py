@@ -249,7 +249,7 @@ class TaskNumGen(Task):
                     timeout = 2*60*60,
                     ttl = 2*60*60,
                     result_ttl = 2*60*60,
-                    meta = {"retries": 2, "args": str((inputs, ))}
+                    meta = {"retries": 5, "args": str((inputs, ))}
                 )
             ]
         logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -340,6 +340,7 @@ class TaskSparseMerge(Task):
         for sample in analysis.samples:
             
             if not sample.name in inputs.keys():
+                print "Skipping sample", sample.name
                 continue
 
             jobs_by_sample[sample.name] = []
@@ -590,11 +591,11 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        TaskNumGen(workdir, "NGEN", analysis),
+        #TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
-        TaskPlotting(workdir, "PLOT", analysis),
+        #TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
     ]
 

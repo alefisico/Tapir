@@ -538,7 +538,7 @@ workflow_datasets["testing_withme"] = {}
 for k in ["ttHTobb", "TTbar_inc"]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(D["perjob"]/10)
-    D["maxlumis"] = 100 * D["perjob"]
+    D["maxlumis"] = 10 * D["perjob"]
     D["runtime"] = int(D["runtime"]/5)
     D["mem_cfg"] = me_cfgs["default"]
     workflow_datasets["testing_withme"][k] = D
@@ -614,6 +614,7 @@ env
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
     config.JobType.maxMemoryMB = 3000
+    config.JobType.outputFiles = ["dump.txt"]
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")

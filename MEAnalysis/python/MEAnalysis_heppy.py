@@ -349,12 +349,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
     print "Looper done"
 
     tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file
-    tf.cd()
+    #tf.cd()
     #ts = ROOT.TNamed("config", conf_to_str(python_conf))
     #ts.Write("", ROOT.TObject.kOverwrite)
 
     #write the output
     looper.write()
+    return python_conf
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig

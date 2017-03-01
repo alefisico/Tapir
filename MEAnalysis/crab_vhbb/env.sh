@@ -3,8 +3,6 @@ echo "heppy_crab_script_pre.sh"
 
 tar xvzf python.tar.gz --directory $CMSSW_BASE 
 tar xzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis
-echo "ENV"
-env
 echo "VOMS"
 voms-proxy-info -all
 echo "CMSSW BASE, python path, pwd"
@@ -39,10 +37,6 @@ cat fakeprov.txt
 EOF
 
 chmod +x $CMSSW_BASE/bin/$SCRAM_ARCH/edmProvDump
-
-echo "Which edmProvDump"
-which edmProvDump
-edmProvDump
 
 # Update library path
 # Needed so recompiled modules are found
