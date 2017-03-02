@@ -65,7 +65,7 @@ class BufferedChain( object ):
         return self
 
 
-def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=1000, files=[], output_name=None):
+def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=-1, files=[], output_name=None):
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
     #Create python configuration object based on path
     if len(mem_python_config) > 0:
@@ -333,7 +333,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=10
     from PhysicsTools.HeppyCore.framework.looper import Looper
 
     kwargs = {}
-    if python_conf.general.get("eventWhitelist", None) is None:
+    if python_conf.general.get("eventWhitelist", None) is None and numEvents >= 0:
         kwargs["nEvents"] = numEvents
     kwargs["firstEvent"] = firstEvent
     looper = Looper(
