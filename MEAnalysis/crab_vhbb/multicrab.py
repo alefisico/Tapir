@@ -401,10 +401,10 @@ workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
         #"ttHTobb",
-        "ttHToNonbb",
-        #"TTbar_inc",
-        "TTbar_sl",
-        "TTbar_dl"
+        #"ttHToNonbb",
+        "TTbar_inc",
+        #"TTbar_sl",
+        #"TTbar_dl"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"

@@ -185,6 +185,7 @@ def get_files(fname):
 # This function is used everywher to translate LFN /store to PFN root://
 # currently all files are assumed to reside at CSCS
 site_prefix = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat"
+#site_prefix = "root://t3dcachedb03.psi.ch/pnfs/psi.ch/cms/trivcat"
 def getSitePrefix(fn=""):
     if fn.startswith("/store"):
         return site_prefix  + fn

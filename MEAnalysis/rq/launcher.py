@@ -88,12 +88,19 @@ def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_s
                     qfail.requeue(job.id)
                 else:
                     #job failed permanently, abort workflow
+                    job.refresh()
                     perm_failed += [job]
-                    raise Exception("job {0} failed with exception {1}".format(job.id, job.exc_info))
+                    raise Exception("job {0} failed with exception {1}".format(
+                        job,
+                        job.exc_info
+                    ))
             
             #This can happen if the worker died
             if job.status is None:
-                raise Exception("Job status is None")
+                print "Job id={0} status is None, probably worker died, trying to requeue".format(
+                    job.id
+                )
+                qfail.requeue(job.id)
 
             #if the job is done, create a unique hash from the job arguments that will be
             #used to "memoize" or store the result in the database
@@ -591,7 +598,7 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        #TaskNumGen(workdir, "NGEN", analysis),
+        TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
