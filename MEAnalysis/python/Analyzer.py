@@ -31,7 +31,8 @@ class MemoryAnalyzer(Analyzer):
 
     def process(self, event):
         memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        autolog("memory usage at event {0}: {1:.2f} MB".format(event.iEv, memory/1024.0))
+        if event.iEv % 100 == 0:
+            autolog("memory usage at event {0}: {1:.2f} MB".format(event.iEv, memory/1024.0))
         
         if not self.hpy is None:
             heap = self.hpy.heap() 

@@ -54,24 +54,3 @@ cat hash
 
 # make sure we can access scikit learn
 source setenv_sklearn_cmssw.sh
-
-echo "Our NEW PYTHONPATH:"
-echo $PYTHONPATH
-
-echo "ls /cvmfs/"
-ls /cvmfs/
-
-echo "ls /cvmfs/cms-ib.cern.ch/"
-ls /cvmfs/cms-ib.cern.ch/
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/"
-ls /cvmfs/cms-ib.cern.ch/week0/
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530"
-ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external"
-ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn"
-ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn

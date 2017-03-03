@@ -400,7 +400,7 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        #"ttHTobb",
+        "ttHTobb",
         #"ttHToNonbb",
         "TTbar_inc",
         #"TTbar_sl",
@@ -503,11 +503,11 @@ for k in [
     #"TTbar_inc"
     ]:
     D = deepcopy(datasets[k])
-    D["maxlumis"] = 10
-    D["perjob"] = 2
+    D["maxlumis"] = 50
+    D["perjob"] = 10
     if "data" in D["script"]:
-        D["maxlumis"] = 200
-        D["perjob"] = 10
+        D["maxlumis"] = 500
+        D["perjob"] = 100
     D["runtime"] = 5
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D

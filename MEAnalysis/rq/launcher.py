@@ -598,7 +598,7 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        #TaskNumGen(workdir, "NGEN", analysis),
+        TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),

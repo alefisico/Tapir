@@ -102,13 +102,15 @@ if not "--nostep1" in args:
     else:
         looper = Looper( 'Output', config, nPrint=0)
     looper.loop()
+    looper.write()
+    
     tf = ROOT.TFile("Output/tree.root")
     if not tf or tf.IsZombie():
         raise Exception("Error occurred in processing step1")
     tt = tf.Get("tree")
     print "step1 tree={0}".format(tt.GetEntries())
     tf.Close()
-    looper.write()
+    
     print "timeto_doVHbb ",(time.time()-t0)
 
 ###
