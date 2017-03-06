@@ -780,9 +780,7 @@ if __name__ == "__main__":
 
     else:
         file_names = [
-            getSitePrefix("/store/user/jpata/tth/Feb6_leptonic_nome/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Feb6_leptonic_nome/170206_161748/0000/tree_{0}.root".format(i))
-            #getSitePrefix("/store/user/jpata/tth/Feb23_mem_v2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Feb23_mem_v2/170223_192407/0000/tree_{0}.root".format(i))
-            for i in range(1, 10)
+            getSitePrefix("/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_1.root")
         ]
         prefix = ""
         sample = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"
