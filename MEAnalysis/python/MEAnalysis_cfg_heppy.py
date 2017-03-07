@@ -639,7 +639,7 @@ c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagg
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) == 3 and #DS
-    ( len(mcfg.l_quark_candidates(ev)) == 4 or len(mcfg.l_quark_candidates(ev)) == 5 ) #DS
+    ( len(mcfg.l_quark_candidates(ev)) >= 4 and len(mcfg.l_quark_candidates(ev)) <= 6 ) #DS
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("4w2h1t")

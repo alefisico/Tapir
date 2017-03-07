@@ -316,7 +316,7 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         kwargs["nEvents"] = numEvents
     kwargs["firstEvent"] = firstEvent
     looper = Looper(
-        'Loop_'+samp.name if len(output_name) == 0 else output_name,
+        'Loop_'+an_sample.name if len(output_name) == 0 else output_name,
         heppy_config,
         nPrint = 0,
         **kwargs

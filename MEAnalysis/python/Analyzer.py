@@ -1,6 +1,7 @@
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 from TTH.MEAnalysis.vhbb_utils import lvec
 import ROOT
+from TTH.MEAnalysis.VHbbTree import LHE_weights_pdf
 
 class FilterAnalyzer(Analyzer):
     """
@@ -42,7 +43,13 @@ class CounterAnalyzer(FilterAnalyzer):
     
     def process(self, event):
         #super(CounterAnalyzer, self).process(event)
-        self.chist.Fill(0)
+        passes = False
+        if( LHE_weights_pdf.make_array(event.input) ):
+            self.chist.Fill(0)
+            passes = True
+        else:
+            print "event in tree not accessible"
+        return passes
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
     """
