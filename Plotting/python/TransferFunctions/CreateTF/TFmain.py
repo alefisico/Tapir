@@ -58,3 +58,5 @@ if __name__ == "__main__":
     # python TFmain.py resolved
     jettype = sys.argv[1]
     main("configs/{0}/config.dat".format(jettype))
+    #main("config.dat") #DS
+

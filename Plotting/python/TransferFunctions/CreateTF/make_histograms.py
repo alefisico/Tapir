@@ -60,7 +60,7 @@ def Make_E_axis( input_chain, eta_axis, n_E_bins, E_bounds, particle, config ):
 
         # The more bins chosen, the more precise the bin boundaries will be
         #n_E_hist_bins = 50000
-        n_E_hist_bins = 200
+        n_E_hist_bins = 2000 #DS
 
         # Store this number also in config
         config['n_E_hist_bins'] = n_E_hist_bins
@@ -225,9 +225,9 @@ def Make_sel_str( left_eta, right_eta, left_E, right_E, particle, config ):
         print "Use 'b', 'bottom', 'o', 'other', 'l' or 'light' for particle types"
         return
         
-    eta_str = "abs({0})>={1} && abs({0})<={2} && ".format(eta_var, left_eta, right_eta)
+    eta_str = "abs({0})>={1} && abs({0})<={2} && ".format(eta_var, left_eta, right_eta) #DS may double count at boundaries!
 
-    E_str = "abs({0})>={1} && abs({0})<={2}".format( E_var, left_E, right_E )
+    E_str = "abs({0})>={1} && abs({0})<={2}".format( E_var, left_E, right_E ) #DS may double count at boundaries!
 
     if not 'selection_string' in config:
         config['selection_string'] = {}
@@ -259,7 +259,7 @@ def Make_hist_mat( eta_axis, E_axis, particle, config ):
                 config['E_or_Pt_str'] )
 
             number_of_bins = 100
-            min_x = 0
+            min_x = 0     #DS does this require a non-zero value??
             max_x = 2*E_axis[i_eta][i_E+1]
 
             hist_mat[i_eta][i_E] = ROOT.TH1F(
@@ -510,7 +510,7 @@ def Make_Histograms(conffile):
 ########################################   
 
 def main():
-    Make_Histograms()
+    Make_Histograms("config.dat") #DS
 
 if __name__ == "__main__":
     main()

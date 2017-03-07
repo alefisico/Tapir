@@ -166,7 +166,7 @@ def Fit_Single_Bins(conffile):
 
                 dic['hist_mat'][i_eta][i_E].Fit(f1,'RQ')
                 dic['hist_mat'][i_eta][i_E].Fit(f1,'RQ')
-                dic['hist_mat'][i_eta][i_E].Fit(f1,'RQ')
+                dic['hist_mat'][i_eta][i_E].Fit(f1,'RQ') #DS why 3 times??!!
 
 
                 # Save the fit results in separate dicts; these dicts will be used to
