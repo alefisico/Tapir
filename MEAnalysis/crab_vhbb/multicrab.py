@@ -153,55 +153,103 @@ datasets.update({
         "script": 'heppy_crab_script.sh'
     },
     
-   # 'ww': {
-   #     "ds": '/WW_TuneCUETP8M1_13TeV-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'wz': {
-   #     "ds": '/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'zz': {
-   #     "ds": '/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'ttw_wlnu': {
-   #     "ds": '/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'ttw_wqq': {
-   #     "ds": '/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'ttz_zqq': {
-   #     "ds": '/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 
+   'ww1': {
+       "ds": '/WW_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'ww2': {
+       "ds": '/WW_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'wz1': {
+       "ds": '/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'wz2': {
+       "ds": '/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'zz1': {
+       "ds": '/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'zz2': {
+       "ds": '/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'ttw_wlnu1': {
+       "ds": '/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'ttw_wlnu2': {
+       "ds": '/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v3/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'ttw_wqq': {
+       "ds": '/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'ttz_zllnunu1': {
+       "ds": '/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'ttz_zllnunu2': {
+       "ds": '/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'ttz_zqq': {
+       "ds": '/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   
    # 'wjets_ht_100_200': {
    #     "ds": '/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
    #     "maxlumis": -1,
@@ -280,46 +328,46 @@ datasets.update({
    #     "script": 'heppy_crab_script.sh'
    # },
    # 
-   # 'st_t': {
-   #     "ds": '/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'stbar_t': {
-   #     "ds": '/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'st_tw': {
-   #     "ds": '/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'stbar_tw': {
-   #     "ds": '/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'st_s': {
-   #     "ds": '/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
+   'st_t': {
+       "ds": '/ST_t-channel_top_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'stbar_t': {
+       "ds": '/ST_t-channel_antitop_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'st_tw': {
+       "ds": '/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'stbar_tw': {
+       "ds": '/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'st_s': {
+       "ds": '/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
 
 
     'QCD300': {
@@ -400,11 +448,23 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        "ttHTobb",
+        #"ttHTobb",
         #"ttHToNonbb",
-        "TTbar_inc",
-        #"TTbar_sl",
-        #"TTbar_dl"
+        #"TTbar_inc",
+        "TTbar_sl",
+        "TTbar_dl",
+        "ww1", "ww2",
+        "wz1", "wz2",
+        "zz1", "zz2",
+        "st_t", "stbar_t",
+        "st_tw", "stbar_tw",
+        "st_s",
+        "ttw_wlnu1",
+        "ttw_wlnu2",
+        "ttz_zllnunu1",
+        "ttz_zllnunu2",
+        "ttw_wqq",
+        "ttz_zqq",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -422,13 +482,16 @@ for k in [
         #"TTbar_inc",
         "TTbar_sl",
         "TTbar_dl",
-        #"ww", "wz", "zz",
-        #"st_t", "stbar_t",
-        #"st_tw", "stbar_tw",
-        #"st_s",
-        #"ttw_wlnu",
-        #"ttw_wqq",
-        #"ttz_zqq",
+        "ww1", "ww2",
+        "wz1", "wz2",
+        "zz1", "zz2",
+        "st_t", "stbar_t",
+        "st_tw", "stbar_tw",
+        "st_s",
+        "ttw_wlnu1",
+        "ttw_wlnu2",
+        "ttw_wqq",
+        "ttz_zqq",
         # "wjets_ht_100_200",
         # "wjets_ht_200_400",
         # "wjets_ht_400_600",

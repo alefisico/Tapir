@@ -1,0 +1,2 @@
+[TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8]
+/store/user/jpata/tth/Mar7_v1/TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar7_v1/170307_083948/0002/tree_2776.root = 5552

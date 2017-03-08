@@ -1,0 +1,2 @@
+[TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8]
+/store/user/jpata/tth/Mar7_v1/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/Mar7_v1/170307_084724/0000/tree_189.root = 2394

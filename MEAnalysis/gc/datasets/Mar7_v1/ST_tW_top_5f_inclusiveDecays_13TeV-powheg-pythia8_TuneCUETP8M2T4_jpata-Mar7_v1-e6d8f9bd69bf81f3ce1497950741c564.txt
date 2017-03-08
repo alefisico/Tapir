@@ -1,0 +1,2 @@
+[ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4]
+/store/user/jpata/tth/Mar7_v1/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/Mar7_v1/170307_084258/0000/tree_139.root = 3557
