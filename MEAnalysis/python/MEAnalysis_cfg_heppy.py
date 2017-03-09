@@ -320,7 +320,7 @@ class Conf:
         #Actually run the ME calculation
         #If False, all ME values will be 0
         "calcME": True,
-        "n_integration_points_mult": 0.1, #5.0, #DS temp
+        "n_integration_points_mult": 1.0, #5.0, #DS temp
         "factorized_sources": factorizedJetCorrections,
         "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
         "enabled_systematics": [
@@ -397,7 +397,8 @@ class Conf:
         ],
         # btag LR cuts for FH MEM categories
         "FH_bLR_3b_SR": 0.83,
-        "FH_bLR_4b_SR": 0.99,
+        "FH_bLR_4b_SR": 0.98,
+        "FH_bLR_4b_excl": 0.99,       
         "FH_bLR_3b_CR_lo": 0.60,
         "FH_bLR_3b_CR_hi": 0.80,
         "FH_bLR_4b_CR_lo": 0.75,
@@ -612,6 +613,7 @@ print "the bLR from the config is",bLR #DS temp
 # btag LR cuts for FH MEM categories
 FH_bLR_3b_SR = Conf.mem["FH_bLR_3b_SR"]
 FH_bLR_4b_SR = Conf.mem["FH_bLR_4b_SR"]
+FH_bLR_4b_excl = Conf.mem["FH_bLR_4b_excl"]
 FH_bLR_3b_CR_lo = Conf.mem["FH_bLR_3b_CR_lo"]
 FH_bLR_3b_CR_hi = Conf.mem["FH_bLR_3b_CR_hi"]
 FH_bLR_4b_CR_lo = Conf.mem["FH_bLR_4b_CR_lo"]
@@ -678,7 +680,7 @@ if bLR:
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
-    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_SR and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
+    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
      (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
     ( len(mcfg.l_quark_candidates(ev)) >= 4 and len(mcfg.l_quark_candidates(ev)) <= 6 )
 )
@@ -702,7 +704,7 @@ if bLR:
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
-    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_SR and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
+    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
      (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
     ( len(mcfg.l_quark_candidates(ev)) == 4 or len(mcfg.l_quark_candidates(ev)) == 5
       or len(mcfg.l_quark_candidates(ev)) == 6 ) #DS
@@ -727,7 +729,7 @@ if bLR:
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
-    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_SR and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
+    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
      (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
     ( len(mcfg.l_quark_candidates(ev)) == 4 or len(mcfg.l_quark_candidates(ev)) == 5 )
 )
@@ -896,16 +898,3 @@ def conf_to_str(Conf):
             s += str(v) + ",\n"
     s += "\n"
     return s
-
-def get_b_quark_candidates(event, cfg):
-    b_quarks = event.selected_btagged_jets_high
-    if bLR and event.is_fh:
-        if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
-            b_quarks = event.btagged_jets_maxLikelihood_4b
-        elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
-            b_quarks = event.btagged_jets_maxLikelihood_3b
-        elif (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
-            b_quarks = event.btagged_jets_maxLikelihood_4b
-        elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
-            b_quarks = event.btagged_jets_maxLikelihood_3b
-    return b_quarks

@@ -466,7 +466,7 @@ class MEAnalyzer(FilterAnalyzer):
                             hypo,
                             self.vars_to_integrate,
                             self.vars_to_marginalize,
-                            1500 #max number of calls per iteration (if > 0)
+                            -1500 #max number of calls per iteration (if > 0)
                         )
                     else:
                         r = MEM.MEMOutput()

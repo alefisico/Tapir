@@ -110,12 +110,6 @@ class QGLRAnalyzer(FilterAnalyzer):
         if len(toDo)==0:
             return event
 
-        toDo = {
-             #nB:[(nQ1,nQ2),...] = test the hypo nQ1q vs nQ2q,(nQ1-nQ2)g, given nB bs (removed from the QGLR).
-             3:[(3,0),(3,2),(4,0),(4,3),(5,4)],
-             4:[(3,0),(3,2),(4,0),(4,3)]
-        }
-
         maxLikelihood_perm = {}
         maxLikelihood = {}
         for nB in toDo:
