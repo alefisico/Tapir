@@ -76,6 +76,33 @@ class MECategoryAnalyzer(FilterAnalyzer):
         pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
             len(event.selected_btagged_jets_high) >= 4
         )
+        
+        b_quarks = event.selected_btagged_jets_high #DS
+        l_quarks = event.buntagged_jets + event.selected_btagged_jets_low
+        if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh:
+            if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
+                b_quarks = event.btagged_jets_maxLikelihood_4b
+                l_quarks = event.buntagged_jets_maxLikelihood_4b
+                print "considered 4b SR event" #DS temp
+            elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
+                b_quarks = event.btagged_jets_maxLikelihood_3b
+                l_quarks = event.buntagged_jets_maxLikelihood_3b
+                print "considered 3b SR event" #DS temp
+            elif (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+                b_quarks = event.btagged_jets_maxLikelihood_4b
+                l_quarks = event.buntagged_jets_maxLikelihood_4b
+                print "considered 4b CR event" #DS temp
+            elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+                b_quarks = event.btagged_jets_maxLikelihood_3b
+                l_quarks = event.buntagged_jets_maxLikelihood_3b
+                print "considered 3b CR event" #DS temp
+            else: #event considered 2b event
+                b_quarks = event.btagged_jets_maxLikelihood_3b[:2]
+                l_quarks = event.buntagged_jets_maxLikelihood_3b + event.btagged_jets_maxLikelihood_3b[2:]
+                print "considered 2b event" #DS temp
+        #     for k, v in self.conf.mem_configs.items():
+        #         v.b_quark_candidates = b_quarks
+        #         v.l_quark_candidates = l_quarks
 
         #Here we define if an event was of high-btag multiplicity
         cat_btag = "NOCAT"
@@ -105,23 +132,23 @@ class MECategoryAnalyzer(FilterAnalyzer):
             #exactly 8 jets, Wtag in [60,100]
             if (len(event.good_jets) == 8 and event.Wmass >= 60 and event.Wmass < 100):
                 #event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
-                if(len(event.selected_btagged_jets_high) == 4):
+                if(len(b_quarks) == 4):
                     cat = "cat8"
-                elif(len(event.selected_btagged_jets_high) == 3):
+                elif(len(b_quarks) == 3):
                     cat = "cat10"
             #exactly 7 jets, Wtag in [60,100]
             if (len(event.good_jets) == 7 and event.Wmass >= 60 and event.Wmass < 100):
                 #event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
-                if(len(event.selected_btagged_jets_high) == 4):
+                if(len(b_quarks) == 4):
                     cat = "cat7"
-                elif(len(event.selected_btagged_jets_high) == 3):
+                elif(len(b_quarks) == 3):
                     cat = "cat11"
-            #exactly 9 jets, Wtag in [72,94]
-            if (len(event.good_jets) == 9 and event.Wmass >= 72 and event.Wmass < 94):
+            #exactly 9 jets, Wtag in [72,94] - new allow more than 9 jets, just drop the 10th...
+            if (len(event.good_jets) >= 9 and event.Wmass >= 72 and event.Wmass < 94):
                 #event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
-                if(len(event.selected_btagged_jets_high) == 4):
+                if(len(b_quarks) == 4):
                     cat = "cat9"
-                elif(len(event.selected_btagged_jets_high) == 3):
+                elif(len(b_quarks) == 3):
                     cat = "cat12"
 
         event.cat = cat
@@ -218,6 +245,8 @@ class MEAnalyzer(FilterAnalyzer):
         set_integration_vars(self.vars_to_integrate, self.vars_to_marginalize, mem_cfg.mem_assumptions)
         
         bquarks = sorted(list(mem_cfg.b_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
+        for b in bquarks:
+            b.btagFlag = 1.0
 
         if len(bquarks) > mem_cfg.maxBJets:
             autolog("More than {0} b-quarks supplied, dropping last {1} from MEM".format(
@@ -228,6 +257,8 @@ class MEAnalyzer(FilterAnalyzer):
             bquarks = bquarks[:mem_cfg.maxBJets]
         
         lquarks = sorted(list(mem_cfg.l_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
+        for l in lquarks:
+            l.btagFlag = 0.0
 
         if len(lquarks) > mem_cfg.maxLJets:
             autolog("More than {0} l-quarks supplied, dropping last {1} from MEM".format(
@@ -374,7 +405,7 @@ class MEAnalyzer(FilterAnalyzer):
         res = {}
         
         if "meminput" in self.conf.general["verbosity"]:
-            autolog("MEM id={run},{lumi},{evt} cat={cat} cat_b={cat_btag} nj={nj} nt={nb} nel={n_el} nmu={n_mu} syst={syst}".format(
+            autolog("MEM id={run},{lumi},{evt} cat={cat} cat_b={cat_btag} nj={nj} nt={nb} nel={n_el} nmu={n_mu} syst={syst} blr={blr} 3blr={blr3} mW={mW}".format(
                 run=event.input.run,
                 lumi=event.input.lumi,
                 evt=event.input.evt,
@@ -387,6 +418,9 @@ class MEAnalyzer(FilterAnalyzer):
                 n_el=event.n_el_SL,
                 n_mu=event.n_mu_SL,
                 syst=getattr(event, "systematic", None),
+                blr=event.btag_LR_4b_2b,
+                blr3=event.btag_LR_3b_2b,
+                mW=event.Wmass,
             ))
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
@@ -416,10 +450,10 @@ class MEAnalyzer(FilterAnalyzer):
                         and event.changes_jet_category) or event.systematic == "nominal")
                     ):
                     
-                    autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6}".format(
+                    autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6} 3blr={7}".format(
                         hypo, confname,
                         event.input.run, event.input.lumi, event.input.evt,
-                        event.category_string, event.btag_LR_4b_2b
+                        event.category_string, event.btag_LR_4b_2b, event.btag_LR_3b_2b
                     ))
                     autolog("Integrator conf: b={0} l={1}".format(
                         len(mem_cfg.b_quark_candidates(event)),
@@ -431,7 +465,8 @@ class MEAnalyzer(FilterAnalyzer):
                             fstate,
                             hypo,
                             self.vars_to_integrate,
-                            self.vars_to_marginalize
+                            self.vars_to_marginalize,
+                            1500 #max number of calls per iteration (if > 0)
                         )
                     else:
                         r = MEM.MEMOutput()

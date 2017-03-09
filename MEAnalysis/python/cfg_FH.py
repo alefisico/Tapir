@@ -20,7 +20,7 @@ Conf.mem["selection"] = lambda event: (event.is_fh
                                        and event.cat in ["cat7","cat8","cat9","cat10","cat11","cat12"]
                                        #and event.btag_LR_4b_2b > 0.95
                                        )
-Conf.jets["untaggedSelection"] = "btagCSV" #or "btagLR"
+#Conf.jets["untaggedSelection"] = "btagLR" #or "btagCSV" #DS needs to be set in MEAnalysis_cfg_heppy!!!
 Conf.jets["NJetsForBTagLR"] = 9
 
 Conf.mem["calcME"] = True

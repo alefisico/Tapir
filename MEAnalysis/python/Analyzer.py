@@ -44,10 +44,11 @@ class CounterAnalyzer(FilterAnalyzer):
     def process(self, event):
         #super(CounterAnalyzer, self).process(event)
         passes = False
-        if( LHE_weights_pdf.make_array(event.input) ):
-            self.chist.Fill(0)
-            passes = True
-        else:
+        try:
+            if( LHE_weights_pdf.make_array(event.input) ):
+                self.chist.Fill(0)
+                passes = True
+        except:
             print "event in tree not accessible"
         return passes
 
