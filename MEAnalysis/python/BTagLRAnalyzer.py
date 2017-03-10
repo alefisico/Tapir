@@ -178,8 +178,30 @@ class BTagLRAnalyzer(FilterAnalyzer):
         if self.conf.jets["untaggedSelection"] == "btagLR":
             if "debug" in self.conf.general["verbosity"]:
                 autolog("using btagLR for btag/untag jet selection")
-            event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
-            event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
+            if event.is_fh:
+                if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
+                    event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
+                    event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
+                    print "BTagLRAna: considered 4b SR event" #DS temp
+                elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
+                    event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
+                    event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
+                    print "BTagLRAna: considered 3b SR event" #DS temp
+                elif (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+                    event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
+                    event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
+                    print "BTagLRAna: considered 4b CR event" #DS temp
+                elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+                    event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
+                    event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
+                    print "BTagLRAna: considered 3b CR event" #DS temp
+                else: #event considered 2b event (2bs in random order)
+                    event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b[:2]
+                    event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b + event.btagged_jets_maxLikelihood_3b[2:]
+                    print "BTagLRAna: considered 2b event" #DS temp
+            else:
+                event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
+                event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
         #Jets are untagged according to b-discriminatr
         elif self.conf.jets["untaggedSelection"] == "btagCSV":
             if "debug" in self.conf.general["verbosity"]:
