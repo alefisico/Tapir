@@ -18,9 +18,15 @@ def main(filenames, ofname):
     count_dict = {}
     for infn in filenames:
         print "trying to open {0}".format(infn)
-        tf = ROOT.TFile.Open(infn)
-        if not tf or tf.IsZombie():
-            raise Exception("Could not open {0}".format(infn))
+        try:
+            tf = ROOT.TFile.Open(infn)
+            if not tf:
+                raise Exception("Could not open file {0}".format(infn))
+        except Exception as e:
+            print "bad file"
+            print e
+            continue
+        
         print "good file", infn, tf
         good_filenames += [infn]
         vhbb_dir = tf.Get("vhbb")

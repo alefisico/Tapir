@@ -23,8 +23,7 @@ env
 
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py ${CMSSW_BASE}/src/TTH/MEAnalysis/data/default.cfg
 
-mv $GC_SCRATCH/Loop/tree.root tree.root
-hadd out.root tree.root counts.root
+mv $GC_SCRATCH/Loop/tree.root out.root
 
 echo $OFNAME > output.txt
 
