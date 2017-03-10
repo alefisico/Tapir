@@ -5,7 +5,7 @@ logger = logging.getLogger("main")
 from rq import Queue
 from redis import Redis
 from rq import push_connection, get_failed_queue, Queue, Worker
-from job import count, sparse, plot, makecategory, makelimits, mergeFiles
+from job import count, sparse, plot, makecategory, makelimits, mergeFiles, validateFiles
 import socket
 
 import time, os, sys
@@ -194,6 +194,66 @@ class Task(object):
             self.get_analysis_config(workdir)
         )
 
+class TaskValidateFiles(Task):
+    def __init__(self, workdir, name, analysis):
+        """Given an analysis, creates a counter task that can be executed
+        
+        Args:
+            workdir (string): A directory where the code will execute
+            name (string): Name of the task, can be anything
+            analysis (Analysis): The Analysis object as constructed from the config
+        """
+        super(TaskValidateFiles, self).__init__(workdir, name, analysis)
+    
+    def run(self, inputs, redis_conn, qmain, qfail):
+        all_jobs = []
+        jobs = {}
+        
+        for sample in self.analysis.samples:
+            #create the jobs that will count the events in this sample
+            _jobs = TaskValidateFiles.getGoodFiles(sample, qmain)
+            jobs[sample.name] = _jobs
+            all_jobs += _jobs
+
+        #wait for the jobs to complete
+        waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
+
+        #Count the total number of generated events per sample and save it
+        for sample in analysis.samples:
+            good_files = []
+            for job in jobs[sample.name]:
+                good_files += job.result
+            logger.info("TaskValidateFiles: sample {0} had {1} files, {2} are good".format(
+                sample.name,
+                len(sample.file_names),
+                len(good_files),
+            ))
+            sample.file_names = good_files
+        self.save_state()
+    
+    @staticmethod
+    def getGoodFiles(sample, queue):
+
+        jobs = []
+        if len(sample.file_names) == 0:
+            raise Exception("No files specified for sample {0}".format(sample.name))
+
+        #split the sample input files into a number of chunks based on the prescribed size
+        for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
+            jobs += [
+                enqueue_memoize(
+                    queue,
+                    func = validateFiles,
+                    args = (inputs, ),
+                    timeout = 2*60*60,
+                    ttl = 2*60*60,
+                    result_ttl = 2*60*60,
+                    meta = {"retries": 5, "args": str((inputs, ))}
+                )
+            ]
+        logger.info("getGoodFiles: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
+        return jobs
+
 class TaskNumGen(Task):
     """Counts the number of generated events for a sample
     """
@@ -208,6 +268,7 @@ class TaskNumGen(Task):
         super(TaskNumGen, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
         all_jobs = []
         jobs = {}
         #Loop over all the samples defined in the analysis
@@ -226,7 +287,7 @@ class TaskNumGen(Task):
                 [j.result["Count"] for j in jobs[sample.name]]
             )
             sample.ngen = int(ngen)
-            logging.info("sample.ngen {0} = {1}".format(sample.name, sample.ngen))
+            logger.info("sample.ngen {0} = {1}".format(sample.name, sample.ngen))
         self.save_state()
         return jobs
 
@@ -273,7 +334,7 @@ class TaskSparsinator(Task):
         jobs = {}
         for sample in self.analysis.samples:
             if not sample.name in [p.input_name for p in self.analysis.processes]:
-                logging.info("Skipping sample {0} because matched to any process".format(
+                logger.info("Skipping sample {0} because matched to any process".format(
                     sample.name
                 ))
                 continue
@@ -417,7 +478,7 @@ class TaskCategories(Task):
 
         hdict = {}
 
-        logging.info("Opening {0}".format(inputs))
+        logger.info("Opening {0}".format(inputs))
         tf = ROOT.TFile(inputs)
         ROOT.gROOT.cd()
         for k in tf.GetListOfKeys():
@@ -431,7 +492,7 @@ class TaskCategories(Task):
             category_dir = "{0}/categories/{1}/{2}".format(
                 workdir, cat.name, cat.discriminator.name
             )
-            logging.info("creating category to {0}".format(category_dir))
+            logger.info("creating category to {0}".format(category_dir))
             if not os.path.exists(category_dir):
                 os.makedirs(category_dir)
             make_datacard(self.analysis, [cat], category_dir, hdict)
@@ -582,11 +643,11 @@ if __name__ == "__main__":
     
     #clean queues in case they are full
     if len(qmain) > 0:
-        logging.warning("main queue has jobs, emptying")
+        logger.warning("main queue has jobs, emptying")
         qmain.empty()
 
     if len(qfail) > 0:
-        logging.warning("fail queue has jobs, emptying")
+        logger.warning("fail queue has jobs, emptying")
         qfail.empty()
     
     if args.config.endswith("cfg"):
@@ -598,6 +659,7 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
+        TaskValidateFiles(workdir, "VALIDATE", analysis),
         TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),

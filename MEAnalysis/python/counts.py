@@ -16,16 +16,14 @@ def main(filenames, ofname):
     of = ROOT.TFile(ofname, "RECREATE")
     good_filenames = []
     count_dict = {}
+    count_dict["Count"] = 0
+
+    count_dict["failed"] = []
     for infn in filenames:
         print "trying to open {0}".format(infn)
-        try:
-            tf = ROOT.TFile.Open(infn)
-            if not tf:
-                raise Exception("Could not open file {0}".format(infn))
-        except Exception as e:
-            print "bad file"
-            print e
-            continue
+        tf = ROOT.TFile.Open(infn)
+        if not tf or tf.IsZombie():
+            raise Exception("Could not open file {0}".format(infn))
         
         print "good file", infn, tf
         good_filenames += [infn]
