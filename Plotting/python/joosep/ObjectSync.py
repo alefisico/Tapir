@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--cfg', action="store", help="path to analysis configuration", required=True)
     args = parser.parse_args()
 
-    an_name, analysis = analysisFromConfig(args.cfg)
+    analysis = analysisFromConfig(args.cfg)
 
     DATASETPATH = os.environ["DATASETPATH"]
     prefix, sample_name = get_prefix_sample(DATASETPATH)
@@ -37,16 +37,7 @@ if __name__ == "__main__":
         [
             plot("sl", "numJets", "is_sl", "sample"),
             plot("dl", "numJets", "is_dl", "sample"),
-        ] + [
-            plot("sl_JESUp", "numJets_JESUp", "is_sl", "sample"),
-            plot("sl_JESDown", "numJets_JESDown", "is_sl", "sample"),
-            plot("sl_JERUp", "numJets_JERUp", "is_sl", "sample"),
-            plot("sl_JERDown", "numJets_JERDown", "is_sl", "sample"),
-            plot("dl_JESUp", "numJets_JESUp", "is_dl", "sample"),
-            plot("dl_JESDown", "numJets_JESDown", "is_dl", "sample"),
-            plot("dl_JERUp", "numJets_JERUp", "is_dl", "sample"),
-            plot("dl_JERDown", "numJets_JERDown", "is_dl", "sample"),
-        ] if not sample.is_data else [],
+        ],
         10,
         0,
         10,
@@ -60,18 +51,8 @@ if __name__ == "__main__":
             plot("sl_j4", "nBCSVM", "is_sl && numJets==4", "sample"),
             plot("sl_j5", "nBCSVM", "is_sl && numJets==5", "sample"),
             plot("sl_jge6", "nBCSVM", "is_sl && numJets>=6", "sample"),
-            plot("dl_j3", "nBCSVM", "is_sl && numJets==3", "sample"),
-            plot("dl_jge4", "nBCSVM", "is_sl && numJets>=4", "sample"),
-        ] + [
-            plot("sl_JESUp", "nBCSVM_JESUp", "is_sl", "sample"),
-            plot("sl_JESDown", "nBCSVM_JESDown", "is_sl", "sample"),
-            plot("sl_JERUp", "nBCSVM_JERUp", "is_sl", "sample"),
-            plot("sl_JERDown", "nBCSVM_JERDown", "is_sl", "sample"),
-            plot("dl_JESUp", "nBCSVM_JESUp", "is_dl", "sample"),
-            plot("dl_JESDown", "nBCSVM_JESDown", "is_dl", "sample"),
-            plot("dl_JERUp", "nBCSVM_JERUp", "is_dl", "sample"),
-            plot("dl_JERDown", "nBCSVM_JERDown", "is_dl", "sample"),
-        ] if not sample.is_data else [],
+            plot("sl_jge6_tge4", "nBCSVM", "is_sl && numJets>=6 && nBCSVM>=4", "sample"),
+        ],
         10,
         0,
         10,
@@ -85,18 +66,8 @@ if __name__ == "__main__":
             plot("sl_j4", "nBCMVAM", "is_sl && numJets==4", "sample"),
             plot("sl_j5", "nBCMVAM", "is_sl && numJets==5", "sample"),
             plot("sl_jge6", "nBCMVAM", "is_sl && numJets>=6", "sample"),
-            plot("dl_j3", "nBCMVAM", "is_sl && numJets==3", "sample"),
-            plot("dl_jge4", "nBCMVAM", "is_sl && numJets>=4", "sample"),
-        ] + [
-            plot("sl_JESUp", "nBCMVAM_JESUp", "is_sl", "sample"),
-            plot("sl_JESDown", "nBCMVAM_JESDown", "is_sl", "sample"),
-            plot("sl_JERUp", "nBCMVAM_JERUp", "is_sl", "sample"),
-            plot("sl_JERDown", "nBCMVAM_JERDown", "is_sl", "sample"),
-            plot("dl_JESUp", "nBCMVAM_JESUp", "is_dl", "sample"),
-            plot("dl_JESDown", "nBCMVAM_JESDown", "is_dl", "sample"),
-            plot("dl_JERUp", "nBCMVAM_JERUp", "is_dl", "sample"),
-            plot("dl_JERDown", "nBCMVAM_JERDown", "is_dl", "sample"),
-        ] if not sample.is_data else [],
+            plot("sl_jge6_tge4", "nBCMVAM", "is_sl && numJets>=6 && nBCSVM>=4", "sample"),
+        ],
         10,
         0,
         10,
@@ -106,15 +77,7 @@ if __name__ == "__main__":
         "jets_pt_0",
         [
             plot("sl", "jets_pt[0]", "is_sl", "sample"),
-        ] + ([
-            plot("sl_JESUp", "jets_pt[0]*jets_corr_JESUp[0]/jets_corr[0]", "is_sl", "sample"),
-            plot("sl_JESDown", "jets_pt[0]*jets_corr_JESDown[0]/jets_corr[0]", "is_sl", "sample"),
-            plot("sl_bTagWeightCSV", "jets_pt[0]", "btagWeightCSV * is_sl", "sample"),
-            plot("sl_allWeightCSV", "jets_pt[0]", "btagWeightCSV * puWeight * is_sl", "sample"),
-        ] + [
-            plot("sl_bTagWeightCSV_{0}".format(bw), "jets_pt[0]", "{0} * is_sl".format(bw), "sample") for
-            bw in btag_weights_csv
-        ]) if not sample.is_data else [],
+        ],
         100,
         0,
         400,
@@ -124,15 +87,7 @@ if __name__ == "__main__":
         "jets_eta_0",
         [
             plot("sl", "jets_eta[0]", "is_sl", "sample"),
-        ] + ([
-            plot("sl_JESUp", "jets_eta[0]*jets_corr_JESUp[0]/jets_corr[0]", "is_sl", "sample"),
-            plot("sl_JESDown", "jets_eta[0]*jets_corr_JESDown[0]/jets_corr[0]", "is_sl", "sample"),
-            plot("sl_bTagWeightCSV", "jets_eta[0]", "btagWeightCSV * is_sl", "sample"),
-            plot("sl_allWeightCSV", "jets_eta[0]", "btagWeightCSV * puWeight * is_sl", "sample"),
-        ] + [
-            plot("sl_bTagWeightCSV_{0}".format(bw), "jets_eta[0]", "{0} * is_sl".format(bw), "sample") for
-            bw in btag_weights_csv
-        ]) if not sample.is_data else [],
+        ],
         100,
         -5,
         5,
@@ -143,10 +98,7 @@ if __name__ == "__main__":
         [
             plot("sl", "leps_pt[0]", "is_sl", "sample"),
             plot("dl", "leps_pt[0]", "is_dl", "sample"),
-        ] + [
-            plot("sl_triggerWeight", "leps_pt[0]", "triggerEmulationWeight * (is_sl)", "sample"),
-            plot("dl_triggerWeight", "leps_pt[0]", "triggerEmulationWeight * (is_dl)", "sample"),
-        ] if sample.schema == "mc" else [],
+        ],
         100,
         0,
         300,
@@ -157,6 +109,16 @@ if __name__ == "__main__":
         [
             plot("sl", "leps_pdgId[0]", "is_sl", "sample"),
             plot("dl", "leps_pdgId[0]", "is_dl", "sample"),
+        ],
+        30,
+        -15,
+        15,
+    )
+    
+    combinedPlot(
+        "leps_pdgId_1",
+        [
+            plot("dl", "leps_pdgId[1]", "is_dl", "sample"),
         ],
         30,
         -15,
@@ -180,10 +142,7 @@ if __name__ == "__main__":
             plot("sl_b", "jets_btagCSV", "btagWeightCSV * (is_sl && abs(jets_hadronFlavour) == 5)", "sample"),
             plot("sl_c", "jets_btagCSV", "btagWeightCSV * (is_sl && abs(jets_hadronFlavour) == 4)", "sample"),
             plot("sl_l", "jets_btagCSV", "btagWeightCSV * (is_sl && abs(jets_hadronFlavour) != 5 && abs(jets_hadronFlavour) != 4)", "sample"),
-        ] + [
-            plot("sl_bTagWeightCSV_{0}".format(bw), "jets_btagCSV", "{0} * (is_sl)".format(bw), "sample") for
-            bw in btag_weights_csv 
-        ] if not sample.is_data else [],
+        ],
         100,
         0,
         1,
@@ -196,10 +155,7 @@ if __name__ == "__main__":
             plot("sl_b", "jets_btagCMVA", "btagWeightCMVAV2 * (is_sl && abs(jets_hadronFlavour) == 5)", "sample"),
             plot("sl_c", "jets_btagCMVA", "btagWeightCMVAV2 * (is_sl && abs(jets_hadronFlavour) == 4)", "sample"),
             plot("sl_l", "jets_btagCMVA", "btagWeightCMVAV2 * (is_sl && abs(jets_hadronFlavour) != 5 && abs(jets_hadronFlavour) != 4)", "sample"),
-        ] + [
-            plot("sl_bTagWeightCMVA_{0}".format(bw), "jets_btagCMVA", "{0} * is_sl".format(bw), "sample") for
-            bw in btag_weights_cmva
-        ] if not sample.is_data else [],
+        ],
         100,
         -1,
         1,
@@ -234,23 +190,6 @@ if __name__ == "__main__":
             plot("dl_jge4", "btag_LR_4b_2b_btagCMVA", "is_dl && numJets>=4", "sample"),
         ],
         100,
-        0,
-        1,
-    )
-    
-    combinedPlot(
-        "mem",
-        [
-            plot("sl_jge6_tge4", "mem_tth_SL_2w2h2t_p / (mem_tth_SL_2w2h2t_p + 0.1 * mem_ttbb_SL_2w2h2t_p)", "is_sl && numJets>=6 && nBCSVM>=4", "sample"),
-            plot("sl_jge6_t3", "mem_tth_SL_2w2h2t_p / (mem_tth_SL_2w2h2t_p + 0.1 * mem_ttbb_SL_2w2h2t_p)", "is_sl && numJets>=6 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["sl_jge6_t3"]), "sample"),
-            plot("sl_j5_tge4", "mem_tth_SL_1w2h2t_p / (mem_tth_SL_1w2h2t_p + 0.1 * mem_ttbb_SL_1w2h2t_p)", "is_sl && numJets==5 && nBCSVM>=4", "sample"),
-            plot("sl_j5_t3", "mem_tth_SL_1w2h2t_p / (mem_tth_SL_1w2h2t_p + 0.1 * mem_ttbb_SL_1w2h2t_p)", "is_sl && numJets==5 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["sl_j5_t3"]), "sample"),
-            plot("sl_j4_tge4", "mem_tth_SL_0w2h2t_p / (mem_tth_SL_0w2h2t_p + 0.1 * mem_ttbb_SL_0w2h2t_p)", "is_sl && numJets==4 && nBCSVM>=4", "sample"),
-            plot("sl_j4_t3", "mem_tth_SL_0w2h2t_p / (mem_tth_SL_0w2h2t_p + 0.1 * mem_ttbb_SL_0w2h2t_p)", "is_sl && numJets==4 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["sl_j4_t3"]), "sample"),
-            plot("dl_jge4_tge4", "mem_tth_DL_0w2h2t_p / (mem_tth_DL_0w2h2t_p + 0.1 * mem_ttbb_DL_0w2h2t_p)", "is_dl && numJets>=4 && nBCSVM>=4", "sample"),
-            plot("dl_jge4_t3", "mem_tth_DL_0w2h2t_p / (mem_tth_DL_0w2h2t_p + 0.1 * mem_ttbb_DL_0w2h2t_p)", "is_dl && numJets>=4 && nBCSVM==3 && log(btag_LR_4b_2b_btagCSV/(1.0 - btag_LR_4b_2b_btagCSV))>{0}".format(cfg.Conf.mem["blr_cuts"]["dl_jge4_t3"]), "sample"),
-        ],
-        6,
         0,
         1,
     )

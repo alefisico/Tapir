@@ -624,9 +624,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     break_file_loop = False
 
+    tf = None
+
     #Main loop
     for file_name in file_names:
         if break_file_loop:
+            if tf:
+                tf.Close()
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
@@ -641,7 +645,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             nevents += 1
             iEv += 1
 
-            if nevents < skip_events:
+            if skip_events > 0 and nevents < skip_events:
                 continue
             if max_events > 0:
                 if nevents > (skip_events + max_events):
@@ -774,17 +778,14 @@ if __name__ == "__main__":
     if os.environ.has_key("FILE_NAMES"):
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
-        skip_events = int(os.environ.get("SKIP_EVENTS", 0))
-        max_events = int(os.environ.get("MAX_EVENTS", 0))
+        skip_events = int(os.environ.get("SKIP_EVENTS", -1))
+        max_events = int(os.environ.get("MAX_EVENTS", -1))
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        file_names = [
-            getSitePrefix("/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_1.root")
-        ]
-        prefix = ""
-        sample = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"
+        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 1000
+        max_events = 5000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        file_names = analysis.get_sample(sample).file_names 
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
