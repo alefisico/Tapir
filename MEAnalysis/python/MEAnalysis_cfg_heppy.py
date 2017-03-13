@@ -398,6 +398,7 @@ class Conf:
         # btag LR cuts for FH MEM categories
         "FH_bLR_3b_SR": 0.83,
         "FH_bLR_4b_SR": 0.98,
+        "FH_bLR_3b_excl": 0.90,
         "FH_bLR_4b_excl": 0.99,       
         "FH_bLR_3b_CR_lo": 0.60,
         "FH_bLR_3b_CR_hi": 0.80,
@@ -613,6 +614,7 @@ print "the bLR from the config is",bLR #DS temp
 # btag LR cuts for FH MEM categories
 FH_bLR_3b_SR = Conf.mem["FH_bLR_3b_SR"]
 FH_bLR_4b_SR = Conf.mem["FH_bLR_4b_SR"]
+FH_bLR_3b_excl = Conf.mem["FH_bLR_3b_excl"]
 FH_bLR_4b_excl = Conf.mem["FH_bLR_4b_excl"]
 FH_bLR_3b_CR_lo = Conf.mem["FH_bLR_3b_CR_lo"]
 FH_bLR_3b_CR_hi = Conf.mem["FH_bLR_3b_CR_hi"]
@@ -631,7 +633,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and #although from BTagLRAnalyzer there are max 4 candidates
     (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
-     (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) #DS do not consider 10 jet events
 )
@@ -656,7 +658,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
-     (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 ) #run two methods for 8j,4b category
 )
@@ -754,7 +756,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
-     (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
@@ -780,7 +782,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
-     (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
@@ -806,7 +808,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
-     (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 

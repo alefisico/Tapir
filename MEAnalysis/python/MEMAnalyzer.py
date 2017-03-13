@@ -81,11 +81,15 @@ class MECategoryAnalyzer(FilterAnalyzer):
             print "event considered:",
             if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
                 print "4b_SR",
-            if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
+            if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and 
+                event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
                 print "3b_SR",
-            if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+            if (event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_excl"] and 
+                event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and 
+                event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
                 print "4b_CR",
-            if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+            if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and 
+                event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
                 print "3b_CR",
             if (len(event.selected_btagged_jets_high)<3):
                 print "2b_event",

@@ -15,7 +15,7 @@ from TTH.MEAnalysis.LeptonAnalyzer import LeptonAnalyzer
 from TTH.MEAnalysis.JetAnalyzer import JetAnalyzer
 from TTH.MEAnalysis.BTagLRAnalyzer import BTagLRAnalyzer
 from TTH.MEAnalysis.QGLRAnalyzer import QGLRAnalyzer
-from TTH.MEAnalysis.Analyzer import CounterAnalyzer, EventIDFilterAnalyzer, EventWeightAnalyzer, PrimaryVertexAnalyzer, PrefilterAnalyzer
+from TTH.MEAnalysis.Analyzer import CounterAnalyzer, EventIDFilterAnalyzer, EventWeightAnalyzer, PrimaryVertexAnalyzer, PrefilterAnalyzer, MemoryAnalyzer
 from TTH.MEAnalysis.TriggerAnalyzer import TriggerAnalyzer
 from TTH.MEAnalysis.MVAVarAnalyzer import MVAVarAnalyzer
 from TTH.MEAnalysis.BTagRandomizerAnalyzer import BTagRandomizerAnalyzer

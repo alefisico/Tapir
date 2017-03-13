@@ -112,8 +112,8 @@ datasets.update({
     'ttHTobb': {
         "ds": '/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 20,
-        "runtime": 10,
+        "perjob": 2, #DS
+        "runtime": 40, #DS
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
@@ -129,8 +129,8 @@ datasets.update({
     'TTbar_inc': {
         "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 50,
-        "runtime": 20,
+        "perjob": 20, #DS
+        "runtime": 40,
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
@@ -544,11 +544,11 @@ for k in ["ttHTobb", "TTbar_inc", "SingleMuon-Run2016B-PromptReco-v1"]:
     workflow_datasets["testing_withme"][k] = D
 
 workflow_datasets["testing_hadronic_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc", "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
+for k in ["ttHTobb", "TTbar_inc"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
-    D["perjob"] = int(5)
+    #D["perjob"] = int(5)
     D["maxlumis"] = 10 * D["perjob"]
-    D["runtime"] = int(D["runtime"]/5)
+    #D["runtime"] = int(D["runtime"]/5)
     D["mem_cfg"] = me_cfgs["hadronic"]
     workflow_datasets["testing_hadronic_withme"][k] = D
 
@@ -613,7 +613,7 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 2500
+    config.JobType.maxMemoryMB = 3000 #DS
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")

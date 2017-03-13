@@ -187,11 +187,13 @@ class BTagLRAnalyzer(FilterAnalyzer):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
                     print "BTagLRAna: considered 3b SR event" #DS temp
-                elif (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+                elif not self.cfg_comp.isMC and (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and
+                                                 event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
                     print "BTagLRAna: considered 4b CR event" #DS temp
-                elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+                elif not self.cfg_comp.isMC and (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and
+                                                 event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
                     print "BTagLRAna: considered 3b CR event" #DS temp

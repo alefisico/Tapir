@@ -238,6 +238,11 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         'treevar',
         _conf = python_conf
     )
+    memory_ana = cfg.Analyzer(
+        MECoreAnalyzers.MemoryAnalyzer,
+        'memory',
+        _conf = python_conf
+    )
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
     
@@ -264,6 +269,7 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         mem_analyzer,
         #mva,
         treevar,
+        memory_ana,
         treeProducer
     ])
     
