@@ -219,7 +219,7 @@ class TaskValidateFiles(Task):
         waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
 
         #Count the total number of generated events per sample and save it
-        for sample in analysis.samples:
+        for sample in self.analysis.samples:
             good_files = []
             for job in jobs[sample.name]:
                 good_files += job.result
@@ -282,7 +282,7 @@ class TaskNumGen(Task):
         waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
 
         #Count the total number of generated events per sample and save it
-        for sample in analysis.samples:
+        for sample in self.analysis.samples:
             ngen = sum(
                 [j.result["Count"] for j in jobs[sample.name]]
             )
@@ -338,6 +338,7 @@ class TaskSparsinator(Task):
                     sample.name
                 ))
                 continue
+            logger.info("Submitting sample {0} ngen={1}".format(sample.name, sample.ngen))
             jobs[sample.name] = TaskSparsinator.runSparsinator_async(
                 self.get_analysis_config(workdir),
                 sample,
@@ -405,7 +406,7 @@ class TaskSparseMerge(Task):
         all_jobs = []
         jobs_by_sample = {}
 
-        for sample in analysis.samples:
+        for sample in self.analysis.samples:
             
             if not sample.name in inputs.keys():
                 print "Skipping sample", sample.name
@@ -533,7 +534,7 @@ class TaskPlotting(Task):
        
         run_plots(
             workdir,
-            analysis,
+            self.analysis,
             inputs,
             redis_conn,
             qmain,
