@@ -50,6 +50,30 @@ class MET:
     def make_array(event):
         return [MET(tree=event.input)]
 
+class JetWrapper:
+    def __init__(self, orig):
+        self.orig = orig
+    
+    def __getattr__(self, attr):
+        return getattr(self.__dict__["orig"], attr)
+    
+    def pt(self):
+        return self.orig.pt
+    
+    def eta(self):
+        return self.orig.eta
+
+    def hadronFlavour(self):
+        return self.orig.hadronFlavour
+
+    def btag(self, algo):
+        if algo == "newpfCombinedInclusiveSecondaryVertexV2BJetTags":
+            return self.orig.btagCSV
+        elif algo == "newpfCombinedMVAV2BJetTags":
+            return self.orig.btagCMVA
+        else:
+            raise Exception("b-tag algorithm {0} undefined".format(algo))
+
 class SystematicObject(object):
     def __init__(self, orig, variated_values):
         self.orig = orig

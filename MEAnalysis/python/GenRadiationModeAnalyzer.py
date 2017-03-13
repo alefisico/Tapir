@@ -25,7 +25,7 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
     def _process(self, event):
 
         if "debug" in self.conf.general["verbosity"]:
-            autolog("GenTTHAnalyzer started")
+            autolog("GenRadiationModeAnalyzer started")
         
         event.nMatchSimB = 0
         event.nMatchSimC = 0

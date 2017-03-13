@@ -3,8 +3,6 @@ echo "heppy_crab_script_pre.sh"
 
 tar xvzf python.tar.gz --directory $CMSSW_BASE 
 tar xzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis
-echo "ENV"
-env
 echo "VOMS"
 voms-proxy-info -all
 echo "CMSSW BASE, python path, pwd"
@@ -40,44 +38,19 @@ EOF
 
 chmod +x $CMSSW_BASE/bin/$SCRAM_ARCH/edmProvDump
 
-echo "Which edmProvDump"
-which edmProvDump
-edmProvDump
-
 # Update library path
 # Needed so recompiled modules are found
-#export LD_LIBRARY_PATH=./lib/slc6_amd64_gcc481:$LD_LIBRARY_PATH 
+export LD_LIBRARY_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc530/external/gsl/2.2.1/lib:$LD_LIBRARY_PATH 
 cd $CMSSW_BASE
 eval `scram runtime -sh`
 cd -
 echo "LD LIBRARY PATH IS"
 echo $LD_LIBRARY_PATH
 
-export ROOT_INCLUDE_PATH=.:./src:$ROOT_INCLUDE_PATH
+export ROOT_INCLUDE_PATH=.:./src:/cvmfs/cms.cern.ch/slc6_amd64_gcc530/external/gsl/2.2.1/include:$ROOT_INCLUDE_PATH
 
 echo "tth_hashes"
 cat hash
 
 # make sure we can access scikit learn
 source setenv_sklearn_cmssw.sh
-
-echo "Our NEW PYTHONPATH:"
-echo $PYTHONPATH
-
-echo "ls /cvmfs/"
-ls /cvmfs/
-
-echo "ls /cvmfs/cms-ib.cern.ch/"
-ls /cvmfs/cms-ib.cern.ch/
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/"
-ls /cvmfs/cms-ib.cern.ch/week0/
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530"
-ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external"
-ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external
-
-echo "ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn"
-ls /cvmfs/cms-ib.cern.ch/week0/slc6_amd64_gcc530/external/py2-scikit-learn

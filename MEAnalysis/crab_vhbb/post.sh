@@ -13,7 +13,9 @@ exitMessage=`tail -n500 | grep -A5 -B5 -i error`
 cat << EOF > FrameworkJobReport.xml
 <FrameworkJobReport>
 <FrameworkError ExitStatus="$exitCode" Type="$errorType" >
+<![CDATA[
 $exitMessage
+]]>
 </FrameworkError>
 </FrameworkJobReport>
 EOF

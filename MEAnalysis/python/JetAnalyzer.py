@@ -37,54 +37,29 @@ class JetAnalyzer(FilterAnalyzer):
 
     def variateJets(self, jets, systematic, sigma):
         newjets = [SystematicObject(jet, {"pt": jet.pt, "mass": jet.mass}) for jet in jets]
-        if self.cfg_comp.isMC and systematic == "JES":
-            for i in range(len(jets)):
-                if sigma > 0:
-                    cf = sigma * newjets[i].corr_JECUp / newjets[i].corr
-                elif sigma < 0:
-                    cf = abs(sigma) * newjets[i].corr_JECDown / newjets[i].corr
-                
-                #get the uncorrected jets
-                elif sigma == 0:
-                    cf = 1.0 / newjets[i].corr
+        for i in range(len(jets)):
+            if sigma > 0:
+                sdir = "Up"
+                _sigma = sigma
+            elif sigma < 0:
+                sdir = "Down"
+                _sigma = abs(sigma)
+            else:
+                raise Exception("sigma must be != 0")
+            new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
+            old_corr = newjets[i].corr
 
-                newjets[i].pt *= cf
-                newjets[i].mass *= cf
-        elif self.cfg_comp.isMC and systematic == "JER":
-            for i in range(len(jets)):
-                if newjets[i].corr_JER > 0:
-                    if sigma > 0:
-                        cf =  sigma * newjets[i].corr_JERUp / newjets[i].corr_JER
-                    elif sigma < 0:
-                        cf = abs(sigma) * newjets[i].corr_JERDown / newjets[i].corr_JER
-                    
-                    #get the uncorrected jets
-                    elif sigma == 0:
-                        cf = 1.0 / newjets[i].corr_JER
-                else:
-                    cf = 0.0
+            #for JER need to uncorrect by a different factor
+            if systematic == "JER":
+                old_corr = newjets[i].corr_JER
 
-                newjets[i].pt *= cf
-                newjets[i].mass *= cf
-        elif self.cfg_comp.isMC:
-            for i in range(len(jets)):
-                if sigma > 0:
-                    sdir = "Up"
-                elif sigma < 0:
-                    sdir = "Down"
-                    sigma = abs(sigma)
-                else:
-                    raise Exception("sigma must be != 0")
-                new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
-                old_corr = newjets[i].corr
+            if new_corr > 0 and old_corr > 0:
+                cf =  _sigma * new_corr / old_corr
+            else:
+                cf = 0.0
 
-                if new_corr > 0:
-                    cf =  sigma * new_corr / old_corr
-                else:
-                    cf = 0.0
-
-                newjets[i].pt *= cf
-                newjets[i].mass *= cf
+            newjets[i].pt *= cf
+            newjets[i].mass *= cf
         return newjets
 
     def process(self, event):
@@ -100,23 +75,13 @@ class JetAnalyzer(FilterAnalyzer):
 
         #add events with variated jets
         if self.cfg_comp.isMC:
-            jets_raw = self.variateJets(event.Jet, "JES", 0)
-            jets_JES_Up = self.variateJets(event.Jet, "JES", 1)
-            jets_JES_Down = self.variateJets(event.Jet, "JES", -1)
-            jets_JER_Up = self.variateJets(event.Jet, "JER", 1)
-            jets_JER_Down = self.variateJets(event.Jet, "JER", -1)
             jets_variated = {}
-            for fjc in self.conf.mem["factorized_sources"]:
+            for fjc in self.conf.mem["factorized_sources"] + ["JER"]:
                 for sdir, sigma in [("Up", 1.0), ("Down", -1.0)]:
                     jet_var = self.variateJets(event.Jet, fjc, sigma)
                     jets_variated[fjc+sdir] = jet_var
-            for name, jets in [
-                    ("raw", jets_raw),
-                    ("JESUp", jets_JES_Up),
-                    ("JESDown", jets_JES_Down),
-                    ("JERUp", jets_JER_Up),
-                    ("JERDown", jets_JER_Down)
-                ] + jets_variated.items():
+            for name, jets in jets_variated.items():
+                #skip processing of systematics that are not enabled
                 if not name in self.conf.general["systematics"]:
                     continue
 
@@ -124,9 +89,8 @@ class JetAnalyzer(FilterAnalyzer):
                 evdict[name] = ev
 
         for syst, event_syst in evdict.items():
-            if "debug" in self.conf.general["verbosity"]:
-                autolog("processing systematic", syst)
-            res = self._process(event_syst)
+            event_syst.systematic = syst 
+            res = self._process(event_syst, evdict)
             if syst != "nominal":
                 res.nominal_event = evdict["nominal"]
             evdict[syst] = res
@@ -144,7 +108,7 @@ class JetAnalyzer(FilterAnalyzer):
                 evdict[syst].changes_jet_category = True
         return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
 
-    def _process(self, event):
+    def _process(self, event, evdict):
         
         #FIXME: why discarded jets no longer in vhbb?
         #injets = event.Jet+event.DiscardedJet
@@ -268,12 +232,16 @@ class JetAnalyzer(FilterAnalyzer):
 
         #Require at least 2 good resolved jets to continue analysis
         passes = True
-        if event.is_sl and not (len(event.good_jets) >= 4 and event.nBCSVM>=3):
+        if event.systematic == "nominal":
+            event_proxy = event
+        else:
+            event_proxy = evdict["nominal"]
+        if event.is_sl and not (len(event_proxy.good_jets) >= 4 and event_proxy.nBCSVM>=3):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("fails because SL NJ<3")
             passes = False
         elif event.is_dl:
-            if not (len(event.good_jets) >= 4 and event.nBCSVM>=3):
+            if not (len(event_proxy.good_jets) >= 4 and event_proxy.nBCSVM>=3):
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False

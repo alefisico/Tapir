@@ -16,14 +16,20 @@ def main(filenames, ofname):
     of = ROOT.TFile(ofname, "RECREATE")
     good_filenames = []
     count_dict = {}
+    count_dict["Count"] = 0
+
+    count_dict["failed"] = []
     for infn in filenames:
+        print "trying to open {0}".format(infn)
         tf = ROOT.TFile.Open(infn)
         if not tf or tf.IsZombie():
-            print "Could not open {0}, skipping".format(infn)
-            continue
+            raise Exception("Could not open file {0}".format(infn))
+        
         print "good file", infn, tf
         good_filenames += [infn]
         vhbb_dir = tf.Get("vhbb")
+        if not vhbb_dir:
+            vhbb_dir = tf
         for k in vhbb_dir.GetListOfKeys():
             kn = k.GetName()
             if "Count" in kn:

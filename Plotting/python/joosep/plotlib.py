@@ -359,23 +359,36 @@ def fill_overflow(hist):
 
 
 def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=lambda x: x):
-
+    """Summary
+    
+    Args:
+        tf (rootpy.io.File): Input ROOT file
+        samples (list of tuples): (sample, sample_name) of the input samples
+        hname (string): name of the histogram
+        pattern (str, optional): pattern to find histograms in file
+        rename_func (TYPE, optional): Description
+    
+    Returns:
+        TYPE: Description
+    """
     hs = OrderedDict()
     for sample, sample_name in samples:
+        pat = pattern.format(sample=sample, hname=hname)
         try:
-            h = tf.get(pattern.format(sample=sample, hname=hname)).Clone()
+            h = tf.get(pat).Clone()
+        #histo didn't exist, create empty dummy
         except rootpy.io.file.DoesNotExist as e:
-            continue
+            print "ERROR: could not load hist {0}: {1}".format(pat, e)
+            h = rootpy.asrootpy(hs.values()[0].Clone())
+            for ibin in range(0, h.GetNbinsX() + 1):
+                h.SetBinContent(ibin, 0.0)
+                h.SetBinError(ibin, 0.0)
+            h.SetEntries(0.0)
+        #create or add to output
         if not hs.has_key(rename_func(sample)):
             hs[rename_func(sample)] = rootpy.asrootpy(h)
         else:
             hs[rename_func(sample)] += rootpy.asrootpy(h)
-    for sample, sample_name in samples:
-        if not hs.has_key(sample):
-            if len(hs)>0:
-                hs[rename_func(sample)] = rootpy.asrootpy(0.0*hs.values()[0].Clone())
-            else:
-                return hs
     return hs
 
 def escape_string(s):
@@ -429,6 +442,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     systematics = kwargs.get("systematics", [])
 
     histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern, rename_func=rename_func)
+
     if len(histograms_nominal) == 0:
         raise KeyError(
             "getHistograms: processes={0} hname={1} pattern={2}".format(processes, hname, pattern) +
@@ -471,7 +485,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         systematics,
         colors = colors
     )
-    
+
     #Create the normalized signal shape
     histogram_signal = sum([histograms_nominal[sig] for sig in signal_processes])
     histogram_total_mc = sum(histograms_nominal.values())
@@ -527,9 +541,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         ylabel = "events / {0:.2f} {1}".format(histogram_signal.get_bin_width(1), xunit)
     plt.ylabel(ylabel)
 
-    #hide x ticks on main panel
-    ticks = a1.get_xticks()
-    a1.get_xaxis().set_visible(False)
+    if data:
+        #hide x ticks on main panel
+        ticks = a1.get_xticks()
+        a1.get_xaxis().set_visible(False)
     
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)

@@ -49,10 +49,6 @@ class Cut(object):
             skim = config.get(name, "skim")
         )
 
-    def updateConfig(self, config):
-        config.set(self.name, "sparsinator", Cut.cuts_to_string(self.sparsinator))
-        config.set(self.name, "skim", Cut.cuts_to_string(self.skim))
-
     def __str__(self):
         s = []
         for c in self.sparsinator:
@@ -64,11 +60,26 @@ class Sample(object):
         self.debug = kwargs.get("debug")
         self.name = kwargs.get("name")
         self.schema = kwargs.get("schema")
-        self.process = kwargs.get("process")
         self.files_load = kwargs.get("files_load")
+        self.files_load_step1 = kwargs.get("files_load_step1", None)
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
-        self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
+
+        try:
+            self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
+        except Exception as e:
+            print "ERROR: could not load sample file {0}: {1}".format(self.files_load, e)
+            self.file_names = []
+
+        if self.files_load_step1 is None:
+            self.file_names_step1 = self.file_names
+        else:
+            try:
+                self.file_names_step1 = [getSitePrefix(fn) for fn in get_files(self.files_load_step1)]
+            except Exception as e:
+                print "ERROR: could not load sample file {0}: {1}".format(self.files_load_step1, e)
+                self.file_names_step1 = []
+
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
@@ -82,10 +93,9 @@ class Sample(object):
         sample = Sample(
             debug = config.getboolean("general", "debug"),
             name = sample_name,
-            process = config.get(sample_name, "process"),
             files_load = config.get(sample_name, "files_load"),
+            files_load_step1 = config.get(sample_name, "files_load_step1"),
             schema = config.get(sample_name, "schema"),
-            is_data = config.get(sample_name, "is_data"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen"),
@@ -95,29 +105,21 @@ class Sample(object):
         )
         return sample
 
-    def updateConfig(self, config):
-        for field in dir(self):
-            if field.startswith("__"):
-                continue
-            config.set(self.name, field, str(getattr(self, field)))
-
 class Process(object):
     """
-    Defines how an input process should be mapped to an output histogram.
+    Defines how an input sample should be mapped to an output histogram.
+    Possibly applies cuts on the event to separate a sample into processes
+    based on some event-level quantity such as ttCls
     """
     def __init__(self, *args, **kwargs):
         self.input_name = kwargs.get("input_name")
         self.output_name = kwargs.get("output_name")
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
+        self.index = kwargs.get("index", -1)
     
     def __repr__(self):
-        s = "Process: maps {0}->{1} with cuts=[{2}], xsw={3}".format(
-            self.input_name,
-            self.output_name,
-            ",".join(map(str, self.cuts)),
-            self.xs_weight
-        )
+        s = "Process({0}, {1})".format(self.input_name, self.output_name)
         return s
 
 class DataProcess(Process):
@@ -154,7 +156,7 @@ class Category:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name")
         self.discriminator = kwargs.get("discriminator")
-        self.full_name = "{0}_{1}".format(self.name, self.discriminator.name)
+        self.full_name = "{0}__{1}".format(self.name, self.discriminator.name)
         self.src_histogram = kwargs.get("src_histogram")
         self.rebin = kwargs.get("rebin", 1)
         self.do_limit = kwargs.get("do_limit", True)
@@ -236,21 +238,12 @@ class Analysis:
     def get_sample(self, sample_name):
         return self.sample_d[sample_name]
 
-    def to_JSON(self):
-        return json.dumps(self.__dict__, indent=2)
-    
     def __repr__(self):
-        s = "Analysis:\n"
-        s += "  processes:\n"
-        for proc in self.processes:
-            s += "    {0}\n".format(proc)
-        s += "  categories:\n"
-        for cat in self.categories:
-            s += "    {0}\n".format(cat)
-        
-        s += "  groups for combine:\n"
-        for groupname, cats in self.groups.items():
-            s += "    {0}: {1}\n".format(groupname, [c.name for c in self.groups[groupname]])
+        s = "Analysis(processes={0}, categories={1}, groups={2})".format(
+            len(self.processes),
+            len(self.categories),
+            len(self.groups),
+        )
         return s
 
     @staticmethod

@@ -5,11 +5,12 @@ import math
 from collections import OrderedDict
 
 import logging
+import sparse
 
 def PrintDatacard(categories, event_counts, filenames, dcof):
     number_of_bins = len(categories)
     number_of_backgrounds = len(list(set(reduce(lambda x,y:x+y, [c.out_processes for c in categories], [])))) - 1
-    analysis_categories = list(set([c.name for c in categories]))
+    analysis_categories = list(set([c.full_name for c in categories]))
 
 
     dcof.write("imax {0}\n".format(number_of_bins))
@@ -18,12 +19,10 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     dcof.write("---------------\n")
 
     for cat in categories:
-        analysis_var = cat.discriminator
-        dcof.write("shapes * {0} {1} $PROCESS/$CHANNEL/{2} $PROCESS/$CHANNEL/{2}_$SYSTEMATIC\n".format(
-            cat.name,
-            os.path.basename(filenames[cat.full_name]),
-            analysis_var)
-        )
+        dcof.write("shapes * {0} {1} $PROCESS__$CHANNEL $PROCESS__$CHANNEL__$SYSTEMATIC\n".format(
+            cat.full_name,
+            os.path.basename(filenames[cat.full_name])
+        ))
 
     dcof.write("---------------\n")
 
@@ -135,9 +134,15 @@ def makeStatVariations(tf, of, categories):
 def fakeData(infile, outfile, categories):
     dircache = {}
     for cat in categories:
-        h = infile.Get("{0}__{1}__{2}".format(
+
+        #get first histogram
+        hn = "{0}__{1}__{2}".format(
             cat.out_processes[0], cat.name, cat.discriminator.name
-        )).Clone()
+        )
+        h = infile.Get(hn)
+        if not h or h.IsZombie():
+            raise Exception("Could not get histo {0}".format(hn)) 
+        h = h.Clone()
         for proc in cat.out_processes[1:]:
             name = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
@@ -148,14 +153,15 @@ def fakeData(infile, outfile, categories):
                 continue
             h.Add(h2)
 
-        outdir = "data_obs/{0}".format(cat.name)
-        dircache[outdir] = h
+        outname = "data_obs__{0}__{1}".format(cat.name, cat.discriminator.name)
+        dircache[outname] = h
 
     # End of loop over categories
+
+    outfile.cd()
     for (k, v) in dircache.items():
-        if outfile.Get(k) == None:
-            outfile.mkdir(k)
-        k = outfile.Get(k)
-        v.SetDirectory(k)
-        k.Write("", ROOT.TObject.kOverwrite)
+        v.SetName(k)
+        v.SetDirectory(outfile)
+        outfile.Append(v, True)
+    outfile.Write()
 #end of fakeData
