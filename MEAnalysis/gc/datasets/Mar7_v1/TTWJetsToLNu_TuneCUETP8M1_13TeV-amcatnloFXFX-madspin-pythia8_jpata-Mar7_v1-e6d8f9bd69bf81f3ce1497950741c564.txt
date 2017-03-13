@@ -282,6 +282,7 @@
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_354.root = 3575
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_355.root = 3615
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_356.root = 3626
+/store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_357.root = 3675
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_358.root = 3619
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_359.root = 3648
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_36.root = 3669
@@ -731,6 +732,7 @@
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_762.root = 3584
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_763.root = 3691
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_764.root = 3571
+/store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_765.root = 3656
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_766.root = 3649
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_767.root = 3649
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_083816/0000/tree_768.root = 3606
@@ -1017,6 +1019,7 @@
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_085408/0000/tree_259.root = 2547
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_085408/0000/tree_26.root = 2619
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_085408/0000/tree_261.root = 2558
+/store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_085408/0000/tree_262.root = 2562
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_085408/0000/tree_263.root = 2597
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_085408/0000/tree_264.root = 2564
 /store/user/jpata/tth/Mar7_v1/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/Mar7_v1/170307_085408/0000/tree_265.root = 2556
