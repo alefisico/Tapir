@@ -2,16 +2,17 @@
 import os
 import PhysicsTools.HeppyCore.framework.config as cfg
 import ROOT
-ROOT.gROOT.SetBatch(True)
 import imp
 
 #pickle and transfer function classes to load transfer functions
 import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
-sys.modules["TFClasses"] = TFClasses
 
 from TTH.Plotting.joosep.sparsinator import BufferedTree
+
+sys.modules["TFClasses"] = TFClasses
+ROOT.gROOT.SetBatch(True)
 
 class BufferedChain( object ):
     """Wrapper to TChain, with a python iterable interface.
@@ -64,8 +65,8 @@ class BufferedChain( object ):
         return self
 
 
-def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], output_name=""):
-    mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])  
+def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None):
+    mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
     #Create python configuration object based on path
     if len(mem_python_config) > 0:
         print "Loading ME config from", mem_python_config
@@ -75,11 +76,11 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
         from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf as python_conf
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-    
+
     #Load transfer functions from pickle file
     pi_file = open(python_conf.general["transferFunctionsPickle"] , 'rb')
     python_conf.tf_matrix = pickle.load(pi_file)
-    
+
     #Pre-compute the TF formulae
     # eval_gen:specifies how the transfer functions are interpreted
     #     If True, TF [0] - reco, x - gen
@@ -91,28 +92,46 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         python_conf.tf_formula[fl] = {}
         for bin in [0, 1]:
                 python_conf.tf_formula[fl][bin] = python_conf.tf_matrix[fl][bin].Make_Formula(eval_gen)
-    
+
     pi_file.close()
-    
+
     #Load the subjet transfer functions from pickle file
     pi_file = open(python_conf.general["transferFunctions_sj_Pickle"] , 'rb')
     python_conf.tf_sj_matrix = pickle.load(pi_file)
     pi_file.close()
-        
-    
+
+    if sample_name:
+        an_sample = analysis_cfg.get_sample(sample_name)
+        sample_name = an_sample.name
+        vhbb_tree_name = an_sample.vhbb_tree_name
+        schema = an_sample.schema
+        if len(files) == 0:
+            files = an_sample.file_names_step1[:an_sample.debug_max_files]
+        if not output_name:
+            output_name = "Loop_" + sample_name
+    elif schema:
+        sample_name = "sample"
+        vhbb_tree_name = "tree"
+        pass
+    else:
+        raise Exception("Must specify either sample name or schema")
+
     #Event contents are defined here
     #This is work in progress
-    from TTH.MEAnalysis.VHbbTree import EventAnalyzer
-    
+    if schema == "mc":
+        from TTH.MEAnalysis.VHbbTree import EventAnalyzer
+    else:
+        from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+
     #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
     evs = cfg.Analyzer(
         EventAnalyzer,
         'events',
     )
-    
+
     #Here we define all the main analyzers
     import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
-    
+
     prefilter = cfg.Analyzer(
         MECoreAnalyzers.PrefilterAnalyzer,
         'prefilter',
@@ -124,46 +143,46 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         'counter',
         _conf = python_conf
     )
-    
+
     evtid_filter = cfg.Analyzer(
         MECoreAnalyzers.EventIDFilterAnalyzer,
         'eventid',
         _conf = python_conf
     )
-    
+
     pvana = cfg.Analyzer(
         MECoreAnalyzers.PrimaryVertexAnalyzer,
         'pvana',
         _conf = python_conf
     )
-    
+
     trigger = cfg.Analyzer(
         MECoreAnalyzers.TriggerAnalyzer,
         'trigger',
         _conf = python_conf
     )
-    
+
     #This class performs lepton selection and SL/DL disambiguation
     leps = cfg.Analyzer(
         MECoreAnalyzers.LeptonAnalyzer,
         'leptons',
         _conf = python_conf
     )
-    
+
     #This class performs jet selection and b-tag counting
     jets = cfg.Analyzer(
         MECoreAnalyzers.JetAnalyzer,
         'jets',
         _conf = python_conf
     )
-    
+
     #calculates the number of matched simulated B, C quarks for tt+XY matching
     genrad = cfg.Analyzer(
         MECoreAnalyzers.GenRadiationModeAnalyzer,
         'genrad',
         _conf = python_conf
     )
-    
+
     #calculates the b-tag likelihood ratio
     btaglr = cfg.Analyzer(
         MECoreAnalyzers.BTagLRAnalyzer,
@@ -171,7 +190,7 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         _conf = python_conf,
         btagAlgo = "btagCSV"
     )
-    
+
     ##calculates the b-tag likelihood ratio
     #btaglr_bdt = cfg.Analyzer(
     #    MECoreAnalyzers.BTagLRAnalyzer,
@@ -179,40 +198,40 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
     #    _conf = python_conf,
     #    btagAlgo = "btagBDT"
     #)
-    
+
     #calculates the b-tag likelihood ratio
     qglr = cfg.Analyzer(
         MECoreAnalyzers.QGLRAnalyzer,
         'qglr',
         _conf = python_conf
     )
-    
+
     #assigns the ME category based on leptons, jets and the bLR
     mecat = cfg.Analyzer(
         MECoreAnalyzers.MECategoryAnalyzer,
         'mecat',
         _conf = python_conf
     )
-    
+
     #performs W-tag calculation on pairs of untagged jets
     wtag = cfg.Analyzer(
         MECoreAnalyzers.WTagAnalyzer,
         'wtag',
         _conf = python_conf
     )
-    
+
     subjet_analyzer = cfg.Analyzer(
         MECoreAnalyzers.SubjetAnalyzer,
         'subjet',
         _conf = python_conf
     )
-    
+
     #multiclass_analyzer = cfg.Analyzer(
     #    MECoreAnalyzers.MulticlassAnalyzer,
     #    'multiclass',
     #    _conf = conf
     #)
-    
+
     #Calls the C++ MEM integrator with good_jets, good_leptons and
     #the ME category
     mem_analyzer = cfg.Analyzer(
@@ -220,19 +239,19 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         'mem',
         _conf = python_conf
     )
-    
+
     gentth = cfg.Analyzer(
         MECoreAnalyzers.GenTTHAnalyzer,
         'gentth',
         _conf = python_conf
     )
-    
-    mva = cfg.Analyzer(
-        MECoreAnalyzers.MVAVarAnalyzer,
-        'mva',
-        _conf = python_conf
-    )
-    
+
+#    mva = cfg.Analyzer(
+#        MECoreAnalyzers.MVAVarAnalyzer,
+#        'mva',
+#        _conf = python_conf
+#    )
+
     treevar = cfg.Analyzer(
         MECoreAnalyzers.TreeVarAnalyzer,
         'treevar',
@@ -245,10 +264,11 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
     )
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
-    
+
     # definition of a sequence of analyzers,
     # the analyzers will process each event in this order
     sequence = cfg.Sequence([
+        memory_ana,
         counter,
         evtid_filter,
         prefilter,
@@ -262,17 +282,16 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         qglr,
         wtag,
         mecat,
+        subjet_analyzer,
         genrad,
         gentth,
-        subjet_analyzer,
         #multiclass_analyzer,
         mem_analyzer,
         #mva,
         treevar,
-        memory_ana,
         treeProducer
     ])
-    
+
     #Book the output file
     from PhysicsTools.HeppyCore.framework.services.tfile import TFileService
     output_service = cfg.Service(
@@ -282,22 +301,18 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         fname='tree.root',
         option='recreate'
     )
-    
-    #finalization of the configuration object.
-    #need this config in order to import it later from crab_vhbb
-    an_sample = analysis_cfg.get_sample(sample_name)
 
     comp_cls = cfg.MCComponent
-    if an_sample.schema == "data":
+    if schema == "data":
         comp_cls = cfg.DataComponent
 
     comp = comp_cls(
-        an_sample.name,
-        files = an_sample.file_names[:an_sample.debug_max_files] if len(files) == 0 else files,
-        tree_name = an_sample.vhbb_tree_name,
+        sample_name,
+        files = files,
+        tree_name = vhbb_tree_name,
     )
 
-    from PhysicsTools.HeppyCore.framework.chain import Chain
+    #from PhysicsTools.HeppyCore.framework.chain import Chain
     heppy_config = cfg.Config(
         #Run across these inputs
         components = [comp],
@@ -311,40 +326,45 @@ def main(analysis_cfg, sample_name, firstEvent=0, numEvents=1000, files=[], outp
         #This defines how events are loaded
         #BufferedChain should be faster, but is kind of hacky
         events_class = BufferedChain
-        #events_class = Chain 
+        #events_class = Chain
     )
 
     #Configure the number of events to run
     from PhysicsTools.HeppyCore.framework.looper import Looper
 
     kwargs = {}
-    if python_conf.general.get("eventWhitelist", None) is None:
+    if python_conf.general.get("eventWhitelist", None) is None and not (numEvents is None):
         kwargs["nEvents"] = numEvents
     kwargs["firstEvent"] = firstEvent
     looper = Looper(
+<<<<<<< HEAD
         'Loop_'+an_sample.name if len(output_name) == 0 else output_name,
+=======
+        output_name,
+>>>>>>> meanalysis-80x-V25
         heppy_config,
         nPrint = 0,
         **kwargs
     )
-    
+
     print "Running looper"
     #execute the code
     looper.loop()
     print "Looper done"
 
-    tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file 
-    tf.cd()
-    ts = ROOT.TNamed("config", conf_to_str(python_conf))
-    ts.Write("", ROOT.TObject.kOverwrite)
-    
+    tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file
+    #tf.cd()
+    #ts = ROOT.TNamed("config", conf_to_str(python_conf))
+    #ts.Write("", ROOT.TObject.kOverwrite)
+
     #write the output
     looper.write()
+    return python_conf
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     an = analysisFromConfig(sys.argv[1])
-    
+
     import argparse
     parser = argparse.ArgumentParser(description='Runs MEAnalysis')
     parser.add_argument(
@@ -362,4 +382,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args(sys.argv[2:])
 
-    main(an, args.sample, numEvents=args.numEvents)
+    main(an, sample_name=args.sample, numEvents=args.numEvents)

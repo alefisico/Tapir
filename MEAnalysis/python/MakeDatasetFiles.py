@@ -24,7 +24,7 @@ from FWCore.PythonUtilities.LumiList import LumiList
 #    "bin",
 #    "das_client.py"
 #)
-das_client = "/afs/cern.ch/user/v/valya/public/das_client.py"
+das_client = "/cvmfs/cms.cern.ch/common/das_client"
 output_base = os.path.join(
     os.environ["CMSSW_BASE"],
     "src/TTH/MEAnalysis/gc/datasets/",
@@ -105,6 +105,7 @@ if __name__ == "__main__":
         # Yields:
         # sample = TTTo2L2Nu_13TeV-powheg
         sample  = "_".join(ds.split("/")[1:3])
+        sample_short  = ds.split("/")[1]
         if sample in samples_processed:
             raise Exception("Duplicate sample {0}".format(sample))
         samples_processed += [sample]
@@ -112,17 +113,17 @@ if __name__ == "__main__":
         ofile_fn = os.path.join(outdir, sample + ".txt")
         ofile = open(ofile_fn, "w")
     
-        ofile.write("[{0}__{1}]\n".format(version, sample))
+        ofile.write("[{0}]\n".format(sample_short))
             
         files_json = subprocess.Popen([
-            "python {0} --query='file dataset={1} instance={2}' --format=json --limit={3}".format(
+            "{0} --query='file dataset={1} instance={2}' --format=json --limit={3}".format(
             das_client, ds, args.instance, args.limit)
             ], stdout=subprocess.PIPE, shell=True
         ).stdout.read()
         files_di = json.loads(files_json)
         
         files_run_lumi_json = subprocess.Popen([
-            "python {0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3}".format(
+            "{0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3}".format(
             das_client, ds, args.instance, args.limit)
             ], stdout=subprocess.PIPE, shell=True
         ).stdout.read()

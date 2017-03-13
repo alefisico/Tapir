@@ -18,21 +18,21 @@ from TTH.MEAnalysis import samples_base
 
 #For tt+jets, we need to apply the selection that splits the processes into
 #different tt+jets categories (ttbarPlusBBbar, ttbarPlusCCbar etc)
-def processCut(proc):
-    n = PROCESS_MAP[proc]
-    return ("process", n, n+1)
+# def processCut(proc):
+#     n = PROCESS_MAP[proc]
+#     return ("process", n, n+1)
 
-def processCutTree(proc):
-    if proc == "ttbarPlusB":
-        return "(ttCls == 51)"
-    elif proc == "ttbarPlus2B":
-        return "(ttCls == 52)"
-    elif proc == "ttbarPlusBBbar":
-        return "(ttCls >= 53)"
-    elif proc == "ttbarPlusCCbar":
-        return "(ttCls >= 41 && ttCls <= 45)"
-    elif proc == "ttbarOther":
-        return "(ttCls == 0)"
+# def processCutTree(proc):
+#     if proc == "ttbarPlusB":
+#         return "(ttCls == 51)"
+#     elif proc == "ttbarPlus2B":
+#         return "(ttCls == 52)"
+#     elif proc == "ttbarPlusBBbar":
+#         return "(ttCls >= 53)"
+#     elif proc == "ttbarPlusCCbar":
+#         return "(ttCls >= 41 && ttCls <= 45)"
+#     elif proc == "ttbarOther":
+#         return "(ttCls == 0)"
 
 def splitByTriggerPath(processes, lumi, cuts_dict):
     """
@@ -74,7 +74,7 @@ def analysisFromConfig(config_file_path):
 
     # Init config parser
     config = Analysis.getConfigParser(config_file_path)
-
+    
     # Get information on sparse input
     lumi = {k: float(v) for (k, v) in config.items("lumi")}
     #blr_cuts = {k: float(v) for (k, v) in config.items("blr_cuts")}
@@ -116,7 +116,7 @@ def analysisFromConfig(config_file_path):
         process_lists[process_list] = []
 
 
-        is_data =  config.get(process_list, "is_data")
+        schema =  config.get(process_list, "schema")
 
         for process in config.get(process_list,"processes").split():
 
@@ -131,7 +131,7 @@ def analysisFromConfig(config_file_path):
                     cuts.append(cuts_dict[cut])
 
             # DATA
-            if is_data == "True":
+            if schema == "data":
                 process_lists[process_list].append(
                     DataProcess(
                         input_name = in_name,
@@ -140,17 +140,25 @@ def analysisFromConfig(config_file_path):
                         lumi = lumi[config.get(process,"lumi")]))
             # SIMULATION
             else:
+                lumi = 1.0
+                #if not splitting by trigger path, use a common lumi for every sample
+                if not config.getboolean(process_list, "split_by_trigger_path"):
+                    lumi = config.getfloat("lumi", "Common")
+                    
                 process_lists[process_list].append(
                     Process(
                         input_name = in_name,
                         output_name = out_name,
                         cuts = cuts,
-                        xs_weight = samples_dict[in_name].xsec/samples_dict[in_name].ngen))
+                        xs_weight = lumi * samples_dict[in_name].xsec/samples_dict[in_name].ngen,
+                        index = config.getint(process, "index")
+                    )
+                )
         # End loop over processes
 
         #post-processing of processes
         #split by trigger path
-        if config.get(process_list, "split_by_trigger_path") == "True":
+        if config.getboolean(process_list, "split_by_trigger_path"):
             process_lists_original[process_list] = process_lists[process_list]
             process_lists[process_list] = splitByTriggerPath(
                 process_lists[process_list],
@@ -180,11 +188,11 @@ def analysisFromConfig(config_file_path):
     for group in config.get("general","analysis_groups").split():
 
         cats = []
-        for cat in config.get(group,"categories").split():
+        for category_name in config.get(group,"categories").split():
 
-            template = config.get(cat, "template")
+            template = config.get(category_name, "template")
 
-            cut = Cut(sparsinator = Cut.string_to_cuts(config.get(cat, "cuts").split()))
+            cut = Cut(sparsinator = Cut.string_to_cuts(config.get(category_name, "cuts").split()))
 
             mc_processes = sum([process_lists[x] for x in config.get(template, "mc_processes").split()], [])
             data_processes = sum([process_lists[x] for x in config.get(template, "data_processes").split()], [])
@@ -203,35 +211,37 @@ def analysisFromConfig(config_file_path):
                 for name, uncert in pairwise(v.split()):
                     scale_uncertainties[k][name] = float(uncert)
 
-            if config.has_option(cat, "rebin"):
-                rebin = int(config.get(cat,"rebin"))
+            if config.has_option(category_name, "rebin"):
+                rebin = int(config.get(category_name,"rebin"))
             else:
                 rebin = 1
 
-            cats.append(
-                Category(
-                    name = cat,
-                    cuts = [cut],
-                    processes = mc_processes,
-                    data_processes = data_processes,
-                    signal_processes = signal_processes, 
-                    common_shape_uncertainties = common_shape_uncertainties, 
-                    common_scale_uncertainties = common_scale_uncertainties, 
-                    scale_uncertainties = scale_uncertainties, 
-                    discriminator = Histogram.from_string(config.get(cat, "discriminator")),
-                    rebin = rebin,
-                    do_limit = True
-                )
+            category = Category(
+                name = category_name,
+                cuts = [cut],
+                processes = mc_processes,
+                data_processes = data_processes,
+                signal_processes = signal_processes, 
+                common_shape_uncertainties = common_shape_uncertainties, 
+                common_scale_uncertainties = common_scale_uncertainties, 
+                scale_uncertainties = scale_uncertainties, 
+                discriminator = Histogram.from_string(config.get(category_name, "discriminator")),
+                rebin = rebin,
+                do_limit = True
             )
+            cats.append(category)
+
+            #a group consisting of only this category
+            analysis_groups[category.full_name] = [category] 
 
             # Also add control variables as separate categories
-            if config.has_option(cat, "control_variables"):
-                for cv in config.get(cat, "control_variables").split('\n'):
+            if config.has_option(category_name, "control_variables"):
+                for cv in config.get(category_name, "control_variables").split('\n'):
                     if len(cv) == 0:
                         continue
                     cats.append(
                         Category(
-                            name = cat,
+                            name = category_name,
                             cuts = [cut],
                             processes = mc_processes,
                             data_processes = data_processes,
@@ -253,8 +263,11 @@ def analysisFromConfig(config_file_path):
         all_cats.extend(cats)
     # End loop over groups of categories
 
-    # Uniquify all categories
-    all_cats = list(set(all_cats))
+    # If the same category is defined in multiple groups, it will exist multiple times
+    # We need to define each category uniquely, so do this here via the dictionary
+    all_cats_uniq = {}
+    all_cats_uniq = {c.full_name: c for c in all_cats}
+    all_cats = sorted(all_cats_uniq.values(), key=lambda x: x.full_name)
 
 
     ########################################
@@ -269,6 +282,7 @@ def analysisFromConfig(config_file_path):
         cuts = cuts_dict,
         processes = processes,
         processes_unsplit = processes_original,
+        process_map = processes_original,
         categories = all_cats,
         groups = analysis_groups,
         do_fake_data = config.getboolean("general", "do_fake_data"),

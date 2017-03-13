@@ -8,7 +8,7 @@ git cms-init
 git cms-merge-topic -u vhbb:vhbbHeppy80X
 
 #get the TTH code
-git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch meanalysis-80x
+git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch meanalysis-80x-V25
 cd $CMSSW_BASE/src/TTH
 
 git submodule update --init --recursive
@@ -20,3 +20,4 @@ cd $CMSSW_BASE/src
 #after scram b clean, these need to be copied again
 cp -R TTH/MEIntegratorStandalone/libs/* ../lib/$SCRAM_ARCH/
 scram setup lhapdf
+scram setup MEIntegratorStandalone/deps/gsl.xml

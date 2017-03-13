@@ -154,45 +154,7 @@ xsec[("stop_t", "13TeV")] = 45.34
 xsec[("stop_tbar", "13TeV")] = 26.98 
 xsec[("stop_s", "13TeV")] = 3.44
 
-# xsec_sample = {
-#     "TT_TuneCUETP8M1_13TeV-powheg-pythia8":     xsec[("ttjets", "13TeV")],
-#     "TT_TuneEE5C_13TeV-powheg-herwigpp":        xsec[("ttjets", "13TeV")],
-#     "TTTo2L2Nu_13TeV-powheg":                   xsec[("ttjets", "tt_to_ll", "13TeV")],
-#     "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": 0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
-#     "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8":    0.5*xsec[("ttjets", "tt_to_lj", "13TeV")],
-#     "TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8": xsec[("ttjets", "13TeV")],
-#     "TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8": xsec[("ttjets", "13TeV")],
-    
-#     "ttHTobb_M125_13TeV_powheg_pythia8":        xsec[("tthbb", "13TeV")],
-#     "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8": xsec[("tthbb", "13TeV")],
-
-#     "ttHToNonbb_M125_13TeV_powheg_pythia8":     xsec[("tth_nonhbb", "13TeV")],
-#     "ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8": xsec[("tthbb", "13TeV")],
-    
-#     'WW_TuneCUETP8M1_13TeV-pythia8' :  xsec[("ww", "13TeV")],
-#     'WZ_TuneCUETP8M1_13TeV-pythia8' :  xsec[("wz", "13TeV")],
-#     'ZZ_TuneCUETP8M1_13TeV-pythia8' :  xsec[("zz", "13TeV")],
-
-#     'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': xsec[("ttw_wqq", "13TeV")],
-#     'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8': xsec[("ttz_zqq", "13TeV")],
-
-#     'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_tW", "13TeV")],
-#     'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_tbarW", "13TeV")],
-#     'ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_t", "13TeV")],
-#     'ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': xsec[("stop_tbar", "13TeV")],
-#     'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': xsec[("stop_s", "13TeV")],
-
-#     'QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :   xsec[("qcd_ht300to500", "13TeV")],
-#     'QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :   xsec[("qcd_ht500to700", "13TeV")],
-#     'QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :  xsec[("qcd_ht700to1000", "13TeV")],
-#     'QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : xsec[("qcd_ht1000to1500", "13TeV")],
-#     'QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : xsec[("qcd_ht1500to2000", "13TeV")],
-#     'QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :  xsec[("qcd_ht2000toinf", "13TeV")],
-    
-# }
-
 #Configure the site-specific file path
-import os
 hn = os.environ.get("HOSTNAME", "")
 vo = os.environ.get("VO_CMS_DEFAULT_SE", "")
 
@@ -211,22 +173,26 @@ def chunks(l, n):
 def get_files(fname):
     # Expect fname relative to CMSSW BASE
     fname = fname.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
-    lines = open(fname).readlines()
-    lines = map(lambda x: x.strip(), lines)
-    lines = filter(lambda x: "root" in x, lines)
-    lines = map(lambda x: x.split()[0], lines)
+    if fname.endswith(".txt"):
+        lines = open(fname).readlines()
+        lines = map(lambda x: x.strip(), lines)
+        lines = filter(lambda x: "root" in x, lines)
+        lines = map(lambda x: x.split()[0], lines)
+    elif fname.endswith("*"):
+        lines = ["file://" + f for f in glob.glob(fname)]
     return lines
 
 # This function is used everywher to translate LFN /store to PFN root://
 # currently all files are assumed to reside at CSCS
 site_prefix = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat"
+#site_prefix = "root://t3dcachedb03.psi.ch/pnfs/psi.ch/cms/trivcat"
 def getSitePrefix(fn=""):
     if fn.startswith("/store"):
         return site_prefix  + fn
     elif fn.startswith("file://") or fn.startswith("root://"):
         return fn
     else:
-        raise Exception("Could not open file: {0}".format(fn))
+        raise Exception("Could not open file: {0} due to unknown path format".format(fn))
 
 def get_prefix_sample(datasetpath):
     spl = datasetpath.split("__")

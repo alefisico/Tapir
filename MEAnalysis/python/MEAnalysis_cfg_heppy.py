@@ -8,7 +8,7 @@ import VHbbAnalysis.Heppy.TriggerTable as trig
 
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID
-    #Look in Heppy autophobj.py and Jet.py 
+    #Look in Heppy autophobj.py and Jet.py
     return (jet.id >= 1)
 
 # LB: in fact,  mu.tightId should contain all the other cuts
@@ -77,6 +77,7 @@ factorizedJetCorrections = [
         "CorrelationGroupbJES",
         "CorrelationGroupFlavor",
         "CorrelationGroupUncorrelated",
+        "JER"
 ]
 
 def el_baseline_medium(el):
@@ -98,10 +99,10 @@ def el_baseline_medium(el):
         el.eleHcalClusterIso / el.pt < 0.28 and
         el.dr03TkSumPt/el.pt < 0.18)
     )
-    
+
     #medium ID (cut-based)
     #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
- 
+
     #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
     # We want 80% (tight id)
     # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTbarHbbRun2ReferenceAnalysis_76XTransition#Electrons
@@ -205,7 +206,7 @@ class Conf:
             "CSVL": ("btagCSV", 0.5426),
             "CSVM": ("btagCSV", 0.8484),
             "CSVT": ("btagCSV", 0.9535),
-            
+
             "CMVAL": ("btagCMVA", -0.5884),
             "CMVAM": ("btagCMVA", 0.4432),
             "CMVAT": ("btagCMVA", 0.9432)
@@ -213,9 +214,9 @@ class Conf:
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
         #if btagLR, selection is done by the btag likelihood ratio permutation
-        #"untaggedSelection": "btagCSV",
+        #"untaggedSelection": "btagCMVA",
         "untaggedSelection": "btagLR",
-        
+
         #how many jets to consider for the btag LR permutations
         "NJetsForBTagLR": 9, #DS
 
@@ -226,8 +227,8 @@ class Conf:
     trigger = {
 
         "filter": False,
-        "trigTable": trig.triggerTable, 
-        "trigTableData": trigData.triggerTable, 
+        "trigTable": trig.triggerTable,
+        "trigTableData": trigData.triggerTable,
     }
 
     general = {
@@ -246,32 +247,32 @@ class Conf:
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle",
         "systematics": [
             "nominal",
-            "JESUp", "JESDown",
-            "RelativeJEREC1Up",
-            "RelativeJEREC2Down",
-            #"JERUp", "JERDown"
-        ],
-        
-        
+        ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
+
+
         #If the list contains:
         # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
         "verbosity": [
-            "eventboundary", #print run:lumi:event
+            #"eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
             #"gen", #print out gen-level info
+            #"matching", 
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            "meminput", #info about particles used for MEM input
+            #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
         ],
 
-        #"eventWhitelist": [
-        #    (1, 45, 6199)
-        #]
+        # "eventWhitelist": [
+        #    # (1, 8471, 1181605),
+        #    # (1, 10785, 1504514),
+        #    # (1, 11359, 1584590),
+        #    (1, 4034, 562719),
+        # ]
     }
 
     #multiclass = {
@@ -314,33 +315,40 @@ class Conf:
     #        "Wmass"
     #    ]
     #}
-    
+
     mem = {
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
+<<<<<<< HEAD
         "calcME": True,
         "n_integration_points_mult": 1.0, #5.0,
+=======
+        "calcME": False,
+        "n_integration_points_mult": 1.0,
+
+>>>>>>> meanalysis-80x-V25
         "factorized_sources": factorizedJetCorrections,
-        "jet_corrections": ["corr_{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
+        #compute MEM variations for these sources in the nominal case
+        "jet_corrections": ["{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
+        #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            "JESUp", "JESDown",
-            "RelativeJEREC1Up",
-            "RelativeJEREC2Down",
+            "TotalUp",
+            "TotalDown",
         ],
 
-        "weight": 0.15, #k in Psb = Ps/(Ps+k*Pb)
+        "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)
 
         "blr_cuts": {
             "sl_j4_t2": 20,
             "sl_j4_t3": -20,
             "sl_j4_tge4": -20,
-            
+
             "sl_j5_t2": 20,
             "sl_j5_t3": -20,
             "sl_j5_tge4": -20,
-            
+
             "sl_jge6_t2": 20,
             "sl_jge6_t3": -20,
             "sl_jge6_tge4": -20,
@@ -365,15 +373,16 @@ class Conf:
         #just before the MEM. If False, MEM is skipped for all hypos
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
-                (event.is_sl and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 3)
+                ((event.is_sl or event.is_dl) and
+                (event.numJets>=4 and event.nBCSVM >= 4))
             #(event.is_fh and event.cat in ["cat7","cat8"]
             #and event.btag_LR_4b_2b > 0.95)
         ),
 
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
-            #"SL_0w2h2t",
-            #"DL_0w2h2t",
+            "SL_0w2h2t",
+            "DL_0w2h2t",
             "SL_1w2h2t",
             #"SL_2w2h1t_l",
             #"SL_2w2h1t_h",
@@ -383,7 +392,6 @@ class Conf:
             #"SL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
-            #"DL_0w2h2t_Rndge4t",
             #"FH_4w2h2t", #8j,4b
             #"FH_3w2h2t", #7j,4b
             #"FH_4w2h1t", #7j,3b & 8j,3b
@@ -405,7 +413,7 @@ class Conf:
         "FH_bLR_4b_CR_lo": 0.75,
         "FH_bLR_4b_CR_hi": 0.88,
     }
-    
+
     mem_configs = OrderedDict()
 
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
@@ -454,7 +462,7 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
     len(mcfg.b_quark_candidates(ev)) >= 4 and
     len(mcfg.l_quark_candidates(ev)) >= 1 and
-    ev.numJets == 5 and ev.systematic != "nominal"
+    ev.numJets == 5
 )
 c.mem_assumptions.add("sl")
 c.mem_assumptions.add("1qW")
@@ -525,7 +533,7 @@ Conf.mem_configs["SL_0w2h2t"] = c
 ### DL_0w2h2t
 ###
 c = MEMConfig(Conf)
-c.b_quark_candidates = lambda ev: ev.good_jets
+#c.b_quark_candidates = lambda ev: ev.good_jets
 c.l_quark_candidates = lambda ev: []
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 2 and
@@ -811,7 +819,7 @@ c.do_calculate = lambda ev, mcfg: (
      (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
-      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 )
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("0w0w2h2t")
@@ -838,7 +846,7 @@ c.do_calculate = lambda ev, mcfg: (
      (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
-      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 )
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("0w0w2h1t")
@@ -865,7 +873,7 @@ c.do_calculate = lambda ev, mcfg: (
      (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
-      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 )
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("0w0w1h2t")
@@ -887,7 +895,7 @@ def print_dict(d):
         s += "  {0}: {1},\n".format(k, v)
     s += ")"
     return s
-    
+
 def conf_to_str(Conf):
     s = "Conf (\n"
     for k, v in sorted(Conf.__dict__.items(), key=lambda x: x[0]):

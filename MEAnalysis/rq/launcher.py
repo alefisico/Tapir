@@ -5,7 +5,7 @@ logger = logging.getLogger("main")
 from rq import Queue
 from redis import Redis
 from rq import push_connection, get_failed_queue, Queue, Worker
-from job import count, sparse, plot, makecategory, makelimits, mergeFiles
+from job import count, sparse, plot, makecategory, makelimits, mergeFiles, validateFiles
 import socket
 
 import time, os, sys
@@ -36,53 +36,6 @@ import matplotlib.pyplot as plt
 # Configuation
 ####
 
-def kill_jobs():
-
-    proc = subprocess.Popen("qstat -u $USER | grep 'rq_worker'",
-                     shell=True,
-                     stdout=subprocess.PIPE)
-    out = proc.communicate()[0]
-
-    jobs = []
-    for line in out.split("\n"):
-        if not line:
-            continue
-        jobs.append(line.split(" ")[0])
-        
-    for job in jobs:
-        subprocess.Popen("qdel {0}".format(job),
-                         shell=True,
-                         stdout=subprocess.PIPE).communicate()       
-    
-
-def start_jobs(queue, njobs, extra_requirements = [], redis_host=None, redis_port=None):
-
-    if redis_host is None:
-        redis_host = socket.gethostname()
-    if redis_port is None:
-        redis_port = 6379
-
-    pwd = os.getcwd()
-
-    qsub_command = ["qsub", 
-                    "-q", queue,
-                    "-N", "rq_worker", 
-                    "-wd", pwd, 
-                    "-o", pwd+"/logs/", 
-                    "-e", pwd+"/logs/"]
-                    
-    if extra_requirements:
-        qsub_command += extra_requirements
-
-    qsub_command.append("worker.sh")
-    qsub_command.append("redis://{0}:{1}".format(redis_host, redis_port))
-
-    for _ in range(njobs):
-        subprocess.Popen(qsub_command, 
-                         stdout=subprocess.PIPE).communicate()[0] 
-    print "waiting 30s for jobs to be run..."
-    time.sleep(30)
-
 def basic_job_status(jobs):
     status = [j.status for j in jobs]
     status_counts = dict(Counter(status))
@@ -98,6 +51,22 @@ def basic_job_status(jobs):
     sys.stdout.write("\033[F") # Cursor up one line
 
 def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_status):
+    """Given a list of redis jobs, wait for them to finish and retrieve the results.
+    
+    Args:
+        jobs (list of redis jobs): The jobs that we want to do
+        redis_conn (Connection): The redis connection
+        qmain (Queue): The queue on which to do work
+        qfail (Queue): The queue on which failed jobs end up on
+        num_retries (int, optional): The number of times to retry a failed job
+        callback (function, optional):  a function jobs -> output that will be called at every polling iteration 
+    
+    Returns:
+        TYPE: Description
+    
+    Raises:
+        Exception: Description
+    """
     done = False
     istep = 0
     perm_failed = []
@@ -110,16 +79,31 @@ def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_s
         for job in jobs:
             #logger.debug("id={0} status={1} meta={2}".format(job.id, job.status, job.meta))
             if job.status == "failed":
+
+                #resubmit job if failed
                 if job.meta["retries"] < num_retries:
                     job.meta["retries"] += 1
                     logger.info("requeueing job {0}".format(job.id))
                     logger.error("job error: {0}".format(job.exc_info))
                     qfail.requeue(job.id)
                 else:
+                    #job failed permanently, abort workflow
+                    job.refresh()
                     perm_failed += [job]
-                    raise Exception("job failed: {0}".format(job.exc_info))
+                    raise Exception("job {0} failed with exception {1}".format(
+                        job,
+                        job.exc_info
+                    ))
+            
+            #This can happen if the worker died
             if job.status is None:
-                raise Exception("Job status is None")
+                print "Job id={0} status is None, probably worker died, trying to requeue".format(
+                    job.id
+                )
+                qfail.requeue(job.id)
+
+            #if the job is done, create a unique hash from the job arguments that will be
+            #used to "memoize" or store the result in the database
             if job.status == "finished":
                 key = (job.func.func_name, job.meta["args"])
                 if job.meta["args"] != "": 
@@ -128,9 +112,11 @@ def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_s
                         logger.debug("setting key {0} in db".format(hkey))
                         redis_conn.set(hkey, pickle.dumps(job.result))
         
+        #count the job statuses 
         status = [j.status for j in jobs]
         status_counts = dict(Counter(status))
 
+        #fail the workflow if any jobs failed permanently
         if len(perm_failed) > 0:
             logger.error("--- fail queue has {0} items".format(len(qfail)))
             for job in qfail.jobs:
@@ -138,6 +124,7 @@ def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_s
                 logger.error("job {0} failed with message:\n{1}".format(job.id, job.exc_info))
                 qfail.remove(job.id)
         
+        #workflow is done if all jobs are done
         if status_counts.get("started", 0) == 0 and status_counts.get("queued", 0) == 0:
             done = True
             break
@@ -150,6 +137,8 @@ def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_s
 
     if workflow_failed:
         raise Exception("workflow failed, see errors above")
+
+    #fetch the results
     results = [j.result for j in jobs]
     return results
 
@@ -169,7 +158,7 @@ def enqueue_nomemoize(queue, **kwargs):
 
 def enqueue_memoize(queue, **kwargs):
     """
-    Check if result already exists in redis DB and return it or compute it.
+    Check if result already exists in redis DB, then return it, otherwise compute it.
     """
     key = (kwargs.get("func").func_name, kwargs.get("meta")["args"])
     hkey = hash(str(key))
@@ -205,32 +194,120 @@ class Task(object):
             self.get_analysis_config(workdir)
         )
 
-class TaskNumGen(Task):
+class TaskValidateFiles(Task):
     def __init__(self, workdir, name, analysis):
-        super(TaskNumGen, self).__init__(workdir, name, analysis)
-
+        """Given an analysis, creates a counter task that can be executed
+        
+        Args:
+            workdir (string): A directory where the code will execute
+            name (string): Name of the task, can be anything
+            analysis (Analysis): The Analysis object as constructed from the config
+        """
+        super(TaskValidateFiles, self).__init__(workdir, name, analysis)
+    
     def run(self, inputs, redis_conn, qmain, qfail):
         all_jobs = []
         jobs = {}
+        
         for sample in self.analysis.samples:
+            #create the jobs that will count the events in this sample
+            _jobs = TaskValidateFiles.getGoodFiles(sample, qmain)
+            jobs[sample.name] = _jobs
+            all_jobs += _jobs
+
+        #wait for the jobs to complete
+        waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
+
+        #Count the total number of generated events per sample and save it
+        for sample in analysis.samples:
+            good_files = []
+            for job in jobs[sample.name]:
+                good_files += job.result
+            logger.info("TaskValidateFiles: sample {0} had {1} files, {2} are good".format(
+                sample.name,
+                len(sample.file_names),
+                len(good_files),
+            ))
+            sample.file_names = good_files
+        self.save_state()
+    
+    @staticmethod
+    def getGoodFiles(sample, queue):
+
+        jobs = []
+        if len(sample.file_names) == 0:
+            raise Exception("No files specified for sample {0}".format(sample.name))
+
+        #split the sample input files into a number of chunks based on the prescribed size
+        for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
+            jobs += [
+                enqueue_memoize(
+                    queue,
+                    func = validateFiles,
+                    args = (inputs, ),
+                    timeout = 2*60*60,
+                    ttl = 2*60*60,
+                    result_ttl = 2*60*60,
+                    meta = {"retries": 5, "args": str((inputs, ))}
+                )
+            ]
+        logger.info("getGoodFiles: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
+        return jobs
+
+class TaskNumGen(Task):
+    """Counts the number of generated events for a sample
+    """
+    def __init__(self, workdir, name, analysis):
+        """Given an analysis, creates a counter task that can be executed
+        
+        Args:
+            workdir (string): A directory where the code will execute
+            name (string): Name of the task, can be anything
+            analysis (Analysis): The Analysis object as constructed from the config
+        """
+        super(TaskNumGen, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+        all_jobs = []
+        jobs = {}
+        #Loop over all the samples defined in the analysis
+        for sample in self.analysis.samples:
+            #create the jobs that will count the events in this sample
             _jobs = TaskNumGen.getGeneratedEvents(sample, qmain)
             jobs[sample.name] = _jobs
             all_jobs += _jobs
 
-        #synchronize
+        #wait for the jobs to complete
         waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
 
+        #Count the total number of generated events per sample and save it
         for sample in analysis.samples:
             ngen = sum(
                 [j.result["Count"] for j in jobs[sample.name]]
             )
             sample.ngen = int(ngen)
+            logger.info("sample.ngen {0} = {1}".format(sample.name, sample.ngen))
         self.save_state()
         return jobs
 
     @staticmethod
     def getGeneratedEvents(sample, queue):
+        """Given a sample with a list of files, count the number of generated events in this sample
+        This method is asynchronous, meaning it won't wait until the jobs are done.
+
+        Args:
+            sample (Sample): The input sample
+            queue (Queue): Redis queue
+        
+        Returns:
+            list of rq jobs: The jobs that will return the result
+        """
         jobs = []
+        if len(sample.file_names) == 0:
+            raise Exception("No files specified for sample {0}".format(sample.name))
+
+        #split the sample input files into a number of chunks based on the prescribed size
         for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
             jobs += [
                 enqueue_memoize(
@@ -240,7 +317,7 @@ class TaskNumGen(Task):
                     timeout = 2*60*60,
                     ttl = 2*60*60,
                     result_ttl = 2*60*60,
-                    meta = {"retries": 0, "args": str((inputs, ))}
+                    meta = {"retries": 5, "args": str((inputs, ))}
                 )
             ]
         logger.info("getGeneratedEvents: {0} jobs launched for sample {1}".format(len(jobs), sample.name))
@@ -251,11 +328,13 @@ class TaskSparsinator(Task):
         super(TaskSparsinator, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+
         all_jobs = []
         jobs = {}
         for sample in self.analysis.samples:
             if not sample.name in [p.input_name for p in self.analysis.processes]:
-                logging.info("Skipping sample {0} because matched to no process".format(
+                logger.info("Skipping sample {0} because matched to any process".format(
                     sample.name
                 ))
                 continue
@@ -321,29 +400,36 @@ class TaskSparseMerge(Task):
         super(TaskSparseMerge, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+
         all_jobs = []
         jobs_by_sample = {}
 
         for sample in analysis.samples:
             
             if not sample.name in inputs.keys():
+                print "Skipping sample", sample.name
                 continue
 
+            jobs_by_sample[sample.name] = []
             sample_results = [os.path.abspath(job.result) for job in inputs[sample.name]]
             logger.info("sparsemerge: submitting merge of {0} files for sample {1}".format(len(sample_results), sample.name))
             outfile = os.path.abspath("{0}/sparse/sparse_{1}.root".format(workdir, sample.name))
-            job = enqueue_memoize(
-                qmain,
-                func = mergeFiles,
-                args = (outfile, sample_results),
-                timeout = 20*60,
-                result_ttl = 60*60,
-                meta = {"retries": 0, "args": sample.name}
-            )
-            jobs_by_sample[sample.name] = job
-            all_jobs += [job]
+
+            for ijob, sample_inputs in enumerate(chunks(sample_results, 100)):
+                job = enqueue_memoize(
+                    qmain,
+                    func = mergeFiles,
+                    args = (outfile + "." + str(ijob), sample_inputs),
+                    timeout = 20*60,
+                    result_ttl = 60*60,
+                    meta = {"retries": 0, "args": sample_inputs}
+                )
+                jobs_by_sample[sample.name] += [job]
+            all_jobs += jobs_by_sample[sample.name]
         waitJobs(all_jobs, redis_conn, qmain, qfail, callback=TaskSparseMerge.status_callback)
         results = [j.result for j in all_jobs]
+        logger.info("sparsemerge: {0}".format(results))
         logger.info("sparsemerge: merging final sparse out of {0} files".format(len(results)))
         final_merge = os.path.abspath("{0}/merged.root".format(workdir))
         job = enqueue_memoize(
@@ -352,7 +438,7 @@ class TaskSparseMerge(Task):
             args = (final_merge, results),
             timeout = 20*60,
             result_ttl = 60*60,
-            meta = {"retries": 0, "args": ("final", final_merge, results)}
+            meta = {"retries": 2, "args": ("final", final_merge, results)}
         )
         waitJobs([job], redis_conn, qmain, qfail, callback=TaskSparseMerge.status_callback)
         self.save_state()
@@ -388,9 +474,11 @@ class TaskCategories(Task):
         super(TaskCategories, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+
         hdict = {}
 
-        logging.info("Opening {0}".format(inputs))
+        logger.info("Opening {0}".format(inputs))
         tf = ROOT.TFile(inputs)
         ROOT.gROOT.cd()
         for k in tf.GetListOfKeys():
@@ -404,8 +492,9 @@ class TaskCategories(Task):
             category_dir = "{0}/categories/{1}/{2}".format(
                 workdir, cat.name, cat.discriminator.name
             )
-            logging.info("creating category to {0}".format(category_dir))
-            os.makedirs(category_dir)
+            logger.info("creating category to {0}".format(category_dir))
+            if not os.path.exists(category_dir):
+                os.makedirs(category_dir)
             make_datacard(self.analysis, [cat], category_dir, hdict)
 
         # hadd Results        
@@ -440,6 +529,7 @@ class TaskPlotting(Task):
 
     def run(self, inputs, redis_conn, qmain, qfail):
         from plots import run_plots
+        self.load_state(self.workdir)
        
         run_plots(
             workdir,
@@ -455,11 +545,17 @@ class TaskLimits(Task):
         super(TaskLimits, self).__init__(workdir, name, analysis)
 
     def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
 
         # Prepare jobs
         all_jobs = []
         os.makedirs("{0}/limits".format(self.workdir))
+        #copy datacard files and root input files to limit directory 
+        os.system("cp {0}/categories/shapes*.txt {0}/limits/".format(self.workdir))
+        os.system("cp {0}/categories/*/*/*.root {0}/limits/".format(self.workdir))
+
         for group in self.analysis.groups.keys():
+            logger.info("submitting limit jobs for {0}".format(group))
             all_jobs += [
                 qmain.enqueue_call(
                     func = makelimits,
@@ -472,7 +568,14 @@ class TaskLimits(Task):
                     result_ttl = 60*60,
                     meta = {"retries": 0, "args": ""})]
             
-        waitJobs(all_jobs, redis_conn, qmain, qfail)
+        limits = waitJobs(all_jobs, redis_conn, qmain, qfail)
+        lims_tot = {}
+        for lim in limits:
+            lims_tot.update(lim)
+
+        for k in sorted(lims_tot.keys()):
+            print k, lims_tot[k]
+
         self.save_state()
 
 def make_workdir():
@@ -528,13 +631,6 @@ if __name__ == "__main__":
         choices = starting_points,
         default = "ngen"
     )
-    parser.add_argument(
-        '--njobs',
-        action = "store",
-        help = "Job queue",
-        type = int,
-        default = 200
-    )
     args = parser.parse_args()
 
     queue_kwargs = {}
@@ -547,11 +643,11 @@ if __name__ == "__main__":
     
     #clean queues in case they are full
     if len(qmain) > 0:
-        logging.warning("main queue has jobs, emptying")
+        logger.warning("main queue has jobs, emptying")
         qmain.empty()
 
     if len(qfail) > 0:
-        logging.warning("fail queue has jobs, emptying")
+        logger.warning("fail queue has jobs, emptying")
         qfail.empty()
     
     if args.config.endswith("cfg"):
@@ -563,15 +659,18 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        #TaskNumGen(workdir, "NGEN", analysis),
-        #TaskSparsinator(workdir, "SPARSE", analysis),
-        #TaskSparseMerge(workdir, "MERGE", analysis),
+        TaskValidateFiles(workdir, "VALIDATE", analysis),
+        TaskNumGen(workdir, "NGEN", analysis),
+        TaskSparsinator(workdir, "SPARSE", analysis),
+        TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
-        TaskPlotting(workdir, "PLOT", analysis),
+        #TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
     ]
 
-    inputs = "results/28efd210-1f0f-4da7-a4ff-62e16057bae7/merged.root" 
+    #inputs = "results/28efd210-1f0f-4da7-a4ff-62e16057bae7/merged.root" 
+    inputs = []
+    tasks[0].save_state()
     for task in tasks:
         res = task.run(inputs, redis_conn, qmain, qfail)
         inputs = res

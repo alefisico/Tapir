@@ -24,7 +24,7 @@ env
 
 python ${CMSSW_BASE}/src/TTH/MEAnalysis/gc/MEAnalysis_heppy_gc.py ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/config_DS.cfg
 
-mv $GC_SCRATCH/Loop/tree.root tree.root
+mv $GC_SCRATCH/Loop/tree.root out.root
 
 echo $OFNAME > output.txt
 

@@ -6,7 +6,6 @@ rc('text', usetex=False)
 matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
 
-
 import ROOT
 import TTH.MEAnalysis.counts as counts
 import TTH.Plotting.joosep.sparsinator as sparsinator
@@ -25,11 +24,12 @@ from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
 
 from TTH.Plotting.joosep import controlPlot
-
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.Plotting.Datacards import MakeCategory
 from TTH.Plotting.Datacards import MakeLimits
+
+from TTH.MEAnalysis.samples_base import getSitePrefix
 
 def copy_rsync(src, dst):
     os.system("rsync --bwlimit=20000 {0} {1}".format(src, dst))
@@ -108,6 +108,20 @@ def plot(*kwargs):
 def makelimits(*args):
     #an_name, analysis = analysisFromConfig(args[1])
     return MakeLimits.main(*args)
+
+def validateFiles(*args):
+    input_files = args[0]
+    good_files = []
+    filenames = map(getSitePrefix, input_files)
+    for ifile, fn in enumerate(filenames):
+        try:
+            tf = ROOT.TFile.Open(fn)
+            if not tf or tf.IsZombie():
+                raise Exception("bad file")
+            good_files += [input_files[ifile]]
+        except Exception as e:
+            print "bad file", e
+    return good_files
 
 if __name__ == "__main__":
     f = filter(

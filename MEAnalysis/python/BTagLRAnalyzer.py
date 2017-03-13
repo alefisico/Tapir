@@ -210,6 +210,11 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 autolog("using btagCSV for btag/untag jet selection")
             event.buntagged_jets = event.buntagged_jets_bdisc
             event.selected_btagged_jets = event.btagged_jets_bdisc
+        elif self.conf.jets["untaggedSelection"] == "btagCMVA":
+            if "debug" in self.conf.general["verbosity"]:
+                autolog("using btagCMVA for btag/untag jet selection")
+            event.buntagged_jets = event.buntagged_jets_bdisc
+            event.selected_btagged_jets = event.btagged_jets_bdisc
         if "debug" in self.conf.general["verbosity"]:
             autolog("N(untagged)={0} N(tagged)={1}".format(
                 len(event.buntagged_jets),

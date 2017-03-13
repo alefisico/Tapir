@@ -54,11 +54,21 @@ class DummyTop(object):
 
 
 class Jet_container:
-    def __init__(self, pt, eta, phi, mass):
-        self.pt = pt
-        self.eta = eta
-        self.phi = phi
-        self.mass = mass
+    def __init__(self, *args):
+
+        # TLV
+        if len(args) == 1:
+            self.pt   = args[0].Pt()
+            self.eta  = args[0].Eta()
+            self.phi  = args[0].Phi()
+            self.mass = args[0].M()
+        # pt eta phi mass
+        elif len(args) == 4:
+            self.pt   = args[0]
+            self.eta  = args[1]
+            self.phi  = args[2]
+            self.mass = args[3]
+
 
 
 class SubjetAnalyzer(FilterAnalyzer):
@@ -136,6 +146,9 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr( event, 'othertopCandidate', [] )
         setattr( event, 'higgsCandidate', [] )
         setattr( event, 'higgsCandidateForSync', [] )
+        setattr( event, 'htt_subjets_b', [] )
+        setattr( event, 'htt_subjets_W', [] )
+        setattr( event, 'higgs_subjets', [] )
 
         event.n_bjets = len( event.selected_btagged_jets_high )
         event.n_ljets = len( list( event.wquark_candidate_jets ) )
@@ -271,6 +284,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                             "sj2pt", "sj2eta", "sj2phi", "sj2mass", "sj2btag", 
                             "sj3pt", "sj3eta", "sj3phi", "sj3mass", "sj3btag", # only calc for subjetfiltered
                             "sj12masspt", "sj12massb", "sj123masspt", # only calc for subjetfiltered
+                            "sj1b", "sj2b", # only calc for subjetfiltered
                             "secondbtag", # only calc for subjetfiltered
         ]
 
@@ -337,7 +351,10 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Sort higgs candidates by pt
         # We store all of them, so it does not really matter fow now
-        higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.pt )
+        higgsCandidates = sorted( higgsCandidates, key=lambda x: -x.secondbtag_subjetfiltered )
+
+        if len(higgsCandidates):
+            event.higgs_mass =  higgsCandidates[0].sj12massb_subjetfiltered
 
                             
         ########################################
@@ -510,6 +527,12 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Store output lists in event
         event.higgsCandidate = higgsCandidates
+    
+        if len(higgsCandidates):
+            for sj in [higgsCandidates[0].sj1b_subjetfiltered, higgsCandidates[0].sj2b_subjetfiltered]:
+                if not hasattr(sj, "pt"):
+                    continue                
+                event.higgs_subjets += [sj]
 
         all_tops_to_add = []
 
@@ -533,6 +556,11 @@ class SubjetAnalyzer(FilterAnalyzer):
         event.topCandidatesSync = all_tops_to_add
 
         if len(tops)>0:
+
+            # Variables which we save to file for all systs
+            event.htt_mass = top.masscal
+            event.htt_frec = top.fRec
+
             event.topCandidate = [ top ]
             event.othertopCandidate = other_tops
             event.boosted_bjets = boosted_bjets
@@ -543,6 +571,12 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             event.n_excluded_bjets = n_excluded_bjets
             event.n_excluded_ljets = n_excluded_ljets
+
+
+            # Subjets from best top for further use
+            if len(top_subjets)==3:
+                event.htt_subjets_b = [top_subjets[0]]
+                event.htt_subjets_W = [top_subjets[1], top_subjets[2]]
 
         #pdb.set_trace()
 
@@ -656,10 +690,10 @@ class SubjetAnalyzer(FilterAnalyzer):
         top_subjets = []
         for prefix in [ 'sjW1', 'sjW2', 'sjNonW' ]:
             x = Jet_container(
-                getattr( top, prefix + 'pt' ),
+                getattr( top, prefix + 'ptcal' ),
                 getattr( top, prefix + 'eta' ),
                 getattr( top, prefix + 'phi' ),
-                getattr( top, prefix + 'mass' ) )
+                getattr( top, prefix + 'masscal' ) )
             setattr( x, 'prefix', prefix )
             setattr( x, 'btag'  , getattr( top, prefix + 'btag' ) )
             setattr( x, 'ptcal', getattr( top, prefix + 'ptcal' ))
@@ -757,50 +791,48 @@ class SubjetAnalyzer(FilterAnalyzer):
             objs1_orig = [ objs1_orig ]
         if hasattr( objs2_orig, 'eta' ) and hasattr( objs2_orig, 'phi' ):
             objs2_orig = [ objs2_orig ]
-    
-        # Create copies of the list, since entries will be popped
-        objs1 = copy.deepcopy( objs1_orig )
-        objs2 = copy.deepcopy( objs2_orig )
 
-        # Save the original objecs as attributes of the workable objects
-        for ( obj1, obj1_orig ) in zip( objs1, objs1_orig ):
-            setattr( obj1, 'orig_obj', obj1_orig )
-        for ( obj2, obj2_orig ) in zip( objs2, objs2_orig ):
-            setattr( obj2, 'orig_obj', obj2_orig )
-
+        # Create list of indices
+        objs1 = range(len(objs1_orig))
+        objs2 = range(len(objs2_orig))
+            
         # Attempt matching until the shortest list is depleted, or until there are
         # no more matches with delR < delR_cut
         n_matches = min( len(objs1), len(objs2) )
 
         for i_match in range(n_matches):
 
-            # Attempt a match
-            (i1, i2, delR) = self.Get_min_delR( objs1, objs2, R_cut )
+            # Attempt a match (map indices to objects first)
+            tmp1 = [objs1_orig[i] for i in objs1]
+            tmp2 = [objs2_orig[i] for i in objs2]
+            (i1, i2, delR) = self.Get_min_delR( tmp1, tmp2, R_cut )
 
             # Return the attempt number if no more matches could be made
             if i1 == 'No link':
                 return i_match
 
-            # Pop the matched objs from the lists for the next iteration
+            # Pop the matched indices from the lists for the next iteration
             matched_obj1 = objs1.pop(i1)
             matched_obj2 = objs2.pop(i2)
 
             # Record the match in the original objs
-            setattr( matched_obj1.orig_obj,
-                     'matched_{0}'.format( label2 ),
-                     matched_obj2.orig_obj )
-            setattr( matched_obj2.orig_obj,
-                     'matched_{0}'.format( label1 ),
-                     matched_obj1.orig_obj )
+            setattr(objs1_orig[matched_obj1],
+                    'matched_{0}'.format( label2 ),
+                    objs2_orig[matched_obj2])
+
+            setattr(objs2_orig[matched_obj2],
+                    'matched_{0}'.format( label1 ),
+                    objs1_orig[matched_obj1])
 
             # Record the delR value in the original objs
-            setattr( matched_obj1.orig_obj,
-                     'matched_{0}_delR'.format( label2 ),
-                     delR )
-            setattr( matched_obj2.orig_obj,
-                     'matched_{0}_delR'.format( label1 ),
-                     delR )
+            setattr(objs1_orig[matched_obj1],
+                    'matched_{0}_delR'.format( label2 ),
+                    delR)
 
+            setattr(objs2_orig[matched_obj2],
+                    'matched_{0}_delR'.format( label1 ),
+                    delR)
+            
         return n_matches
 
     # ==============================================================================
@@ -1214,6 +1246,9 @@ class SubjetAnalyzer(FilterAnalyzer):
                 sj2 = ROOT.TLorentzVector()
                 sj1.SetPtEtaPhiM( subjets_by_btag[0].pt, subjets_by_btag[0].eta, subjets_by_btag[0].phi, subjets_by_btag[0].mass)
                 sj2.SetPtEtaPhiM( subjets_by_btag[1].pt, subjets_by_btag[1].eta, subjets_by_btag[1].phi, subjets_by_btag[1].mass)
+
+                setattr(fj, "sj1b", Jet_container(sj1))
+                setattr(fj, "sj2b", Jet_container(sj2))
                 setattr(fj, "sj12massb", (sj1+sj2).M())
                                             
 
