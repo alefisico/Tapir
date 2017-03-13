@@ -41,8 +41,8 @@ class BufferedChain( object ):
         """
         self.files = input
         self.base_chain = ROOT.TChain(tree_name)
-        for file in self.files:
-            self.base_chain.Add(file)
+        for fi in self.files:
+            ret = self.base_chain.Add(fi)
         self.chain = BufferedTree(self.base_chain)
 
     def __getattr__(self, attr):

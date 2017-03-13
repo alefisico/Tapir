@@ -627,7 +627,7 @@ def getTreeProducer(conf):
                     name + syst_suffix: NTupleObject(
                         name + syst_suffix2, memType ,
                         help="MEM result for proc={0} hypo={1} syst={2}".format(proc, hypo, systematic),
-                        mcOnly = False
+                        mcOnly = False if systematic == "nominal" else True
                     ),
                 })
 
