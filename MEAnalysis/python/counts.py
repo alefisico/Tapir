@@ -37,7 +37,6 @@ def main(filenames, ofname):
                 if not count_dict.has_key(kn):
                     count_dict[kn] = 0
                 count_dict[kn] += o.GetBinContent(1)
-                print "Entries", kn, o.GetBinContent(1)
                 if not of.Get(kn):
                     print "first file, creating histogram", kn
                     o2 = o.Clone()
