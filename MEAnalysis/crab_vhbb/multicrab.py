@@ -44,40 +44,61 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD",
-    "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016C-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016D-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016E-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016F-PromptReco-v2/MINIAOD",
+    "/DoubleEG/Run2016B-23Sep2016-v2/MINIAOD",
+    "/DoubleEG/Run2016B-23Sep2016-v3/MINIAOD",
+    "/DoubleEG/Run2016C-23Sep2016-v1/MINIAOD",
+    "/DoubleEG/Run2016D-23Sep2016-v1/MINIAOD",
+    "/DoubleEG/Run2016E-23Sep2016-v1/MINIAOD",
+    "/DoubleEG/Run2016F-23Sep2016-v1/MINIAOD",
+    "/DoubleEG/Run2016G-23Sep2016-v1/MINIAOD",
+    "/DoubleEG/Run2016H-PromptReco-v1/MINIAOD",
+    "/DoubleEG/Run2016H-PromptReco-v2/MINIAOD",
+    "/DoubleEG/Run2016H-PromptReco-v3/MINIAOD",
+    
+    "/DoubleMuon/Run2016B-23Sep2016-v2/MINIAOD",
+    "/DoubleMuon/Run2016B-23Sep2016-v3/MINIAOD",
+    "/DoubleMuon/Run2016C-23Sep2016-v1/MINIAOD",
+    "/DoubleMuon/Run2016D-23Sep2016-v1/MINIAOD",
+    "/DoubleMuon/Run2016E-23Sep2016-v1/MINIAOD",
+    "/DoubleMuon/Run2016F-23Sep2016-v1/MINIAOD",
+    "/DoubleMuon/Run2016G-23Sep2016-v1/MINIAOD",
+    "/DoubleMuon/Run2016H-PromptReco-v1/MINIAOD",
+    "/DoubleMuon/Run2016H-PromptReco-v2/MINIAOD",
+    "/DoubleMuon/Run2016H-PromptReco-v3/MINIAOD",
+    
+    "/MuonEG/Run2016B-23Sep2016-v2/MINIAOD",
+    "/MuonEG/Run2016B-23Sep2016-v3/MINIAOD",
+    "/MuonEG/Run2016C-23Sep2016-v1/MINIAOD",
+    "/MuonEG/Run2016D-23Sep2016-v1/MINIAOD",
+    "/MuonEG/Run2016E-23Sep2016-v1/MINIAOD",
+    "/MuonEG/Run2016F-23Sep2016-v1/MINIAOD",
+    "/MuonEG/Run2016G-23Sep2016-v1/MINIAOD",
+    "/MuonEG/Run2016H-PromptReco-v1/MINIAOD",
+    "/MuonEG/Run2016H-PromptReco-v2/MINIAOD",
+    "/MuonEG/Run2016H-PromptReco-v3/MINIAOD",
+    
+    "/SingleMuon/Run2016B-23Sep2016-v2/MINIAOD",
+    "/SingleMuon/Run2016B-23Sep2016-v3/MINIAOD",
+    "/SingleMuon/Run2016C-23Sep2016-v1/MINIAOD",
+    "/SingleMuon/Run2016D-23Sep2016-v1/MINIAOD",
+    "/SingleMuon/Run2016E-23Sep2016-v1/MINIAOD",
+    "/SingleMuon/Run2016F-23Sep2016-v1/MINIAOD",
+    "/SingleMuon/Run2016G-23Sep2016-v1/MINIAOD",
+    "/SingleMuon/Run2016H-PromptReco-v1/MINIAOD",
+    "/SingleMuon/Run2016H-PromptReco-v2/MINIAOD",
+    "/SingleMuon/Run2016H-PromptReco-v3/MINIAOD",
+    
+    "/SingleElectron/Run2016B-23Sep2016-v2/MINIAOD",
+    "/SingleElectron/Run2016B-23Sep2016-v3/MINIAOD",
+    "/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD",
+    "/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD",
+    "/SingleElectron/Run2016E-23Sep2016-v1/MINIAOD",
+    "/SingleElectron/Run2016F-23Sep2016-v1/MINIAOD",
+    "/SingleElectron/Run2016G-23Sep2016-v1/MINIAOD",
+    "/SingleElectron/Run2016H-PromptReco-v1/MINIAOD",
+    "/SingleElectron/Run2016H-PromptReco-v2/MINIAOD",
+    "/SingleElectron/Run2016H-PromptReco-v3/MINIAOD",
 
-    "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD",
-    "/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016C-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016D-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016E-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016F-PromptReco-v2/MINIAOD",
-
-    "/MuonEG/Run2016B-PromptReco-v1/MINIAOD",
-    "/MuonEG/Run2016B-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016C-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016D-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016E-PromptReco-v2/MINIAOD",
-    "/MuonEG/Run2016F-PromptReco-v2/MINIAOD",
-
-    "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD",
-    "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016F-PromptReco-v2/MINIAOD",
-
-    "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD",
-    "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016E-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016F-PromptReco-v2/MINIAOD",
 
 #    "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
 #    "/BTagCSV/Run2016B-PromptReco-v2/MINIAOD",
@@ -86,12 +107,16 @@ sets_data = [
 #    "/BTagCSV/Run2016E-PromptReco-v2/MINIAOD",
 #    "/BTagCSV/Run2016F-PromptReco-v2/MINIAOD",
 
-    "/JetHT/Run2016B-PromptReco-v1/MINIAOD",
-    "/JetHT/Run2016B-PromptReco-v2/MINIAOD",
-    "/JetHT/Run2016C-PromptReco-v2/MINIAOD",
-    "/JetHT/Run2016D-PromptReco-v2/MINIAOD",
-    "/JetHT/Run2016E-PromptReco-v2/MINIAOD",
-    "/JetHT/Run2016F-PromptReco-v1/MINIAOD",
+    "/JetHT/Run2016B-23Sep2016-v2/MINIAOD",
+    "/JetHT/Run2016B-23Sep2016-v3/MINIAOD",
+    "/JetHT/Run2016C-23Sep2016-v1/MINIAOD",
+    "/JetHT/Run2016D-23Sep2016-v1/MINIAOD",
+    "/JetHT/Run2016E-23Sep2016-v1/MINIAOD",
+    "/JetHT/Run2016F-23Sep2016-v1/MINIAOD",
+    "/JetHT/Run2016G-23Sep2016-v1/MINIAOD",
+    "/JetHT/Run2016H-PromptReco-v1/MINIAOD",
+    "/JetHT/Run2016H-PromptReco-v2/MINIAOD",
+    "/JetHT/Run2016H-PromptReco-v3/MINIAOD",
 ]
 
 #all available datasets.
@@ -524,8 +549,6 @@ for k in datasets.keys():
         D = deepcopy(datasets[k])
         workflow_datasets["data_leptonic"][k] = D
 
-
-
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
     if "QCD" in k or "ttH" in k or "TTbar_inc" in k:
@@ -563,7 +586,8 @@ workflow_datasets["testing"] = {}
 
 for k in [
     "ttHTobb",
-    #"TTbar_inc"
+    "TTbar_inc",
+    "SingleMuon-Run2016H-PromptReco-v3"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 50
@@ -610,7 +634,7 @@ for k in ["ttHTobb", "TTbar_inc"]:
     workflow_datasets["testing_withme"][k] = D
 
 workflow_datasets["testing_hadronic_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc", "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
+for k in ["ttHTobb", "TTbar_inc", "QCD1000"]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(5)
     D["maxlumis"] = 10 * D["perjob"]
