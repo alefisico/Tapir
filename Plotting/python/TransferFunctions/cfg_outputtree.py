@@ -54,7 +54,8 @@ def Make_config(do_subjets=False):
     config["root_file_base"] = samples_base.site_prefix
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = "Feb6_leptonic_nome_ttbar"
+    config['run_name'] = "Feb1_leptonic_nome"
+    #config['run_name'] = "Feb6_leptonic_nome_ttbar"
     if do_subjets:
         config['run_name'] += "_subjet"
     else:

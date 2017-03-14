@@ -69,7 +69,7 @@ def Make_config(tf_gc_path, filename):
     ########################################
 
     # Use only a part of the root file
-    config['Use_limited_entries'] = False #DS
+    config['Use_limited_entries'] = False
 
     # Specify the number of entries if only a limited number of entries is used
     #   This number is not used if Use_limited_entries is set to False
@@ -158,11 +158,11 @@ def Make_config(tf_gc_path, filename):
     # Set the number of energy bins
     #   The boundaries of the energy bins are determined by dividing all entries 
     #   inside the bounds into the set number of energy bins.
-    config['n_E_bins'] = 100 #DS
+    config['n_E_bins'] = 58
 
     # Set the energy bounds. Quark/MC energies outside these bounds will not be
     # analyzed.
-    config['E_bounds'] = [ 30.0, 300.0 ] #DS 300 IS POTENTIALLY TOO LOW!!! ok for pT
+    config['E_bounds'] = [ 30.0, 300.0 ] #300 is to low for E but ok for pT
 
 
     ########################################
@@ -197,7 +197,7 @@ def Make_config(tf_gc_path, filename):
 
     # Define the means and rms'
     DG_mean = [ '[1]', '[3]' ]
-    DG_rms = [ '[2]', '[4]' ] #DS was '[2]+[4]'
+    DG_rms = [ '[2]', '[2]+[4]' ]
 
     # Set relative weight of the two Gaussians
     config['DG_rel_weight'] = 0.70
@@ -222,8 +222,8 @@ def Make_config(tf_gc_path, filename):
     #   ( high weight, high mean, low rms + low weight, low mean, high rms seems
     #   to work well )
     #DG_init = [ "0", "1.1*mean", "1.0*rms", "0.7*mean", "1.5*rms" ]
-    #DG_init = [ "0", "1.1*mean", "1.0*rms", "0.7*mean", "0.5*rms" ]
-    DG_init = [ "0", "1.1*mean", "0.8*rms", "0.7*mean", "1.2*rms" ] #DS
+    DG_init = [ "0", "1.1*mean", "1.0*rms", "0.7*mean", "0.5*rms" ]
+    #DG_init = [ "0", "1.1*mean", "0.8*rms", "0.7*mean", "1.2*rms" ] #DS
 
     # Create the function object
     DG_func = function( DG_formula, DG_init, DG_parlimits )
@@ -235,7 +235,7 @@ def Make_config(tf_gc_path, filename):
     setattr( DG_func, 'DG_rms', DG_rms )
 
     # Optional: set a fit range
-    setattr( DG_func, 'fitrange', (30.1, 500.0) )  #DS may be too small! ok for pT
+    setattr( DG_func, 'fitrange', (30.1, 500.0) )  #too small for E, ok for pT
 
     config['Standard_DG_func'] = DG_func
 
@@ -260,8 +260,8 @@ def Make_config(tf_gc_path, filename):
         function(),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
 
-        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
-        function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
+        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
         #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
         #function( "[0]*1.0/x + [1]*x*x*x+[2]*x*x+[3]*x+[4]",
         #          [ "0", "0", "0", "0", "0" ] ),
@@ -269,8 +269,8 @@ def Make_config(tf_gc_path, filename):
 
         function( "[0]+[1]*x", [ "0" , "1" ] ),
 
-        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
-        function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
+        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
         #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
         #function( "[0]*x*x+[1]*x+[2]", [ "0", "0", "0" ] ),
         ]
@@ -279,8 +279,8 @@ def Make_config(tf_gc_path, filename):
         function(),
         function( "[0]+[1]*x", [ "0" , "1" ] ),
 
-        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
-        function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
+        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
         #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
         #function( "[0]*1.0/x + [1]*x*x*x+[2]*x*x+[3]*x+[4]",
         #          [ "0", "0", "0", "0", "0" ] ),
@@ -288,8 +288,8 @@ def Make_config(tf_gc_path, filename):
 
         function( "[0]+[1]*x", [ "0" , "1" ] ),
 
-        #function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
-        function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
+        function( "sqrt([0]*[0] + x*[1]*[1] + x*x*[2]*[2])", [ "0", "0", "0" ] ),
+        #function( "(x-[0])^[1]", [ "0", "1" ] ), #DS
         #function( "[0]*1.0/x + [1]*x*x+[2]*x+[3]", [ "0", "0", "0", "0" ] ),
         #function( "[0]*x*x+[1]*x+[2]", [ "0", "0", "0" ] ),
         ]
@@ -361,8 +361,8 @@ def Make_config(tf_gc_path, filename):
 def main():
 
     # !!! Change this line to point to output from make_TF.sh gridcontrol run !!!
-    #path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/tf/V25/"
-    path = "file:///mnt/t3nfs01/data01/shome/dsalerno/TTH_2016/TTH_80X_M17/transfer/ttbar"
+    path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/tf/V25/"
+    #path = "file:///mnt/t3nfs01/data01/shome/dsalerno/TTH_2016/TTH_80X_M17/transfer/ttbar"
 
     for jettype in ["resolved", "subjet"]:
         Make_config(path, jettype)

@@ -353,15 +353,6 @@ def main():
     print 'Setting up IO'
 
     # Input (environment set by grid control)
-    # export FILE_NAMES=/store/user/jpata/tth/Feb1_leptonic_nome/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Feb1_leptonic_nome/170201_171753/0000/tree_1.root
-    # fnames = []
-    # datasetfile = open("../../../MEAnalysis/gc/datasets/Feb6_leptonic_nome/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_jpata-Feb6_leptonic_nome-73161cecf545d5628b07ac5ac6fd2e49.txt")
-    # lines = datasetfile.readlines()
-    # for line in lines:
-    #     if line.find('/store')==0:
-    #         fnames.append(line.split()[0])
-    # config['input_root_file_list'] = fnames #DS
-
     if "FILE_NAMES" in os.environ.keys() and os.environ["FILE_NAMES"]:
         config['input_root_file_list'] = os.environ["FILE_NAMES"].split(" ")
     else:

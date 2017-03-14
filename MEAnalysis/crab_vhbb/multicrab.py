@@ -112,8 +112,8 @@ datasets.update({
     'ttHTobb': {
         "ds": '/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 2, #DS
-        "runtime": 40, #DS
+        "perjob": 10,
+        "runtime": 10,
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
@@ -129,8 +129,8 @@ datasets.update({
     'TTbar_inc': {
         "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
-        "perjob": 20, #DS
-        "runtime": 40,
+        "perjob": 50,
+        "runtime": 20,
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
@@ -612,9 +612,12 @@ for k in ["ttHTobb", "TTbar_inc"]:
 workflow_datasets["testing_hadronic_withme"] = {}
 for k in ["ttHTobb", "TTbar_inc"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
-    #D["perjob"] = int(5)
+    if k == "ttHTobb":
+	D["perjob"] = 2
+    else:
+	D["perjob"] = 20
     D["maxlumis"] = 10 * D["perjob"]
-    #D["runtime"] = int(D["runtime"]/5)
+    D["runtime"] = 40
     D["mem_cfg"] = me_cfgs["hadronic"]
     workflow_datasets["testing_hadronic_withme"][k] = D
 

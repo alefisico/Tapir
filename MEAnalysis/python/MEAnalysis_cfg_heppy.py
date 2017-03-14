@@ -241,10 +241,10 @@ class Conf:
         #"QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/QGL_3dPlot.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
-        #"transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions.pickle",
-        "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle",
-        #"transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
-        "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle",
+        "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions.pickle",
+        #"transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle",
+        "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
+        #"transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle",
         "systematics": [
             "nominal",
         ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
@@ -320,14 +320,8 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-<<<<<<< HEAD
-        "calcME": True,
-        "n_integration_points_mult": 1.0, #5.0,
-=======
         "calcME": False,
         "n_integration_points_mult": 1.0,
-
->>>>>>> meanalysis-80x-V25
         "factorized_sources": factorizedJetCorrections,
         #compute MEM variations for these sources in the nominal case
         "jet_corrections": ["{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],

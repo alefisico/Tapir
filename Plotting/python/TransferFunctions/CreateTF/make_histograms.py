@@ -60,7 +60,7 @@ def Make_E_axis( input_chain, eta_axis, n_E_bins, E_bounds, particle, config ):
 
         # The more bins chosen, the more precise the bin boundaries will be
         #n_E_hist_bins = 50000
-        n_E_hist_bins = 2000 #DS
+        n_E_hist_bins = 200
 
         # Store this number also in config
         config['n_E_hist_bins'] = n_E_hist_bins
@@ -259,7 +259,7 @@ def Make_hist_mat( eta_axis, E_axis, particle, config ):
                 config['E_or_Pt_str'] )
 
             number_of_bins = 100
-            min_x = 0     #DS does this require a non-zero value??
+            min_x = 0
             max_x = 2*E_axis[i_eta][i_E+1]
 
             hist_mat[i_eta][i_E] = ROOT.TH1F(

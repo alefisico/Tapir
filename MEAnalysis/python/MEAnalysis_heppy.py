@@ -337,11 +337,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         kwargs["nEvents"] = numEvents
     kwargs["firstEvent"] = firstEvent
     looper = Looper(
-<<<<<<< HEAD
         'Loop_'+an_sample.name if len(output_name) == 0 else output_name,
-=======
-        output_name,
->>>>>>> meanalysis-80x-V25
         heppy_config,
         nPrint = 0,
         **kwargs

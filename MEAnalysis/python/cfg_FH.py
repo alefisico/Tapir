@@ -1,3 +1,4 @@
+import os
 from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 from ROOT import MEM
 
@@ -18,7 +19,7 @@ Conf.general["passall"] = False
 Conf.leptons["selection"] = lambda event: event.is_fh 
 Conf.mem["selection"] = lambda event: (event.is_fh 
                                        and event.cat in ["cat7","cat8","cat9","cat10","cat11","cat12"]
-                                       #and event.btag_LR_4b_2b > 0.95
+                                       #and event.cat in ["cat8"]
                                        )
 #Conf.jets["untaggedSelection"] = "btagLR" #or "btagCSV" #DS needs to be set in MEAnalysis_cfg_heppy!!!
 Conf.jets["NJetsForBTagLR"] = 9
@@ -58,5 +59,10 @@ Conf.general["verbosity"] = [
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
             "meminput", #info about particles used for MEM input
-            #"commoninput" #print out inputs for CommonClassifier
+            #"commoninput", #print out inputs for CommonClassifier
+            #"commonclassifier",
        ]
+
+Conf.general["systematics"] = ["nominal"]
+Conf.general["transferFunctionsPickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle"
+Conf.general["transferFunctions_sj_Pickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle"
