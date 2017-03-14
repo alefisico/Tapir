@@ -668,7 +668,7 @@ if __name__ == "__main__":
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
-        #TaskPlotting(workdir, "PLOT", analysis),
+        TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
     ]
 

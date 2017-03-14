@@ -23,9 +23,9 @@ procs_names = [
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-    #("diboson", "diboson"),
-    #("stop", "single top"),
-    #("ttv", "tt+V"),
+    ("diboson", "diboson"),
+    ("stop", "single top"),
+    ("ttv", "tt+V"),
     #("wjets", "w+jets"),
     #("dy", "dy")
 ]

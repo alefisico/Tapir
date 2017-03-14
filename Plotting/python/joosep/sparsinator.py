@@ -768,6 +768,26 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     for proc in matched_processes:
         for (syst, hists_syst) in proc.outdict_syst.items():
             outdict = add_hdict(outdict, {k: v.hist for (k, v) in hists_syst.items()})
+   
+    #put underflow and overflow entries into the first and last visible bin
+    for (k, v) in outdict.items():
+        b0 = v.GetBinContent(0)
+        e0 = v.GetBinError(0)
+        nb = v.GetNbinsX()
+        bn = v.GetBinContent(nb + 1)
+        en = v.GetBinError(nb + 1)
+
+        v.SetBinContent(0, 0)
+        v.SetBinContent(nb+1, 0)
+        v.SetBinError(0, 0)
+        v.SetBinError(nb+1, 0)
+
+        v.SetBinContent(1, v.GetBinContent(1) + b0)
+        v.SetBinError(1, math.sqrt(v.GetBinError(1)**2 + e0**2))
+        
+        v.SetBinContent(nb, v.GetBinContent(nb) + bn)
+        v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
+
     save_hdict(hdict=outdict, outfile=outfile, )
 
     LOG_MODULE_NAME.info("writing output")
