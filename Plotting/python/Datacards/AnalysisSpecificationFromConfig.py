@@ -151,7 +151,7 @@ def analysisFromConfig(config_file_path):
                         output_name = out_name,
                         cuts = cuts,
                         xs_weight = lumi * samples_dict[in_name].xsec/samples_dict[in_name].ngen,
-                        index = config.getint(process, "index")
+                        #index = config.getint(process, "index")
                     )
                 )
         # End loop over processes

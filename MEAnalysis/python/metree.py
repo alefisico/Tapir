@@ -537,24 +537,24 @@ def getTreeProducer(conf):
     treeProducer.globalVariables += list(btag_weights.values())
     
     #add HLT bits to final tree
-    #trignames = []
-    #for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-    #    for pref in ["HLT", "HLT2"]:
-    #        #add trigger path (combination of trigger)
-    #        _pathname = "_".join([pref, pathname])
-    #        if not _pathname in trignames:
-    #            trignames += [_pathname]
+    trignames = []
+    for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
+        for pref in ["HLT"]:
+            #add trigger path (combination of trigger)
+            _pathname = "_".join([pref, pathname])
+            if not _pathname in trignames:
+                trignames += [_pathname]
 
-    #        #add individual trigger bits
-    #        for tn in trigs:
-    #            #strip the star
-    #            tn = pref + "_BIT_" + tn[:-1]
-    #            if not tn in trignames:
-    #                trignames += [tn]
-    #for trig in trignames:
-    #    treeProducer.globalVariables += [NTupleVariable(
-    #        trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
-    #    )]
+            #add individual trigger bits
+            for tn in trigs:
+                #strip the star
+                tn = pref + "_BIT_" + tn[:-1]
+                if not tn in trignames:
+                    trignames += [tn]
+    for trig in trignames:
+        treeProducer.globalVariables += [NTupleVariable(
+            trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
+        )]
        
     #Add systematically variated quantities
     for systematic in conf.general["systematics"]:
@@ -627,7 +627,7 @@ def getTreeProducer(conf):
                     name + syst_suffix: NTupleObject(
                         name + syst_suffix2, memType ,
                         help="MEM result for proc={0} hypo={1} syst={2}".format(proc, hypo, systematic),
-                        mcOnly = False
+                        mcOnly = False if systematic == "nominal" else True
                     ),
                 })
 

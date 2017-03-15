@@ -26,19 +26,19 @@ compile:
     - cd $CMSSW_BASE/src
     - eval `scramv1 runtime -sh`
     - git cms-init
-    - git cms-merge-topic -u vhbb:vhbbHeppy80X
+    - git cms-merge-topic -u jpata:vhbbHeppy80X_heppy_fixes_march14
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram b
     - cd $CMSSW_BASE
-    - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
+    - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\|gc\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
   artifacts:
     paths:
       - cmssw.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
     expire_in: 10 minutes
 
-test_MEAnalysis:
+test_MEAnalysis_ttH:
   stage: test
   script:
     - cd $CMSSW_BASE
@@ -46,8 +46,36 @@ test_MEAnalysis:
     - cd src
     - scram b python
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py | tee -i MEAnalysis.txt
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb*" | tee -i MEAnalysis_ttH.txt
   artifacts:
     paths:
-      - MEAnalysis.txt
+      - MEAnalysis_ttH.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_MEAnalysis_ttjets:
+  stage: test
+  script:
+    - cd $CMSSW_BASE
+    - tar -xzf $CI_HOME/cmssw.tgz
+    - cd src
+    - scram b python
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
+  artifacts:
+    paths:
+      - MEAnalysis_ttjets.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_MEAnalysis_DoubleMuon:
+  stage: test
+  script:
+    - cd $CMSSW_BASE
+    - tar -xzf $CI_HOME/cmssw.tgz
+    - cd src
+    - scram b python
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "DoubleMuon" | tee -i MEAnalysis_DoubleMuon.txt
+  artifacts:
+    paths:
+      - MEAnalysis_DoubleMuon.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"

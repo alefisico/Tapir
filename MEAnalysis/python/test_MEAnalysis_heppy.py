@@ -1,28 +1,43 @@
 import subprocess
 import copy, os
-import unittest
 import logging
 import ROOT
+import fnmatch
+import sys
 
 from TTH.MEAnalysis.MEAnalysis_heppy import main
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
-class MEAnalysisTestCase(unittest.TestCase):
-    testfiles = [
-        ("/store/user/jpata/tth/tth_Jul31_V24_v1/ttHTobb_M125_13TeV_powheg_pythia8/tth_Jul31_V24_v1/160731_130548/0000/tree_1.root", "tth"),
-        ("/store/user/jpata/tth/Aug11_leptonic_nome_v1/TT_TuneCUETP8M1_13TeV-powheg-pythia8/Aug11_leptonic_nome_v1/160811_212409/0000/tree_1.root", "ttjets")
-    ]
-    
-    def launch_test_MEAnalysis(self, analysis, sample):
-        main(analysis, sample_name=sample, firstEvent=0, numEvents=1000, output_name="Loop_{0}".format(sample))
-        return True
-    
-    def test_MEAnalysis(self):
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        for sample in analysis.samples:
-            logging.info("Running on sample {0}".format(sample.name))
-            self.launch_test_MEAnalysis(analysis, sample.name)
+def launch_test_MEAnalysis(analysis, sample, **kwargs):
+    output_name = "Loop_{0}".format(sample)
+    main(analysis, sample_name=sample, firstEvent=0, output_name = output_name, **kwargs)
+    return output_name
 
+def test_MEAnalysis(sample_pattern="*", **kwargs):
+    analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+    for sample in analysis.samples:
+        if fnmatch.fnmatch(sample.name, sample_pattern):
+            logging.info("Running on sample {0}".format(sample.name))
+            out = launch_test_MEAnalysis(analysis, sample.name, numEvents=analysis.config.getint(sample.name, "test_events"))
+            
+            tf = ROOT.TFile(out + "/tree.root")
+            tt = tf.Get("tree")
+            if not tt:
+                raise Exception("Could not find tree in output")
+            logging.info("produced {0} entries".format(tt.GetEntries()))
+            
+            tf.Close()
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    unittest.main()
+    
+    import argparse
+    parser = argparse.ArgumentParser(description='Runs MEAnalysis tests')
+    parser.add_argument(
+        '--sample_pattern',
+        action="store",
+        help="Samples to process, glob pattern",
+        required=False,
+        default="*"
+    )
+    args = parser.parse_args(sys.argv[1:])
+    test_MEAnalysis(args.sample_pattern) 

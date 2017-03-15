@@ -219,7 +219,7 @@ class TaskValidateFiles(Task):
         waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
 
         #Count the total number of generated events per sample and save it
-        for sample in analysis.samples:
+        for sample in self.analysis.samples:
             good_files = []
             for job in jobs[sample.name]:
                 good_files += job.result
@@ -273,6 +273,9 @@ class TaskNumGen(Task):
         jobs = {}
         #Loop over all the samples defined in the analysis
         for sample in self.analysis.samples:
+            jobs[sample.name] = []
+            if not sample.schema == "mc":
+                continue
             #create the jobs that will count the events in this sample
             _jobs = TaskNumGen.getGeneratedEvents(sample, qmain)
             jobs[sample.name] = _jobs
@@ -282,9 +285,9 @@ class TaskNumGen(Task):
         waitJobs(all_jobs, redis_conn, qmain, qfail, 0)
 
         #Count the total number of generated events per sample and save it
-        for sample in analysis.samples:
+        for sample in self.analysis.samples:
             ngen = sum(
-                [j.result["Count"] for j in jobs[sample.name]]
+                [j.result.get("Count", 0) for j in jobs[sample.name]]
             )
             sample.ngen = int(ngen)
             logger.info("sample.ngen {0} = {1}".format(sample.name, sample.ngen))
@@ -338,6 +341,7 @@ class TaskSparsinator(Task):
                     sample.name
                 ))
                 continue
+            logger.info("Submitting sample {0} ngen={1}".format(sample.name, sample.ngen))
             jobs[sample.name] = TaskSparsinator.runSparsinator_async(
                 self.get_analysis_config(workdir),
                 sample,
@@ -405,7 +409,7 @@ class TaskSparseMerge(Task):
         all_jobs = []
         jobs_by_sample = {}
 
-        for sample in analysis.samples:
+        for sample in self.analysis.samples:
             
             if not sample.name in inputs.keys():
                 print "Skipping sample", sample.name
@@ -533,7 +537,7 @@ class TaskPlotting(Task):
        
         run_plots(
             workdir,
-            analysis,
+            self.analysis,
             inputs,
             redis_conn,
             qmain,
@@ -664,7 +668,7 @@ if __name__ == "__main__":
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
-        #TaskPlotting(workdir, "PLOT", analysis),
+        TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
     ]
 
