@@ -58,7 +58,7 @@ Conf.general["verbosity"] = [
             #"gen", #print out gen-level info
             #"debug", #very high-level debug info
             #"reco", #info about reconstructed final state
-            "meminput", #info about particles used for MEM input
+            #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
        ]
