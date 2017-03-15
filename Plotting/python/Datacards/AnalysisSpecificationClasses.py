@@ -101,6 +101,7 @@ class Sample(object):
             ngen = config.getfloat(sample_name, "ngen"),
             classifier_db_path = config.get(sample_name, "classifier_db_path", None),
             skim_file = config.get(sample_name, "skim_file", None),
+            vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),
         )
         return sample
@@ -116,10 +117,10 @@ class Process(object):
         self.output_name = kwargs.get("output_name")
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
-        self.index = kwargs.get("index", -1)
+        #self.index = kwargs.get("index", -1)
     
     def __repr__(self):
-        s = "Process({0}, {1})".format(self.input_name, self.output_name)
+        s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
         return s
 
 class DataProcess(Process):
@@ -198,12 +199,8 @@ class Category:
 
     
     def __str__(self):
-        s = "Category: {0} ({1}) discr={2} cuts={3} do_limit={4}".format(
-            self.name,
+        s = "Category(full_name={0})".format(
             self.full_name,
-            self.discriminator,
-            self.cuts,
-            self.do_limit
         )
         return s
 

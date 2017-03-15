@@ -260,9 +260,6 @@ class GenTTHAnalyzer(FilterAnalyzer):
                     matched_pairs[ij] = []
                 matched_pairs[ij] += match
 
-        print matched_pairs
-        for m in [matches_wq, matches_tb, matches_hb, matches_tg, matches_bg, matches_q_htt, matches_b_htt, matches_b_higgstagger]:
-            print m
         #Number of reco jets matched to quarks from W, top, higgs
         event.nMatch_wq = 0
         event.nMatch_tb = 0
@@ -332,8 +329,6 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 event.nMatch_hb += 1
                 if jet.btagFlag == 1.0:
                     event.nMatch_hb_btag += 1
-
-        print "MATCH", event.nMatch_wq_btag, event.nMatch_tb_btag, event.nMatch_hb_btag, event.is_sl, event.numJets, event.nBCSVM
 
         for ij, jet in enumerate(event.htt_subjets_W):
             if matches_q_htt.has_key(ij):
