@@ -585,16 +585,16 @@ workflow_datasets["pilot"][pilot_name] = D
 workflow_datasets["testing"] = {}
 
 for k in [
-    "ttHTobb",
-    "TTbar_inc",
+    #"ttHTobb",
+    #"TTbar_inc",
     "SingleMuon-Run2016H-PromptReco-v3"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 50
     D["perjob"] = 10
     if "data" in D["script"]:
-        D["maxlumis"] = 500
-        D["perjob"] = 100
+        D["maxlumis"] = 5
+        D["perjob"] = 1
     D["runtime"] = 5
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
