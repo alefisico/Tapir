@@ -30,7 +30,7 @@ dataset = {
     "tthnon":"ttHToNonbb_M125_13TeV_powheg_pythia8",
 }
 
-endpath = "/scratch/dsalerno/tth/80x_M17/JoosepFeb_v5/"  ##CHANGE HERE!!!
+endpath = "/scratch/dsalerno/tth/80x_M17/gc_JoosepFeb_v5/"  ##CHANGE HERE!!!
 
 for sample in samples: 
     print "\n",sample
