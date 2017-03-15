@@ -9,7 +9,7 @@ import logging
 LOG_MODULE_NAME = logging.getLogger(__name__)
     
 import numpy as np
-from TTH.MEAnalysis.samples_base import getSitePrefix, samples_nick, get_prefix_sample, PROCESS_MAP, TRIGGERPATH_MAP
+from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 
 from TTH.CommonClassifier.db import ClassifierDB
@@ -102,31 +102,6 @@ class BufferedTree:
         self.buf = {}
         self.iEv = idx
         return self.tree.GetEntry(idx)
-
-
-def assign_process_label(process, event):
-    """ In case the you need to decide which process an event falls into based on the event itself.
-
-    Args:
-        process (string): the input process
-        event (dict string->data): the event data
-    """
-    if process == "ttbarUnsplit":
-        ttCls = event["ttCls"]
-        if ttCls == 51:
-            _process = "ttbarPlusB"
-        elif ttCls == 52:
-            _process = "ttbarPlus2B"
-        elif ttCls >= 53:
-            _process = "ttbarPlusBBbar"
-        elif ttCls in [41, 42, 43, 44, 45]:
-            _process = "ttbarPlusCCbar"
-        else:
-            _process = "ttbarOther"
-        return _process 
-    elif samples_nick.has_key(process):
-        return samples_nick[process]
-    return process
 
 def logit(x):
     return np.log(x/(1.0 - x))
@@ -262,6 +237,8 @@ class CategoryCut:
             for cname, clow, chigh in cut.sparsinator:
                 v = event[cname]
                 ret = ret and (v >= clow and v < chigh)
+                if not ret:
+                    return False
         return ret
 
 def createOutputs(outdir, analysis, process, systematics):
@@ -282,11 +259,14 @@ def createOutputs(outdir, analysis, process, systematics):
 
     ROOT.TH1.AddDirectory(False)
 
+
     for syst in systematics:
         outdict_syst[syst] = {} 
         syststr = ""
         if syst != "nominal":
             syststr = "__" + syst
+
+        #for every category in every group
         for k in analysis.groups.keys():
             for cat in analysis.groups[k]:
                 if not outdict_cuts.has_key(cat.name):
@@ -301,7 +281,7 @@ def createOutputs(outdir, analysis, process, systematics):
                 ) + syststr
                 if not outdict_syst[syst].has_key(name):
                     h = cat.discriminator.get_TH1(name)
-                    outdict_syst[syst][name] = HistogramOutput(h, FUNCTION_TABLE[cat.discriminator.func], (cat, process))
+                    outdict_syst[syst][name] = HistogramOutput(h, FUNCTION_TABLE[cat.discriminator.func], "_".join([cat.full_name, process.input_name, process.output_name]))
     return outdict_syst, outdict_cuts
 
 def pass_HLT_sl_mu(event):
@@ -524,12 +504,12 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 #            nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
 #        ),
 
-#        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_mumu}),
-#        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elel}),
-#        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_DL_elmu}),
-#        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_el}),
-#        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_SL_mu}),
-#        Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
+        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v}),
+        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v}),
+        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v}),
+        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Ele27_WPTight_Gsf_v}),
+        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_IsoMu24_v or ev.HLT_IsoTkMu24_v}),
+        #Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
 
 #        Var(name="lep_SF_weight", 
 #            funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
@@ -679,7 +659,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ret["syst"] = syst
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
-                #ret["triggerPath"] = triggerPath(ret)
+                ret["triggerPath"] = triggerPath(ret)
 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
@@ -740,8 +720,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #pre-calculate all category cuts for the processes that match this sample
                 for proc in matched_processes:
                     for (cat, process), cut in proc.outdict_cuts.items():
-                        ret[(cat, process)] = cut.cut(ret)
-
+                        ret["_".join([cat.full_name, process.input_name, process.output_name])] = cut.cut(ret)
+                
                 #Fill the base histogram
                 for proc in matched_processes:
                     for (k, v) in proc.outdict_syst[syst].items():
@@ -805,7 +785,7 @@ if __name__ == "__main__":
     else:
         sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 5000
+        max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names 
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
