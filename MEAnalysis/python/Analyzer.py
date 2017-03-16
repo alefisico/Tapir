@@ -2,6 +2,7 @@ from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 import resource
 import ROOT
+from TTH.MEAnalysis.VHbbTree import LHE_weights_pdf
 import logging
 
 class FilterAnalyzer(Analyzer):
@@ -33,7 +34,7 @@ class MemoryAnalyzer(Analyzer):
         memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         if event.iEv % 100 == 0:
             autolog("memory usage at event {0}: {1:.2f} MB".format(event.iEv, memory/1024.0))
-        
+ 
         if not self.hpy is None:
             heap = self.hpy.heap() 
             if not self.heap_prev is None:
@@ -75,7 +76,14 @@ class CounterAnalyzer(FilterAnalyzer):
     
     def process(self, event):
         #super(CounterAnalyzer, self).process(event)
-        self.chist.Fill(0)
+        passes = False
+        try:
+            if( LHE_weights_pdf.make_array(event.input) ):
+                self.chist.Fill(0)
+                passes = True
+        except:
+            print "event in tree not accessible"
+        return passes
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
     """

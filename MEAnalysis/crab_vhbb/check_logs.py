@@ -3,12 +3,13 @@ import os
 import subprocess
 from ROOT import TH1F, TCanvas, TFile, TObject
 
-sample = "QCD1500"
+sample = "ttHbb"
 copy = 1
 extract = 1
 analyse = 1
 
 se = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/dsalerno"
+lsprefix = "xrdfs storage01.lcg.cscs.ch ls -ltr -u /pnfs/lcg.cscs.ch/cms/trivcat/store/user/dsalerno/"
 path = {
     # "QCD300":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_193325",
     # "QCD500":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_194135",
@@ -27,24 +28,28 @@ path = {
     "QCD1500":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194746",
     "QCD2000":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194905",
     "TTbar":"tth/VHBBHeppyV21_tthbbV9_v2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194119",
-    "ttHbb":"tth/VHBBHeppyV21_tthbbV9_v2/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194005",
+    "ttHbb":"tth/JoosepFeb_test3/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/JoosepFeb_test3/170315_103625",
 }
 
-endpath = "/scratch/dsalerno/tth/VHBBHeppyV21_tthbbV9_v2/"
+endpath = "/scratch/dsalerno/tth/80x_M17/crab_JoosepFeb_test3/" #CHOOSE HERE!!
 destination = endpath+sample
 
 if( copy ):
-    listdir = "gfal-ls "+se+"/"+path[sample]
+    listdir = lsprefix+path[sample]
+    print listdir
     p = subprocess.Popen(listdir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     
+    if not os.path.exists(destination):
+        os.makedirs(destination)
+
     for line in p.stdout.readlines():
-        directory = line.split()[0]
+        directory = line.split(path[sample]+"/")[1].strip()
         print "directory ", directory
         listlog = listdir+"/"+directory+"/log"
         q = subprocess.Popen(listlog, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
         for line in q.stdout.readlines():
-            logfile = line.split()[0]
+            logfile = line.split(path[sample]+"/"+directory+"/log/")[1].strip()
             #print "logfile ", logfile
             if( os.path.isfile(destination+"/"+logfile) ):
                 print logfile, " already copied"
@@ -55,7 +60,8 @@ if( copy ):
             if( os.path.isfile(destination+"/"+stdoutfile) ):
                 print logfile, " already extracted"
                 continue
-            copylog = "gfal-copy "+se+"/"+path[sample]+"/"+directory+"/log/"+logfile+" file://"+destination
+            ##copylog = "gfal-copy "+se+"/"+path[sample]+"/"+directory+"/log/"+logfile+" file://"+destination
+            copylog = "xrdcp "+se+"/"+path[sample]+"/"+directory+"/log/"+logfile+" "+destination
             #print copylog
             os.system(copylog)
 

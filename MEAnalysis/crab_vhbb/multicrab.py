@@ -634,11 +634,14 @@ for k in ["ttHTobb", "TTbar_inc"]:
     workflow_datasets["testing_withme"][k] = D
 
 workflow_datasets["testing_hadronic_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc", "QCD1000"]:
+for k in ["ttHTobb", "TTbar_inc"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
-    D["perjob"] = int(5)
+    if k == "ttHTobb":
+	D["perjob"] = 2
+    else:
+	D["perjob"] = 20
     D["maxlumis"] = 10 * D["perjob"]
-    D["runtime"] = int(D["runtime"]/5)
+    D["runtime"] = 40
     D["mem_cfg"] = me_cfgs["hadronic"]
     workflow_datasets["testing_hadronic_withme"][k] = D
 

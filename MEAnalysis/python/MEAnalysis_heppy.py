@@ -260,7 +260,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     memory_ana = cfg.Analyzer(
         MECoreAnalyzers.MemoryAnalyzer,
         'memory',
-        _conf = python_conf,
+        _conf = python_conf
     )
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
@@ -337,7 +337,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         kwargs["nEvents"] = numEvents
     kwargs["firstEvent"] = firstEvent
     looper = Looper(
-        output_name,
+        'Loop_'+an_sample.name if len(output_name) == 0 else output_name,
         heppy_config,
         nPrint = 0,
         **kwargs

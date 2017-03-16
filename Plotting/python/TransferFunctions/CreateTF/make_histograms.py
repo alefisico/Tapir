@@ -225,9 +225,9 @@ def Make_sel_str( left_eta, right_eta, left_E, right_E, particle, config ):
         print "Use 'b', 'bottom', 'o', 'other', 'l' or 'light' for particle types"
         return
         
-    eta_str = "abs({0})>={1} && abs({0})<={2} && ".format(eta_var, left_eta, right_eta)
+    eta_str = "abs({0})>={1} && abs({0})<={2} && ".format(eta_var, left_eta, right_eta) #DS may double count at boundaries!
 
-    E_str = "abs({0})>={1} && abs({0})<={2}".format( E_var, left_E, right_E )
+    E_str = "abs({0})>={1} && abs({0})<={2}".format( E_var, left_E, right_E ) #DS may double count at boundaries!
 
     if not 'selection_string' in config:
         config['selection_string'] = {}
@@ -510,7 +510,7 @@ def Make_Histograms(conffile):
 ########################################   
 
 def main():
-    Make_Histograms()
+    Make_Histograms("config.dat") #DS
 
 if __name__ == "__main__":
     main()

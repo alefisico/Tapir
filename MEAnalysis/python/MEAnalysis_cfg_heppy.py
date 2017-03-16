@@ -233,12 +233,18 @@ class Conf:
 
     general = {
         "passall": False,
-        "doQGL": False,
-        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsV25.root",
-        "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
+        "QGLtoDo": {
+         #3:[(3,0)] => "evalute qg LR of 3q vs 0q(+3g), considering only light jets, in events with 3 b-jets"
+            3:[(3,0),(3,2),(4,0),(4,3),(5,4)], 
+            4:[(3,0),(3,2),(4,0),(4,3)] },
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsJul13.root",
+        #"QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
+        "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/QGL_3dPlot.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions.pickle",
+        #"transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle",
         "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
+        #"transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle",
         "systematics": [
             "nominal",
         ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
@@ -316,7 +322,6 @@ class Conf:
         #If False, all ME values will be 0
         "calcME": False,
         "n_integration_points_mult": 1.0,
-
         "factorized_sources": factorizedJetCorrections,
         #compute MEM variations for these sources in the nominal case
         "jet_corrections": ["{0}{1}".format(corr, direction) for corr in factorizedJetCorrections for direction in ["Up", "Down"]],
@@ -384,11 +389,23 @@ class Conf:
             #"FH_4w2h2t", #8j,4b
             #"FH_3w2h2t", #7j,4b
             #"FH_4w2h1t", #7j,3b & 8j,3b
+            #"FH_4w1h2t", #7j,3b & 8j,3b
+            #"FH_3w2h1t", #7j,3b & 8j,3b (int. 1 jet)
+            #"FH_0w2w2h2t", #all 4b cats
+            #"FH_1w1w2h2t", #all 4b cats
             #"FH_0w0w2h2t", #all 4b cats
             #"FH_0w0w2h1t", #all cats
             #"FH_0w0w1h2t"  #all cats
         ],
-
+        # btag LR cuts for FH MEM categories
+        "FH_bLR_3b_SR": 0.83,
+        "FH_bLR_4b_SR": 0.98,
+        "FH_bLR_3b_excl": 0.90,
+        "FH_bLR_4b_excl": 0.99,       
+        "FH_bLR_3b_CR_lo": 0.60,
+        "FH_bLR_3b_CR_hi": 0.80,
+        "FH_bLR_4b_CR_lo": 0.75,
+        "FH_bLR_4b_CR_hi": 0.88,
     }
 
     mem_configs = OrderedDict()
@@ -589,15 +606,36 @@ Conf.mem_configs["SL_0w2h2t_sj"] = c
 #c.cfg.perm_pruning = strat
 #Conf.mem_configs["SL_2w2h2t_sj_perm"] = c
 
+# apply btag LR cuts for FH MEM categories only if using btagLR
+# must allow for overlapping 3b and 4b regions (both hypos run)
+bLR = False
+if Conf.jets["untaggedSelection"] == "btagLR":
+    bLR = True
+print "the bLR from the config is",bLR #DS temp
+
+# btag LR cuts for FH MEM categories
+FH_bLR_3b_SR = Conf.mem["FH_bLR_3b_SR"]
+FH_bLR_4b_SR = Conf.mem["FH_bLR_4b_SR"]
+FH_bLR_3b_excl = Conf.mem["FH_bLR_3b_excl"]
+FH_bLR_4b_excl = Conf.mem["FH_bLR_4b_excl"]
+FH_bLR_3b_CR_lo = Conf.mem["FH_bLR_3b_CR_lo"]
+FH_bLR_3b_CR_hi = Conf.mem["FH_bLR_3b_CR_hi"]
+FH_bLR_4b_CR_lo = Conf.mem["FH_bLR_4b_CR_lo"]
+FH_bLR_4b_CR_hi = Conf.mem["FH_bLR_4b_CR_hi"]
 
 ###
 ### FH_4w2h2t #8j,4b, 9j,4b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_4b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_4b
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and #DS #although from BTagLRAnalyzer there are max 4 candidates
+    len(mcfg.b_quark_candidates(ev)) >= 4 and #although from BTagLRAnalyzer there are max 4 candidates
+    (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) #DS do not consider 10 jet events
 )
@@ -611,15 +649,20 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_4w2h2t"] = c
 
 ###
-### FH_3w2h2t #7j,4b (& 8j,4b)
+### FH_3w2h2t #7j,4b (& 8j,4b & 9j,4b)
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_4b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_4b
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and #DS
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
-      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 ) #DS run two methods for 8j,4b category
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 ) #run two methods for 8j,4b category
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("3w2h2t")
@@ -631,14 +674,19 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_3w2h2t"] = c
 
 ###
-### FH_4w2h1t #7j,3b, 8j,3b #do not need _l,_h if not imposing t-tbar symmetry
+### FH_4w2h1t #7j,3b, 8j,3b (9j,3b) #do not need _l,_h if not imposing t-tbar symmetry
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_3b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_3b
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) == 3 and #DS
-    ( len(mcfg.l_quark_candidates(ev)) == 4 or len(mcfg.l_quark_candidates(ev)) == 5 ) #DS
+    (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
+    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
+     (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
+    ( len(mcfg.l_quark_candidates(ev)) >= 4 and len(mcfg.l_quark_candidates(ev)) <= 6 )
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("4w2h1t")
@@ -650,13 +698,119 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_4w2h1t"] = c
 
 ###
+### FH_4w1h2t #7j,3b, 8j,3b (9j,3b as drop 6th l jet) #DS
+###
+c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_3b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_3b
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
+    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
+     (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
+    ( len(mcfg.l_quark_candidates(ev)) == 4 or len(mcfg.l_quark_candidates(ev)) == 5
+      or len(mcfg.l_quark_candidates(ev)) == 6 ) #DS
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("4w1h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_4w1h2t"] = c
+
+###
+### FH_3w2h1t #7j,3b, 8j,3b (int. 1 light jet)
+###
+c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_3b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_3b
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
+    (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
+     (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
+    ( len(mcfg.l_quark_candidates(ev)) == 4 or len(mcfg.l_quark_candidates(ev)) == 5 )
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("3w2h1t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_3w2h1t"] = c
+
+###
+### FH_0w2w2h2t #all 4b categories: 7j,4b, 8j,4b, 9j,4b
+###
+c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_4b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_4b
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
+    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("0w2w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_0w2w2h2t"] = c
+
+###
+### FH_1w1w2h2t #all 4b categories: 7j,4b, 8j,4b, 9j,4b
+###
+c = MEMConfig(Conf)
+c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_4b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_4b
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 0 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
+    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) 
+)
+c.mem_assumptions.add("fh")
+c.mem_assumptions.add("1w1w2h2t")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry) #FIXME: add t-tbar symmetry
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["FH_1w1w2h2t"] = c
+
+###
 ### FH_0w0w2h2t #all 4b categories: 7j,4b, 8j,4b, 9j,4b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_4b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_4b
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and #DS
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
+     (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 )
@@ -675,9 +829,15 @@ Conf.mem_configs["FH_0w0w2h2t"] = c
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_4b if (event.btag_LR_4b_2b > FH_bLR_4b_SR or (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi)) else event.buntagged_jets_maxLikelihood_3b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_4b if (event.btag_LR_4b_2b > FH_bLR_4b_SR or (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi)) else event.btagged_jets_maxLikelihood_3b
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) >= 3 and #DS
+    len(mcfg.b_quark_candidates(ev)) >= 3 and
+    (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or ev.btag_LR_3b_2b > FH_bLR_3b_SR or
+     (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) or
+     (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 )
@@ -696,9 +856,15 @@ Conf.mem_configs["FH_0w0w2h1t"] = c
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
+if bLR:
+    c.l_quark_candidates = lambda event: event.buntagged_jets_maxLikelihood_4b if (event.btag_LR_4b_2b > FH_bLR_4b_SR or (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi)) else event.buntagged_jets_maxLikelihood_3b
+    c.b_quark_candidates = lambda event: event.btagged_jets_maxLikelihood_4b if (event.btag_LR_4b_2b > FH_bLR_4b_SR or (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi)) else event.btagged_jets_maxLikelihood_3b
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 0 and
-    len(mcfg.b_quark_candidates(ev)) >= 3 and #DS
+    len(mcfg.b_quark_candidates(ev)) >= 3 and
+    (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or ev.btag_LR_3b_2b > FH_bLR_3b_SR or
+     (ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) or
+     (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) and
     ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==7 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
       (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 )
