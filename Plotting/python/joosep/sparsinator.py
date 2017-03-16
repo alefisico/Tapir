@@ -21,7 +21,6 @@ CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 FUNCTION_TABLE = {
     "btag_LR_4b_2b_btagCSV_logit": lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"],
     "common_bdt": lambda ev: ev["common_bdt"],
-    "common_mem": lambda ev: ev["common_mem"],
     "jetsByPt_0_eta": lambda ev: ev["jets_p4"][0].Eta(),
     "jetsByPt_0_pt": lambda ev: ev["jets_p4"][0].Pt(),
     "leps_0_pt": lambda ev: ev["leps_pt"][0],
@@ -404,10 +403,12 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                    btag_weights += [bweight]
 
         systematic_weights += [
-                ("puUp", lambda ev: ev["puWeightUp"] * ev["btagWeightCSV"] ),
-                ("puDown", lambda ev: ev["puWeightDown"] * ev["btagWeightCSV"]),
+                ("CMS_puUp", lambda ev: ev["puWeightUp"] * ev["btagWeightCSV"] ),
+                ("CMS_puDown", lambda ev: ev["puWeightDown"] * ev["btagWeightCSV"]),
                 ("unweighted", lambda ev: 1.0)
         ]
+
+        systematics_sample = analysis.config.get("systematics", "sample").split()
 
     #Generates accessor functions for systematically variatied values
     def generateSystematicsSuffix(base, sources, func=lambda x, ev: x):
@@ -508,11 +509,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 #            nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
 #        ),
 
-        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v}),
-        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v}),
-        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v}),
-        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_Ele27_WPTight_Gsf_v}),
-        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_IsoMu24_v or ev.HLT_IsoTkMu24_v}),
+        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v}),
+        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v}),
+        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v}),
+        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Ele27_WPTight_Gsf_v}),
+        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_IsoMu24_v or ev.HLT_BIT_HLT_IsoTkMu24_v}),
         #Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
 
 #        Var(name="lep_SF_weight", 
@@ -547,6 +548,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     matched_processes = [p for p in analysis.processes if p.input_name == sample.name]
     if len(matched_processes) == 0:
         LOG_MODULE_NAME.error("Could not match any processes to sample, will not generate histograms {0}".format(sample.name))
+    for proc in matched_processes:
+        print(proc.input_name, proc.output_name, ",".join([c.name for c in proc.cuts]), proc.xs_weight)
     LOG_MODULE_NAME.info("matched processes: " + str(matched_processes))
 
     do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
@@ -669,17 +672,17 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 if schema == "mc":
                     ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]# * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
            
-                #get MEM from the classifier database
-                ret["common_mem"] = -99
-                if do_classifier_db:
-                    syst_index = int(analysis.config.get(syst, "index"))
-                    db_key = int(event.run), int(event.lumi), int(event.evt), int(syst_index)
-                    if cls_db.data.has_key(db_key):
-                        classifiers = cls_db.get(db_key)
-                        if classifiers.mem_p_sig > 0:
-                            ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
-                    else:
-                        ret["common_mem"] = -99
+                ##get MEM from the classifier database
+                #ret["common_mem"] = -99
+                #if do_classifier_db:
+                #    syst_index = int(analysis.config.get(syst, "index"))
+                #    db_key = int(event.run), int(event.lumi), int(event.evt), int(syst_index)
+                #    if cls_db.data.has_key(db_key):
+                #        classifiers = cls_db.get(db_key)
+                #        if classifiers.mem_p_sig > 0:
+                #            ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
+                #    else:
+                #        ret["common_mem"] = -99
                 
                 ret["common_bdt"] = 0
 
@@ -710,7 +713,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 bufs["run"][0] = event.run
                 bufs["lumi"][0] = event.lumi
                 bufs["systematic"][0] = iSyst
-                bufs["mem"][0] = ret["common_mem"]
                 bufs["bdt"][0] = ret["common_bdt"]
                 bufs["is_sl"][0] = event.is_sl
                 bufs["is_dl"][0] = event.is_dl
@@ -730,7 +732,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #Fill the base histogram
                 for proc in matched_processes:
                     for (k, v) in proc.outdict_syst[syst].items():
-                        weight = ret["weight_nominal"] * proc.xs_weight
+                        weight = 1.0 
+                        if schema == "mc":
+                            weight = ret["weight_nominal"] * proc.xs_weight
                         #weight = ret["weight_nominal"]
                         if v.cut(ret):
                             v.fill(ret, weight)
@@ -738,11 +742,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc":
                     for (syst_weight, weightfunc) in systematic_weights:
-                        weight = weightfunc(ret)
+                        weight = 1.0 
+                        if schema == "mc":
+                            weight = weightfunc(ret) * proc.xs_weight
                         for proc in matched_processes:
                             for (k, v) in proc.outdict_syst[syst_weight].items():
                                 if v.cut(ret):
-                                    v.fill(ret, weight * proc.xs_weight)
+                                    v.fill(ret, weight)
 
             #end of loop over event systematics
         #end of loop over events
@@ -790,9 +796,10 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "SingleMuon"
         skip_events = 0
-        max_events = 500
+        max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        file_names = analysis.get_sample(sample).file_names 
+        file_names = analysis.get_sample(sample).file_names
+        print(file_names)
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

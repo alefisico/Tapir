@@ -33,7 +33,7 @@ procs = [x[0] for x in procs_names]
 
 syst_pairs = [
 #    ("__puUp", "__puDown"),
-    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
+#    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
 #    ("__CMS_res_jUp", "__CMS_res_jDown"),
 #    ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
 #    ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
@@ -55,7 +55,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "outname": os.path.abspath("/".join([outpath, category, variable])),
         "procs": procs_names,
         "signal_procs": ["ttH_hbb"],
-        "dataname": None,
+        "dataname": "data",
         "rebin": 1,
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames in plotlib.py",
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "",
@@ -67,7 +67,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",
         "systematics": syst_pairs,
         "do_syst": True, #currently crashes with True due to some dvipng/DISPLAY issue
-        "blindFunc": "blind_mem" if "common" in variable else "no_blind",
+        "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
     }
 
 
