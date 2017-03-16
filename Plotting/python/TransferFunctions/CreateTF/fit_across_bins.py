@@ -175,6 +175,11 @@ def Make_AcrossBinFit( TFobj, fit_dicts, config ):
         # Specify fit across bins
         f1 = abfunc.Initialize_as_TF1()
 
+        # E_bounds = config['E_bounds'] #DS
+        # f1.SetRange(E_bounds[0],E_bounds[1])
+        # gr.Fit(f1,'RQ')
+        # gr.Fit(f1,'RQ')
+        # gr.Fit(f1,'RQ')
         gr.Fit(f1,'Q')
         gr.Fit(f1,'Q')
         gr.Fit(f1,'Q')

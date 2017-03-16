@@ -40,4 +40,4 @@ if __name__ == "__main__":
         default="*"
     )
     args = parser.parse_args(sys.argv[1:])
-    test_MEAnalysis(args.sample_pattern) 
+    test_MEAnalysis(args.sample_pattern)
