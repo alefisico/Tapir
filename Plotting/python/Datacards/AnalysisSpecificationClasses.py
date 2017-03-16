@@ -122,6 +122,9 @@ class Process(object):
     def __repr__(self):
         s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
         return s
+    
+    def full_name(self):
+        return " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
 
 class DataProcess(Process):
     def __init__(self, *args, **kwargs):

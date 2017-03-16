@@ -271,7 +271,7 @@ def createOutputs(outdir, analysis, process, systematics):
             for cat in analysis.groups[k]:
                 if not outdict_cuts.has_key(cat.name):
                     outdict_cuts[(cat, process)] = CategoryCut(
-                        cat.cuts + process.cuts
+                        process.cuts + cat.cuts
                     )
 
                 name = "{proc}__{cat}__{discr}".format(
@@ -281,7 +281,11 @@ def createOutputs(outdir, analysis, process, systematics):
                 ) + syststr
                 if not outdict_syst[syst].has_key(name):
                     h = cat.discriminator.get_TH1(name)
-                    outdict_syst[syst][name] = HistogramOutput(h, FUNCTION_TABLE[cat.discriminator.func], "_".join([cat.full_name, process.input_name, process.output_name]))
+                    outdict_syst[syst][name] = HistogramOutput(
+                        h,
+                        FUNCTION_TABLE[cat.discriminator.func],
+                        (cat.full_name, process.full_name())
+                    )
     return outdict_syst, outdict_cuts
 
 def pass_HLT_sl_mu(event):
@@ -720,8 +724,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #pre-calculate all category cuts for the processes that match this sample
                 for proc in matched_processes:
                     for (cat, process), cut in proc.outdict_cuts.items():
-                        ret["_".join([cat.full_name, process.input_name, process.output_name])] = cut.cut(ret)
-                
+                        cut_result = cut.cut(ret)
+                        ret[(cat.full_name, process.full_name())] = cut_result
+
                 #Fill the base histogram
                 for proc in matched_processes:
                     for (k, v) in proc.outdict_syst[syst].items():
@@ -750,7 +755,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             outdict = add_hdict(outdict, {k: v.hist for (k, v) in hists_syst.items()})
    
     #put underflow and overflow entries into the first and last visible bin
-    for (k, v) in outdict.items():
+    for k in sorted(outdict.keys()):
+        v = outdict[k]
         b0 = v.GetBinContent(0)
         e0 = v.GetBinError(0)
         nb = v.GetNbinsX()
@@ -767,9 +773,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         
         v.SetBinContent(nb, v.GetBinContent(nb) + bn)
         v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
-
+        print(k, v.Integral(), v.GetEntries())
+    
     save_hdict(hdict=outdict, outfile=outfile, )
-
+    
     LOG_MODULE_NAME.info("writing output")
 
 if __name__ == "__main__":

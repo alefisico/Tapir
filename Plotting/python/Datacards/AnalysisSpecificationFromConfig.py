@@ -3,7 +3,6 @@
 ########################################
 
 import sys
-import pdb
 from copy import deepcopy
 
 from TTH.MEAnalysis.samples_base import xsec
@@ -125,15 +124,14 @@ def analysisFromConfig(config_file_path):
                 local_lumi = 1.0
                 #if not splitting by trigger path, use a common lumi for every sample
                 if not config.getboolean(process_list, "split_by_trigger_path"):
-                    local_lumi = config.getfloat("local_lumi", "Common")
-                    
+                    local_lumi = config.getfloat("lumi", "Common")
+                 
                 process_lists[process_list].append(
                     Process(
                         input_name = in_name,
                         output_name = out_name,
                         cuts = cuts,
                         xs_weight = local_lumi * samples_dict[in_name].xsec/samples_dict[in_name].ngen,
-                        #index = config.getint(process, "index")
                     )
                 )
         # End loop over processes

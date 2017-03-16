@@ -32,18 +32,18 @@ procs_names = [
 procs = [x[0] for x in procs_names]
 
 syst_pairs = [
-    ("__puUp", "__puDown"),
+#    ("__puUp", "__puDown"),
     ("__CMS_scale_jUp", "__CMS_scale_jDown"),
-    ("__CMS_res_jUp", "__CMS_res_jDown"),
-    ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
-    ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
-    ("__CMS_ttH_CSVhfUp", "__CMS_ttH_CSVhfDown"),
-    ("__CMS_ttH_CSVhfstats1Up", "__CMS_ttH_CSVhfstats1Down"),
-    ("__CMS_ttH_CSVhfstats2Up", "__CMS_ttH_CSVhfstats2Down"),
-    ("__CMS_ttH_CSVjesUp", "__CMS_ttH_CSVjesDown"),
-    ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
-    ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
-    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down")
+#    ("__CMS_res_jUp", "__CMS_res_jDown"),
+#    ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
+#    ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
+#    ("__CMS_ttH_CSVhfUp", "__CMS_ttH_CSVhfDown"),
+#    ("__CMS_ttH_CSVhfstats1Up", "__CMS_ttH_CSVhfstats1Down"),
+#    ("__CMS_ttH_CSVhfstats2Up", "__CMS_ttH_CSVhfstats2Down"),
+#    ("__CMS_ttH_CSVjesUp", "__CMS_ttH_CSVjesDown"),
+#    ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
+#    ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
+#    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down")
 ]
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
