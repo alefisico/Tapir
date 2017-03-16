@@ -44,27 +44,27 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/DoubleEG/Run2016B-23Sep2016-v2/MINIAOD",
-    "/DoubleEG/Run2016B-23Sep2016-v3/MINIAOD",
-    "/DoubleEG/Run2016C-23Sep2016-v1/MINIAOD",
-    "/DoubleEG/Run2016D-23Sep2016-v1/MINIAOD",
-    "/DoubleEG/Run2016E-23Sep2016-v1/MINIAOD",
-    "/DoubleEG/Run2016F-23Sep2016-v1/MINIAOD",
-    "/DoubleEG/Run2016G-23Sep2016-v1/MINIAOD",
-    "/DoubleEG/Run2016H-PromptReco-v1/MINIAOD",
-    "/DoubleEG/Run2016H-PromptReco-v2/MINIAOD",
-    "/DoubleEG/Run2016H-PromptReco-v3/MINIAOD",
-    
-    "/DoubleMuon/Run2016B-23Sep2016-v2/MINIAOD",
-    "/DoubleMuon/Run2016B-23Sep2016-v3/MINIAOD",
-    "/DoubleMuon/Run2016C-23Sep2016-v1/MINIAOD",
-    "/DoubleMuon/Run2016D-23Sep2016-v1/MINIAOD",
-    "/DoubleMuon/Run2016E-23Sep2016-v1/MINIAOD",
-    "/DoubleMuon/Run2016F-23Sep2016-v1/MINIAOD",
-    "/DoubleMuon/Run2016G-23Sep2016-v1/MINIAOD",
-    "/DoubleMuon/Run2016H-PromptReco-v1/MINIAOD",
-    "/DoubleMuon/Run2016H-PromptReco-v2/MINIAOD",
-    "/DoubleMuon/Run2016H-PromptReco-v3/MINIAOD",
+#    "/DoubleEG/Run2016B-23Sep2016-v2/MINIAOD",
+#    "/DoubleEG/Run2016B-23Sep2016-v3/MINIAOD",
+#    "/DoubleEG/Run2016C-23Sep2016-v1/MINIAOD",
+#    "/DoubleEG/Run2016D-23Sep2016-v1/MINIAOD",
+#    "/DoubleEG/Run2016E-23Sep2016-v1/MINIAOD",
+#    "/DoubleEG/Run2016F-23Sep2016-v1/MINIAOD",
+#    "/DoubleEG/Run2016G-23Sep2016-v1/MINIAOD",
+#    "/DoubleEG/Run2016H-PromptReco-v1/MINIAOD",
+#    "/DoubleEG/Run2016H-PromptReco-v2/MINIAOD",
+#    "/DoubleEG/Run2016H-PromptReco-v3/MINIAOD",
+#    
+#    "/DoubleMuon/Run2016B-23Sep2016-v2/MINIAOD",
+#    "/DoubleMuon/Run2016B-23Sep2016-v3/MINIAOD",
+#    "/DoubleMuon/Run2016C-23Sep2016-v1/MINIAOD",
+#    "/DoubleMuon/Run2016D-23Sep2016-v1/MINIAOD",
+#    "/DoubleMuon/Run2016E-23Sep2016-v1/MINIAOD",
+#    "/DoubleMuon/Run2016F-23Sep2016-v1/MINIAOD",
+#    "/DoubleMuon/Run2016G-23Sep2016-v1/MINIAOD",
+#    "/DoubleMuon/Run2016H-PromptReco-v1/MINIAOD",
+#    "/DoubleMuon/Run2016H-PromptReco-v2/MINIAOD",
+#    "/DoubleMuon/Run2016H-PromptReco-v3/MINIAOD",
     
     "/MuonEG/Run2016B-23Sep2016-v2/MINIAOD",
     "/MuonEG/Run2016B-23Sep2016-v3/MINIAOD",
@@ -77,27 +77,27 @@ sets_data = [
     "/MuonEG/Run2016H-PromptReco-v2/MINIAOD",
     "/MuonEG/Run2016H-PromptReco-v3/MINIAOD",
     
-    "/SingleMuon/Run2016B-23Sep2016-v2/MINIAOD",
-    "/SingleMuon/Run2016B-23Sep2016-v3/MINIAOD",
-    "/SingleMuon/Run2016C-23Sep2016-v1/MINIAOD",
-    "/SingleMuon/Run2016D-23Sep2016-v1/MINIAOD",
-    "/SingleMuon/Run2016E-23Sep2016-v1/MINIAOD",
-    "/SingleMuon/Run2016F-23Sep2016-v1/MINIAOD",
-    "/SingleMuon/Run2016G-23Sep2016-v1/MINIAOD",
-    "/SingleMuon/Run2016H-PromptReco-v1/MINIAOD",
-    "/SingleMuon/Run2016H-PromptReco-v2/MINIAOD",
-    "/SingleMuon/Run2016H-PromptReco-v3/MINIAOD",
-    
-    "/SingleElectron/Run2016B-23Sep2016-v2/MINIAOD",
-    "/SingleElectron/Run2016B-23Sep2016-v3/MINIAOD",
-    "/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD",
-    "/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD",
-    "/SingleElectron/Run2016E-23Sep2016-v1/MINIAOD",
-    "/SingleElectron/Run2016F-23Sep2016-v1/MINIAOD",
-    "/SingleElectron/Run2016G-23Sep2016-v1/MINIAOD",
-    "/SingleElectron/Run2016H-PromptReco-v1/MINIAOD",
-    "/SingleElectron/Run2016H-PromptReco-v2/MINIAOD",
-    "/SingleElectron/Run2016H-PromptReco-v3/MINIAOD",
+#    "/SingleMuon/Run2016B-23Sep2016-v2/MINIAOD",
+#    "/SingleMuon/Run2016B-23Sep2016-v3/MINIAOD",
+#    "/SingleMuon/Run2016C-23Sep2016-v1/MINIAOD",
+#    "/SingleMuon/Run2016D-23Sep2016-v1/MINIAOD",
+#    "/SingleMuon/Run2016E-23Sep2016-v1/MINIAOD",
+#    "/SingleMuon/Run2016F-23Sep2016-v1/MINIAOD",
+#    "/SingleMuon/Run2016G-23Sep2016-v1/MINIAOD",
+#    "/SingleMuon/Run2016H-PromptReco-v1/MINIAOD",
+#    "/SingleMuon/Run2016H-PromptReco-v2/MINIAOD",
+#    "/SingleMuon/Run2016H-PromptReco-v3/MINIAOD",
+#    
+#    "/SingleElectron/Run2016B-23Sep2016-v2/MINIAOD",
+#    "/SingleElectron/Run2016B-23Sep2016-v3/MINIAOD",
+#    "/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD",
+#    "/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD",
+#    "/SingleElectron/Run2016E-23Sep2016-v1/MINIAOD",
+#    "/SingleElectron/Run2016F-23Sep2016-v1/MINIAOD",
+#    "/SingleElectron/Run2016G-23Sep2016-v1/MINIAOD",
+#    "/SingleElectron/Run2016H-PromptReco-v1/MINIAOD",
+#    "/SingleElectron/Run2016H-PromptReco-v2/MINIAOD",
+#    "/SingleElectron/Run2016H-PromptReco-v3/MINIAOD",
 
 
 #    "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
@@ -128,7 +128,7 @@ for sd in sets_data:
     datasets[name] = {
         "ds": sd,
         "maxlumis": -1,
-        "perjob": 10, #each lumisection is 200 MC events
+        "perjob": 10,
         "runtime": 10, #hours
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'
@@ -585,16 +585,16 @@ workflow_datasets["pilot"][pilot_name] = D
 workflow_datasets["testing"] = {}
 
 for k in [
-    #"ttHTobb",
-    #"TTbar_inc",
-    "SingleMuon-Run2016H-PromptReco-v3"
+    "ttHTobb",
+    "TTbar_inc",
+    #"SingleMuon-Run2016H-PromptReco-v3"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 50
     D["perjob"] = 10
     if "data" in D["script"]:
-        D["maxlumis"] = 5
-        D["perjob"] = 1
+        D["maxlumis"] = 50
+        D["perjob"] = 5
     D["runtime"] = 5
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
