@@ -8,6 +8,8 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
+elif "--local" in sys.argv:
+    import PSet_local as PSet
 
 import copy
 import json
@@ -45,11 +47,6 @@ dumpfile.write("\n")
 
 t0 = time.time()
 print "ARGV:",sys.argv
-
-me_conf_name = "MEAnalysis_cfg_heppy.py"
-for arg in sys.argv:
-    if arg.startswith("ME_CONF="):
-        me_conf_name = arg.split("=")[1]
 
 crabFiles=PSet.process.source.fileNames
 crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
@@ -122,8 +119,17 @@ if not "--nostep2" in args:
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-    an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-    an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
+    if os.environ["AN_CFG"]:
+        an = analysisFromConfig(os.environ["AN_CFG"])
+    else:
+        an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        me_conf_name = "MEAnalysis_cfg_heppy.py"
+        for arg in sys.argv:
+            if arg.startswith("ME_CONF="):
+                me_conf_name = arg.split("=")[1]
+                an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
+    
+    print "I'm using ",an, " and ", an.mem_python_config
     mem_python_conf = tth_main(
         an,
         schema="mc" if cfo.sample.isMC else "data",

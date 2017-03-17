@@ -20,4 +20,4 @@ cd $CMSSW_BASE/src
 #after scram b clean, these need to be copied again
 cp -R TTH/MEIntegratorStandalone/libs/* ../lib/$SCRAM_ARCH/
 scram setup lhapdf
-scram setup MEIntegratorStandalone/deps/gsl.xml
+scram setup TTH/MEIntegratorStandalone/deps/gsl.xml
