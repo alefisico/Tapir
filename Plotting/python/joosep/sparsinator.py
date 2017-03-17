@@ -136,7 +136,8 @@ class Var:
         self.present_syst = {}
 
     def getValue(self, event, schema, systematic="nominal"):
-        
+    
+        #check if this branch was present with this systematic 
         if self.present_syst.get(systematic, True): 
             try:
                 if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
@@ -410,7 +411,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         systematics_sample = analysis.config.get("systematics", "sample").split()
 
-    #Generates accessor functions for systematically variatied values
+    #Generates accessor functions for systematically variated values
     def generateSystematicsSuffix(base, sources, func=lambda x, ev: x):
         ret = {}
         for name, src in sources:
@@ -796,9 +797,9 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "SingleMuon"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 1000
+        max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         print(file_names)
