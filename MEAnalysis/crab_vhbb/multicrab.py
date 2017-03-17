@@ -450,8 +450,8 @@ datasets.update({
 })
 
 #load the QCD datasets
-from QCDdatasets import QCDdatasets
-datasets.update(QCDdatasets)
+#from QCDdatasets import QCDdatasets
+#datasets.update(QCDdatasets)
 
 #now we construct the workflows from all the base datasets
 workflow_datasets = {}
