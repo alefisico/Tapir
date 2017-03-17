@@ -435,7 +435,7 @@ class MEAnalyzer(FilterAnalyzer):
             #if it was a systematic event
             #AND the variation changed the jet category
             #AND the nominal MEM was computed, get the variation off of that
-            if event.systematic != "nominal" and not event.changes_jet_category and key in event.nominal_event.was_run.keys():
+            if event.systematic != "nominal" and not event.changes_jet_category and hasattr(event.nominal_event, 'was_run') and key in event.nominal_event.was_run.keys():
                 icorr = self.conf.mem["jet_corrections"].index(event.systematic)
                 r1 = event.nominal_event.res[(MEM.Hypothesis.TTH, key)].variated
                 r2 = event.nominal_event.res[(MEM.Hypothesis.TTBB, key)].variated
