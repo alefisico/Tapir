@@ -12,6 +12,7 @@ before_script:
   - export SCRAM_ARCH="slc6_amd64_gcc530"
   - export CMSSW_VERSION="CMSSW_8_0_25"
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
+  - source /cvmfs/grid.cern.ch/emi-ui-3.15.3-1_sl6v1/etc/profile.d/setup-ui-example.sh
   - cd ..
   - scramv1 project CMSSW $CMSSW_VERSION
   - cd $CMSSW_VERSION/src
@@ -19,6 +20,10 @@ before_script:
   - source $CI_HOME/setenv_sklearn_cmssw.sh
   - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
   - cd $CI_HOME
+  - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
+  - scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIDelegateCredentials=yes -o GSSAPITrustDNS=yes -o GSSAPIAuthentication=yes -o ControlMaster=auto -o ControlPath=/tmp/%%r@%%h:%%p -o ControlPersist=1 {$KRB_USERBAME}@lxplus.cern.ch:~/x509 $CI_HOME/x509
+  - export X509_USER_PROXY=$CI_HOME/x509
+  - voms-proxy-info -d
 
 compile:
   stage: compile
