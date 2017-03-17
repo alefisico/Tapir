@@ -3,36 +3,17 @@
 ########################################
 
 import sys
-import pdb
 from copy import deepcopy
 
 from TTH.MEAnalysis.samples_base import xsec
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Histogram, Cut, Sample, Process, DataProcess, Category, Analysis, pairwise, triplewise, make_csv_categories_abstract, make_csv_groups_abstract
-from TTH.Plotting.joosep.sparsinator import PROCESS_MAP, TRIGGERPATH_MAP
+from TTH.Plotting.joosep.sparsinator import TRIGGERPATH_MAP
 from TTH.MEAnalysis import samples_base
 
 
 ########################################
 # Helper Functions
 ########################################
-
-#For tt+jets, we need to apply the selection that splits the processes into
-#different tt+jets categories (ttbarPlusBBbar, ttbarPlusCCbar etc)
-# def processCut(proc):
-#     n = PROCESS_MAP[proc]
-#     return ("process", n, n+1)
-
-# def processCutTree(proc):
-#     if proc == "ttbarPlusB":
-#         return "(ttCls == 51)"
-#     elif proc == "ttbarPlus2B":
-#         return "(ttCls == 52)"
-#     elif proc == "ttbarPlusBBbar":
-#         return "(ttCls >= 53)"
-#     elif proc == "ttbarPlusCCbar":
-#         return "(ttCls >= 41 && ttCls <= 45)"
-#     elif proc == "ttbarOther":
-#         return "(ttCls == 0)"
 
 def splitByTriggerPath(processes, lumi, cuts_dict):
     """
@@ -55,7 +36,7 @@ def splitByTriggerPath(processes, lumi, cuts_dict):
                 input_name = proc.input_name,
                 output_name = proc.output_name,
                 xs_weight = _lumis[name] * proc.xs_weight,
-                cuts = proc.cuts + [cuts_dict["triggerPath_{0}".format(name)]]
+                cuts = [cuts_dict["triggerPath_{0}".format(name)]] + proc.cuts,
             )
             out += [newproc]
     return out
@@ -140,18 +121,17 @@ def analysisFromConfig(config_file_path):
                         lumi = lumi[config.get(process,"lumi")]))
             # SIMULATION
             else:
-                lumi = 1.0
+                local_lumi = 1.0
                 #if not splitting by trigger path, use a common lumi for every sample
                 if not config.getboolean(process_list, "split_by_trigger_path"):
-                    lumi = config.getfloat("lumi", "Common")
-                    
+                    local_lumi = config.getfloat("lumi", "Common")
+                 
                 process_lists[process_list].append(
                     Process(
                         input_name = in_name,
                         output_name = out_name,
                         cuts = cuts,
-                        xs_weight = lumi * samples_dict[in_name].xsec/samples_dict[in_name].ngen,
-                        #index = config.getint(process, "index")
+                        xs_weight = local_lumi * samples_dict[in_name].xsec/samples_dict[in_name].ngen,
                     )
                 )
         # End loop over processes

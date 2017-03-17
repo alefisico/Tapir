@@ -1,5 +1,6 @@
 import glob, os
 
+#NB: these cross-sections are now in the config file
 #Cross-sections from
 # $t \bar{t} + \mathrm{jets}$ - https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO, $M_{top} = 172.5$ GeV
 # ttH - https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV, $M_H = 125.0$ GeV
@@ -46,99 +47,13 @@ xsec[("ww", "13TeV")] = 118.7
 xsec[("wz", "13TeV")] = 47.13
 xsec[("zz", "13TeV")] = 16.523
 
-samples_nick = {
-    'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_s",
-    'ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1': "stop_t",
-    'ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_tbar",
-    'ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_t",
-    'ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1': "stop_tbarW",
-    'ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1':"stop_tW",
-    'TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"ttbarUnsplit",
-    'TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
-    'TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
-    'TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
-    'TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
-    'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
-    'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
-    'TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8': "ttbarUnsplit",
-    'TTTo2L2Nu_13TeV-powheg': 'ttbarUnsplit',
-    'TT_TuneEE5C_13TeV-powheg-herwigpp': 'ttbarUnsplit',
-    'TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttbarUnsplit",
-    'TT_TuneCUETP8M1_13TeV-powheg-pythia8': "ttbarUnsplit",
-    'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8': "ttW_Wlnu",
-    'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8':"ttW_Wqq",
-    'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8': "ttZ_Zqq",
-    'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wlnu_ht_100_200",
-    'WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wlnu_ht_100_200",
-    'WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wlnu_ht_600_inf",
-    'WJetsToQQ_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8':"wjets_Wqq_ht_600_inf",
-    'WW_TuneCUETP8M1_13TeV-pythia8': "ww",
-    'WZ_TuneCUETP8M1_13TeV-pythia8': "wz",
-    'ZZ_TuneCUETP8M1_13TeV-pythia8': "zz",
-    'ttHToNonbb_M125_13TeV_powheg_pythia8': "ttH_nonhbb",
-    'ttHTobb_M125_13TeV_powheg_pythia8': "ttH_hbb",
-    'QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
-    'QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
-    'QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
-    'QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
-    'QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
-    'QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : 'qcd',
-    "SingleMuon": "data_m",
-    "SingleElectron": "data_e",
-    "MuonEG": "data_em",
-    "DoubleEG": "data_ee",
-    "DoubleMuon": "data_mm",
-    "BTagCSV": "data_fh",
-}
+xsec[("stop_tW", "13TeV")] = 35.6
+xsec[("stop_tbarW", "13TeV")] = 35.6
+xsec[("stop_t", "13TeV")] = 45.34
+xsec[("stop_tbar", "13TeV")] = 26.98 
+xsec[("stop_s", "13TeV")] = 3.44
 
-#Numeric keys for processes, used for filling the process axis
-#in the sparse histogram
-PROCESS_MAP = {
-    "ttH_hbb": 0,
-    "ttH_nonhbb": 1,
-    "ttbarPlusBBbar": 2,
-    "ttbarPlus2B": 3,
-    "ttbarPlusB": 4,
-    "ttbarPlusCCbar": 5,
-    "ttbarOther": 6,
-    "qcd": 13,
-    
-    "ww": 14,
-    "wz": 15,
-    "zz": 16,
-    
-    "st_t": 17,
-    "stbar_t": 18,
-    "st_tw": 19,
-    "stbar_tw": 20,
-    "st_s": 21,
-
-    "ttw_wqq": 22,
-    "ttz_zqq": 23,
-    "ttw_wlnu": 24,
-    "ttjetsUnsplit": 25,
-    "wjets_ht_100_200": 26,
-    "wjets_ht_200_400": 27,
-    "wjets_ht_400_600": 28,
-    "wjets_ht_600_800": 29,
-    "wjets_ht_600_800": 30,
-    "wjets_ht_800_1200": 31,
-    "wjets_ht_1200_2500": 32,
-    "wjets_ht_2500_inf": 33,
-
-    "ttbar_dl": 34,
-    "dy_10_50": 35,
-    "dy_50_inf": 36,
-
-#need to keep different data samples separate at this point
-    "data_e": 7,
-    "data_m": 8,
-    "data_mm": 9,
-    "data_ee": 10,
-    "data_em": 11,
-    "data_fh": 12,
-}
-
+#used to assign a number that you can cut on to events in different trigger paths
 TRIGGERPATH_MAP = {
     "m": 1,
     "e": 2,
@@ -147,12 +62,6 @@ TRIGGERPATH_MAP = {
     "ee": 5,
     "fh": 6,
 }
-
-xsec[("stop_tW", "13TeV")] = 35.6
-xsec[("stop_tbarW", "13TeV")] = 35.6
-xsec[("stop_t", "13TeV")] = 45.34
-xsec[("stop_tbar", "13TeV")] = 26.98 
-xsec[("stop_s", "13TeV")] = 3.44
 
 #Configure the site-specific file path
 hn = os.environ.get("HOSTNAME", "")
