@@ -84,3 +84,31 @@ test_MEAnalysis_DoubleMuon:
     paths:
       - MEAnalysis_DoubleMuon.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_sparsinator:
+  stage: test
+  script:
+    - cd $CMSSW_BASE
+    - tar -xzf $CI_HOME/cmssw.tgz
+    - cd src
+    - scram b python
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/Plotting/python/sparsinator.py | tee -i sparsinator.txt
+  artifacts:
+    paths:
+      - sparsinator.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_vhbb:
+  stage: test
+  script:
+    - cd $CMSSW_BASE
+    - tar -xzf $CI_HOME/cmssw.tgz
+    - cd src
+    - scram b python
+    - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
+    - python vhbb_combined.py | tee -i vhbb.txt
+  artifacts:
+    paths:
+      - vhbb.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
