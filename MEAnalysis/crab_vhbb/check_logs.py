@@ -4,9 +4,9 @@ import subprocess
 from ROOT import TH1F, TCanvas, TFile, TObject
 
 sample = "ttHbb"
-copy = 0
-extract = 0
-analyse = 1
+copy = 1
+extract = 1
+analyse = 0
 
 se = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/dsalerno"
 lsprefix = "xrdfs storage01.lcg.cscs.ch ls -ltr -u /pnfs/lcg.cscs.ch/cms/trivcat/store/user/dsalerno/"
@@ -28,10 +28,10 @@ path = {
     "QCD1500":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194746",
     "QCD2000":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194905",
     "TTbar":"tth/JoosepFeb_test3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/JoosepFeb_test3/170315_103441",
-    "ttHbb":"tth/JoosepFeb_test4/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/JoosepFeb_test4/170315_161744",
+    "ttHbb":"tth/JoosepFeb_2python_test1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/JoosepFeb_2python_test1/170316_152719",
 }
 
-endpath = "/scratch/dsalerno/tth/80x_M17/crab_JoosepFeb_test4/" #CHOOSE HERE!!
+endpath = "/scratch/dsalerno/tth/80x_M17/crab_JoosepFeb_2python_test1/" #CHOOSE HERE!!
 destination = endpath+sample
 
 if( copy ):
