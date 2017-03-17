@@ -128,7 +128,7 @@ for sd in sets_data:
     datasets[name] = {
         "ds": sd,
         "maxlumis": -1,
-        "perjob": 10, #each lumisection is 200 MC events
+        "perjob": 10,
         "runtime": 10, #hours
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'
@@ -153,6 +153,60 @@ datasets.update({
 
     'TTbar_inc': {
         "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'TTbar_isr_up': {
+        "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'TTbar_isr_down1': {
+        "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+
+    'TTbar_isr_down2': {
+        "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'TTbar_fsr_up1': {
+        "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'TTbar_fsr_up2': {
+        "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'TTbar_fsr_down': {
+        "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-fsrdown-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 50,
         "runtime": 20,
@@ -476,20 +530,26 @@ for k in [
         #"ttHTobb",
         #"ttHToNonbb",
         #"TTbar_inc",
-        "TTbar_sl",
-        "TTbar_dl",
-        "ww1", "ww2",
-        "wz1", "wz2",
-        "zz1", "zz2",
-        "st_t", "stbar_t",
-        "st_tw", "stbar_tw",
-        "st_s",
-        "ttw_wlnu1",
-        "ttw_wlnu2",
-        "ttz_zllnunu1",
-        "ttz_zllnunu2",
-        "ttw_wqq",
-        "ttz_zqq",
+        "TTbar_isr_up",
+        "TTbar_isr_down1",
+        "TTbar_isr_down2",
+        "TTbar_fsr_up1",
+        "TTbar_fsr_up2",
+        "TTbar_fsr_down",
+        #"TTbar_sl",
+        #"TTbar_dl",
+        #"ww1", "ww2",
+        #"wz1", "wz2",
+        #"zz1", "zz2",
+        #"st_t", "stbar_t",
+        #"st_tw", "stbar_tw",
+        #"st_s",
+        #"ttw_wlnu1",
+        #"ttw_wlnu2",
+        #"ttz_zllnunu1",
+        #"ttz_zllnunu2",
+        #"ttw_wqq",
+        #"ttz_zqq",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -597,8 +657,8 @@ for k in [
     D["maxlumis"] = 50
     D["perjob"] = 10
     if "data" in D["script"]:
-        D["maxlumis"] = 500
-        D["perjob"] = 100
+        D["maxlumis"] = 50
+        D["perjob"] = 5
     D["runtime"] = 5
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D

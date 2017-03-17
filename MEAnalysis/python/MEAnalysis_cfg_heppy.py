@@ -201,7 +201,7 @@ class Conf:
         "btagWP": "CSVM",
 
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
-        #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
+        #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
         "btagWPs": {
             "CSVL": ("btagCSV", 0.5426),
             "CSVM": ("btagCSV", 0.8484),
