@@ -553,6 +553,10 @@ workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
     if "QCD" in k or "ttH" in k or "TTbar_inc" in k:
         D = deepcopy(datasets[k])
+	if k == "ttHTobb":
+	    D["perjob"] = 4 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
+	elif k == "TTbar_inc":
+	    D["perjob"] = 52 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
         D["mem_cfg"] = me_cfgs["hadronic"]
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
@@ -634,14 +638,14 @@ for k in ["ttHTobb", "TTbar_inc"]:
     workflow_datasets["testing_withme"][k] = D
 
 workflow_datasets["testing_hadronic_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
+for k in ["JetHT-Run2016D-23Sep2016-v1"]: #"ttHTobb"]: #, "TTbar_inc"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
     if k == "ttHTobb":
-	D["perjob"] = 2
+	D["perjob"] = 4 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
     else:
-	D["perjob"] = 20
+	D["perjob"] = 10 #52 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
     D["maxlumis"] = 10 * D["perjob"]
-    D["runtime"] = 40
+    D["runtime"] = 20
     D["mem_cfg"] = me_cfgs["hadronic"]
     workflow_datasets["testing_hadronic_withme"][k] = D
 
@@ -706,7 +710,7 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 3000
+    config.JobType.maxMemoryMB = 3000 #DS
     config.JobType.outputFiles = ["dump.txt"]
 
     import os
