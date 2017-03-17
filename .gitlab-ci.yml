@@ -91,5 +91,5 @@ test_MEAnalysis_TTbar_FH:
     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8.txt
   artifacts:
     paths:
-      - MEAnalysis_DoubleMuon.txt
+      - MEAnalysis_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
