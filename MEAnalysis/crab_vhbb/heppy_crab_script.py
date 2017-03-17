@@ -8,6 +8,8 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
+elif "--local" in sys.argv:
+    import PSet_local as PSet
 
 import copy
 import json
