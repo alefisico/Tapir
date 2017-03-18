@@ -63,6 +63,6 @@ Conf.general["verbosity"] = [
             #"commonclassifier",
        ]
 
-#Conf.general["systematics"] = ["nominal"]
+Conf.general["systematics"] = ["nominal"]
 Conf.general["transferFunctionsPickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle"
 Conf.general["transferFunctions_sj_Pickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle"
