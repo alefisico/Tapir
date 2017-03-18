@@ -36,7 +36,7 @@ compile:
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram b
     - cd $CMSSW_BASE
-    - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\|gc\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
+    - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\|gc\|test\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
   artifacts:
     paths:
       - cmssw.tgz
@@ -93,7 +93,7 @@ test_sparsinator:
     - cd src
     - scram b python
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/Plotting/python/sparsinator.py | tee -i sparsinator.txt
+    - python $CMSSW_BASE/src/TTH/Plotting/python/joosep/sparsinator.py | tee -i sparsinator.txt
   artifacts:
     paths:
       - sparsinator.txt
