@@ -131,7 +131,7 @@ for sd in sets_data:
         "perjob": 10, #each lumisection is 200 MC events
         "runtime": 10, #hours
         "mem_cfg": me_cfgs["nome"],
-        "script": 'heppy_crab_script_data.sh'
+        "script": 'DS_heppy_crab_script_data.sh'
     }
 datasets.update({
     'ttHTobb': {
@@ -148,7 +148,7 @@ datasets.update({
         "perjob": 20,
         "runtime": 10,
         "mem_cfg": me_cfgs["default"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
 
     'TTbar_inc': {
@@ -157,7 +157,7 @@ datasets.update({
         "perjob": 50,
         "runtime": 20,
         "mem_cfg": me_cfgs["default"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
 
     'TTbar_sl': {
@@ -166,7 +166,7 @@ datasets.update({
         "perjob": 150,
         "runtime": 20,
         "mem_cfg": me_cfgs["leptonic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     
     'TTbar_dl': {
@@ -175,7 +175,7 @@ datasets.update({
         "perjob": 150,
         "runtime": 20,
         "mem_cfg": me_cfgs["leptonic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     
    'ww1': {
@@ -184,7 +184,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'ww2': {
        "ds": '/WW_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
@@ -192,7 +192,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'wz1': {
        "ds": '/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -200,7 +200,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'wz2': {
        "ds": '/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
@@ -208,7 +208,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'zz1': {
        "ds": '/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -216,7 +216,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'zz2': {
        "ds": '/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
@@ -224,7 +224,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'ttw_wlnu1': {
        "ds": '/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM',
@@ -232,7 +232,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'ttw_wlnu2': {
        "ds": '/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v3/MINIAODSIM',
@@ -240,7 +240,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'ttw_wqq': {
        "ds": '/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -248,7 +248,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'ttz_zllnunu1': {
        "ds": '/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
@@ -256,7 +256,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'ttz_zllnunu2': {
        "ds": '/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM',
@@ -264,7 +264,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'ttz_zqq': {
        "ds": '/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -272,7 +272,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    
    # 'wjets_ht_100_200': {
@@ -281,7 +281,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
    # 
    # 'wjets_ht_200_400': {
@@ -290,7 +290,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
    # 'wjets_ht_400_600': {
    #     "ds": '/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
@@ -298,7 +298,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
    # 'wjets_ht_600_800': {
    #     "ds": '/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
@@ -306,7 +306,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
    # 
    # 'wjets_ht_800_1200': {
@@ -315,7 +315,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
    # 'wjets_ht_1200_2500': {
    #     "ds": '/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
@@ -323,7 +323,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
 
 
@@ -333,7 +333,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
 
    # 'dy_10_50': {
@@ -342,7 +342,7 @@ datasets.update({
    #     "perjob": 20,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
    # 'dy_50_inf': {
    #     "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/MINIAODSIM',
@@ -350,7 +350,7 @@ datasets.update({
    #     "perjob": 40,
    #     "runtime": 10,
    #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
+   #     "script": 'DS_heppy_crab_script.sh'
    # },
    # 
    'st_t': {
@@ -359,7 +359,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'stbar_t': {
        "ds": '/ST_t-channel_antitop_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -367,7 +367,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'st_tw': {
        "ds": '/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -375,7 +375,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'stbar_tw': {
        "ds": '/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -383,7 +383,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
    'st_s': {
        "ds": '/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -391,7 +391,7 @@ datasets.update({
        "perjob": 20,
        "runtime": 10,
        "mem_cfg": me_cfgs["leptonic"],
-       "script": 'heppy_crab_script.sh'
+       "script": 'DS_heppy_crab_script.sh'
    },
 
 
@@ -401,7 +401,7 @@ datasets.update({
         "perjob": 500,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD300_ext1': {
         "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
@@ -409,7 +409,7 @@ datasets.update({
         "perjob": 500,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD500': {
         "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
@@ -417,7 +417,7 @@ datasets.update({
         "perjob": 500,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD500_ext1': {
         "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
@@ -425,7 +425,7 @@ datasets.update({
         "perjob": 500,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD700': {
         "ds": '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
@@ -433,7 +433,7 @@ datasets.update({
         "perjob": 300,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD700_ext1': {
         "ds": '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
@@ -441,7 +441,7 @@ datasets.update({
         "perjob": 300,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD1000': {
         "ds": '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
@@ -449,7 +449,7 @@ datasets.update({
         "perjob": 200,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD1500': {
         "ds": '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
@@ -457,7 +457,7 @@ datasets.update({
         "perjob": 100,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     'QCD2000': {
         "ds": '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
@@ -465,7 +465,7 @@ datasets.update({
         "perjob": 100,
         "runtime": 40,
         "mem_cfg": me_cfgs["hadronic"],
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
 })
 
@@ -607,12 +607,12 @@ datasets_local = {
     "mc": {
         "mem_cfg": me_cfgs["nome"],
 
-        "script": 'heppy_crab_script.sh'
+        "script": 'DS_heppy_crab_script.sh'
     },
     "data": {
         "maxlumis": -1,
         "mem_cfg": me_cfgs["nome"],
-        "script": 'heppy_crab_script_data.sh'
+        "script": 'DS_heppy_crab_script_data.sh'
     }
 }
 
@@ -638,7 +638,7 @@ for k in ["ttHTobb", "TTbar_inc"]:
     workflow_datasets["testing_withme"][k] = D
 
 workflow_datasets["testing_hadronic_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
+for k in ["TTbar_inc"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
     if k == "ttHTobb":
 	D["perjob"] = 2 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
