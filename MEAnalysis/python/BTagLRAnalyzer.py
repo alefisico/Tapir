@@ -174,6 +174,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         for i in range(len(event.good_jets)):
             event.good_jets[i].btagFlag = 0.0
 
+        event.fh_region = -99 #DS QCD estimation region
         #Jets are untagged according to the b-tagging likelihood ratio permutation
         if self.conf.jets["untaggedSelection"] == "btagLR":
             if "debug" in self.conf.general["verbosity"]:
@@ -182,25 +183,33 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
-                    print "BTagLRAna: considered 4b SR event" #DS temp
+                    event.fh_region = 0
+                    if event.systematic == "nominal":
+                        print "BTagLRAna: considered 4b SR event" #DS temp
                 elif (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
-                    print "BTagLRAna: considered 3b SR event" #DS temp
-                elif not self.cfg_comp.isMC and (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and
-                                                 event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+                    event.fh_region = 1
+                    if event.systematic == "nominal":
+                        print "BTagLRAna: considered 3b SR event" #DS temp
+                elif (not self.cfg_comp.isMC or "TT" in self.cfg_comp.name ) and (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
-                    print "BTagLRAna: considered 4b CR event" #DS temp
-                elif not self.cfg_comp.isMC and (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and
-                                                 event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+                    event.fh_region = 2
+                    if event.systematic == "nominal":
+                        print "BTagLRAna: considered 4b CR event" #DS temp
+                elif (not self.cfg_comp.isMC or "TT" in self.cfg_comp.name ) and (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
-                    print "BTagLRAna: considered 3b CR event" #DS temp
+                    event.fh_region = 3
+                    if event.systematic == "nominal":
+                        print "BTagLRAna: considered 3b CR event" #DS temp
                 else: #event considered 2b event (2bs in random order)
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b[:2]
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b + event.btagged_jets_maxLikelihood_3b[2:]
-                    print "BTagLRAna: considered 2b event" #DS temp
+                    event.fh_region = 4
+                    if event.systematic == "nominal":
+                        print "BTagLRAna: considered 2b event" #DS temp
             else:
                 event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
                 event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b

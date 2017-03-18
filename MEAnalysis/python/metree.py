@@ -565,6 +565,7 @@ def getTreeProducer(conf):
             ("cat",                 int,        "ME category", "catn"),
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
             ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
+            ("fh_region",           int,        "FH region for QCD estimation"), #DS
             #("btag_lr_4b",          float,      "4b, N-4 light, probability, 3D binning"),
             #("btag_lr_3b",          float,      "3b, N-3 light, probability, 3D binning"),
             #("btag_lr_2b",          float,      "2b, N-2 Nlight probability, 3D binning"),

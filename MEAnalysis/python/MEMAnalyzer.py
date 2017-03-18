@@ -75,7 +75,7 @@ class MECategoryAnalyzer(FilterAnalyzer):
             len(event.selected_btagged_jets_high) >= 4
         )
         
-        if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh: #DS
+        if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh and event.systematic == "nominal": #DS
             print "event considered:",
             if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
                 print "4b_SR",
@@ -386,9 +386,10 @@ class MEAnalyzer(FilterAnalyzer):
                         event.input.run, event.input.lumi, event.input.evt,
                         event.category_string, event.btag_LR_4b_2b, event.btag_LR_3b_2b
                     ))
-                    autolog("Integrator conf: b={0} l={1}".format(
+                    autolog("Integrator conf: b={0} l={1} syst={2}".format(
                         len(mem_cfg.b_quark_candidates(event)),
-                        len(mem_cfg.l_quark_candidates(event))
+                        len(mem_cfg.l_quark_candidates(event)),
+                        event.systematic
                     ))
                     self.configure_mem(event, mem_cfg)
                     if self.conf.mem["calcME"]:
