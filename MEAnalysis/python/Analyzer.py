@@ -76,14 +76,15 @@ class CounterAnalyzer(FilterAnalyzer):
     
     def process(self, event):
         #super(CounterAnalyzer, self).process(event)
-        passes = False
-        try:
-            if( LHE_weights_pdf.make_array(event.input) ):
-                self.chist.Fill(0)
-                passes = True
-        except:
-            print "event in tree not accessible"
-        return passes
+        self.chist.Fill(0)
+        # passes = False #DS FIXME: put some meaningful check that works for data and MC
+        # try:
+        #     if( LHE_weights_pdf.make_array(event.input) ):
+        #         self.chist.Fill(0)
+        #         passes = True
+        # except:
+        #     print "event in tree not accessible"
+        # return passes
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
     """

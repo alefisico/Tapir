@@ -309,7 +309,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     comp = comp_cls(
         sample_name,
         files = files,
-        tree_name = vhbb_tree_name,
+        tree_name = vhbb_tree_name, #DS requires change to ../../PhysicsTools/HeppyCore/python/framework/config.py
     )
 
     #from PhysicsTools.HeppyCore.framework.chain import Chain
