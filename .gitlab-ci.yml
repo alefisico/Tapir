@@ -38,7 +38,7 @@ compile:
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
     expire_in: 10 minutes
 
-test_MEAnalysis_ttH:
+test_MEAnalysis_ttH_FH:
   stage: test
   script:
     - cd $CMSSW_BASE
@@ -46,36 +46,50 @@ test_MEAnalysis_ttH:
     - cd src
     - scram b python
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb*" | tee -i MEAnalysis_ttH.txt
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy_FH.py --sample "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --file "$CMSSW_BASE/src/TTH/MEAnalysis/test/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8_128.root" | tee -i MEAnalysis_ttH.txt
   artifacts:
     paths:
-      - MEAnalysis_ttH.txt
+      - MEAnalysis_ttH_FH.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
-test_MEAnalysis_ttjets:
-  stage: test
-  script:
-    - cd $CMSSW_BASE
-    - tar -xzf $CI_HOME/cmssw.tgz
-    - cd src
-    - scram b python
-    - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
-  artifacts:
-    paths:
-      - MEAnalysis_ttjets.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+# test_MEAnalysis_ttH:
+#   stage: test
+#   script:
+#     - cd $CMSSW_BASE
+#     - tar -xzf $CI_HOME/cmssw.tgz
+#     - cd src
+#     - scram b python
+#     - cd $CI_HOME
+#     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb*" | tee -i MEAnalysis_ttH.txt
+#   artifacts:
+#     paths:
+#       - MEAnalysis_ttH.txt
+#     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
-test_MEAnalysis_DoubleMuon:
-  stage: test
-  script:
-    - cd $CMSSW_BASE
-    - tar -xzf $CI_HOME/cmssw.tgz
-    - cd src
-    - scram b python
-    - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "DoubleMuon" | tee -i MEAnalysis_DoubleMuon.txt
-  artifacts:
-    paths:
-      - MEAnalysis_DoubleMuon.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+# test_MEAnalysis_ttjets:
+#   stage: test
+#   script:
+#     - cd $CMSSW_BASE
+#     - tar -xzf $CI_HOME/cmssw.tgz
+#     - cd src
+#     - scram b python
+#     - cd $CI_HOME
+#     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
+#   artifacts:
+#     paths:
+#       - MEAnalysis_ttjets.txt
+#     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+# test_MEAnalysis_DoubleMuon:
+#   stage: test
+#   script:
+#     - cd $CMSSW_BASE
+#     - tar -xzf $CI_HOME/cmssw.tgz
+#     - cd src
+#     - scram b python
+#     - cd $CI_HOME
+#     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "DoubleMuon" | tee -i MEAnalysis_DoubleMuon.txt
+#   artifacts:
+#     paths:
+#       - MEAnalysis_DoubleMuon.txt
+#     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
