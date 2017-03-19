@@ -320,7 +320,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True, #DS
         "n_integration_points_mult": 1.0,
         "factorized_sources": factorizedJetCorrections,
         #compute MEM variations for these sources in the nominal case
@@ -328,8 +328,8 @@ class Conf:
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            "TotalUp",
-            "TotalDown",
+            #"TotalUp", #DS
+            #"TotalDown",
         ],
 
         "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)

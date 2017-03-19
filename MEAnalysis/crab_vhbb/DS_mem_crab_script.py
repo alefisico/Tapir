@@ -132,6 +132,12 @@ if not "--nostep2" in args:
     )
     dumpfile.write(conf_to_str(mem_python_conf))
     dumpfile.write("\n")
+    tfm = ROOT.TFile("Output_tth/tree.root") #DS print events
+    if not tfm or tfm.IsZombie():
+        raise Exception("Error occurred in processing step2")
+    ttm = tfm.Get("tree")
+    print "step2 tree={0}".format(ttm.GetEntries())
+    tfm.Close()
     print "timeto_doMEM ",(time.time()-t0)
 
 #Now we need to copy both the vhbb and tth outputs to the same file

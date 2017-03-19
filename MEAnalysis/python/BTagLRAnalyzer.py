@@ -192,13 +192,14 @@ class BTagLRAnalyzer(FilterAnalyzer):
                     event.fh_region = 1
                     if event.systematic == "nominal":
                         print "BTagLRAna: considered 3b SR event" #DS temp
-                elif (not self.cfg_comp.isMC or "TT" in self.cfg_comp.name ) and (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+#DS FIXME - allow TTbar MC to have CRs...                        or "TT" in self.cfg_comp.name
+                elif (not self.cfg_comp.isMC or 0 ) and (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
                     event.fh_region = 2
                     if event.systematic == "nominal":
                         print "BTagLRAna: considered 4b CR event" #DS temp
-                elif (not self.cfg_comp.isMC or "TT" in self.cfg_comp.name ) and (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+                elif (not self.cfg_comp.isMC or 0 ) and (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
                     event.fh_region = 3

@@ -3,7 +3,7 @@ import os
 import subprocess
 from ROOT import TH1F, TCanvas, TFile, TObject
 
-sample = "ttHbb"
+sample = "JetHT"
 copy = 1
 extract = 1
 analyse = 0
@@ -11,16 +11,6 @@ analyse = 0
 se = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/dsalerno"
 lsprefix = "xrdfs storage01.lcg.cscs.ch ls -ltr -u /pnfs/lcg.cscs.ch/cms/trivcat/store/user/dsalerno/"
 path = {
-    # "QCD300":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_193325",
-    # "QCD500":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_194135",
-    # "QCD700":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_193622",
-    # "QCD1000":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_193740",
-    # "QCD1500":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_194255",
-    # "QCD2000":"tth/VHBBHeppyV21_tthbbV9_v3/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v3/160514_193858",
-    # "TTbar":"tth/VHBBHeppyV21_tthbbV9_v3_2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/VHBBHeppyV21_tthbbV9_v3_2/160515_085747",
-    # "ttHbb":"tth/VHBBHeppyV21_tthbbV9_v3_3/ttHTobb_M125_13TeV_powheg_pythia8/VHBBHeppyV21_tthbbV9_v3_3/160518_110721",
-    # "ttHNon":"tth/VHBBHeppyV21_tthbbV9_v3_3/ttHToNonbb_M125_13TeV_powheg_pythia8/VHBBHeppyV21_tthbbV9_v3_3/160518_110839",
-
     "QCD300":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194235",
     "QCD500":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194354",
     "QCD700":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194510",
@@ -29,9 +19,11 @@ path = {
     "QCD2000":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194905",
     "TTbar":"tth/JoosepFeb_test3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/JoosepFeb_test3/170315_103441",
     "ttHbb":"tth/JoosepFeb_2python_test1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/JoosepFeb_2python_test1/170316_152719",
+    #"JetHT":"tth/JoosepFeb_data_syst_test5/JetHT/JoosepFeb_data_syst_test5/170318_065324",
+    "JetHT":"tth/JoosepFeb_2python_nosyst_test8/JetHT/JoosepFeb_2python_nosyst_test8/170318_113451",
 }
 
-endpath = "/scratch/dsalerno/tth/80x_M17/crab_JoosepFeb_2python_test1/" #CHOOSE HERE!!
+endpath = "/scratch/dsalerno/tth/80x_M17/crab_JoosepFeb_2python_nosyst_test8/" #CHOOSE HERE!!
 destination = endpath+sample
 
 if( copy ):
