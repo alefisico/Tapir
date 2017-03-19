@@ -59,7 +59,7 @@ class BufferedTree:
     """
     def __init__(self, tree):
         self.tree = tree
-        self.tree.SetCacheSize(1*1024*1024)
+        self.tree.SetCacheSize(10*1024*1024)
         self.branches = {}
         for br in self.tree.GetListOfBranches():
             self.branches[br.GetName()] = br
@@ -621,7 +621,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 tf.Close()
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
-        tf = ROOT.TFile.Open(file_name)
+        try:
+            tf = ROOT.TFile.Open(file_name)
+        except Exception as e:
+            LOG_MODULE_NAME.error("error opening file {0} {1}".format(file_name, e))
+            continue
         events = BufferedTree(tf.Get("tree"))
         LOG_MODULE_NAME.info("looping over {0} events".format(events.GetEntries()))
        
@@ -743,11 +747,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc":
                     for (syst_weight, weightfunc) in systematic_weights:
-                        weight = 1.0 
-                        if schema == "mc":
-                            weight = weightfunc(ret) * proc.xs_weight
                         for proc in matched_processes:
                             for (k, v) in proc.outdict_syst[syst_weight].items():
+                                weight = 1.0
+                                if schema == "mc":
+                                    weight = weightfunc(ret) * proc.xs_weight
                                 if v.cut(ret):
                                     v.fill(ret, weight)
 
@@ -801,6 +805,18 @@ if __name__ == "__main__":
         skip_events = 0
         max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        file_names = analysis.get_sample(sample).file_names
-        print(file_names)
+        fns = [
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_1.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_10.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_101.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_102.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_103.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_104.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_105.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_106.root",
+            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_107.root",
+        ]
+        #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + f for f in fns]
+        file_names = ["root://t3dcachedb03.psi.ch/pnfs/psi.ch/cms/trivcat" + f for f in fns]
+
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
