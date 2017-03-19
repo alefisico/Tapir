@@ -46,7 +46,7 @@ test_MEAnalysis_ttH_FH:
     - cd src
     - scram b python
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy_FH.py --sample "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --file "$CMSSW_BASE/src/TTH/MEAnalysis/test/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8_128.root" | tee -i MEAnalysis_ttH.txt
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy_FH.py --sample "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --file "$CMSSW_BASE/src/TTH/MEAnalysis/data/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8_128.root" | tee -i MEAnalysis_ttH.txt
   artifacts:
     paths:
       - MEAnalysis_ttH_FH.txt
