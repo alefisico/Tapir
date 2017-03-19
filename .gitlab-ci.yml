@@ -12,6 +12,7 @@ before_script:
   - export SCRAM_ARCH="slc6_amd64_gcc530"
   - export CMSSW_VERSION="CMSSW_8_0_25"
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
+  - source /cvmfs/grid.cern.ch/emi-ui-3.15.3-1_sl6v1/etc/profile.d/setup-ui-example.sh
   - cd ..
   - scramv1 project CMSSW $CMSSW_VERSION
   - cd $CMSSW_VERSION/src
@@ -19,6 +20,10 @@ before_script:
   - source $CI_HOME/setenv_sklearn_cmssw.sh
   - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
   - cd $CI_HOME
+  - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
+  - scp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIDelegateCredentials=yes -o GSSAPITrustDNS=yes -o GSSAPIAuthentication=yes -o ControlMaster=auto -o ControlPath=/tmp/%%r@%%h:%%p -o ControlPersist=1 ${KRB_USERNAME}@lxplus:~/x509 $CI_HOME/x509
+  - export X509_USER_PROXY=$CI_HOME/x509
+  - voms-proxy-info --all
 
 compile:
   stage: compile
@@ -31,7 +36,7 @@ compile:
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram b
     - cd $CMSSW_BASE
-    - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\|gc\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
+    - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\|gc\|test\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
   artifacts:
     paths:
       - cmssw.tgz
@@ -78,4 +83,32 @@ test_MEAnalysis_DoubleMuon:
   artifacts:
     paths:
       - MEAnalysis_DoubleMuon.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_sparsinator:
+  stage: test
+  script:
+    - cd $CMSSW_BASE
+    - tar -xzf $CI_HOME/cmssw.tgz
+    - cd src
+    - scram b python
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/Plotting/python/joosep/sparsinator.py | tee -i sparsinator.txt
+  artifacts:
+    paths:
+      - sparsinator.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_vhbb:
+  stage: test
+  script:
+    - cd $CMSSW_BASE
+    - tar -xzf $CI_HOME/cmssw.tgz
+    - cd src
+    - scram b python
+    - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
+    - python vhbb_combined.py | tee -i vhbb.txt
+  artifacts:
+    paths:
+      - vhbb.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
