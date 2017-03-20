@@ -1,4 +1,4 @@
-import ROOT
+aimport ROOT
 import sys
 from TTH.MEAnalysis.samples_base import getSitePrefix
 
@@ -28,16 +28,18 @@ tt.SetBranchStatus("run", True)
 tt.SetBranchStatus("lumi", True)
 tt.SetBranchStatus("evt", True)
 tt.SetBranchStatus("cat", True)
-#tt.SetBranchStatus("ht", True)
-#tt.SetBranchStatus("isotropy", True)
-#tt.SetBranchStatus("sphericity", True)
-#tt.SetBranchStatus("C", True)
-#tt.SetBranchStatus("D", True)
-#tt.SetBranchStatus("aplanarity", True)
-tt.SetBranchStatus("leps_*", True)
+tt.SetBranchStatus("isotropy", True)
+tt.SetBranchStatus("sphericity", True)
+tt.SetBranchStatus("C", True)
+tt.SetBranchStatus("D", True)
+tt.SetBranchStatus("aplanarity", True)
+#tt.SetBranchStatus("leps_*", True)
 tt.SetBranchStatus("jets_*", True)
-#tt.SetBranchStatus("HLT_ttH*", True)
-tt.SetBranchStatus("HLT_*", True)
+tt.SetBranchStatus("HLT_ttH*", True)
+tt.SetBranchStatus("HLT_BIT_HLT*SixJet*", True)
+tt.SetBranchStatus("HLT_BIT_HLT_Iso*", True)
+tt.SetBranchStatus("HLT_BIT_HLT_Ele*", True)
+#tt.SetBranchStatus("HLT_*", True)
 tt.SetBranchStatus("trigger*", True)
 tt.SetBranchStatus("tr*", True)
 tt.SetBranchStatus("l1*", True)
