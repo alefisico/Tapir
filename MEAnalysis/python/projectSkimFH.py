@@ -1,4 +1,4 @@
-aimport ROOT
+import ROOT
 import sys
 from TTH.MEAnalysis.samples_base import getSitePrefix
 
