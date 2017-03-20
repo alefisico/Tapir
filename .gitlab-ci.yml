@@ -21,7 +21,7 @@ before_script:
   - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
   - cd $CI_HOME
   - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
-  - scp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIDelegateCredentials=yes -o GSSAPITrustDNS=yes -o GSSAPIAuthentication=yes -o ControlMaster=auto -o ControlPath=/tmp/%%r@%%h:%%p -o ControlPersist=1 ${KRB_USERNAME}@lxplus:~/x509 $CI_HOME/x509
+  - scp -vvvv -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIDelegateCredentials=yes -o GSSAPITrustDNS=yes -o GSSAPIAuthentication=yes -o ControlMaster=auto -o ControlPath=/tmp/%%r@%%h:%%p -o ControlPersist=1 ${KRB_USERNAME}@lxplus:~/x509 $CI_HOME/x509
   - export X509_USER_PROXY=$CI_HOME/x509
   - voms-proxy-info --all
 

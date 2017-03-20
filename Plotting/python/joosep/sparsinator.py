@@ -805,18 +805,6 @@ if __name__ == "__main__":
         skip_events = 0
         max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        fns = [
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_1.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_10.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_101.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_102.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_103.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_104.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_105.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_106.root",
-            "/store/user/jpata/tth/Mar3_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Mar3_v1/170303_085214/0000/tree_107.root",
-        ]
-        #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat" + f for f in fns]
-        file_names = ["root://t3dcachedb03.psi.ch/pnfs/psi.ch/cms/trivcat" + f for f in fns]
+        file_names = analysis.get_sample(sample).file_names
 
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
