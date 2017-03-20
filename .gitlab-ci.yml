@@ -43,7 +43,7 @@ compile:
     paths:
       - cmssw.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-    expire_in: 10 minutes
+    expire_in: 90 minutes
 
 test_MEAnalysis_ttH:
   stage: test
