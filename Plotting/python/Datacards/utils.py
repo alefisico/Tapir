@@ -9,7 +9,16 @@ import sparse
 
 def PrintDatacard(categories, event_counts, filenames, dcof):
     number_of_bins = len(categories)
-    number_of_backgrounds = len(list(set(reduce(lambda x,y:x+y, [c.out_processes for c in categories], [])))) - 1
+    number_of_backgrounds = 0
+    backgrounds = []
+    #FIXME: check what happens with ttH_nonhbb
+    for cat in categories:
+        for proc in cat.out_processes:
+            if proc == "data":
+                continue
+            backgrounds += [proc]
+    backgrounds = set(backgrounds)
+    number_of_backgrounds = len(backgrounds) - 1
     analysis_categories = list(set([c.full_name for c in categories]))
 
 
@@ -40,6 +49,8 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
 
     for cat in categories:
         for i_sample, sample in enumerate(cat.out_processes):
+            if sample == "data":
+                continue
             bins.append(cat.full_name)
             processes_0.append(sample)
             if sample in cat.signal_processes:
