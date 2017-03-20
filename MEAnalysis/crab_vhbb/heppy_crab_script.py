@@ -8,8 +8,6 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
-elif "--local" in sys.argv:
-    import PSet_local as PSet
 
 import copy
 import json
@@ -40,13 +38,18 @@ def getLumisProcessed(vlumiblock):
         lumidict[run] += [i for i in range(lumi1, lumi2 + 1)]
     return lumidict
 
-dumpfile = open("dump.txt", "w")
+dumpfile = open("dump.txt", "w") #DS new file here
 
 dumpfile.write(PSet.process.dumpPython())
 dumpfile.write("\n")
 
 t0 = time.time()
 print "ARGV:",sys.argv
+
+me_conf_name = "MEAnalysis_cfg_heppy.py"
+for arg in sys.argv:
+    if arg.startswith("ME_CONF="):
+        me_conf_name = arg.split("=")[1]
 
 crabFiles=PSet.process.source.fileNames
 crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
@@ -113,23 +116,14 @@ if not "--nostep1" in args:
 ###
 ### tthbb13 code
 ###
-if not "--nostep2" in args:
+if 0: #DS don't do mem here
     print "Running tth code"
     
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-    if "AN_CFG" in os.environ and os.environ["AN_CFG"]:
-        an = analysisFromConfig(os.environ["AN_CFG"])
-    else:
-        an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        me_conf_name = "MEAnalysis_cfg_heppy.py"
-        for arg in sys.argv:
-            if arg.startswith("ME_CONF="):
-                me_conf_name = arg.split("=")[1]
-                an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
-    
-    print "I'm using ",an, " and ", an.mem_python_config
+    an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+    an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
     mem_python_conf = tth_main(
         an,
         schema="mc" if cfo.sample.isMC else "data",
@@ -140,11 +134,11 @@ if not "--nostep2" in args:
     dumpfile.write("\n")
     print "timeto_doMEM ",(time.time()-t0)
 
-#Now we need to copy both the vhbb and tth outputs to the same file
-inf1 = ROOT.TFile("Output/tree.root")
-inf2 = ROOT.TFile("Output_tth/tree.root")
-tof = ROOT.TFile("tree.root", "RECREATE")
-vhbb_dir = tof.mkdir("vhbb")
+#Now we need to copy both the vhbb and tth outputs to the same file #DS (WAIT!!! do it later)
+#inf1 = ROOT.TFile("Output/tree.root") #DS
+#inf2 = ROOT.TFile("Output_tth/tree.root")
+#tof = ROOT.TFile("tree.root", "RECREATE")
+#vhbb_dir = tof.mkdir("vhbb")
 def copyTo(src, dst, keys=[]):
     #copy ttjets output
     dst.cd()
@@ -160,9 +154,9 @@ def copyTo(src, dst, keys=[]):
         dst.Add(o)
         o.Write("", ROOT.TObject.kOverwrite)
 
-copyTo(inf1, vhbb_dir)
-copyTo(inf2, tof)
-tof.Close()
+#copyTo(inf1, vhbb_dir) #DS
+#copyTo(inf2, tof)
+#tof.Close()
 
 
 def getEntries(inf, tree):
@@ -172,8 +166,8 @@ def getEntries(inf, tree):
     tf.Close()
     return n
 
-assert(getEntries("Output/tree.root", "tree") == getEntries("tree.root", "vhbb/tree"))
-assert(getEntries("Output_tth/tree.root", "tree") == getEntries("tree.root", "tree"))
+#assert(getEntries("Output/tree.root", "tree") == getEntries("tree.root", "vhbb/tree")) #DS
+#assert(getEntries("Output_tth/tree.root", "tree") == getEntries("tree.root", "tree"))
 
 def getEventsLumisInFile(infile):
     from DataFormats.FWLite import Lumis, Handle, Events
@@ -242,9 +236,9 @@ def getFJR(lumidict, inputfiles_lfn, inputfiles_pfn, outputfile):
         """
         fwkreport += inf
     
-    output_entries = 0
-    tf = ROOT.TFile(outputfile)
-    output_entries = tf.Get("vhbb/tree").GetEntries()
+    #output_entries = 0
+    #tf = ROOT.TFile(outputfile)
+    #output_entries = tf.Get("vhbb/tree").GetEntries()
 
     fwkreport += """
     <File>
@@ -270,7 +264,7 @@ def getFJR(lumidict, inputfiles_lfn, inputfiles_pfn, outputfile):
     <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
     </File>
     
-    </FrameworkJobReport>""" % (output_entries)
+    </FrameworkJobReport>""" # % (output_entries)
     return fwkreport
 
 #Now write the FWKJobReport
@@ -279,4 +273,4 @@ report=open('./FrameworkJobReport.xml', 'w+')
 report.write(getFJR(lumidict, crabFiles, crabFiles_pfn, "tree.root"))
 report.close()
 print "timeto_totalJob ",(time.time()-t0)
-dumpfile.close()
+dumpfile.close() #DS need to reopen in append mode later
