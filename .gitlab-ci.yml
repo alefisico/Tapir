@@ -14,14 +14,16 @@ before_script:
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
   - source /cvmfs/grid.cern.ch/emi-ui-3.15.3-1_sl6v1/etc/profile.d/setup-ui-example.sh
   - cd ..
+  - rm -Rf $CMSSW_VERSION
   - scramv1 project CMSSW $CMSSW_VERSION
   - cd $CMSSW_VERSION/src
   - eval `scramv1 runtime -sh`
   - source $CI_HOME/setenv_sklearn_cmssw.sh
   - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
   - cd $CI_HOME
-  - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
-  - scp -vvvv -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIDelegateCredentials=yes -o GSSAPITrustDNS=yes -o GSSAPIAuthentication=yes -o ControlMaster=auto -o ControlPath=/tmp/%%r@%%h:%%p -o ControlPersist=1 ${KRB_USERNAME}@lxplus:~/x509 $CI_HOME/x509
+#  - echo "${KRB_PASSWORD}" | kinit ${KRB_USERNAME}@CERN.CH
+#  - scp -vvvv -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIDelegateCredentials=yes -o GSSAPITrustDNS=yes -o GSSAPIAuthentication=yes -o ControlMaster=auto -o ControlPath=/tmp/%%r@%%h:%%p -o ControlPersist=1 ${KRB_USERNAME}@lxplus:~/x509 $CI_HOME/x509
+  - scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${KRB_USERNAME}@lxplus:~/x509 $CI_HOME/x509
   - export X509_USER_PROXY=$CI_HOME/x509
   - voms-proxy-info --all
 
@@ -34,14 +36,14 @@ compile:
     - git cms-merge-topic -u jpata:vhbbHeppy80X_heppy_fixes_march14
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
-    - scram b
+    - scram b -j4
     - cd $CMSSW_BASE
     - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\|gc\|test\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
   artifacts:
     paths:
       - cmssw.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-    expire_in: 10 minutes
+    expire_in: 90 minutes
 
 test_MEAnalysis_ttH:
   stage: test
