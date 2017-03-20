@@ -13,8 +13,11 @@ def launch_test_MEAnalysis(analysis, sample, **kwargs):
     main(analysis, sample_name=sample, firstEvent=0, output_name = output_name, **kwargs)
     return output_name
 
-def test_MEAnalysis(sample_pattern="*", **kwargs):
-    analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+def test_MEAnalysis(sample_pattern="*", analysis_cfg="", **kwargs):
+    if analysis_cfg is "":
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+    else:
+        analysis = analysisFromConfig(analysis_cfg)
     for sample in analysis.samples:
         if fnmatch.fnmatch(sample.name, sample_pattern):
             logging.info("Running on sample {0}".format(sample.name))
@@ -39,5 +42,12 @@ if __name__ == "__main__":
         required=False,
         default="*"
     )
+    parser.add_argument(
+        '--analysis_cfg',
+        action="store",
+        help="Analysis cfg (eg. MEAnalysis/data/default.cfg)",
+        required=False,
+        default=""
+    )
     args = parser.parse_args(sys.argv[1:])
-    test_MEAnalysis(args.sample_pattern)
+    test_MEAnalysis(args.sample_pattern,args.analysis_cfg)
