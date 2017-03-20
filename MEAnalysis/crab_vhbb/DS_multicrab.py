@@ -405,7 +405,7 @@ datasets.update({
         "script": 'DS_heppy_crab_script.sh'
     },
     'QCD300_ext1': {
-        "ds": '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/MINIAODSIM',
+        "ds": '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 250,
         "runtime": 40,
@@ -569,7 +569,7 @@ for k in datasets.keys():
 
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
-    if "TTbar_inc" in k: #"QCD" in k or or "ttH" in k 
+    if "QCD300_ext1" in k: #"TTbar_inc" in k: #"QCD" in k or or "ttH" in k 
         D = deepcopy(datasets[k])
 	if k == "ttHTobb":
 	    D["perjob"] = 4 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
