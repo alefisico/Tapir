@@ -123,7 +123,7 @@ test_MEAnalysis_ttH_FH:
     - cd src
     - scram b python
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_ttH_FH.txt
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_ttH_FH.txt
   artifacts:
     paths:
       - MEAnalysis_ttH_FH.txt
@@ -137,7 +137,7 @@ test_MEAnalysis_TTbar_FH:
     - cd src
     - scram b python
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_TTbar_FH.txt
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_TTbar_FH.txt
   artifacts:
     paths:
       - MEAnalysis_TTbar_FH.txt
