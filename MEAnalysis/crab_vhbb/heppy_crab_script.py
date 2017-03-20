@@ -8,6 +8,8 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
+elif "--local" in sys.argv:
+    import PSet_local as PSet
 
 import copy
 import json
@@ -38,18 +40,13 @@ def getLumisProcessed(vlumiblock):
         lumidict[run] += [i for i in range(lumi1, lumi2 + 1)]
     return lumidict
 
-dumpfile = open("dump.txt", "w") #DS new file here
+dumpfile = open("dump.txt", "w") #new file created here
 
 dumpfile.write(PSet.process.dumpPython())
 dumpfile.write("\n")
 
 t0 = time.time()
 print "ARGV:",sys.argv
-
-me_conf_name = "MEAnalysis_cfg_heppy.py"
-for arg in sys.argv:
-    if arg.startswith("ME_CONF="):
-        me_conf_name = arg.split("=")[1]
 
 crabFiles=PSet.process.source.fileNames
 crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
@@ -93,6 +90,7 @@ handle.close()
 #replace files with crab ones
 config.components[0].files=crabFiles_pfn
 
+### vhbb code
 if not "--nostep1" in args:
     print "heppy_config", config
     if hasattr(PSet.process.source, "skipEvents") and PSet.process.source.skipEvents.value()>=0:
@@ -113,61 +111,7 @@ if not "--nostep1" in args:
     
     print "timeto_doVHbb ",(time.time()-t0)
 
-###
-### tthbb13 code
-###
-if 0: #DS don't do mem here
-    print "Running tth code"
-    
-    from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
-    from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
-    from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-    an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-    an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
-    mem_python_conf = tth_main(
-        an,
-        schema="mc" if cfo.sample.isMC else "data",
-        output_name="Output_tth",
-        files="Output/tree.root"
-    )
-    dumpfile.write(conf_to_str(mem_python_conf))
-    dumpfile.write("\n")
-    print "timeto_doMEM ",(time.time()-t0)
-
-#Now we need to copy both the vhbb and tth outputs to the same file #DS (WAIT!!! do it later)
-#inf1 = ROOT.TFile("Output/tree.root") #DS
-#inf2 = ROOT.TFile("Output_tth/tree.root")
-#tof = ROOT.TFile("tree.root", "RECREATE")
-#vhbb_dir = tof.mkdir("vhbb")
-def copyTo(src, dst, keys=[]):
-    #copy ttjets output
-    dst.cd()
-    if len(keys) == 0:
-        keys = list(set([k.GetName() for k in src.GetListOfKeys()]))
-    for k in keys:
-        o = src.Get(k)
-        if o.ClassName() == "TTree":
-            o = o.CloneTree()
-        else:
-            o = o.Clone()
-        print "copying", k, o
-        dst.Add(o)
-        o.Write("", ROOT.TObject.kOverwrite)
-
-#copyTo(inf1, vhbb_dir) #DS
-#copyTo(inf2, tof)
-#tof.Close()
-
-
-def getEntries(inf, tree):
-    tf = ROOT.TFile(inf)
-    tt = tf.Get(tree)
-    n = tt.GetEntries()
-    tf.Close()
-    return n
-
-#assert(getEntries("Output/tree.root", "tree") == getEntries("tree.root", "vhbb/tree")) #DS
-#assert(getEntries("Output_tth/tree.root", "tree") == getEntries("tree.root", "tree"))
+### run tthbb13 code separately
 
 def getEventsLumisInFile(infile):
     from DataFormats.FWLite import Lumis, Handle, Events
@@ -272,5 +216,5 @@ def getFJR(lumidict, inputfiles_lfn, inputfiles_pfn, outputfile):
 report=open('./FrameworkJobReport.xml', 'w+')
 report.write(getFJR(lumidict, crabFiles, crabFiles_pfn, "tree.root"))
 report.close()
-print "timeto_totalJob ",(time.time()-t0)
-dumpfile.close() #DS need to reopen in append mode later
+print "timeto_FirstHalf ",(time.time()-t0)
+dumpfile.close() #will reopen in append mode later

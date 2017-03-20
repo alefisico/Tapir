@@ -8,6 +8,8 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
+elif "--local" in sys.argv:
+    import PSet_local as PSet
 
 import copy
 import json
@@ -45,11 +47,6 @@ dumpfile.write("\n")
 
 t0 = time.time()
 print "ARGV:",sys.argv
-
-me_conf_name = "MEAnalysis_cfg_heppy.py"
-for arg in sys.argv:
-    if arg.startswith("ME_CONF="):
-        me_conf_name = arg.split("=")[1]
 
 crabFiles=PSet.process.source.fileNames #DS ignore
 crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
@@ -93,37 +90,25 @@ handle.close()
 #replace files with crab ones
 config.components[0].files=crabFiles_pfn
 
-if 0: #DS don't do vhbb (already done!)
-    print "heppy_config", config
-    if hasattr(PSet.process.source, "skipEvents") and PSet.process.source.skipEvents.value()>=0:
-        nfirst = int(PSet.process.source.skipEvents.value())
-        nmax = int(PSet.process.maxEvents.input.value())
-        looper = Looper( 'Output', config, nPrint=0, nEvents=nmax, firstEvent=nfirst)
-    else:
-        looper = Looper( 'Output', config, nPrint=0)
-    looper.loop()
-    looper.write()
-    
-    tf = ROOT.TFile("Output/tree.root")
-    if not tf or tf.IsZombie():
-        raise Exception("Error occurred in processing step1")
-    tt = tf.Get("tree")
-    print "step1 tree={0}".format(tt.GetEntries())
-    tf.Close()
-    
-    print "timeto_doVHbb ",(time.time()-t0)
+### vhbb code already done
 
-###
 ### tthbb13 code
-###
 if not "--nostep2" in args:
     print "Running tth code"
     
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
-    an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-    an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
+    if "AN_CFG" in os.environ and os.environ["AN_CFG"]:
+        an = analysisFromConfig(os.environ["AN_CFG"])
+    else:
+        an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        me_conf_name = "MEAnalysis_cfg_heppy.py"
+        for arg in sys.argv:
+            if arg.startswith("ME_CONF="):
+                me_conf_name = arg.split("=")[1]
+                an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
+    print "I'm using ",an, " and ", an.mem_python_config
     mem_python_conf = tth_main(
         an,
         schema="mc" if cfo.sample.isMC else "data",
