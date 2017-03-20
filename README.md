@@ -252,3 +252,35 @@ When you're done, don't forget to free up your jobs:
 ~~~
 qdel -u $USER
 ~~~
+
+
+# Continous integration (CI)
+
+In order to run the continuous integration on a multicore machine, we have provisioned a virtual machine on the CERN cloud infrastructure.
+This machine is configured as a CI runner in the `tthbb13` repository.
+
+SLC6 machine on OpenStack
+https://openstack.cern.ch/project/instances/
+
+With two additional volumes:
+- `cvmfs`: 25GB
+- `gitlab-runner`: 100GB
+
+With the following software
+~~~
+yum install git wget
+~~~
+
+Install cvmfs like
+https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallCvmfs
+
+~~~
+#/etc/cvmfs/default.local
+CVMFS_REPOSITORIES="cms.cern.ch,grid.cern.ch"
+CVMFS_QUOTA_LIMIT=5000
+CVMFS_HTTP_PROXY='http://ca-proxy-meyrin.cern.ch:3128;http://ca-proxy.cern.ch:3128;http://ca01.cern.ch:3128|http://ca02.cern.ch:3128|http://ca03.cern.ch:3128|http://ca04.cern.ch:3128|http://ca05.cern.ch:3128|http://ca06.cern.ch:3128'
+~~~
+
+configure runner as in
+https://docs.gitlab.com/runner/install/linux-manually.html
+

@@ -34,7 +34,7 @@ compile:
     - git cms-merge-topic -u jpata:vhbbHeppy80X_heppy_fixes_march14
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
-    - scram b -j2
+    - scram b -j4
     - cd $CMSSW_BASE
     - find src -maxdepth 3 -type d | grep -e "^src/.*/.*/\(interface\|data\|python\|gc\|test\)" | tar -czf $CI_HOME/cmssw.tgz lib biglib bin --exclude="*.pyc" --files-from -
   artifacts:
