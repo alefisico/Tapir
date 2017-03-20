@@ -48,11 +48,15 @@ def calculate_lumi(
         shutil.copy(
             os.path.join(os.environ["CMSSW_BASE"], dataset_base, dataset_name, process + ".json"),
             tmpdir_name)
+    shutil.copy(
+        os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/crab_vhbb/json.txt",
+        tmpdir_name + "/golden.json"
+    )
 
     # Now build the shell script
     out = open(os.path.join(tmpdir_name, "runme.sh"), "w")
     out.write("export PATH=$HOME/.local/bin:/afs/cern.ch/cms/lumi/brilconda-1.0.3/bin:$PATH\n")
-    for process in processes:
+    for process in processes + ["golden"]:
         out.write('brilcalc lumi -b "STABLE BEAMS" --normtag=/afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i {0}.json -u /pb -o {0}.out\n'.format(process))
     out.close()
 
@@ -70,7 +74,7 @@ def calculate_lumi(
     print subprocess.Popen(scp_back_command, stdout=subprocess.PIPE).communicate()[0]
 
     # and analyze it
-    for process in processes:
+    for process in processes + ["golden"]:
         inf = open(os.path.join(tmpdir_name+"_OUT", process + ".out"), "r")
         
         # Look for:
@@ -93,15 +97,15 @@ if __name__ == "__main__":
                      "jpata"  : "jpata" }
 
     lxplus_username = lxplus_users[getpass.getuser()]
-    dataset_name = "Sep14_leptonic_nome"
+    dataset_name = "Mar15_v1"
 
     processes = [
-        "SingleMuon",
-         "SingleElectron",
-         "MuonEG",
-         "DoubleEG",
-         "DoubleMuon",
-    ] 
+        #"SingleMuon",
+        #"SingleElectron",
+        "MuonEG",
+        #"DoubleEG",
+        #"DoubleMuon",
+    ]
 
     dataset_base = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/gc/datasets/"
     tmpdir_name = "LUMICALC_TEMP"
