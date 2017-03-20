@@ -59,7 +59,7 @@ class BufferedTree:
     """
     def __init__(self, tree):
         self.tree = tree
-        self.tree.SetCacheSize(1*1024*1024)
+        self.tree.SetCacheSize(10*1024*1024)
         self.branches = {}
         for br in self.tree.GetListOfBranches():
             self.branches[br.GetName()] = br
@@ -621,7 +621,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 tf.Close()
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
-        tf = ROOT.TFile.Open(file_name)
+        try:
+            tf = ROOT.TFile.Open(file_name)
+        except Exception as e:
+            LOG_MODULE_NAME.error("error opening file {0} {1}".format(file_name, e))
+            continue
         events = BufferedTree(tf.Get("tree"))
         LOG_MODULE_NAME.info("looping over {0} events".format(events.GetEntries()))
        
@@ -743,11 +747,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc":
                     for (syst_weight, weightfunc) in systematic_weights:
-                        weight = 1.0 
-                        if schema == "mc":
-                            weight = weightfunc(ret) * proc.xs_weight
                         for proc in matched_processes:
                             for (k, v) in proc.outdict_syst[syst_weight].items():
+                                weight = 1.0
+                                if schema == "mc":
+                                    weight = weightfunc(ret) * proc.xs_weight
                                 if v.cut(ret):
                                     v.fill(ret, weight)
 
@@ -802,5 +806,5 @@ if __name__ == "__main__":
         max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
-        print(file_names)
+
     main(analysis, file_names, sample, "out.root", skip_events, max_events)
