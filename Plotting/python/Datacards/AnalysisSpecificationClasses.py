@@ -20,6 +20,19 @@ def triplewise(iterable):
     a = iter(iterable)
     return izip(a, a, a)
 
+FUNCTION_TABLE = {
+    "btag_LR_4b_2b_btagCSV_logit": lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"],
+    "common_bdt": lambda ev: ev["common_bdt"],
+    "jetsByPt_0_eta": lambda ev: ev["jets_p4"][0].Eta(),
+    "jetsByPt_0_pt": lambda ev: ev["jets_p4"][0].Pt(),
+    "leps_0_pt": lambda ev: ev["leps_pt"][0],
+    "mem_DL_0w2h2t_p": lambda ev: ev["mem_DL_0w2h2t_p"],
+    "mem_SL_0w2h2t_p": lambda ev: ev["mem_SL_0w2h2t_p"],
+    "mem_SL_1w2h2t_p": lambda ev: ev["mem_SL_1w2h2t_p"],
+    "mem_SL_2w2h2t_p": lambda ev: ev["mem_SL_2w2h2t_p"],
+    "Wmass": lambda ev: ev["Wmass"]
+}
+
 class Cut(object):
 
     @staticmethod
@@ -106,6 +119,32 @@ class Sample(object):
         )
         return sample
 
+class HistogramOutput:
+    def __init__(self, hist, func, cut_name):
+        self.hist = hist
+        self.func = func
+        self.cut_name = cut_name
+
+    def cut(self, event):
+        return event[self.cut_name]
+
+    def fill(self, event, weight = 1.0):
+        self.hist.Fill(self.func(event), weight)
+
+class CategoryCut:
+    def __init__(self, cuts):
+        self.cuts = cuts
+            
+    def cut(self, event):
+        ret = True
+        for cut in self.cuts:
+            for cname, clow, chigh in cut.sparsinator:
+                v = event[cname]
+                ret = ret and (v >= clow and v < chigh)
+                if not ret:
+                    return False
+        return ret
+
 class Process(object):
     """
     Defines how an input sample should be mapped to an output histogram.
@@ -119,11 +158,111 @@ class Process(object):
         self.xs_weight = kwargs.get("xs_weight", 1.0)
         #self.index = kwargs.get("index", -1)
         self.full_name = " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
-    
+
     def __repr__(self):
         s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
         return s
 
+    def output_path(self, category_name, discriminator_name, systematic_string):
+        name = "{proc}__{cat}__{discr}__{syst}".format(
+            proc = self.output_name,
+            cat = category_name,
+            discr = discriminator_name,
+            syst = systematic_string
+        )
+        return name
+    
+    def createOutputs(self, outdir, analysis, systematics):
+        """Creates an output dictionary with fillable objects in TDirectories based on categories and systematics. 
+        
+        Args:
+            outdir (TYPE): Description
+            analysis (TYPE): Description
+            sample (TYPE): Description
+            systematics (list of string): list of systematics for which to create outputs
+        
+        Returns:
+            dict of string->output: Dictionary of fillable outputs
+        """
+    
+        outdict_syst = {}
+        outdict_cuts = {}
+    
+        ROOT.TH1.AddDirectory(False)
+    
+        for syst in systematics:
+            outdict_syst[syst] = {} 
+            syststr = ""
+            if syst != "nominal":
+                syststr = "__" + syst
+            #for every category in every group
+            for group_name in analysis.groups.keys():
+                for category in analysis.groups[group_name]:
+                    #create a new cut object that applies both the Category and Process cuts
+                    category_cut = CategoryCut(
+                        self.cuts + category.cuts
+                    )
+                    cut_name = category.name + "__" + self.output_name
+                    if not outdict_cuts.has_key(cut_name):
+                        outdict_cuts[cut_name] = category_cut
+                        print "saving cut with name {0}, {1}".format(cut_name, [c.sparsinator for c in category_cut.cuts])
+                    name = self.output_path(category.name, category.discriminator.name, syststr)
+                    if not outdict_syst[syst].has_key(name):
+                        h = category.discriminator.get_TH1(name)
+                        print "creating histogram with name {0}".format(name)
+                        outdict_syst[syst][name] = HistogramOutput(
+                            h,
+                            FUNCTION_TABLE[category.discriminator.func],
+                            cut_name,
+                        )
+        return outdict_syst, outdict_cuts
+
+class SystematicProcess(Process):
+    def __init__(self, *args, **kwargs):
+        super(SystematicProcess, self).__init__(self, *args, **kwargs)
+        self.systematic_name = kwargs.get("systematic_name")
+
+    def output_path(self, category_name, discriminator_name, systematic_string=None):
+        return super(SystematicProcess, self).output_path(
+            category_name,
+            discriminator_name,
+            self.systematic_name
+        )
+    
+    def createOutputs(self, outdir, analysis, systematics):
+        outdict_syst = {"nominal": {}}
+        outdict_cuts = {}
+    
+        ROOT.TH1.AddDirectory(False)
+        for group_name in analysis.groups.keys():
+            for category in analysis.groups[group_name]:
+                #create a new cut object that applies both the Category and Process cuts
+                category_cut = CategoryCut(
+                    self.cuts + category.cuts
+                )
+                cut_name = category.name + "__" + self.output_name
+                if not outdict_cuts.has_key(cut_name):
+                    outdict_cuts[cut_name] = category_cut
+                    print "saving cut with name {0}, {1}".format(cut_name, [c.sparsinator for c in category_cut.cuts])
+                name = self.output_path(category.name, category.discriminator.name)
+                if not outdict_syst["nominal"].has_key(name):
+                    h = category.discriminator.get_TH1(name)
+                    print "creating histogram with name {0}".format(name)
+                    outdict_syst["nominal"][name] = HistogramOutput(
+                        h,
+                        FUNCTION_TABLE[category.discriminator.func],
+                        cut_name,
+                    )
+        return outdict_syst, outdict_cuts
+    
+    def __repr__(self):
+        s = "SystematicProcess(input_name={0}, output_name={1}, systematic_name={2})".format(
+            self.input_name,
+            self.output_name,
+            self.systematic_name
+        )
+        return s
+            
 class DataProcess(Process):
     def __init__(self, *args, **kwargs):
         super(DataProcess, self).__init__(self, *args, **kwargs)
@@ -221,6 +360,7 @@ class Analysis:
         self.debug = kwargs.get("debug", False)
         self.samples = kwargs.get("samples", [])
         self.cuts = kwargs.get("cuts", {})
+        self.process_lists = kwargs.get("process_lists")
         self.processes = kwargs.get("processes")
         self.processes_unsplit = kwargs.get("processes_unsplit")
         self.categories = kwargs.get("categories")

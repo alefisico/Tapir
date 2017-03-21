@@ -91,7 +91,7 @@ def analysisFromConfig(config_file_path):
     process_lists = {}
     process_lists_original = {}
     for process_list in config.get("general","process_lists").split():
-
+        print "adding process list", process_list
 
         process_lists_original[process_list] = []
         process_lists[process_list] = []
@@ -101,6 +101,7 @@ def analysisFromConfig(config_file_path):
 
         for process in config.get(process_list,"processes").split():
 
+            print "adding process", process
             in_name  = config.get(process,"in")
             out_name = config.get(process,"out")
 
@@ -260,6 +261,7 @@ def analysisFromConfig(config_file_path):
         debug = config.getboolean("general", "debug"),
         samples = samples,
         cuts = cuts_dict,
+        process_lists = process_lists,
         processes = processes,
         processes_unsplit = processes_original,
         process_map = processes_original,

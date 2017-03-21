@@ -13,24 +13,12 @@ import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProcess
 from TTH.CommonClassifier.db import ClassifierDB
 
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
-
-FUNCTION_TABLE = {
-    "btag_LR_4b_2b_btagCSV_logit": lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"],
-    "common_bdt": lambda ev: ev["common_bdt"],
-    "jetsByPt_0_eta": lambda ev: ev["jets_p4"][0].Eta(),
-    "jetsByPt_0_pt": lambda ev: ev["jets_p4"][0].Pt(),
-    "leps_0_pt": lambda ev: ev["leps_pt"][0],
-    "mem_DL_0w2h2t_p": lambda ev: ev["mem_DL_0w2h2t_p"],
-    "mem_SL_0w2h2t_p": lambda ev: ev["mem_SL_0w2h2t_p"],
-    "mem_SL_1w2h2t_p": lambda ev: ev["mem_SL_1w2h2t_p"],
-    "mem_SL_2w2h2t_p": lambda ev: ev["mem_SL_2w2h2t_p"],
-    "Wmass": lambda ev: ev["Wmass"]
-}
 
 def vec_from_list(vec_type, src):
     """
@@ -216,80 +204,7 @@ def calc_lepton_SF(ev):
 
     return weight
 
-class HistogramOutput:
-    def __init__(self, hist, func, cut_name):
-        self.hist = hist
-        self.func = func
-        self.cut_name = cut_name
 
-    def cut(self, event):
-        return event[self.cut_name]
-
-    def fill(self, event, weight = 1.0):
-        self.hist.Fill(self.func(event), weight)
-
-class CategoryCut:
-    def __init__(self, cuts):
-        self.cuts = cuts
-        for c in self.cuts:
-            print(c.sparsinator)
-
-    def cut(self, event):
-        ret = True
-        for cut in self.cuts:
-            for cname, clow, chigh in cut.sparsinator:
-                v = event[cname]
-                ret = ret and (v >= clow and v < chigh)
-                if not ret:
-                    return False
-        return ret
-
-def createOutputs(outdir, analysis, process, systematics):
-    """Creates an output dictionary with fillable objects in TDirectories based on categories and systematics. 
-    
-    Args:
-        outdir (TYPE): Description
-        analysis (TYPE): Description
-        sample (TYPE): Description
-        systematics (list of string): list of systematics for which to create outputs
-    
-    Returns:
-        dict of string->output: Dictionary of fillable outputs
-    """
-
-    outdict_syst = {}
-    outdict_cuts = {}
-
-    ROOT.TH1.AddDirectory(False)
-
-
-    for syst in systematics:
-        outdict_syst[syst] = {} 
-        syststr = ""
-        if syst != "nominal":
-            syststr = "__" + syst
-
-        #for every category in every group
-        for k in analysis.groups.keys():
-            for cat in analysis.groups[k]:
-                if not outdict_cuts.has_key(cat.name):
-                    outdict_cuts[(cat, process)] = CategoryCut(
-                        process.cuts + cat.cuts
-                    )
-
-                name = "{proc}__{cat}__{discr}".format(
-                    proc = process.output_name,
-                    cat = cat.name,
-                    discr = cat.discriminator.name
-                ) + syststr
-                if not outdict_syst[syst].has_key(name):
-                    h = cat.discriminator.get_TH1(name)
-                    outdict_syst[syst][name] = HistogramOutput(
-                        h,
-                        FUNCTION_TABLE[cat.discriminator.func],
-                        (cat.full_name, process.full_name)
-                    )
-    return outdict_syst, outdict_cuts
 
 def pass_HLT_sl_mu(event):
     pass_hlt = event["HLT_ttH_SL_mu"]
@@ -335,24 +250,22 @@ def triggerPath(event):
 
 def fillBase(matched_processes, ret, syst, schema):
     for proc in matched_processes:
-        for (k, v) in proc.outdict_syst[syst].items():
+        for (k, histo_out) in proc.outdict_syst.get(syst, {}).items():
             weight = 1.0 
             if schema == "mc":
                 weight = ret["weight_nominal"] * proc.xs_weight
             #weight = ret["weight_nominal"]
-            if v.cut(ret):
-                v.fill(ret, weight)
+            if histo_out.cut(ret):
+                histo_out.fill(ret, weight)
 
 
 def fillSystematic(matched_processes, ret, systematic_weights, schema):
     for (syst_weight, weightfunc) in systematic_weights:
         for proc in matched_processes:
-            for (k, v) in proc.outdict_syst[syst_weight].items():
-                weight = 1.0
-                if schema == "mc":
-                    weight = weightfunc(ret) * proc.xs_weight
-                if v.cut(ret):
-                    v.fill(ret, weight)
+            for (k, histo_out) in proc.outdict_syst[syst_weight].items():
+                weight = weightfunc(ret) * proc.xs_weight
+                if histo_out.cut(ret):
+                    histo_out.fill(ret, weight)
 
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1):
     """Summary
@@ -432,8 +345,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ("CMS_puDown", lambda ev: ev["puWeightDown"] * ev["btagWeightCSV"]),
                 ("unweighted", lambda ev: 1.0)
         ]
-
-        systematics_sample = analysis.config.get("systematics", "sample").split()
 
     #Generates accessor functions for systematically variated values
     def generateSystematicsSuffix(base, sources, func=lambda x, ev: x):
@@ -580,16 +491,49 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     sample = analysis.get_sample(sample_name)
     schema = sample.schema
+    sample_systematic = False 
     #process = sample.process
 
     #now we find which processes are matched to have this sample as an input
     #these processes are used to generate histograms
     matched_processes = [p for p in analysis.processes if p.input_name == sample.name]
+    
+    systematics_sample = analysis.config.get("systematics", "sample").split()
+    matched_procs_new = []
+    for syst_sample in systematics_sample:
+        procs_up = analysis.process_lists[analysis.config.get(syst_sample, "process_list_up")]
+        procs_down = analysis.process_lists[analysis.config.get(syst_sample, "process_list_down")]
+        for matched_proc in matched_processes:
+            if matched_proc in procs_up:
+                matched_proc = SystematicProcess(
+                    input_name = matched_proc.input_name,
+                    output_name = matched_proc.output_name,
+                    cuts = matched_proc.cuts,
+                    xs_weight = matched_proc.xs_weight,
+                    systematic_name = syst_sample + "Up"
+                )
+                matched_procs_new += [matched_proc]
+            if matched_proc in procs_down:
+                matched_proc = SystematicProcess(
+                    input_name = matched_proc.input_name,
+                    output_name = matched_proc.output_name,
+                    cuts = matched_proc.cuts,
+                    xs_weight = matched_proc.xs_weight,
+                    systematic_name = syst_sample + "Down"
+                )
+                matched_procs_new += [matched_proc]
+  
+    if len(matched_procs_new) > 0:
+        if len(matched_procs_new) != len(matched_processes):
+            raise Exception("Could not match each process to a systematic replacement!")
+        matched_processes = matched_procs_new
+        sample_systematic = True
+
     if len(matched_processes) == 0:
         LOG_MODULE_NAME.error("Could not match any processes to sample, will not generate histograms {0}".format(sample.name))
     for proc in matched_processes:
         print(proc.input_name, proc.output_name, ",".join([c.name for c in proc.cuts]), proc.xs_weight)
-    LOG_MODULE_NAME.info("matched processes: " + str(matched_processes))
+    LOG_MODULE_NAME.info("matched processes: {0}".format(len(matched_processes)))
 
     do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
     if do_classifier_db:
@@ -605,14 +549,14 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     LOG_MODULE_NAME.info("systematics_event: " + str(systematics_event))
     LOG_MODULE_NAME.info("systematics_weight: " + str(systematics_weight))
 
-    all_systematics = systematics_event+systematics_weight
+    all_systematics = systematics_event + systematics_weight
    
     outfile = ROOT.TFile(ofname, "RECREATE")
     outfile.cd()
     
     #pre-create output histograms
     for proc in matched_processes:
-        outdict_syst, outdict_cuts = createOutputs(outfile, analysis, proc, all_systematics)
+        outdict_syst, outdict_cuts = proc.createOutputs(outfile, analysis, all_systematics)
         proc.outdict_syst = outdict_syst
         proc.outdict_cuts = outdict_cuts
 
@@ -680,10 +624,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #check if this event falls into any category
                 any_passes = False
                 for proc in matched_processes:
-                    for (cat, process), cut in proc.outdict_cuts.items():
+                    for cut_name, cut in proc.outdict_cuts.items():
                         cut_result = cut.cut(ret)
                         any_passes = any_passes or cut_result
-                        ret[(cat.full_name, process.full_name)] = cut_result
+                        ret[cut_name] = cut_result
                 if not any_passes:
                     continue
                
@@ -736,7 +680,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #Fill the base histogram
                
                 #nominal event, fill also histograms with systematic weights
-                if syst == "nominal" and schema == "mc":
+                if syst == "nominal" and schema == "mc" and not sample_systematic:
                     fillSystematic(matched_processes, ret, systematic_weights, schema)
 
             #end of loop over event systematics
@@ -785,7 +729,7 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "TT_TuneCUETP8M2T4_13TeV-powheg-fsrdown-pythia8"
         skip_events = 0
         max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
