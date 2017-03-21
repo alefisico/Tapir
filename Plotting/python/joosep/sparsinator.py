@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import ROOT
 import math
+import time
 
 import sys, os
 from collections import OrderedDict
@@ -67,7 +68,7 @@ class BufferedTree:
         self.buf = {}
         self.iEv = 0
         self.maxEv = int(self.tree.GetEntries())
-        
+    
     def __getattr__(self, attr, defval=None):
         if self.__dict__["branches"].has_key(attr):
             if self.__dict__["buf"].has_key(attr):
@@ -137,7 +138,7 @@ class Var:
 
     def getValue(self, event, schema, systematic="nominal"):
     
-        #check if this branch was present with this systematic 
+        #check if this branch was present with this systematic
         if self.present_syst.get(systematic, True): 
             try:
                 if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
@@ -230,6 +231,8 @@ class HistogramOutput:
 class CategoryCut:
     def __init__(self, cuts):
         self.cuts = cuts
+        for c in self.cuts:
+            print(c.sparsinator)
 
     def cut(self, event):
         ret = True
@@ -284,7 +287,7 @@ def createOutputs(outdir, analysis, process, systematics):
                     outdict_syst[syst][name] = HistogramOutput(
                         h,
                         FUNCTION_TABLE[cat.discriminator.func],
-                        (cat.full_name, process.full_name())
+                        (cat.full_name, process.full_name)
                     )
     return outdict_syst, outdict_cuts
 
@@ -329,6 +332,27 @@ def triggerPath(event):
     elif event["is_fh"] and pass_HLT_fh(event):
         return TRIGGERPATH_MAP["fh"]
     return 0
+
+def fillBase(matched_processes, ret, syst, schema):
+    for proc in matched_processes:
+        for (k, v) in proc.outdict_syst[syst].items():
+            weight = 1.0 
+            if schema == "mc":
+                weight = ret["weight_nominal"] * proc.xs_weight
+            #weight = ret["weight_nominal"]
+            if v.cut(ret):
+                v.fill(ret, weight)
+
+
+def fillSystematic(matched_processes, ret, systematic_weights, schema):
+    for (syst_weight, weightfunc) in systematic_weights:
+        for proc in matched_processes:
+            for (k, v) in proc.outdict_syst[syst_weight].items():
+                weight = 1.0
+                if schema == "mc":
+                    weight = weightfunc(ret) * proc.xs_weight
+                if v.cut(ret):
+                    v.fill(ret, weight)
 
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1):
     """Summary
@@ -420,6 +444,41 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         return ret
     
     #create the event description
+
+    desc_cut = Desc(
+        systematics_event,
+        [
+        Var(name="is_sl"),
+        Var(name="is_dl"),
+        Var(name="is_fh"),
+        
+        Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
+
+        Var(name="numJets", systematics = generateSystematicsSuffix("numJets", systematics_suffix_list)),
+        Var(name="nBCSVM", systematics = generateSystematicsSuffix("nBCSVM", systematics_suffix_list)),
+        Var(name="HLT_ttH_DL_mumu", funcs_schema={
+            "mc": lambda ev: ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v,
+            "data": lambda ev: ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
+        }),
+        Var(name="HLT_ttH_DL_elel", funcs_schema={
+            "mc": lambda ev: ev.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v,
+            "data": lambda ev: ev.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        }),
+        Var(name="HLT_ttH_DL_elmu", funcs_schema={
+            "mc": lambda ev: ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v,
+            "data": lambda ev: ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v
+        }),
+        Var(name="HLT_ttH_SL_el", funcs_schema={
+            "mc": lambda ev: ev.HLT_BIT_HLT_Ele27_WPTight_Gsf_v,
+            "data": lambda ev: ev.HLT_BIT_HLT_Ele27_WPTight_Gsf_v
+        }),
+        Var(name="HLT_ttH_SL_mu", funcs_schema={
+            "mc": lambda ev: ev.HLT_BIT_HLT_IsoMu24_v or ev.HLT_BIT_HLT_IsoTkMu24_v,
+            "data": lambda ev: ev.HLT_BIT_HLT_IsoMu24_v or ev.HLT_BIT_HLT_IsoTkMu24_v
+        }),
+        Var(name="ttCls", schema=["mc"]),
+        ]
+    )
     desc = Desc(
         systematics_event,
         [
@@ -427,21 +486,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Var(name="lumi"),
         Var(name="evt"),
 
-        Var(name="is_sl"),
-        Var(name="is_dl"),
-        Var(name="is_fh"),
-
-        Var(name="nfatjets"),
-        Var(name="fatjets_pt"),
-        Var(name="fatjets_eta"),
-        Var(name="fatjets_mass"),
-
         Var(name="leps_pt"),
         Var(name="leps_eta"),
 
         Var(name="Wmass", systematics = generateSystematicsSuffix("Wmass", systematics_suffix_list)),
-        Var(name="numJets", systematics = generateSystematicsSuffix("numJets", systematics_suffix_list)),
-        Var(name="nBCSVM", systematics = generateSystematicsSuffix("nBCSVM", systematics_suffix_list)),
 
         Var(name="btag_LR_4b_2b_btagCSV_logit",
             nominal=Func("btag_LR_4b_2b_btagCSV",
@@ -449,7 +497,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             systematics = generateSystematicsSuffix("btag_LR_4b_2b_btagCSV", systematics_suffix_list, func=lambda x, ev: logit(x))
         ),
 
-        Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
         Var(name="leps_charge", nominal=Func("leps_charge", func=lambda ev: [float(math.copysign(1.0, ev.leps_pdgId[i])) for i in range(ev.nleps)])),
         Var(name="leps_p4",
             nominal=Func(
@@ -510,24 +557,15 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 #            nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
 #        ),
 
-        Var(name="HLT_ttH_DL_mumu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v}),
-        Var(name="HLT_ttH_DL_elel", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v}),
-        Var(name="HLT_ttH_DL_elmu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v}),
-        Var(name="HLT_ttH_SL_el", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_Ele27_WPTight_Gsf_v}),
-        Var(name="HLT_ttH_SL_mu", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_BIT_HLT_IsoMu24_v or ev.HLT_BIT_HLT_IsoTkMu24_v}),
-        #Var(name="HLT_ttH_FH", funcs_schema={"mc": lambda ev: 1.0, "data": lambda ev: ev.HLT_ttH_FH}),
-
 #        Var(name="lep_SF_weight", 
 #            funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
 #                          "data": lambda ev: 1.0}),
 
 
     #MC-only branches
-        Var(name="ttCls", schema=["mc"]),
         Var(name="puWeight", schema=["mc"]),
         Var(name="puWeightUp", schema=["mc"]),
         Var(name="puWeightDown", schema=["mc"]),
-        Var(name="triggerEmulationWeight", schema=["mc"]),
 
         #nominal b-tag weight, systematic weights added later
         Var(name="btagWeightCSV", schema=["mc"]),
@@ -571,36 +609,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
    
     outfile = ROOT.TFile(ofname, "RECREATE")
     outfile.cd()
-
-    outtree = ROOT.TTree("tree", "tree")
-    bufs = {}
-    bufs["event"] = np.zeros(1, dtype=np.int64)
-    bufs["run"] = np.zeros(1, dtype=np.int64)
-    bufs["lumi"] = np.zeros(1, dtype=np.int64)
-    bufs["systematic"] = np.zeros(1, dtype=np.int64)
-    bufs["mem"] = np.zeros(1, dtype=np.float32)
-    bufs["bdt"] = np.zeros(1, dtype=np.float32)
-    bufs["is_sl"] = np.zeros(1, dtype=np.int32)
-    bufs["is_dl"] = np.zeros(1, dtype=np.int32)
-    bufs["is_fh"] = np.zeros(1, dtype=np.int32)
-    bufs["ttCls"] = np.zeros(1, dtype=np.int32)
-    bufs["btag_LR_4b_2b"] = np.zeros(1, dtype=np.float32)
-    bufs["numJets"] = np.zeros(1, dtype=np.int32)
-    bufs["nBCSVM"] = np.zeros(1, dtype=np.int32)
-    
-    outtree.Branch("event", bufs["event"], "event/L")
-    outtree.Branch("run", bufs["run"], "run/L")
-    outtree.Branch("lumi", bufs["lumi"], "lumi/L")
-    outtree.Branch("systematic", bufs["systematic"], "systematic/L")
-    outtree.Branch("mem", bufs["mem"], "mem/F")
-    outtree.Branch("bdt", bufs["bdt"], "bdt/F")
-    outtree.Branch("numJets", bufs["numJets"], "numJets/I")
-    outtree.Branch("nBCSVM", bufs["nBCSVM"], "nBCSVM/I")
-    outtree.Branch("is_sl", bufs["is_sl"], "is_sl/I")
-    outtree.Branch("is_dl", bufs["is_dl"], "is_dl/I")
-    outtree.Branch("is_fh", bufs["is_fh"], "is_fh/I")
-    outtree.Branch("btag_LR_4b_2b", bufs["btag_LR_4b_2b"], "btag_LR_4b_2b/F")
-    outtree.Branch("ttCls", bufs["ttCls"], "ttCls/I")
     
     #pre-create output histograms
     for proc in matched_processes:
@@ -653,30 +661,39 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             #apply some basic preselection
             if not (event.is_sl or event.is_dl):
                 continue
-            if not event.numJets >= 4:
-                continue
-            if not (event.nBCSVM>=3 or event.nBCMVAM>=3):
-                continue
             if schema == "data" and not event.json:
                 continue
 
-            #Found a monster event in ttH (bug?)
-            if event.jets_pt[0] > 10000:
-                LOG_MODULE_NAME.error("ANOMALOUS MEGAPT EVENT: {0}:{1}:{2}".format(event.run, event.lumi, event.evt))
-                continue
+            ##Found a monster event in ttH (bug?)
+            #if event.jets_pt[0] > 10000:
+            #    LOG_MODULE_NAME.error("ANOMALOUS MEGAPT EVENT: {0}:{1}:{2}".format(event.run, event.lumi, event.evt))
+            #    continue
 
             #Loop over systematics that transform the event
             for iSyst, syst in enumerate(systematics_event):
-                ret = desc.getValue(event, schema, syst)
+                ret = desc_cut.getValue(event, schema, syst)
                 ret["syst"] = syst
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
                 ret["triggerPath"] = triggerPath(ret)
 
+                #check if this event falls into any category
+                any_passes = False
+                for proc in matched_processes:
+                    for (cat, process), cut in proc.outdict_cuts.items():
+                        cut_result = cut.cut(ret)
+                        any_passes = any_passes or cut_result
+                        ret[(cat.full_name, process.full_name)] = cut_result
+                if not any_passes:
+                    continue
+               
+                #now load the full event
+                ret.update(desc.getValue(event, schema, syst))
+                
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
                     ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]# * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
-           
+               
                 ##get MEM from the classifier database
                 #ret["common_mem"] = -99
                 #if do_classifier_db:
@@ -713,47 +730,14 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                             l4p(event.met_pt, 0, event.met_phi, 0),
                         )
                         ret["common_bdt"] = ret_bdt
-               
-                bufs["event"][0] = event.evt
-                bufs["run"][0] = event.run
-                bufs["lumi"][0] = event.lumi
-                bufs["systematic"][0] = iSyst
-                bufs["bdt"][0] = ret["common_bdt"]
-                bufs["is_sl"][0] = event.is_sl
-                bufs["is_dl"][0] = event.is_dl
-                bufs["is_fh"][0] = event.is_fh
-                bufs["numJets"][0] = event.numJets
-                bufs["nBCSVM"][0] = event.nBCSVM
-                bufs["btag_LR_4b_2b"][0] = ret["btag_LR_4b_2b_btagCSV_logit"]
 
-                outtree.Fill()
 
-                #pre-calculate all category cuts for the processes that match this sample
-                for proc in matched_processes:
-                    for (cat, process), cut in proc.outdict_cuts.items():
-                        cut_result = cut.cut(ret)
-                        ret[(cat.full_name, process.full_name())] = cut_result
-
+                fillBase(matched_processes, ret, syst, schema)
                 #Fill the base histogram
-                for proc in matched_processes:
-                    for (k, v) in proc.outdict_syst[syst].items():
-                        weight = 1.0 
-                        if schema == "mc":
-                            weight = ret["weight_nominal"] * proc.xs_weight
-                        #weight = ret["weight_nominal"]
-                        if v.cut(ret):
-                            v.fill(ret, weight)
-                
+               
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc":
-                    for (syst_weight, weightfunc) in systematic_weights:
-                        for proc in matched_processes:
-                            for (k, v) in proc.outdict_syst[syst_weight].items():
-                                weight = 1.0
-                                if schema == "mc":
-                                    weight = weightfunc(ret) * proc.xs_weight
-                                if v.cut(ret):
-                                    v.fill(ret, weight)
+                    fillSystematic(matched_processes, ret, systematic_weights, schema)
 
             #end of loop over event systematics
         #end of loop over events

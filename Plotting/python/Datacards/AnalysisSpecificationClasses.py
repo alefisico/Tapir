@@ -118,13 +118,11 @@ class Process(object):
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
         #self.index = kwargs.get("index", -1)
+        self.full_name = " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
     
     def __repr__(self):
         s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
         return s
-    
-    def full_name(self):
-        return " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
 
 class DataProcess(Process):
     def __init__(self, *args, **kwargs):
