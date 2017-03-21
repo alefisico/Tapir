@@ -75,14 +75,10 @@ class CounterAnalyzer(FilterAnalyzer):
         self.chist = ROOT.TH1F("CounterAnalyzer_count", "count", 1,0,1)
     
     def process(self, event):
-        #super(CounterAnalyzer, self).process(event)
         passes = False
-        try:
-            if( LHE_weights_pdf.make_array(event.input) ):
-                self.chist.Fill(0)
-                passes = True
-        except:
-            print "event in tree not accessible"
+        if event.input.nJet > 0:
+            self.chist.Fill(0)
+            passes = True
         return passes
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
