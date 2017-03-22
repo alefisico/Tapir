@@ -24,7 +24,7 @@ In order to fix this, you have to re-copy the libraries, see the end of `setup.s
 
 ## Step0: environment
 
-We use rootpy in the plotting code, which is installed on the T3 locally in `~jpata/anaconda2`. In order to properly configure the environment, run the following `source setenv_psi.sh` before starting your work.
+We use rootpy in the plotting code, which is installed on the T3 locally in `/swshare/anaconda`. In order to properly configure the environment, run the following `source setenv_psi.sh` before starting your work.
 
 ## Step1: VHBB code
 This will start with MiniAOD and produce a VHBB ntuple.
@@ -55,12 +55,13 @@ $ python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py
 
 This will call
 ~~~
-python $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_heppy.py
+python $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_heppy.py MEAnalysis/data/default.cfg --sample SAMPLE_NAME
 ~~~
-which is currently configured by the `MEAnalysis_cfg_heppy.py` master configuration.
+which is currently configured by the `MEAnalysis_cfg_heppy.py` (MEM and object ID configuration) and `default.cfg` (samples and categories).
 
 ## Step1+2: VHBB & tthbb13 with CRAB
-In order to reduce the amount of intermediate steps and book-keeping, we run step1 (VHBB) and step2 (tthbb13) together in one job, back to back. This is configured in `$CMSSW_BASE/src/TTH/MEAnalysis/crab_vhbb
+In order to reduce the amount of intermediate steps and book-keeping, we run
+step1 (VHBB) and step2 (tthbb13) together in one job, back to back. This is configured in `$CMSSW_BASE/src/TTH/MEAnalysis/crab_vhbb
 
 To submit a few test workflows with crab do:
 
@@ -83,7 +84,7 @@ $ python TTH/MEAnalysis/python/MakeDatasetFiles.py --version {TAG}
 
 This will create lists of the Step1+2 files in the Storage Element (SE), which are stored under `TTH/MEAnalysis/gc/datasets/{TAG}`.
 
-## Step3: skim with `projectSkim`
+## Step3 (optional): skim with `projectSkim`
 
 When some of the samples are done, you can produce smallish (<10GB) skims of the files using local batch jobs.
 
@@ -118,8 +119,9 @@ $ python $CMSSW_BASE/src/TTH/MEAnalysis/python/getCounts.py /path/to/output/GC12
 
 The counts need to be introduced to `TTH/Plotting/python/Datacards/config_*.cfg` as the `ngen` flags for the samples.
 
-## Step4: N-dimensional histograms with `Plotting/python/joosep/sparsinator.py`
-In order to industrially produce all variated histograms, we create an intermediate file containing ROOT `THnSparse` histograms of the samples with appropriate systematics.
+## Step4: Histograms with systematic distributions per category
+In order to industrially produce all variated histograms, they are configured through
+`default.cfg` and called through `sparsinator.py`
 
 ~~~
 $ cd TTH/MEAnalysis/gc
@@ -128,27 +130,7 @@ $ ./grid-control/go.py confs/sparse.conf
 $ hadd -f sparse.root /path/to/output/GC1234/
 ~~~
 
-The output file will contain
-~~~
-$ 
-TTTo2L2Nu_13TeV-powheg <- sample
--dl <- base category ({sl,dl,fh})
---sparse (THnSparseT<TArrayF>) <==== nominal distribution
---sparse_CMS_ttH_CSVHFDown (THnSparseT<TArrayF>) <==== systematically variated distributions
---sparse_CMS_ttH_CSVHFStats1Down (THnSparseT<TArrayF>)
---sparse_CMS_ttH_CSVHFStats1Up (THnSparseT<TArrayF>)
---sparse_CMS_ttH_CSVHFStats2Down (THnSparseT<TArrayF>)
---sparse_CMS_ttH_CSVHFStats2Up (THnSparseT<TArrayF>)
---sparse_CMS_ttH_CSVHFUp (THnSparseT<TArrayF>)
--sl
-...
-ttHTobb_M125_13TeV_powheg_pythia8
--dl
-...
--sl
-...
-...
-~~~
+The output file will contain per-category histograms.
 
 ## Step5: Categories with `makecategories.sh`
 
