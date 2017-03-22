@@ -254,7 +254,6 @@ def fillBase(matched_processes, ret, syst, schema):
             weight = 1.0 
             if schema == "mc":
                 weight = ret["weight_nominal"] * proc.xs_weight
-            #weight = ret["weight_nominal"]
             if histo_out.cut(ret):
                 histo_out.fill(ret, weight)
 
@@ -573,11 +572,12 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 tf.Close()
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
-        try:
-            tf = ROOT.TFile.Open(file_name)
-        except Exception as e:
-            LOG_MODULE_NAME.error("error opening file {0} {1}".format(file_name, e))
-            continue
+        tf = ROOT.TFile.Open(file_name)
+        #try:
+        #    tf = ROOT.TFile.Open(file_name)
+        #except Exception as e:
+        #    LOG_MODULE_NAME.error("error opening file {0} {1}".format(file_name, e))
+        #    continue
         events = BufferedTree(tf.Get("tree"))
         LOG_MODULE_NAME.info("looping over {0} events".format(events.GetEntries()))
        
@@ -729,7 +729,7 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "TT_TuneCUETP8M2T4_13TeV-powheg-fsrdown-pythia8"
+        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
