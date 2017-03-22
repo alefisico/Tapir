@@ -504,23 +504,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         procs_down = analysis.process_lists[analysis.config.get(syst_sample, "process_list_down")]
         for matched_proc in matched_processes:
             if matched_proc in procs_up:
-                matched_proc = SystematicProcess(
+                matched_proc_new = SystematicProcess(
                     input_name = matched_proc.input_name,
                     output_name = matched_proc.output_name,
                     cuts = matched_proc.cuts,
                     xs_weight = matched_proc.xs_weight,
                     systematic_name = syst_sample + "Up"
                 )
-                matched_procs_new += [matched_proc]
+                matched_procs_new += [matched_proc_new]
             if matched_proc in procs_down:
-                matched_proc = SystematicProcess(
+                matched_proc_new = SystematicProcess(
                     input_name = matched_proc.input_name,
                     output_name = matched_proc.output_name,
                     cuts = matched_proc.cuts,
                     xs_weight = matched_proc.xs_weight,
                     systematic_name = syst_sample + "Down"
                 )
-                matched_procs_new += [matched_proc]
+                matched_procs_new += [matched_proc_new]
   
     if len(matched_procs_new) > 0:
         if len(matched_procs_new) != len(matched_processes):
@@ -729,7 +729,8 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
+        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 500
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
