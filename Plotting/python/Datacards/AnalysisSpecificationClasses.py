@@ -206,7 +206,6 @@ class Process(object):
                     name = self.output_path(category.name, category.discriminator.name, syst_str)
                     if not outdict_syst[syst].has_key(name):
                         h = category.discriminator.get_TH1(name)
-                        print "creating histogram with name {0}, cut {1}".format(name, cut_name)
                         outdict_syst[syst][name] = HistogramOutput(
                             h,
                             FUNCTION_TABLE[category.discriminator.func],
@@ -240,11 +239,9 @@ class SystematicProcess(Process):
                 cut_name = (category, self)
                 if not outdict_cuts.has_key(cut_name):
                     outdict_cuts[cut_name] = category_cut
-                    print "saving cut with name {0}, {1}".format(cut_name, [c.sparsinator for c in category_cut.cuts])
                 name = self.output_path(category.name, category.discriminator.name)
                 if not outdict_syst["nominal"].has_key(name):
                     h = category.discriminator.get_TH1(name)
-                    print "creating histogram with name {0}".format(name)
                     outdict_syst["nominal"][name] = HistogramOutput(
                         h,
                         FUNCTION_TABLE[category.discriminator.func],
