@@ -163,13 +163,11 @@ class Process(object):
         s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
         return s
 
-    def output_path(self, category_name, discriminator_name, systematic_string):
-        name = "{proc}__{cat}__{discr}__{syst}".format(
-            proc = self.output_name,
-            cat = category_name,
-            discr = discriminator_name,
-            syst = systematic_string
-        )
+    def output_path(self, category_name, discriminator_name, systematic_string=None):
+        to_join = [self.output_name, category_name, discriminator_name]
+        if systematic_string:
+            to_join += [systematic_string]
+        name = "__".join(to_join)
         return name
     
     def createOutputs(self, outdir, analysis, systematics):
@@ -191,10 +189,10 @@ class Process(object):
         ROOT.TH1.AddDirectory(False)
     
         for syst in systematics:
-            outdict_syst[syst] = {} 
-            syststr = ""
-            if syst != "nominal":
-                syststr = "__" + syst
+            outdict_syst[syst] = {}
+            syst_str = syst
+            if syst == "nominal":
+                syst_str = None
             #for every category in every group
             for group_name in analysis.groups.keys():
                 for category in analysis.groups[group_name]:
@@ -202,14 +200,12 @@ class Process(object):
                     category_cut = CategoryCut(
                         self.cuts + category.cuts
                     )
-                    cut_name = category.name + "__" + self.output_name
+                    cut_name = (category, self)
                     if not outdict_cuts.has_key(cut_name):
                         outdict_cuts[cut_name] = category_cut
-                        print "saving cut with name {0}, {1}".format(cut_name, [c.sparsinator for c in category_cut.cuts])
-                    name = self.output_path(category.name, category.discriminator.name, syststr)
+                    name = self.output_path(category.name, category.discriminator.name, syst_str)
                     if not outdict_syst[syst].has_key(name):
                         h = category.discriminator.get_TH1(name)
-                        print "creating histogram with name {0}".format(name)
                         outdict_syst[syst][name] = HistogramOutput(
                             h,
                             FUNCTION_TABLE[category.discriminator.func],
@@ -240,14 +236,12 @@ class SystematicProcess(Process):
                 category_cut = CategoryCut(
                     self.cuts + category.cuts
                 )
-                cut_name = category.name + "__" + self.output_name
+                cut_name = (category, self)
                 if not outdict_cuts.has_key(cut_name):
                     outdict_cuts[cut_name] = category_cut
-                    print "saving cut with name {0}, {1}".format(cut_name, [c.sparsinator for c in category_cut.cuts])
                 name = self.output_path(category.name, category.discriminator.name)
                 if not outdict_syst["nominal"].has_key(name):
                     h = category.discriminator.get_TH1(name)
-                    print "creating histogram with name {0}".format(name)
                     outdict_syst["nominal"][name] = HistogramOutput(
                         h,
                         FUNCTION_TABLE[category.discriminator.func],

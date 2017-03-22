@@ -22,6 +22,11 @@ def main(filenames, ofname):
     for infn in filenames:
         print "trying to open {0}".format(infn)
         tf = ROOT.TFile.Open(infn)
+        #try:
+        #    tf = ROOT.TFile.Open(infn)
+        #except Exception as e:
+        #    print e
+        #    continue
         if not tf or tf.IsZombie():
             raise Exception("Could not open file {0}".format(infn))
         
