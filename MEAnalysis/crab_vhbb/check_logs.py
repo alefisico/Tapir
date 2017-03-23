@@ -20,10 +20,10 @@ path = {
     "TTbar":"tth/JoosepFeb_test3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/JoosepFeb_test3/170315_103441",
     "ttHbb":"tth/JoosepFeb_2python_test1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/JoosepFeb_2python_test1/170316_152719",
     #"JetHT":"tth/JoosepFeb_data_syst_test5/JetHT/JoosepFeb_data_syst_test5/170318_065324",
-    "JetHT":"tth/JoosepFeb_2python_nosyst_test8/JetHT/JoosepFeb_2python_nosyst_test8/170318_113451",
+    "JetHT":"tth/JoosepFeb_nosyst_v1/JetHT/JoosepFeb_nosyst_v1/170319_101658",
 }
 
-endpath = "/scratch/dsalerno/tth/80x_M17/crab_JoosepFeb_2python_nosyst_test8/" #CHOOSE HERE!!
+endpath = "/scratch/dsalerno/tth/80x_M17/crab_JoosepFeb_nosyst_v1/" #CHOOSE HERE!!
 destination = endpath+sample
 
 if( copy ):
