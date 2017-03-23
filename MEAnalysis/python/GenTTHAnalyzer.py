@@ -393,8 +393,11 @@ class GenTTHAnalyzer(FilterAnalyzer):
             print "gen Q"
             for q in event.l_quarks_gen:
                 print q.pt, q.eta, q.phi, q.mass, q.pdgId
-            print "gen B"
-            for q in event.b_quarks_gen:
+            print "gen B top"
+            for q in event.b_quarks_gen_t:
+                print q.pt, q.eta, q.phi, q.mass, q.pdgId
+            print "gen B Higgs"
+            for q in event.b_quarks_gen_h:
                 print q.pt, q.eta, q.phi, q.mass, q.pdgId
 
         return event
