@@ -15,7 +15,8 @@ def launch_test_MEAnalysis(analysis, sample, **kwargs):
 
 def test_MEAnalysis(sample_pattern="*", analysis_cfg="", **kwargs):
     if analysis_cfg is "":
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        print "Error: no analysis config specified!"
+        return -1
     else:
         analysis = analysisFromConfig(analysis_cfg)
     for sample in analysis.samples:
@@ -47,7 +48,7 @@ if __name__ == "__main__":
         action="store",
         help="Analysis cfg (eg. MEAnalysis/data/default.cfg)",
         required=False,
-        default=""
+        default=os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/default.cfg"
     )
     args = parser.parse_args(sys.argv[1:])
     test_MEAnalysis(args.sample_pattern,args.analysis_cfg)
