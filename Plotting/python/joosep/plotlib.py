@@ -374,12 +374,17 @@ def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=la
     hs = OrderedDict()
     for sample, sample_name in samples:
         pat = pattern.format(sample=sample, hname=hname)
+        h = None
         try:
             h = tf.get(pat).Clone()
         #histo didn't exist, create empty dummy
         except rootpy.io.file.DoesNotExist as e:
             print "ERROR: could not load hist {0}: {1}".format(pat, e)
-            h = rootpy.asrootpy(hs.values()[0].Clone())
+            for key in tf.GetListOfKeys():
+                if hname in key.GetName():
+                    h = rootpy.asrootpy(tf.get(key.GetName()).Clone())
+            if not h:
+                raise Exception("Could not find histogram with name {0} or replacement".format(pat))
             for ibin in range(0, h.GetNbinsX() + 1):
                 h.SetBinContent(ibin, 0.0)
                 h.SetBinError(ibin, 0.0)

@@ -129,7 +129,7 @@ for sd in sets_data:
     datasets[name] = {
         "ds": sd,
         "maxlumis": -1,
-        "perjob": 10, #each lumisection is 200 MC events
+        "perjob": 30,
         "runtime": 10, #hours
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'

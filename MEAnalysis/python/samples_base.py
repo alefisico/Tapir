@@ -88,7 +88,10 @@ def get_files(fname):
         lines = filter(lambda x: "root" in x, lines)
         lines = map(lambda x: x.split()[0], lines)
     elif fname.endswith("*"):
-        lines = ["file://" + f for f in glob.glob(fname)]
+        if "/pnfs/" in fname:
+            lines = ["root://t3dcachedb03.psi.ch/" + f for f in glob.glob(fname)]
+        else:
+            lines = ["file://" + f for f in glob.glob(fname)]
     return lines
 
 # This function is used everywher to translate LFN /store to PFN root://
