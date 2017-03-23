@@ -717,10 +717,10 @@ for k in ["ttHTobb", "TTbar_inc"]:
     workflow_datasets["testing_withme"][k] = D
 
 workflow_datasets["testing_hadronic_withme"] = {}
-for k in ["TTbar_inc"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
+for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
     if k == "ttHTobb":
-	D["perjob"] = 2 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
+	D["perjob"] = 1 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
     else:
 	D["perjob"] = 20 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
     D["maxlumis"] = 4 * D["perjob"]
@@ -813,6 +813,7 @@ env
         'heppy_config_data.py',
         'heppy_crab_script.py',
         'mem_crab_script.py',
+	'heppy_crab_functions.py',
         'python.tar.gz',
         'data.tar.gz',
         "MEAnalysis_heppy.py",
