@@ -186,7 +186,10 @@ def plot_worker(kwargs):
         else:
             yield_b += y
 
-    plt.title(kwargs.get("category", "unknown category") + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
+    if yield_b == 0:
+        plt.title(kwargs.get("category", "unknown_category"))
+    else:
+        plt.title(kwargs.get("category", "unknown category") + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
     plotlib.svfg(outname + "_pie.pdf")
     plt.clf()
 

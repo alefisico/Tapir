@@ -197,8 +197,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         #  - DOES NOT apply the n_subjettiness cut
         all_tops = self.Match_top_to_fatjet( event, all_tops, False )
 
-        for top in all_tops:
-            top.fj_index = event.FatjetCA15ungroomed.index(top.matched_fatjet)            
+        for alltop in all_tops:
+            alltop.fj_index = event.FatjetCA15ungroomed.index(alltop.matched_fatjet)            
         
         # Sort by which ungroomed fj they are matched to
         all_tops = sorted(all_tops, key=lambda x: x.fj_index )        
@@ -219,12 +219,12 @@ class SubjetAnalyzer(FilterAnalyzer):
 
         # Calculate delR with the lepton for all tops that survived the cut
         if event.is_sl: #LC
-            for top in tops + all_tops:
-                setattr( top, 'delR_lepton' ,
-                          self.Get_DeltaR_two_objects( top, event.good_leptons[0] ) )
+            for alltop in tops + all_tops:
+                setattr( alltop, 'delR_lepton' ,
+                          self.Get_DeltaR_two_objects( alltop, event.good_leptons[0] ) )
         else:
-            for top in tops + all_tops:
-                setattr( top, 'delR_lepton' , -1 )
+            for alltop in tops + all_tops:
+                setattr( alltop, 'delR_lepton' , -1 )
 
         # Keep track of how many httCandidates passed
         event.nhttCandidate_aftercuts = len( tops )
@@ -372,7 +372,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 print subjet
 
         if other_top_present:
-            for top in other_tops: self.Get_Subjets( top )
+            for othertop in other_tops: self.Get_Subjets( othertop )
 
         # Set 'PDGID' to 1 for light, and to 5 for b
         for subjet in top_subjets:
@@ -396,7 +396,8 @@ class SubjetAnalyzer(FilterAnalyzer):
                     print subjet
 
             if other_top_present:
-                for top in other_tops: self.Get_Subjets( top )
+                for othertop in other_tops: self.Get_Subjets( othertop )
+
 
             # Set 'PDGID' to 1 for light, and to 5 for b
             # FIXME: do not use PDGID currently, as it ONLY works with the HEPTopTagger perm pruning strat
@@ -537,17 +538,17 @@ class SubjetAnalyzer(FilterAnalyzer):
         all_tops_to_add = []
 
         # Add top matched to leading fatjet OR dummy
-        for top in all_tops:
-            if top.fj_index == 0:
-                all_tops_to_add.append(top)
+        for alltop in all_tops:
+            if alltop.fj_index == 0:
+                all_tops_to_add.append(alltop)
                 break
         if len(all_tops_to_add) == 0:
             all_tops_to_add.append(DummyTop())
 
         # Add top matched to sub-leading fatjet OR dummy
-        for top in all_tops:
-            if top.fj_index == 1:
-                all_tops_to_add.append( top)
+        for alltop in all_tops:
+            if alltop.fj_index == 1:
+                all_tops_to_add.append( alltop)
                 break
         if len(all_tops_to_add) == 1:
             all_tops_to_add.append(DummyTop())
