@@ -235,8 +235,8 @@ class Conf:
         "passall": False,
         "QGLtoDo": {
          #3:[(3,0)] => "evalute qg LR of 3q vs 0q(+3g), considering only light jets, in events with 3 b-jets"
-            3:[(3,0),(3,2),(4,0),(4,3),(5,4)], 
-            4:[(3,0),(3,2),(4,0),(4,3)] },
+            3:[(3,0),(3,2),(4,0),(4,3),(5,0),(5,4)], 
+            4:[(3,0),(3,2),(4,0),(4,3),(5,0)] },
         "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsJul13.root",
         #"QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/QGL_3dPlot.root",

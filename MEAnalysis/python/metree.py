@@ -385,6 +385,7 @@ def getTreeProducer(conf):
         NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
         #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
         NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
+        NTupleVariable("qg_sf", lambda x : getattr(x,"qg_sf",1.), the_type=float, mcOnly=True),
         NTupleVariable("mcFlavour", lambda x : x.mcFlavour, the_type=int, mcOnly=True),
         NTupleVariable("mcMatchId", lambda x : x.mcMatchId, the_type=int, mcOnly=True),
         NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, the_type=int, mcOnly=True),
@@ -499,6 +500,10 @@ def getTreeProducer(conf):
                the_type=int,
                help="is fully hadronic"
             ),
+            #NTupleVariable("ht40", lambda ev: ev.ht40, the_type=float, help="ht considering only jets with pT>40"),
+            NTupleVariable("csv1", lambda ev: ev.csv1, the_type=float, help="highest jet csv value"),
+            NTupleVariable("csv2", lambda ev: ev.csv2, the_type=float, help="2nd highest jet csv value"),
+
         ],
         globalObjects = {
            "MET" : NTupleObject("met", metType, help="Reconstructed MET"),
@@ -587,14 +592,16 @@ def getTreeProducer(conf):
             ("btag_LR_geq2b_leq1b_btagCMVA",       float,   ""),
             ("btag_LR_geq2b_leq1b_btagCSV",        float,   ""),
             ("qg_LR_4b_flavour_3q_0q", float,      ""),
-            ("qg_LR_4b_flavour_3q_2q", float,      ""),
+            #("qg_LR_4b_flavour_3q_2q", float,      ""),
             ("qg_LR_4b_flavour_4q_0q", float,      ""),
-            ("qg_LR_4b_flavour_4q_3q", float,      ""),
-            ("qg_LR_3b_flavour_3q_0q", float,      ""),
-            ("qg_LR_3b_flavour_3q_2q", float,      ""),
+            #("qg_LR_4b_flavour_4q_3q", float,      ""),
+            ("qg_LR_4b_flavour_5q_0q", float,      ""),
+            #("qg_LR_3b_flavour_3q_0q", float,      ""),
+            #("qg_LR_3b_flavour_3q_2q", float,      ""),
             ("qg_LR_3b_flavour_4q_0q", float,      ""),
-            ("qg_LR_3b_flavour_4q_3q", float,      ""),
-            ("qg_LR_3b_flavour_5q_4q", float,      ""),
+            #("qg_LR_3b_flavour_4q_3q", float,      ""),
+            ("qg_LR_3b_flavour_5q_0q", float,      ""),
+            #("qg_LR_3b_flavour_5q_4q", float,      ""),
 
             ("nBCSVM",              int,      "Number of good jets that pass the CSV Medium WP"),
             #("nBCSVT",              int,      ""),
@@ -602,8 +609,9 @@ def getTreeProducer(conf):
             #("nCSVv2IVFM",              int,      ""),                
             ("nBCMVAM",             int,      "Number of good jets that pass cMVAv2 Medium WP"),
             ("numJets",             int,        "Total number of good jets that pass jet ID"),
-            ("ht",                  float,      ""),
+            #("ht",                  float,      ""),
             ("changes_jet_category",int,        "Jet category changed on systematic"),
+            ("ht30",                float,      ""),
         ]:
 
             is_mc_only = False
@@ -666,6 +674,7 @@ def getTreeProducer(conf):
         ("puWeight",                float,    ""),
         ("puWeightUp",              float,    ""),
         ("puWeightDown",            float,    ""),
+        ("qgWeight",                float,  ""),
         ("nPU0",                    float,  ""),
         ("nTrueInt",                int,  ""),
         ("triggerEmulationWeight",  float,  ""),
