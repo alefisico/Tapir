@@ -500,9 +500,9 @@ def getTreeProducer(conf):
                the_type=int,
                help="is fully hadronic"
             ),
-            #NTupleVariable("ht40", lambda ev: ev.ht40, the_type=float, help="ht considering only jets with pT>40"),
-            NTupleVariable("csv1", lambda ev: ev.csv1, the_type=float, help="highest jet csv value"),
-            NTupleVariable("csv2", lambda ev: ev.csv2, the_type=float, help="2nd highest jet csv value"),
+            #NTupleVariable("ht40", lambda ev: getattr(ev, "ht40", -9999), the_type=float, help="ht considering only jets with pT>40"),
+            NTupleVariable("csv1", lambda ev: getattr(ev, "csv1", -9999), the_type=float, help="highest jet csv value"),
+            NTupleVariable("csv2", lambda ev: getattr(ev, "csv2", -9999), the_type=float, help="2nd highest jet csv value"),
 
         ],
         globalObjects = {
