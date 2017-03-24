@@ -118,3 +118,28 @@ test_MEAnalysis_ttH:
 #    paths:
 #      - vhbb.txt
 #    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_MEAnalysis_ttH_FH:
+  stage: test
+  script:
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_ttH_FH.txt
+  artifacts:
+    paths:
+      - MEAnalysis_ttH_FH.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_MEAnalysis_TTbar_FH:
+  stage: test
+  script:
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_TTbar_FH.txt
+  artifacts:
+    paths:
+      - MEAnalysis_TTbar_FH.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"

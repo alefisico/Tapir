@@ -290,5 +290,47 @@ class JetAnalyzer(FilterAnalyzer):
                         jet.genjet = gj
                         genjets.remove(gj)
                         break
+
+        # calculat ht, qgl weight and highest csv variables
         event.ht = sum(map(lambda x: x.pt, event.good_jets))
+        ht30 = 0
+        ht40 = 0
+        count = 0
+        csv1 = -30
+        csv2 = -30
+        qgWeight = 1
+        for jet in event.good_jets:
+            if self.cfg_comp.isMC:
+                qgSF = -99.0
+                if jet.qgl<0:
+                    qgSF = 1.0
+                elif jet.mcFlavour==21:
+                    qgSF = ( -55.7067*pow(jet.qgl,7) + 113.218*pow(jet.qgl,6)
+                             -21.1421*pow(jet.qgl,5) -99.927*pow(jet.qgl,4) 
+                             + 92.8668*pow(jet.qgl,3) -34.3663*pow(jet.qgl,2) 
+                             + 6.27*jet.qgl + 0.612992 )
+                else:
+                    qgSF = ( -0.666978*pow(jet.qgl,3) + 0.929524*pow(jet.qgl,2)
+                             -0.255505*jet.qgl + 0.981581 )
+                idx = event.good_jets.index(jet)
+                setattr(event.good_jets[idx],"qg_sf",qgSF)
+                qgWeight *= qgSF
+            if abs(jet.eta)<2.4:
+                count += 1
+                if jet.pt>30:
+                    ht30 += jet.pt
+                    if jet.btagCSV>csv1:
+                        csv2 = csv1
+                        csv1 = jet.btagCSV
+                    elif jet.btagCSV>csv2:
+                        csv2 = jet.btagCSV
+                if jet.pt>40:
+                    ht40 += jet.pt
+                
+        event.ht30 = ht30
+        event.ht40 = ht40
+        event.csv1 = csv1
+        event.csv2 = csv2
+        event.qgWeight = qgWeight
+
         return event
