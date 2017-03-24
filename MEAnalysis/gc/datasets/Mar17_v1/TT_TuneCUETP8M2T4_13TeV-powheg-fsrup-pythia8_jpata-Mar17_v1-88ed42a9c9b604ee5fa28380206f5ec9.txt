@@ -241,7 +241,6 @@
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_317.root = 7649
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_318.root = 7510
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_319.root = 7523
-/store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_32.root = 7504
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_320.root = 7664
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_321.root = 7521
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_322.root = 7660
@@ -573,7 +572,6 @@
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_617.root = 7814
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_618.root = 7352
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_619.root = 7343
-/store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_62.root = 7499
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_620.root = 7340
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_621.root = 7836
 /store/user/jpata/tth/Mar17_v1/TT_TuneCUETP8M2T4_13TeV-powheg-fsrup-pythia8/Mar17_v1/170317_110050/0000/tree_622.root = 8160

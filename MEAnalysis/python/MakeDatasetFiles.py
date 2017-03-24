@@ -74,15 +74,9 @@ if __name__ == "__main__":
         print "Got {0} datasets".format(len(datasets))
         
         ds_list = []
-        dupe = False
         for dataset in datasets:
             print dataset
-            ds_name = dataset.split("/")[1]
-            if ds_name in ds_list:
-                dupe = True
-            ds_list += [ds_name]
-        if dupe:
-            raise Exception("Found duplicate datasets, please disambiguate manually")
+            ds_list += [dataset]
     else:
         datasets = filter(
             lambda x: len(x)>0,
@@ -106,15 +100,15 @@ if __name__ == "__main__":
         # sample = TTTo2L2Nu_13TeV-powheg
         sample  = "_".join(ds.split("/")[1:3])
         sample_short  = ds.split("/")[1]
-        if sample in samples_processed:
-            raise Exception("Duplicate sample {0}".format(sample))
-        samples_processed += [sample]
-       
-        ofile_fn = os.path.join(outdir, sample + ".txt")
-        ofile = open(ofile_fn, "w")
-    
-        ofile.write("[{0}]\n".format(sample_short))
-            
+        
+        ofile_fn = os.path.join(outdir, sample_short + ".txt")
+        if sample_short in samples_processed:
+            ofile = open(ofile_fn, "a")
+        else:
+            ofile = open(ofile_fn, "w")
+            ofile.write("[{0}]\n".format(sample_short))
+        
+
         files_json = subprocess.Popen([
             "{0} --query='file dataset={1} instance={2}' --format=json --limit={3}".format(
             das_client, ds, args.instance, args.limit)
@@ -172,11 +166,16 @@ if __name__ == "__main__":
 
         #merge lumi files
         total_lumis = LumiList()
+        lumi_fn = ofile_fn.replace(".txt", ".json")
+        if sample_short in samples_processed:
+            total_lumis = LumiList(filename = lumi_fn)
         for i in range(len(lumis)):
             total_lumis = total_lumis | lumis[i]
-        total_lumis.writeJSON(fileName=ofile_fn.replace(".txt", ".json"))
+        total_lumis.writeJSON(fileName=lumi_fn)
         #end loop over files
 
         ofile.close()
+        samples_processed += [sample_short]
         #sleep so as to not overload the DAS server
         time.sleep(60)
+        

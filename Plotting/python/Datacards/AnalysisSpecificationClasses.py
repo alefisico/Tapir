@@ -126,7 +126,7 @@ class HistogramOutput:
         self.cut_name = cut_name
 
     def cut(self, event):
-        return event[self.cut_name]
+        return event.get(self.cut_name, False)
 
     def fill(self, event, weight = 1.0):
         self.hist.Fill(self.func(event), weight)
@@ -198,9 +198,9 @@ class Process(object):
                 for category in analysis.groups[group_name]:
                     #create a new cut object that applies both the Category and Process cuts
                     category_cut = CategoryCut(
-                        self.cuts + category.cuts
+                        category.cuts
                     )
-                    cut_name = (category, self)
+                    cut_name = (category.full_name, self.full_name)
                     if not outdict_cuts.has_key(cut_name):
                         outdict_cuts[cut_name] = category_cut
                     name = self.output_path(category.name, category.discriminator.name, syst_str)
@@ -234,9 +234,9 @@ class SystematicProcess(Process):
             for category in analysis.groups[group_name]:
                 #create a new cut object that applies both the Category and Process cuts
                 category_cut = CategoryCut(
-                    self.cuts + category.cuts
+                    category.cuts
                 )
-                cut_name = (category, self)
+                cut_name = (category.full_name, self.full_name)
                 if not outdict_cuts.has_key(cut_name):
                     outdict_cuts[cut_name] = category_cut
                 name = self.output_path(category.name, category.discriminator.name)
