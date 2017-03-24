@@ -68,6 +68,8 @@ def analysisFromConfig(config_file_path):
     samples = []
     for sample_name in samples_list:
         sample = Sample.fromConfigParser(config, sample_name)
+        if config.getboolean("general", "debug"):
+            sample.step_size_sparsinator = 1
         samples += [sample]
 
     samples_dict = {_sample.name: _sample for _sample in samples}

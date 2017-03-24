@@ -51,9 +51,6 @@ def make_datacard(analysis, categories, outdir, hdict):
                 ))
                 hdict_cat[cat.full_name][syst_key] = hdict[syst_key]
 
-    # import pdb
-    # pdb.set_trace()
-
     #catname -> file name
     category_files = {}
 
@@ -136,7 +133,7 @@ if __name__ == "__main__":
 
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     args = parser.parse_args()
-    an_name, analysis = analysisFromConfig(args.config)
+    analysis = analysisFromConfig(args.config)
     
     categories = [
         c for c in analysis.categories if fnmatch.fnmatch(c.full_name, args.category)

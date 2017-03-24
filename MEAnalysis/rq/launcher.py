@@ -490,9 +490,19 @@ class TaskCategories(Task):
             #check if this is a valid histogram according to its name
             if len(k.GetName().split("__")) >= 3:
                 hdict[k.GetName()] = k.ReadObj().Clone()
-
+        
         #make all the datacards for all the categories
         for cat in self.analysis.categories:
+            for proc in cat.out_processes:
+                print proc
+                if proc == "data":
+                    continue
+                for syst in cat.common_shape_uncertainties.keys():
+                    for sdir in ["Up", "Down"]:
+                        pat = "__".join([proc, cat.full_name, syst+sdir])
+                        if not hdict.has_key(pat):
+                            logger.info("Could not find {0}, cloning nominal".format(pat))
+                            hdict[pat] = hdict["__".join([proc, cat.full_name])].Clone()
             category_dir = "{0}/categories/{1}/{2}".format(
                 workdir, cat.name, cat.discriminator.name
             )
@@ -663,7 +673,7 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        TaskValidateFiles(workdir, "VALIDATE", analysis),
+#        TaskValidateFiles(workdir, "VALIDATE", analysis),
         TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
