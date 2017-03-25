@@ -101,10 +101,10 @@ if __name__ == "__main__":
 
     processes = [
         "SingleMuon",
-        #"SingleElectron",
-        #"MuonEG",
-        #"DoubleEG",
-        #"DoubleMuon",
+        "SingleElectron",
+        "MuonEG",
+        "DoubleEG",
+        "DoubleMuon",
     ]
 
     dataset_base = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/gc/datasets/"
