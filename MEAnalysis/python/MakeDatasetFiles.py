@@ -38,9 +38,11 @@ if __name__ == "__main__":
     parser.add_argument('--instance', action="store", help="DBS instance", default="prod/phys03")
     parser.add_argument('--limit', action="store", help="max files per dataset", default=0)
     parser.add_argument('--debug', action="store", help="debug mode", default=False)
+    parser.add_argument('--name', action="store", help="search only this dataset", default="*")
     args = parser.parse_args()
     
     version = args.version
+    dsnm = args.name
     
     # Create directory for version under output_base
     outdir = os.path.join(output_base, version)
@@ -58,7 +60,7 @@ if __name__ == "__main__":
             das_client, 
             "--format=json",
             "--limit=0",
-            '--query=dataset dataset=/*/*{0}*/USER instance={1}'.format(version, args.instance)
+            '--query=dataset dataset=/{2}/*{0}*/USER instance={1}'.format(version, args.instance, dsnm)
         ]
         if args.debug:
             print " ".join(cmds)
