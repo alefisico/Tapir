@@ -395,6 +395,18 @@ class Analysis:
         config = ConfigParser.SafeConfigParser()
         config.optionxform = str # Turn on case-sensitivity
         config.read(config_file_name)
+        if config.has_option("importconfig","parent"):
+            parent_file_name = config.get("importconfig","parent").replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+            parent = ConfigParser.SafeConfigParser()
+            parent.optionxform = str # Turn on case-sensitivity
+            parent.read(parent_file_name) 
+            for s in config.sections():
+                if s=="importconfig":
+                    continue
+                for (i,v) in config.items(s):
+                    if parent.get(s,i):
+                        parent.set(s, i, v)
+            return parent
         return config
 
 def make_csv_categories_abstract(di):
