@@ -409,7 +409,6 @@ class Analysis:
             return parent
         return config
 
-
 def make_csv_categories_abstract(di):
 
     import csv
