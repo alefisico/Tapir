@@ -2,6 +2,25 @@
 import os, re
 import ROOT
 
+def updateJetGT(config, crabFiles):
+    print "Setting Data GT if needed"
+    mm=re.match('.*(Run2016.).*',crabFiles[0])
+    gtmap={}
+    gtmap["Run2016B"]='Summer16_23Sep2016BCDV3_DATA'
+    gtmap["Run2016C"]='Summer16_23Sep2016BCDV3_DATA'
+    gtmap["Run2016D"]='Summer16_23Sep2016BCDV3_DATA'
+    gtmap["Run2016E"]='Summer16_23Sep2016EFV3_DATA'
+    gtmap["Run2016F"]='Summer16_23Sep2016EFV3_DATA'
+    gtmap["Run2016G"]='Summer16_23Sep2016GV3_DATA'
+    gtmap["Run2016H"]='Summer16_23Sep2016HV3_DATA'
+    
+    for x in config.sequence :
+      if x.name == "PhysicsTools.Heppy.analyzers.objects.JetAnalyzer.JetAnalyzer_1" :
+        JetAna=x
+    if mm :
+      JetAna.dataGT=gtmap[mm.group(1)]
+      print "Updated data GT: ", JetAna.dataGT
+    
 def convertLFN(crabFiles,crabFiles_pfn):
     print "--------------- using edmFileUtil to convert PFN to LFN -------------------------"
     for i in xrange(0,len(crabFiles)) :
