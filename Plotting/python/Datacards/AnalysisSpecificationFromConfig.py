@@ -242,7 +242,7 @@ def analysisFromConfig(config_file_path):
 
             # End loop over categories
             
-        analysis_groups[group] = cats   
+        analysis_groups[group] = cats
         all_cats.extend(cats)
     # End loop over groups of categories
 

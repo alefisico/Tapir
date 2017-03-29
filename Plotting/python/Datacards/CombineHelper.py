@@ -14,7 +14,7 @@ import subprocess
 import ROOT
 import numpy as np
 
-from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH
+from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
 
 def get_limits(fn):
     """
@@ -101,6 +101,65 @@ class LimitGetter(object):
         print datacard_name, ":", lims[1], lims[2], lims[3]
         return lims, quantiles
     # End of get_limit
+
+class ConstraintGetter(object):
+    def __init__(self, output_path = "."):
+        self.output_path = output_path
+
+    def __call__(self, datacard, signal_coef):
+
+        datacard_path, datacard_name = os.path.split(datacard)
+       
+        process_name = "sig_{0:.2f}".format(signal_coef).replace(".", "_")
+
+        # Run combine
+        combine_command = ["combine", 
+                           "-n", process_name,
+                           "-M", "MaxLikelihoodFit",
+                           "-t", "-1",
+                           "-expectSignal", str(signal_coef),
+                           datacard_name]
+        
+        print "running combine with "
+        print " ".join(combine_command)
+        
+        process = subprocess.Popen(combine_command,
+                                   stdout=subprocess.PIPE,
+                                   cwd=datacard_path,
+                                   env=dict(os.environ, 
+                                            PATH=PATH,
+                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                            PYTHONPATH=PYTHONPATH,
+                                            ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                            ROOTSYS = ROOTSYS,
+                                            GENREFLEX = GENREFLEX
+                                        ))
+        
+        output, stderr = process.communicate()
+        if process.returncode != 0:
+            print "error running limit", stderr
+        print output
+
+        diff_cmd = "python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py --format text -a mlfit{0}.root -g plots{0}.root".format(process_name)
+        print diff_cmd
+        process = subprocess.Popen(diff_cmd,
+                                   stdout=subprocess.PIPE,
+                                   cwd=datacard_path,
+                                   env=dict(os.environ,
+                                           CMSSW_BASE=CMSSW_BASE,
+                                           PATH=PATH,
+                                           LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                           PYTHONPATH=PYTHONPATH,
+                                           ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                           ROOTSYS = ROOTSYS,
+                                           GENREFLEX = GENREFLEX
+                                   ),
+                                   shell=True
+        )
+        
+        output, stderr = process.communicate()
+        print output
+        return output
 
 class DummyLimitGetter(object):
     
