@@ -1,6 +1,14 @@
+#!/bin/bash
+#dont kill on error
+set +e
 source env.sh
+#manually copy the data configuration
+
 python heppy_crab_script.py $@ &> log
-echo Finished_vhbbb
+EXITCODE=$?
+./post.sh $EXITCODE
+echo Finished_vhbb $EXITCODE
+
 python mem_crab_script.py $@ >> log 2>&1
 EXITCODE=$?
 echo ExitCode $EXITCODE

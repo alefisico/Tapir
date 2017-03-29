@@ -662,8 +662,8 @@ for k in [
     "SingleMuon-Run2016H-03Feb2017_ver3-v1"
     ]:
     D = deepcopy(datasets[k])
-    D["maxlumis"] = 50
-    D["perjob"] = 10
+    D["maxlumis"] = 5
+    D["perjob"] = 1
     if "data" in D["script"]:
         D["maxlumis"] = 5
         D["perjob"] = 1
