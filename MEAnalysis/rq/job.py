@@ -117,7 +117,7 @@ def validateFiles(*args):
         try:
             tf = ROOT.TFile.Open(fn)
             if not tf or tf.IsZombie():
-                raise Exception("bad file")
+                raise Exception("Bad file {0}".format(fn))
             good_files += [input_files[ifile]]
         except Exception as e:
             print "bad file", e
