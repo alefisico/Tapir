@@ -47,6 +47,9 @@ handle.close()
 #replace files with crab ones
 config.components[0].files=crabFiles_pfn
 
+if not cfo.sample.isMC:
+    fn.updateJetGT(config, crabFiles_pfn)
+
 ### vhbb code
 if not "--nostep1" in args:
     print "heppy_config", config
