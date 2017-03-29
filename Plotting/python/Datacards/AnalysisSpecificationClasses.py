@@ -25,6 +25,7 @@ FUNCTION_TABLE = {
     "common_bdt": lambda ev: ev["common_bdt"],
     "jetsByPt_0_eta": lambda ev: ev["jets_p4"][0].Eta(),
     "jetsByPt_0_pt": lambda ev: ev["jets_p4"][0].Pt(),
+    "jetsByPt_0_btagCSV": lambda ev: ev["jets_p4"][0].btagCSV,
     "leps_0_pt": lambda ev: ev["leps_pt"][0],
     "mem_DL_0w2h2t_p": lambda ev: ev["mem_DL_0w2h2t_p"],
     "mem_SL_0w2h2t_p": lambda ev: ev["mem_SL_0w2h2t_p"],
