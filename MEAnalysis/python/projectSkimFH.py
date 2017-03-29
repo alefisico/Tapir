@@ -14,7 +14,7 @@ for fi in sys.argv[2:]:
     tt.AddFile(fn)
 
 tt.SetBranchStatus("*", False)
-#tt.SetBranchStatus("mem_tt*", True)
+tt.SetBranchStatus("mem_*", True)
 tt.SetBranchStatus("nMatch*", True)
 tt.SetBranchStatus("is_*", True)
 tt.SetBranchStatus("numJets*", True)
