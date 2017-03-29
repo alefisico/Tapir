@@ -702,11 +702,11 @@ if __name__ == "__main__":
     tasks = []
     tasks += [
         #TaskValidateFiles(workdir, "VALIDATE", analysis),
-        #TaskNumGen(workdir, "NGEN", analysis),
-        #TaskSparsinator(workdir, "SPARSE", analysis),
-        #TaskSparseMerge(workdir, "MERGE", analysis),
-        #TaskCategories(workdir, "CAT", analysis),
-        #TaskPlotting(workdir, "PLOT", analysis),
+        TaskNumGen(workdir, "NGEN", analysis),
+        TaskSparsinator(workdir, "SPARSE", analysis),
+        TaskSparseMerge(workdir, "MERGE", analysis),
+        TaskCategories(workdir, "CAT", analysis),
+        TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
         TaskTables(workdir, "TABLES", analysis)
     ]
