@@ -590,8 +590,10 @@ class TaskLimits(Task):
         for lim in limits:
             lims_tot.update(lim)
 
+        of = open(self.workdir + "/limits.csv", "w")
         for k in sorted(lims_tot.keys()):
-            print k, lims_tot[k]
+            of.write("{0},{1}\n".format(k, lims_tot[k]))
+        of.close()
 
         self.save_state()
 

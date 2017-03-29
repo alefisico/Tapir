@@ -10,16 +10,14 @@ ORIG=`pwd`
 BASE=`dirname $1`
 FILE=`basename $1`
 
-echo "signal=0"
-cd $BASE
-combine -M MaxLikelihoodFit -t -1 --expectSignal 0 $FILE
-cd $ORIG
-python diffNuisances.py --format text -a $BASE/mlfit.root -g plots.root > table_sig0.txt
-cp plots.root plots_sig0.root
+#cd $BASE
+#combine -n result -M Asymptotic -t -1 $FILE
+#cd $ORIG
 
-echo "signal=1"
 cd $BASE
-combine -M MaxLikelihoodFit -t -1 --expectSignal 1 $FILE
+text2workspace.py $FILE -m 125 -b -o model.root
+combine model.root -M Asymptotic --minimizerStrategy 0 --minimizerTolerance 0.1 -m 125 -n sig_0_5 -t -1 --expectSignal=0.5
+combine model.root -M Asymptotic --minimizerStrategy 0 --minimizerTolerance 0.1 -m 125 -n sig_1_0 -t -1 --expectSignal=1.0
+combine model.root -M Asymptotic --minimizerStrategy 0 --minimizerTolerance 0.1 -m 125 -n sig_1_5 -t -1 --expectSignal=1.5
+combine model.root -M Asymptotic --minimizerStrategy 0 --minimizerTolerance 0.1 -m 125 -n sig_2_0 -t -1 --expectSignal=2.0
 cd $ORIG
-python diffNuisances.py --format text -a $BASE/mlfit.root -g plots.root > table_sig1.txt
-cp plots.root plots_sig1.root

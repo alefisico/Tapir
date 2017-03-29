@@ -77,6 +77,8 @@ def main(
 
         # And run limit setting on it
         limits[group_name] = lg(group_dcard_filename)[0][2]
+        
+        limits[group_name + "_siginject"] = lg.runSignalInjection(group_dcard_filename)
 
         #write constraints
         for sig in [1, 0]:
