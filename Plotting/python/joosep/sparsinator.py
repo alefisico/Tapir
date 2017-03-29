@@ -13,12 +13,20 @@ import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 
-from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProcess
+from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProcess, CategoryCut
 from TTH.CommonClassifier.db import ClassifierDB
 
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
+
+#Generates accessor functions for systematically variated values
+def generateSystematicsSuffix(base, sources, func=lambda x, ev: x):
+    ret = {}
+    for name, src in sources:
+        v = "_".join([base, src])
+        ret[name] = Func(v, func=lambda ev, v=v, f=func: f(getattr(ev, v), ev))
+    return ret
 
 def vec_from_list(vec_type, src):
     """
@@ -124,26 +132,21 @@ class Var:
 
         self.present_syst = {}
 
-    def getValue(self, event, schema, systematic="nominal"):
+    def getValue(self, event, schema, systematic="nominal", base_data={}):
     
         #check if this branch was present with this systematic
-        if self.present_syst.get(systematic, True): 
-            try:
-                if systematic == "nominal" or not self.systematics_funcs.has_key(systematic):
-                    return self.funcs_schema.get(schema, self.nominal_func)(event)
+        if self.present_syst.get(systematic, True):
+            if systematic == "nominal":
+                return self.funcs_schema.get(schema, self.nominal_func)(event)
+            elif self.systematics_funcs.has_key(systematic):
+                return self.systematics_funcs[systematic](event)
+            else:
+                if base_data.has_key(self.name):
+                    return base_data[self.name]
                 else:
-                    return self.systematics_funcs[systematic](event)
-                self.present_syst[systematic] = True
-            except Exception as e:
-                #deactivate variable only in case of a systematic uncertainty
-                LOG_MODULE_NAME.error(self.name + " " + systematic + " DEACTIVATED")
-                LOG_MODULE_NAME.error(e)
-                self.present_syst[systematic] = False
-                return 0
-        else:
-            return 0
+                    return self.funcs_schema.get(schema, self.nominal_func)(event) 
 
-class Desc:
+class EventDescription:
     """Event description with varying systematics
     
     Attributes:
@@ -159,7 +162,7 @@ class Desc:
         """
         self.variables_dict = OrderedDict([(v.name, v) for v in variables])
 
-    def getValue(self, event, schema="mc", systematic="nominal"):
+    def getValue(self, event, schema="mc", systematic="nominal", base_data={}):
         """Returns a dict with the values of all the variables given a systematic
         
         Args:
@@ -173,7 +176,7 @@ class Desc:
         ret = OrderedDict()
         for vname, v in self.variables_dict.items():
             if schema in v.schema:
-                ret[vname] = v.getValue(event, schema, systematic)
+                ret[vname] = v.getValue(event, schema, systematic, base_data)
         return ret
 
 def lv_p4s(pt, eta, phi, m, btagCSV=-100):
@@ -266,6 +269,19 @@ def fillSystematic(matched_processes, ret, systematic_weights, schema):
                 if histo_out.cut(ret):
                     histo_out.fill(ret, weight)
 
+def applyCuts(ret, matched_processes):
+    #check if this event falls into any category
+    any_passes = False
+    for proc in matched_processes:
+        check_proc = CategoryCut(proc.cuts).cut(ret)
+        if not check_proc:
+            continue
+        for cut_name, cut in proc.outdict_cuts.items():
+            cut_result = cut.cut(ret)
+            any_passes = any_passes or cut_result
+            ret[cut_name] = cut_result
+    return any_passes
+
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1):
     """Summary
     
@@ -345,17 +361,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ("unweighted", lambda ev: 1.0)
         ]
 
-    #Generates accessor functions for systematically variated values
-    def generateSystematicsSuffix(base, sources, func=lambda x, ev: x):
-        ret = {}
-        for name, src in sources:
-            v = "_".join([base, src])
-            ret[name] = Func(v, func=lambda ev, v=v, f=func: f(getattr(ev, v), ev))
-        return ret
     
     #create the event description
 
-    desc_cut = Desc(
+    desc_cut = EventDescription(
         systematics_event,
         [
         Var(name="is_sl"),
@@ -389,7 +398,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Var(name="ttCls", schema=["mc"]),
         ]
     )
-    desc = Desc(
+    desc = EventDescription(
         systematics_event,
         [
         Var(name="run"),
@@ -420,16 +429,27 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 "jets_p4",
                 func=lambda ev: [lv_p4s(ev.jets_pt[i], ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)]
             ),
-            systematics = generateSystematicsSuffix("jets_corr", systematics_suffix_list, func=lambda x, ev: [lv_p4s(ev.jets_pt[i]*float(x[i])/float(ev.jets_corr[i]), ev.jets_eta[i], ev.jets_phi[i], ev.jets_mass[i], ev.jets_btagCSV[i]) for i in range(ev.njets)])
+            systematics = generateSystematicsSuffix(
+                "jets_corr",
+                systematics_suffix_list,
+                func=lambda x, ev: [
+                    lv_p4s(
+                        ev.jets_pt[i]*float(x[i])/float(ev.jets_corr[i]),
+                        ev.jets_eta[i],
+                        ev.jets_phi[i],
+                        ev.jets_mass[i],
+                        ev.jets_btagCSV[i]
+                    ) for i in range(ev.njets)
+                ])
         ),
 
-        Var(name="loose_jets_p4",
-            nominal=Func(
-                "loose_jets_p4",
-                func=lambda ev: [lv_p4s(ev.loose_jets_pt[i], ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-            ),
-            systematics = generateSystematicsSuffix("loose_jets_corr", systematics_suffix_list, func=lambda x, ev: [lv_p4s(ev.loose_jets_pt[i]*float(x[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)])
-        ),
+        #Var(name="loose_jets_p4",
+        #    nominal=Func(
+        #        "loose_jets_p4",
+        #        func=lambda ev: [lv_p4s(ev.loose_jets_pt[i], ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+        #    ),
+        #    systematics = generateSystematicsSuffix("loose_jets_corr", systematics_suffix_list, func=lambda x, ev: [lv_p4s(ev.loose_jets_pt[i]*float(x[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)])
+        #),
 
         Var(name="mem_DL_0w2h2t_p",
             nominal=Func("mem_DL_0w2h2t_p", func=lambda ev: ev.mem_DL_0w2h2t_p),
@@ -504,23 +524,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         procs_down = analysis.process_lists[analysis.config.get(syst_sample, "process_list_down")]
         for matched_proc in matched_processes:
             if matched_proc in procs_up:
-                matched_proc = SystematicProcess(
+                matched_proc_new = SystematicProcess(
                     input_name = matched_proc.input_name,
                     output_name = matched_proc.output_name,
                     cuts = matched_proc.cuts,
                     xs_weight = matched_proc.xs_weight,
                     systematic_name = syst_sample + "Up"
                 )
-                matched_procs_new += [matched_proc]
+                matched_procs_new += [matched_proc_new]
             if matched_proc in procs_down:
-                matched_proc = SystematicProcess(
+                matched_proc_new = SystematicProcess(
                     input_name = matched_proc.input_name,
                     output_name = matched_proc.output_name,
                     cuts = matched_proc.cuts,
                     xs_weight = matched_proc.xs_weight,
                     systematic_name = syst_sample + "Down"
                 )
-                matched_procs_new += [matched_proc]
+                matched_procs_new += [matched_proc_new]
   
     if len(matched_procs_new) > 0:
         if len(matched_procs_new) != len(matched_processes):
@@ -572,12 +592,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 tf.Close()
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
-        tf = ROOT.TFile.Open(file_name)
-        #try:
-        #    tf = ROOT.TFile.Open(file_name)
-        #except Exception as e:
-        #    LOG_MODULE_NAME.error("error opening file {0} {1}".format(file_name, e))
-        #    continue
+        try:
+            tf = ROOT.TFile.Open(file_name)
+            if not tf or tf.IsZombie():
+                raise Exception("Could not open file")
+        except Exception as e:
+            LOG_MODULE_NAME.error("error opening file {0} {1}".format(file_name, e))
+            continue
         events = BufferedTree(tf.Get("tree"))
         LOG_MODULE_NAME.info("looping over {0} events".format(events.GetEntries()))
        
@@ -614,25 +635,21 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             #    continue
 
             #Loop over systematics that transform the event
+            ret_nominal = {}
             for iSyst, syst in enumerate(systematics_event):
-                ret = desc_cut.getValue(event, schema, syst)
+                ret = desc_cut.getValue(event, schema, syst, ret_nominal)
+
                 ret["syst"] = syst
                 ret["counting"] = 0
                 ret["leptonFlavour"] = 0
                 ret["triggerPath"] = triggerPath(ret)
 
-                #check if this event falls into any category
-                any_passes = False
-                for proc in matched_processes:
-                    for cut_name, cut in proc.outdict_cuts.items():
-                        cut_result = cut.cut(ret)
-                        any_passes = any_passes or cut_result
-                        ret[cut_name] = cut_result
+                any_passes = applyCuts(ret, matched_processes)
                 if not any_passes:
                     continue
                
                 #now load the full event
-                ret.update(desc.getValue(event, schema, syst))
+                ret.update(desc.getValue(event, schema, syst, ret_nominal))
                 
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
@@ -714,9 +731,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
         print(k, v.Integral(), v.GetEntries())
     
-    save_hdict(hdict=outdict, outfile=outfile, )
     
     LOG_MODULE_NAME.info("writing output")
+    save_hdict(hdict=outdict, outfile=outfile, )
+    
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
@@ -729,9 +747,9 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
-        max_events = 500
+        max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
 

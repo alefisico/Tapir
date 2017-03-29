@@ -241,7 +241,7 @@ class TaskValidateFiles(Task):
         #split the sample input files into a number of chunks based on the prescribed size
         for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
             jobs += [
-                enqueue_memoize(
+                enqueue_nomemoize(
                     queue,
                     func = validateFiles,
                     args = (inputs, ),
@@ -490,9 +490,19 @@ class TaskCategories(Task):
             #check if this is a valid histogram according to its name
             if len(k.GetName().split("__")) >= 3:
                 hdict[k.GetName()] = k.ReadObj().Clone()
-
+        
         #make all the datacards for all the categories
         for cat in self.analysis.categories:
+            for proc in cat.out_processes:
+                print proc
+                if proc == "data":
+                    continue
+                for syst in cat.common_shape_uncertainties.keys():
+                    for sdir in ["Up", "Down"]:
+                        pat = "__".join([proc, cat.full_name, syst+sdir])
+                        if not hdict.has_key(pat):
+                            logger.info("Could not find {0}, cloning nominal".format(pat))
+                            hdict[pat] = hdict["__".join([proc, cat.full_name])].Clone()
             category_dir = "{0}/categories/{1}/{2}".format(
                 workdir, cat.name, cat.discriminator.name
             )
@@ -553,7 +563,10 @@ class TaskLimits(Task):
 
         # Prepare jobs
         all_jobs = []
-        os.makedirs("{0}/limits".format(self.workdir))
+        try:
+            os.makedirs("{0}/limits".format(self.workdir))
+        except OSError as e:
+            logger.error(e)
         #copy datacard files and root input files to limit directory 
         os.system("cp {0}/categories/shapes*.txt {0}/limits/".format(self.workdir))
         os.system("cp {0}/categories/*/*/*.root {0}/limits/".format(self.workdir))
@@ -577,10 +590,32 @@ class TaskLimits(Task):
         for lim in limits:
             lims_tot.update(lim)
 
+        of = open(self.workdir + "/limits.csv", "w")
         for k in sorted(lims_tot.keys()):
-            print k, lims_tot[k]
+            of.write("{0},{1}\n".format(k, lims_tot[k]))
+        of.close()
 
         self.save_state()
+
+class TaskTables(Task):
+    def __init__(self, workdir, name, analysis):
+        super(TaskTables, self).__init__(workdir, name, analysis)
+
+    def run(self, inputs, redis_conn, qmain, qfail):
+        self.load_state(self.workdir)
+
+        of = open(self.workdir + "/yields.csv", "w")
+        for groupname, group in self.analysis.groups.items():
+            limit_categories = [c for c in group if c.do_limit]
+            for cat in limit_categories:
+                tf = ROOT.TFile(self.workdir + "/limits/{0}.root".format(cat.full_name))
+                for proc in cat.out_processes:
+                    h = tf.Get("{0}__{1}".format(proc, cat.full_name))
+                    ih = -1
+                    if h:
+                        ih = "{0:.2f}".format(h.Integral())
+                    of.write(",".join([groupname, cat.full_name, proc, ih]) + "\n")
+        of.close()
 
 def make_workdir():
     workflow_id = uuid.uuid4()
@@ -589,12 +624,7 @@ def make_workdir():
     return workdir
 
 if __name__ == "__main__":
-    workdir = make_workdir()
 
-    logger.info("starting workflow {0}".format(workdir))
-
-    starting_points = ["ngen", "sparse", "categories", "plots", "limits"]
-    
     import argparse
     parser = argparse.ArgumentParser(
         description='Runs the workflow'
@@ -628,14 +658,22 @@ if __name__ == "__main__":
         default = "EXISTING"
     )
     parser.add_argument(
-        '--start',
+        '--workdir',
         action = "store",
-        help = "Starting point",
+        help = "working directory",
         type = str,
-        choices = starting_points,
-        default = "ngen"
+        default = None, 
     )
+    
     args = parser.parse_args()
+   
+    new_workflow = True
+    if not args.workdir:
+        workdir = make_workdir()
+    else:
+        new_workflow = False
+        workdir = args.workdir
+    logger.info("starting workflow {0}".format(workdir))
 
     queue_kwargs = {}
     if args.queue == "SYNC":
@@ -663,18 +701,22 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        TaskValidateFiles(workdir, "VALIDATE", analysis),
-        TaskNumGen(workdir, "NGEN", analysis),
-        TaskSparsinator(workdir, "SPARSE", analysis),
-        TaskSparseMerge(workdir, "MERGE", analysis),
-        TaskCategories(workdir, "CAT", analysis),
-        TaskPlotting(workdir, "PLOT", analysis),
+        #TaskValidateFiles(workdir, "VALIDATE", analysis),
+        #TaskNumGen(workdir, "NGEN", analysis),
+        #TaskSparsinator(workdir, "SPARSE", analysis),
+        #TaskSparseMerge(workdir, "MERGE", analysis),
+        #TaskCategories(workdir, "CAT", analysis),
+        #TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
+        TaskTables(workdir, "TABLES", analysis)
     ]
 
-    #inputs = "results/28efd210-1f0f-4da7-a4ff-62e16057bae7/merged.root" 
     inputs = []
-    tasks[0].save_state()
+
+    #create first analysis pickle file
+    if new_workflow:
+        tasks[0].save_state()
+
     for task in tasks:
         res = task.run(inputs, redis_conn, qmain, qfail)
         inputs = res

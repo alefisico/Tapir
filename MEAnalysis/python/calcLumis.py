@@ -70,7 +70,7 @@ def calculate_lumi(
     print subprocess.Popen(run_command, stdout=subprocess.PIPE).communicate()[0]
 
     # get back the output
-    scp_back_command = ["scp", "-o", "PreferredAuthentications=password", "-o", "PubkeyAuthentication=no", "-r", lxplus_username + "@lxplus.cern.ch:"+tmpdir_name, tmpdir_name+"_OUT"]
+    scp_back_command = ["scp", "-v", "-o", "PreferredAuthentications=password", "-o", "PubkeyAuthentication=no", "-r", lxplus_username + "@lxplus.cern.ch:"+tmpdir_name, tmpdir_name+"_OUT"]
     print subprocess.Popen(scp_back_command, stdout=subprocess.PIPE).communicate()[0]
 
     # and analyze it
@@ -97,18 +97,18 @@ if __name__ == "__main__":
                      "jpata"  : "jpata" }
 
     lxplus_username = lxplus_users[getpass.getuser()]
-    dataset_name = "Mar15_v1"
+    dataset_name = "Mar22_data"
 
     processes = [
-        #"SingleMuon",
-        #"SingleElectron",
+        "SingleMuon",
+        "SingleElectron",
         "MuonEG",
-        #"DoubleEG",
-        #"DoubleMuon",
+        "DoubleEG",
+        "DoubleMuon",
     ]
 
     dataset_base = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/gc/datasets/"
-    tmpdir_name = "LUMICALC_TEMP"
+    tmpdir_name = "./LUMICALC_TEMP"
     calculate_lumi(
         lxplus_username,
         dataset_name,
