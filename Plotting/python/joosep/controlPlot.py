@@ -88,8 +88,9 @@ def plot_syst_updown(nominal, up, down):
     a2.grid()
 
 def blind_mem(h):
+    print "blinding MEM"
     h = h.Clone()
-    for ibin in range(1, h.GetNbinsX()+1):
+    for ibin in range(0, h.GetNbinsX()+1):
         if ibin >= h.GetNbinsX()/2:
             h.SetBinContent(ibin, 0)
             h.SetBinError(ibin, 0)

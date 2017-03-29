@@ -238,8 +238,6 @@ class MEAnalyzer(FilterAnalyzer):
             b.btagFlag = 1.0
 
         if len(bquarks) > mem_cfg.maxBJets:
-            import pdb
-            pdb.set_trace()
             autolog("More than {0} b-quarks supplied, dropping last {1} from MEM".format(
                 mem_cfg.maxBJets, len(bquarks) - mem_cfg.maxBJets)
             )

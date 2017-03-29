@@ -1,5 +1,6 @@
 stages:
   - compile_vhbb
+  - test_vhbb
   - compile_tthbb13
   - test
 
@@ -38,6 +39,21 @@ compile_vhbb:
     - scram b -j4
     - cd $CMSSW_BASE
 
+test_vhbb:
+  stage: test_vhbb
+  only:
+    - meanalysis-80x-V25
+  script:
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
+    - python vhbb_combined.py | tee -i vhbb.txt
+  artifacts:
+    paths:
+      - vhbb.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
 compile_tthbb13:
   stage: compile_tthbb13
   script:
@@ -63,61 +79,41 @@ test_MEAnalysis_ttH:
       - MEAnalysis_ttH.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
-#test_MEAnalysis_ttjets:
-#  stage: test
-#  script:
-#    - cd $CMSSW_BASE
-#    - tar -xzf $CI_HOME/cmssw.tgz
-#    - cd src
-#    - scram b python
-#    - cd $CI_HOME
-#    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
-#  artifacts:
-#    paths:
-#      - MEAnalysis_ttjets.txt
-#    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-#
-#test_MEAnalysis_DoubleMuon:
-#  stage: test
-#  script:
-#    - cd $CMSSW_BASE
-#    - tar -xzf $CI_HOME/cmssw.tgz
-#    - cd src
-#    - scram b python
-#    - cd $CI_HOME
-#    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "DoubleMuon" | tee -i MEAnalysis_DoubleMuon.txt
-#  artifacts:
-#    paths:
-#      - MEAnalysis_DoubleMuon.txt
-#    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-#
-#test_sparsinator:
-#  stage: test
-#  script:
-#    - cd $CMSSW_BASE
-#    - tar -xzf $CI_HOME/cmssw.tgz
-#    - cd src
-#    - scram b python
-#    - cd $CI_HOME
-#    - python $CMSSW_BASE/src/TTH/Plotting/python/joosep/sparsinator.py | tee -i sparsinator.txt
-#  artifacts:
-#    paths:
-#      - sparsinator.txt
-#    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-#
-#test_vhbb:
-#  stage: test
-#  script:
-#    - cd $CMSSW_BASE
-#    - tar -xzf $CI_HOME/cmssw.tgz
-#    - cd src
-#    - scram b python
-#    - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
-#    - python vhbb_combined.py | tee -i vhbb.txt
-#  artifacts:
-#    paths:
-#      - vhbb.txt
-#    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+test_MEAnalysis_ttjets:
+  stage: test
+  script:
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
+  artifacts:
+    paths:
+      - MEAnalysis_ttjets.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_MEAnalysis_DoubleMuon:
+  stage: test
+  script:
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "DoubleMuon" | tee -i MEAnalysis_DoubleMuon.txt
+  artifacts:
+    paths:
+      - MEAnalysis_DoubleMuon.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_sparsinator:
+  stage: test
+  script:
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - python $CMSSW_BASE/src/TTH/Plotting/python/joosep/sparsinator.py | tee -i sparsinator.txt
+  artifacts:
+    paths:
+      - sparsinator.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_MEAnalysis_ttH_FH:
   stage: test

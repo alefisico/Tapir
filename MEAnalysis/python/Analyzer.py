@@ -40,8 +40,6 @@ class MemoryAnalyzer(Analyzer):
             if not self.heap_prev is None:
                 diff = heap - self.heap_prev
                 print diff
-                import pdb
-                pdb.set_trace()
             self.heap_prev = heap
         return True
 
