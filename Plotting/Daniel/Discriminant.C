@@ -1,14 +1,16 @@
 #define RUNONDATA 0
 #define LOGSCALE 0
 #define RATIO 0
-#define NORMALIZE 0
+#define NORMALIZE 1
 #define POISSON 0
-#define SAVEPLOTS 0
-#define CAT 9  // 7, 8, 9, 10, 11 or <0 for all
-#define METHOD 12 // 11=4w2h2t, 12=3w2h2t, 13=4w2h1t, 14=0w2h2t, 15=0w2h1t
-#define CUT_HT 450.0
-#define PSB_FAC 0.02
-#define LUMI 10.0
+#define SAVEPLOTS 1
+#define CAT 12  // 7, 8, 9, 10, 11 or <0 for all
+#define METHOD 13 // 11=4w2h2t, 12=3w2h2t, 13=4w2h1t, 14=3w2h1t, 15=0w2w2h2t, 16=1w1w2h2t, 17=4w1h2t, 18=4w1h2t/4w2h1t
+#define CUT_HT 500.0
+#define PSB_FAC "0.02" //"2.0e-10" // 2j:4.0e5  3j:1.0e4  4j:5.0e4
+#define QCD 0
+#define LUMI 36.8
+#define TTSPLIT 1
 
 #include <fstream>
 
@@ -27,39 +29,43 @@ void Discriminant(){
   float xmin  = 0.0;
   float xmax  = 1.0;
 
-  string folder = "/mnt/t3nfs01/data01/shome/dsalerno/TTH_2016/TTH_76X_v1/skim/";
+  string version = "JoosepFeb_nosyst_v1_v2";
+
+  string folder = "/mnt/t3nfs01/data01/shome/dsalerno/TTH_2016/TTH_80X_M17/projectSkimFH/"+version+"/";
 
   string variable;
   variable = "Psb";
 
-  string tag = "_withtrig"; //"_Psb0pt55";
+  string tag = "_"; //"_Psb0pt55";
+  tag += version;
   string method = "";
   if(CUT_HT>0) tag += Form("_HT%.0f",CUT_HT);  
-  if(CAT<0) tag += "_catAll";
-  else tag += Form("_cat%d",CAT);
-  tag += Form("_%.3f",PSB_FAC);
+  if(CAT<0) tag += "_catAll_";
+  else tag += Form("_cat%d_",CAT);
+  tag += PSB_FAC;
+  if(TTSPLIT) tag += "_ttsplit";
   if(RUNONDATA) tag += "_data";
   if(LOGSCALE)  tag += "_log";
   if(RATIO)  tag += "_ratio";  
 
   // load files
-  TFile* fsignal = TFile::Open( (folder+"ttH.root").c_str() );
+  TFile* fsignal = TFile::Open( (folder+"ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8.root").c_str() );
   if(fsignal==0 || fsignal->IsZombie() ) return;
   
-  TFile* fttj = TFile::Open( (folder+"TTbar.root").c_str() );
+  TFile* fttj = TFile::Open( (folder+"TT_TuneCUETP8M2T4_13TeV-powheg-pythia8.root").c_str() );
   if(fttj==0 || fttj->IsZombie() ) return;
   
-  TFile* fqcd3 = TFile::Open( (folder+"QCD300.root").c_str() );
+  TFile* fqcd3 = TFile::Open( (folder+"QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root").c_str() );
   if(fqcd3==0 || fqcd3->IsZombie() ) return;
-  TFile* fqcd5 = TFile::Open( (folder+"QCD500.root").c_str() );
+  TFile* fqcd5 = TFile::Open( (folder+"QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root").c_str() );
   if(fqcd5==0 || fqcd5->IsZombie() ) return;
-  TFile* fqcd7 = TFile::Open( (folder+"QCD700.root").c_str() );
+  TFile* fqcd7 = TFile::Open( (folder+"QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root").c_str() );
   if(fqcd7==0 || fqcd7->IsZombie() ) return;
-  TFile* fqcd10 = TFile::Open( (folder+"QCD1000.root").c_str() );
+  TFile* fqcd10 = TFile::Open( (folder+"QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root").c_str() );
   if(fqcd10==0 || fqcd10->IsZombie() ) return;
-  TFile* fqcd15 = TFile::Open( (folder+"QCD1500.root").c_str() );
+  TFile* fqcd15 = TFile::Open( (folder+"QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root").c_str() );
   if(fqcd15==0 || fqcd15->IsZombie() ) return;
-  TFile* fqcd20 = TFile::Open( (folder+"QCD2000.root").c_str() );
+  TFile* fqcd20 = TFile::Open( (folder+"QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root").c_str() );
   if(fqcd20==0 || fqcd20->IsZombie() ) return;
   
   // determine ME method used
@@ -68,40 +74,43 @@ void Discriminant(){
   if(METHOD==11) {method = "_4w2h2t"; element="11";}
   else if(METHOD==12) {method = "_3w2h2t";  element="12";}
   else if(METHOD==13) {method = "_4w2h1t";  element="13";}
-  else if(METHOD==14) {method = "_0w2h2t";  element="14";}
-  else if(METHOD==15) {method = "_0w2h1t";  element="15";}
+  else if(METHOD==14) {method = "_3w2h1t";  element="14";}
+  else if(METHOD==15) {method = "_0w2w2h2t";  element="15";}
+  else if(METHOD==16) {method = "_1w1w2h2t";  element="16";}
+  else if(METHOD==17) {method = "_4w1h2t";  element="17";}
+  else if(METHOD==18) {method = "_4w1h2t_2h1t";  element="18";}
 
   if(CAT==7){
-    //cat = "cat==7 && nBCSVM>=4";
-    cat = "numJets==7 && nBCSVM>=4";
+    cat = "cat==7 &&  btag_LR_4b_2b_btagCSV>0.99 && qg_LR_4b_flavour_3q_0q>0.5";
   }
   else if(CAT==8){
-    //cat = "cat==8 && nBCSVM>=4";
-    cat = "numJets==8 && nBCSVM>=4";
+    cat = "cat==8 && btag_LR_4b_2b_btagCSV>0.99 && qg_LR_4b_flavour_4q_0q>0.5";
   }
   else if(CAT==9){
-    //cat = "cat==9 && nBCSVM>=4";
-    cat = "numJets==9 && nBCSVM>=4";
+    cat = "cat==9 && btag_LR_4b_2b_btagCSV>0.99 && qg_LR_4b_flavour_4q_0q>0.5"; //5q to come
   }
   else if(CAT==10){
-    //cat = "cat==10 && nBCSVM==3";
-    cat = "numJets==8 && nBCSVM==3";
+    cat = "cat==10 && btag_LR_4b_2b_btagCSV<0.99 && btag_LR_3b_2b_btagCSV>0.83 && qg_LR_3b_flavour_4q_0q>0.5";
   }
   else if(CAT==11){
-    //cat = "cat==11 && nBCSVM==3";
-    cat = "numJets==7 && nBCSVM==3";
+    cat = "cat==11 && btag_LR_4b_2b_btagCSV<0.99 && btag_LR_3b_2b_btagCSV>0.83 && qg_LR_3b_flavour_4q_0q>0.5";
+  }
+  else if(CAT==12){
+    cat = "cat==12 && btag_LR_4b_2b_btagCSV<0.99 && btag_LR_3b_2b_btagCSV>0.83 && qg_LR_3b_flavour_4q_0q>0.5";
   }
   if(CAT>=0) tag += method;
   
   // QCD scale factors (xsec/nGen) - scales to 1 pb-1
-  double scalefacttH = 0.5085*0.577/2862460.0;
-  double scalefacTTbar = 831.76/19690932.0;
-  double scalefacQCD3 = 351300.0/16909004.0; 
-  double scalefacQCD5 = 31630.0/19665696.0;
-  double scalefacQCD7 = 6802.0/15547962.0;
-  double scalefacQCD10 = 1206.0/4962111.0;
-  double scalefacQCD15 = 120.4/3939077.0; 
-  double scalefacQCD20 = 25.25/1981228.0;
+
+  // for JoosepFeb_nonsyst_v1_v2
+  double scalefacttH = 0.5085*0.577 / 3820351.0;
+  double scalefacTTbar = 831.76 / 77206913.0;
+  double scalefacQCD3 = 351300.0 / 53992057.0;
+  double scalefacQCD5 = 31630.0 / 59204623.0;
+  double scalefacQCD7 = 6802.0 / 44868369.0;
+  double scalefacQCD10 = 1206.0 / 15127293.0;
+  double scalefacQCD15 = 120.4 / 3961038.0;
+  double scalefacQCD20 = 25.25 / 1991645.0;
   
   //scale to luminosity (pb-1 --> fb-1)
   double lumi = 1000.0 * LUMI;
@@ -133,6 +142,11 @@ void Discriminant(){
   hsignal  = (TH1F*)h1->Clone("hsignal");
   htth  = (TH1F*)h1->Clone("htth"); 
   httj  = (TH1F*)h1->Clone("httj");
+  httbb = (TH1F*)h1->Clone("httbb");
+  htt2b = (TH1F*)h1->Clone("htt2b");
+  httb  = (TH1F*)h1->Clone("httb");
+  httcc = (TH1F*)h1->Clone("httcc");
+  httjj = (TH1F*)h1->Clone("httjj");
   hqcd  = (TH1F*)h1->Clone("hqcd");
   hqcd3  = (TH1F*)h1->Clone("hqcd3");
   hqcd5  = (TH1F*)h1->Clone("hqcd5");
@@ -146,18 +160,37 @@ void Discriminant(){
   hsignal->Sumw2();
   htth->Sumw2();
   httj->Sumw2();
+  httbb->Sumw2();
+  htt2b->Sumw2();
+  httb->Sumw2();
+  httcc->Sumw2();
+  httjj->Sumw2();
   hqcd->Sumw2();
 
   string selection = "(ht>";
   selection += Form("%.0f",CUT_HT);
-  selection += " && ";
+  selection += " && nBCSVM>=2 && ";
   selection += cat;
-  selection += " && HLT_ttHhardonicLowLumi>0";
+  //selection += " && HLT_ttH_FH>0";  //TRIGGER SELECTION
+  string ttbbsel = selection + " && ttCls>52)";
+  string tt2bsel = selection + " && ttCls==52)";
+  string ttbsel = selection + " && ttCls==51)";
+  string ttccsel = selection + " && ttCls>40 && ttCls<46)";
+  string ttjjsel = selection + " && ttCls<40)";
   selection += ")";
 
-  //TString draw = ("mem_tth_p["+element+"]/(mem_tth_p["+element+"]+"+Form("%.3f",PSB_FAC)+"*mem_ttbb_p["+element+"])").c_str();
-  TString draw = "1.0*numJets/(2.0*numJets)";
+  TString draw = "";
+  if(QCD==0) draw = ("mem_tth_FH"+method+"_p/(mem_tth_FH"+method+"_p+"+PSB_FAC+"*mem_ttbb_FH"+method+"_p)").c_str();
+  method = "_4w1h2t";
+  if(METHOD==18) draw = ("mem_tth_FH"+method+"_p/(mem_tth_FH"+method+"_p+"+PSB_FAC+"*mem_ttbb_FH_4w2h1t_p)").c_str();
+  if(QCD==1) draw = ("mem_tth_FH"+method+"_p/(mem_tth_FH"+method+"_p+"+PSB_FAC+"*mem_qcd_FH"+method+"_p)").c_str();
+  //TString draw = "1.0*numJets/(2.0*numJets)";
   TString cut = selection.c_str();
+  TString ttbbcut = ttbbsel.c_str();
+  TString tt2bcut = tt2bsel.c_str();
+  TString ttbcut = ttbsel.c_str();
+  TString ttcccut = ttccsel.c_str();
+  TString ttjjcut = ttjjsel.c_str();
   
   cout << draw << endl;
   cout << cut << endl;
@@ -165,6 +198,11 @@ void Discriminant(){
   tsignal->Draw(draw+">>hsignal",cut);
   tsignal->Draw(draw+">>htth",cut);
   tttj->Draw(draw+">>httj",cut);
+  tttj->Draw(draw+">>httbb",ttbbcut);
+  tttj->Draw(draw+">>htt2b",tt2bcut);
+  tttj->Draw(draw+">>httb",ttbcut);
+  tttj->Draw(draw+">>httcc",ttcccut);
+  tttj->Draw(draw+">>httjj",ttjjcut);
   tqcd3 ->Draw(draw+">>hqcd3",cut);
   tqcd5 ->Draw(draw+">>hqcd5",cut);
   tqcd7 ->Draw(draw+">>hqcd7",cut);
@@ -175,7 +213,12 @@ void Discriminant(){
   hsignal->Scale(lumi*scalefacttH*10.0);
   htth->Scale(lumi*scalefacttH);
   httj->Scale(lumi*scalefacTTbar);
-  hqcd->Add(hqcd3,lumi*scalefacQCD3); //exclude QCD300 due to large weights
+  httbb->Scale(lumi*scalefacTTbar);
+  htt2b->Scale(lumi*scalefacTTbar);
+  httb->Scale(lumi*scalefacTTbar);
+  httcc->Scale(lumi*scalefacTTbar);
+  httjj->Scale(lumi*scalefacTTbar);
+  //hqcd->Add(hqcd3,lumi*scalefacQCD3); //exclude QCD300 due to large weights
   hqcd->Add(hqcd5,lumi*scalefacQCD5); 
   hqcd->Add(hqcd7,lumi*scalefacQCD7);
   hqcd->Add(hqcd10,lumi*scalefacQCD10);
@@ -262,30 +305,68 @@ void Discriminant(){
 
   THStack* hStack = new THStack("hStack","Title; x-axis ; events ");
 
+  //histrogram colors (index, r, b, g)
+  TColor *coltth = new TColor(9001, 44/255., 62/255., 167/255.);
+  TColor *colttbb = new TColor(9002, 102/255., 0/255., 0/255.);
+  TColor *coltt2b = new TColor(9003, 80/255., 0/255., 0/255.);
+  TColor *colttb = new TColor(9004, 153/255., 51/255., 51/255.);
+  TColor *colttcc = new TColor(9005, 204/255., 2/255., 0/255.);
+  TColor *colttjj = new TColor(9006, 251/255., 102/255., 102/255.);
+  TColor *colqcd = new TColor(9007, 102/255., 201/255., 77/255.);
+
   // set histogram styles
   hsignal->SetLineWidth( 4 );
-  hsignal->SetLineColor( kBlue+2 );
+  hsignal->SetLineColor( 9001 ); //kBlue+2
   //hsignal->Sumw2();
-  htth ->SetLineColor( kBlue+2 );
-  htth ->SetFillColor( kBlue+2 );
+  htth ->SetLineColor( 9001 ); //kBlue+2
+  htth ->SetFillColor( 9001 );
   htth ->SetFillStyle( 3002 );
-  htth ->SetMarkerColor( kBlue+2 );
+  htth ->SetMarkerColor( 9001 );
   htth ->SetMarkerStyle( 20 );
-  htth ->SetMarkerSize( 2 );
+  htth ->SetMarkerSize( 1.5 );
   //htth ->Sumw2();
-  hqcd ->SetLineColor( kGreen+3 );
-  hqcd ->SetFillColor( kGreen+3 );
-  hqcd ->SetMarkerColor( kGreen+3 );
+  hqcd ->SetLineColor( 9007 ); //kGreen+3
+  hqcd ->SetFillColor( 9007 );
+  hqcd ->SetMarkerColor( 9007 );
   hqcd ->SetMarkerStyle( 21 );
-  hqcd ->SetMarkerSize( 2 );
+  hqcd ->SetMarkerSize( 1.5 );
   //hqcd ->Sumw2();
   httj ->SetLineColor( kRed+1 );
   httj ->SetFillColor( kRed+1 );
   httj ->SetMarkerColor( kRed+1 );
   httj ->SetMarkerStyle( 34 );
-  httj ->SetMarkerSize( 2 );
+  httj ->SetMarkerSize( 1.5 );
   //httj ->Sumw2();
- 
+  httbb ->SetLineColor( 9002 );
+  httbb ->SetFillColor( 9002 );
+  httbb ->SetMarkerColor( 9002 );
+  httbb ->SetMarkerStyle( 22 );
+  httbb ->SetMarkerSize( 1.5 );
+
+  htt2b ->SetLineColor( 9003 );
+  htt2b ->SetFillColor( 9003 );
+  htt2b ->SetMarkerColor( 9003 );
+  htt2b ->SetMarkerStyle( 23 );
+  htt2b ->SetMarkerSize( 1.5 );
+
+  httb ->SetLineColor( 9004 );
+  httb ->SetFillColor( 9004 );
+  httb ->SetMarkerColor( 9004 );
+  httb ->SetMarkerStyle( 29 );
+  httb ->SetMarkerSize( 1.5 );
+
+  httcc ->SetLineColor( 9005 );
+  httcc ->SetFillColor( 9005 );
+  httcc ->SetMarkerColor( 9005 );
+  httcc ->SetMarkerStyle( 33 );
+  httcc ->SetMarkerSize( 1.5 );
+
+  httjj ->SetLineColor( 9006 );
+  httjj ->SetFillColor( 9006 );
+  httjj ->SetMarkerColor( 9006 );
+  httjj ->SetMarkerStyle( 34 );
+  httjj ->SetMarkerSize( 1.5 );
+
   herr ->SetLineColor( kBlack );
   herr ->SetFillColor( kBlack );
   herr ->SetFillStyle( 3654 );
@@ -306,12 +387,26 @@ void Discriminant(){
   
   // add histrograms to stack
   hStack->Add(hqcd);
-  hStack->Add(httj);
+  if(TTSPLIT){
+    hStack->Add(httjj);
+    hStack->Add(httcc);
+    hStack->Add(httb);
+    hStack->Add(htt2b);
+    hStack->Add(httbb);
+  }
+  else hStack->Add(httj);
   hStack->Add(htth);
   
   // add histograms to legend
   leg->AddEntry(htth,  "t#bar{t}H (125)", "F");
-  leg->AddEntry(httj, "t#bar{t} + jets", "F");
+  if(TTSPLIT){
+    leg->AddEntry(httbb, "t#bar{t} + b#bar{b}", "P");
+    leg->AddEntry(htt2b, "t#bar{t} + 2b", "P");
+    leg->AddEntry(httb, "t#bar{t} + b", "P");
+    leg->AddEntry(httcc, "t#bar{t} + c#bar{c}", "P");
+    leg->AddEntry(httjj, "t#bar{t} + jj", "P");
+  }
+  else leg->AddEntry(httj, "t#bar{t} + jets", "F");
   leg->AddEntry(hqcd,  "QCD Multijet", "F");
   if(RUNONDATA) leg->AddEntry(hdata, "Data", "LPE");
   leg->AddEntry(herr,  "Bkg. Unc.", "F");
@@ -479,19 +574,36 @@ void Discriminant(){
     p3->SetLeftMargin(0.11);
     p3->SetRightMargin(0.05);
 
-    htth ->SetLineWidth( 4 );
+    int lw = 4;
+
+    htth ->SetLineWidth( lw );
     //htth ->SetFillStyle( 0 );
 
-    hqcd ->SetLineWidth( 4 );
+    hqcd ->SetLineWidth( lw );
     //hqcd ->SetFillStyle( 0 );
 
-    httj ->SetLineWidth( 4 );
+    httj ->SetLineWidth( lw );
     //httj ->SetFillStyle( 0 );
+    httbb ->SetLineWidth( lw );
+    htt2b ->SetLineWidth( lw );
+    httb ->SetLineWidth( lw );
+    httcc ->SetLineWidth( lw );
+    httjj ->SetLineWidth( lw );
+
 
     hqcd ->GetYaxis()->SetTitle("Normalized units");
-    hqcd ->SetMaximum( hqcd->GetMaximum()*2.6 );   //CHANGE HERE
+    hqcd ->SetMinimum( 0.0 );
+    float normmax = TMath::Max( hqcd->GetMaximum(), htth->GetMaximum()*hqcd->Integral()/htth->Integral() );
+    hqcd ->SetMaximum( normmax*1.2 );   //CHANGE HERE
     hqcd ->DrawNormalized("PE");
-    httj->DrawNormalized("PESAME");
+    if(TTSPLIT){
+      httbb->DrawNormalized("PESAME");
+      htt2b->DrawNormalized("PESAME");
+      httb->DrawNormalized("PESAME");
+      httcc->DrawNormalized("PESAME");
+      httjj->DrawNormalized("PESAME");  
+    }
+    else httj->DrawNormalized("PESAME");
     htth ->DrawNormalized("PESAME");
     leg->Draw();
     pt_title->Draw();
