@@ -600,7 +600,7 @@ for k in datasets.keys():
 workflow_datasets["data_leptonic"] = {}
 for k in datasets.keys():
     # Ignore hadronic
-    if "JetHT" in k or "BTagCSV" in k:
+    if not "Single" in k:
         continue
     
     if "data" in datasets[k]["script"]:

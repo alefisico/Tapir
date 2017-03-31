@@ -592,6 +592,8 @@ class TaskLimits(Task):
 
         of = open(self.workdir + "/limits.csv", "w")
         for k in sorted(lims_tot.keys()):
+            if not "inject" in k:
+                print k, lims_tot[k]
             of.write("{0},{1}\n".format(k, lims_tot[k]))
         of.close()
 

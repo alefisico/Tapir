@@ -31,7 +31,7 @@ compile_vhbb:
     - cd $CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - git cms-init
-    - git cms-merge-topic -u jpata:vhbbHeppy80X_heppy_fixes_march14
+    - git cms-merge-topic -u jpata:vhbbHeppy80X_heppy_fixes_march29
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - source $CI_HOME/setenv_sklearn_cmssw.sh
