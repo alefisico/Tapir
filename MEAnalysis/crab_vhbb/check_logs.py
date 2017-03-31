@@ -3,17 +3,18 @@ import os
 import subprocess
 from ROOT import TH1F, TCanvas, TFile, TObject
 
-sample = "JetHT"
+sample = "QCD700"
 copy = 1
 extract = 1
-analyse = 0
+analyse = 1
 
 se = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat//store/user/dsalerno"
 lsprefix = "xrdfs storage01.lcg.cscs.ch ls -ltr -u /pnfs/lcg.cscs.ch/cms/trivcat/store/user/dsalerno/"
 path = {
     "QCD300":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194235",
     "QCD500":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194354",
-    "QCD700":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194510",
+    "QCD700":"tth/JoosepFeb_nosyst_v1/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/JoosepFeb_nosyst_v1/170318_233514", #ok
+    "QCD700ext1":"tth/JoosepFeb_nosyst_v1/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/JoosepFeb_nosyst_v1/170318_233336", #ok
     "QCD1000":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194632",
     "QCD1500":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194746",
     "QCD2000":"tth/VHBBHeppyV21_tthbbV9_v2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/VHBBHeppyV21_tthbbV9_v2/160503_194905",
