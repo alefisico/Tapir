@@ -596,13 +596,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 tf.Close()
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
-        try:
-            tf = ROOT.TFile.Open(file_name)
-            if not tf or tf.IsZombie():
-                raise Exception("Could not open file")
-        except Exception as e:
-            LOG_MODULE_NAME.error("error opening file {0} {1}".format(file_name, e))
-            continue
+        tf = ROOT.TFile.Open(file_name)
         events = BufferedTree(tf.Get("tree"))
         LOG_MODULE_NAME.info("looping over {0} events".format(events.GetEntries()))
        

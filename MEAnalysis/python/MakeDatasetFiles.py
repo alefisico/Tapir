@@ -105,8 +105,10 @@ if __name__ == "__main__":
         
         ofile_fn = os.path.join(outdir, sample_short + ".txt")
         if sample_short in samples_processed:
+            print "opening existing file"
             ofile = open(ofile_fn, "a")
         else:
+            print "opening new file"
             ofile = open(ofile_fn, "w")
             ofile.write("[{0}]\n".format(sample_short))
         
@@ -171,6 +173,7 @@ if __name__ == "__main__":
         lumi_fn = ofile_fn.replace(".txt", ".json")
         if sample_short in samples_processed:
             total_lumis = LumiList(filename = lumi_fn)
+            print "opened existing lumi file", len(total_lumis)
         for i in range(len(lumis)):
             total_lumis = total_lumis | lumis[i]
         total_lumis.writeJSON(fileName=lumi_fn)

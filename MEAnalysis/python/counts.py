@@ -12,25 +12,20 @@ def get_tree_entries(treename, filenames):
     return i
 
 def main(filenames, ofname):
-    filenames = map(getSitePrefix, filenames)
+    filenames_pref = map(getSitePrefix, filenames)
     of = ROOT.TFile(ofname, "RECREATE")
     good_filenames = []
     count_dict = {}
     count_dict["Count"] = 0
 
     count_dict["failed"] = []
-    for infn in filenames:
+    count_dict["good_files"] = []
+    for infn, lfn in zip(filenames_pref, filenames):
         print "trying to open {0}".format(infn)
-        try:
-            tf = ROOT.TFile.Open(infn)
-            if not tf or tf.IsZombie():
-                raise Exception("Could not open file {0}".format(infn))
-        except Exception as e:
-            print e
-            continue
+        tf = ROOT.TFile.Open(infn)
         
         print "good file", infn, tf
-        good_filenames += [infn]
+        good_filenames += [lfn]
         vhbb_dir = tf.Get("vhbb")
         if not vhbb_dir:
             vhbb_dir = tf
@@ -49,6 +44,7 @@ def main(filenames, ofname):
                     of.Get(kn).Add(o)
         of.Write()
         tf.Close()
+    count_dict["good_files"] = good_filenames
     
     #hEntries = ROOT.TH1D("numEntries", "numEntries", 3, 0, 3)
     #hEntries.SetDirectory(of)

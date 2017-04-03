@@ -89,7 +89,7 @@ def get_files(fname):
         lines = map(lambda x: x.split()[0], lines)
     elif fname.endswith("*"):
         if "/pnfs/" in fname:
-            lines = ["root://t3dcachedb03.psi.ch/" + f for f in glob.glob(fname)]
+            lines = ["root://t3dcachedb.psi.ch/" + f for f in glob.glob(fname)]
         else:
             lines = ["file://" + f for f in glob.glob(fname)]
     return lines

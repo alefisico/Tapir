@@ -48,15 +48,19 @@ def calculate_lumi(
         shutil.copy(
             os.path.join(os.environ["CMSSW_BASE"], dataset_base, dataset_name, process + ".json"),
             tmpdir_name)
+    #golden JSON
     shutil.copy(
         os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/crab_vhbb/json.txt",
         tmpdir_name + "/golden.json"
     )
 
+    for process in processes:
+        os.system("compareJSON.py --sub {0}/golden.json {0}/{1}.json {0}/{1}_notgolden.json\n".format(tmpdir_name, process))
+
     # Now build the shell script
     out = open(os.path.join(tmpdir_name, "runme.sh"), "w")
     out.write("export PATH=$HOME/.local/bin:/afs/cern.ch/cms/lumi/brilconda-1.0.3/bin:$PATH\n")
-    for process in processes + ["golden"]:
+    for process in processes + ["golden"] + ["{0}_notgolden".format(proc) for proc in processes]:
         out.write('brilcalc lumi -b "STABLE BEAMS" --normtag=/afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i {0}.json -u /pb -o {0}.out\n'.format(process))
     out.close()
 
@@ -97,14 +101,14 @@ if __name__ == "__main__":
                      "jpata"  : "jpata" }
 
     lxplus_username = lxplus_users[getpass.getuser()]
-    dataset_name = "Mar22_data"
+    dataset_name = "Mar29_rereco_v1"
 
     processes = [
         "SingleMuon",
         "SingleElectron",
-        "MuonEG",
-        "DoubleEG",
-        "DoubleMuon",
+#        "MuonEG",
+#        "DoubleEG",
+#        "DoubleMuon",
     ]
 
     dataset_base = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/gc/datasets/"

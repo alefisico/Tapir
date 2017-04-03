@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("FAKE")
 
+#MC
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('root://cms-xrd-global.cern.ch//store/mc/RunIISummer16MiniAODv2/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0C0796F5-CFC6-E611-ADB6-008CFA0A58B4.root'),
     lumisToProcess = cms.untracked.VLuminosityBlockRange(
@@ -10,10 +11,11 @@ process.source = cms.Source("PoolSource",
     )
 )
 
+#Data
 #process.source = cms.Source("PoolSource",
-#    fileNames = cms.untracked.vstring('root://cms-xrd-global.cern.ch//store/data/Run2016H/SingleMuon/MINIAOD/PromptReco-v3/000/284/036/00000/0E02D50E-989F-E611-A962-FA163EE15C80.root'),
+#        fileNames = cms.untracked.vstring('root://cmsxrootd.hep.wisc.edu//store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver3-v1/80000/F0B09550-7DEA-E611-A445-B8CA3A70A5E8.root'),
 #    lumisToProcess = cms.untracked.VLuminosityBlockRange(
-#        "284036:58-284036:61",
+#        "284036:1-284036:1",
 #    )
 #)
 process.maxEvents = cms.untracked.PSet(

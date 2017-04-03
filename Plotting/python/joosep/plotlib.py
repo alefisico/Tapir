@@ -514,7 +514,12 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #Get the data histogram
     data = None
     if not dataname is None:
-        data = tf.get(pattern.format(sample=dataname, hname=hname))
+        try:
+            data = tf.get(pattern.format(sample=dataname, hname=hname))
+        #try to read fake data
+        except rootpy.io.file.DoesNotExist as e:
+            print e
+            data = tf.get(pattern.format(sample="data_obs", hname=hname))
         data.rebin(rebin)
         if blindFunc:
             data = blindFunc(data)

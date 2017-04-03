@@ -556,7 +556,17 @@ def getTreeProducer(conf):
                 tn = pref + "_BIT_" + tn[:-1]
                 if not tn in trignames:
                     trignames += [tn]
-    for trig in trignames:
+
+    #MET filter flags added in VHBB
+    metfilter_flags = [
+        "Flag_goodVertices", 
+        "Flag_GlobalTightHalo2016Filter",
+        "Flag_HBHENoiseFilter",
+        "Flag_HBHENoiseIsoFilter",
+        "Flag_EcalDeadCellTriggerPrimitiveFilter",
+        "Flag_eeBadScFilter",
+    ]
+    for trig in trignames + metfilter_flags:
         treeProducer.globalVariables += [NTupleVariable(
             trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
         )]
