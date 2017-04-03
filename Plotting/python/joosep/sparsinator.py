@@ -409,6 +409,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         Var(name="leps_eta"),
 
         Var(name="Wmass", systematics = generateSystematicsSuffix("Wmass", systematics_suffix_list)),
+            
+        Var(name="btag_LR_4b_2b_btagCSV", systematics = generateSystematicsSuffix("btag_LR_4b_2b_btagCSV", systematics_suffix_list)),
 
         Var(name="btag_LR_4b_2b_btagCSV_logit",
             nominal=Func("btag_LR_4b_2b_btagCSV",
@@ -443,13 +445,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ])
         ),
 
-        #Var(name="loose_jets_p4",
-        #    nominal=Func(
-        #        "loose_jets_p4",
-        #        func=lambda ev: [lv_p4s(ev.loose_jets_pt[i], ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
-        #    ),
-        #    systematics = generateSystematicsSuffix("loose_jets_corr", systematics_suffix_list, func=lambda x, ev: [lv_p4s(ev.loose_jets_pt[i]*float(x[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)])
-        #),
+        Var(name="loose_jets_p4",
+            nominal=Func(
+                "loose_jets_p4",
+                func=lambda ev: [lv_p4s(ev.loose_jets_pt[i], ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)]
+            ),
+            systematics = generateSystematicsSuffix("loose_jets_corr", systematics_suffix_list, func=lambda x, ev: [lv_p4s(ev.loose_jets_pt[i]*float(x[i])/float(ev.loose_jets_corr[i]), ev.loose_jets_eta[i], ev.loose_jets_phi[i], ev.loose_jets_mass[i], ev.loose_jets_btagCSV[i]) for i in range(ev.nloose_jets)])
+        ),
 
         Var(name="mem_DL_0w2h2t_p",
             nominal=Func("mem_DL_0w2h2t_p", func=lambda ev: ev.mem_DL_0w2h2t_p),
@@ -468,6 +470,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             nominal=Func("mem_SL_2w2h2t_p", func=lambda ev: ev.mem_SL_2w2h2t_p),
             systematics = generateSystematicsSuffix("mem_SL_2w2h2t_p", systematics_suffix_list)
         ),
+
+
 #        Var(name="mem_DL_0w2h2t_p",
 #            nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
 #        ),
