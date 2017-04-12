@@ -20,7 +20,7 @@ btag_weights_cmva = ["btagWeightCMVAV2_" + suff for suff in btag_weights_suff]
 if __name__ == "__main__":
 
     import argparse
-    parser = argparse.ArgumentParser(description='Prepares dataset lists from DAS')
+    parser = argparse.ArgumentParser(description='')
     parser.add_argument('--cfg', action="store", help="path to analysis configuration", required=True)
     args = parser.parse_args()
 

@@ -376,6 +376,16 @@ if __name__ == "__main__":
         help="Number of events to process",
         default=1000,
     )
+    parser.add_argument(
+        '--files',
+        action="store",
+        help="list of files to process",
+        default=None,
+        required=False
+    )
     args = parser.parse_args(sys.argv[2:])
-
-    main(an, sample_name=args.sample, numEvents=args.numEvents)
+    if args.files:
+        files = args.files.split(",")
+    else:
+        files = []
+    main(an, sample_name=args.sample, numEvents=args.numEvents, files=files)

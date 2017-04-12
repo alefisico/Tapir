@@ -16,6 +16,8 @@ from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProcess, CategoryCut
 from TTH.CommonClassifier.db import ClassifierDB
 
+from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
+
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
@@ -211,11 +213,11 @@ def calc_lepton_SF(ev):
 
 def pass_HLT_sl_mu(event):
     pass_hlt = event["HLT_ttH_SL_mu"]
-    return event["is_sl"] and pass_hlt and int(abs(event["leps_pdgId"][0])) == 13
+    return event["is_sl"] and pass_hlt and len(event["leps_pdgId"])>=1 and int(abs(event["leps_pdgId"][0])) == 13
 
 def pass_HLT_sl_el(event):
     pass_hlt = event["HLT_ttH_SL_el"]
-    return event["is_sl"] and pass_hlt and int(abs(event["leps_pdgId"][0])) == 11
+    return event["is_sl"] and pass_hlt and len(event["leps_pdgId"])>=1 and int(abs(event["leps_pdgId"][0])) == 11
 
 def pass_HLT_dl_mumu(event):
     pass_hlt = event["HLT_ttH_DL_mumu"]
@@ -281,6 +283,60 @@ def applyCuts(ret, matched_processes):
             any_passes = any_passes or cut_result
             ret[cut_name] = cut_result
     return any_passes
+
+class FakeJet:
+    def __init__(self, pt, eta, hadronFlavour, csv):
+        self._pt = pt
+        self._eta = eta
+        self._hadronFlavour = hadronFlavour
+        self._csv = csv
+
+    def pt(self):
+        return self._pt
+    
+    def eta(self):
+        return self._eta
+    
+    def hadronFlavour(self):
+        return self._hadronFlavour
+    
+    def btag(self, algo):
+        return self._csv
+
+def recompute_btag_weights(ret):
+    p4 = ret["jets_p4"]
+    hadronFlavour = ret["jets_hadronFlavour"]
+    wrapped_jets = []
+    for _p4, hf in zip(p4, hadronFlavour):
+        jet = FakeJet(
+            _p4.Pt(),
+            _p4.Eta(),
+            hf,
+            _p4.btagCSV
+        )
+        wrapped_jets += [jet]
+
+    btag_weights_recomputed = {}
+    for algo in ["CSV"]:
+        for btag_syst in [
+                "central",
+                "up_jes", "down_jes",
+                "up_lf", "down_lf",
+                "up_hf", "down_hf",
+                "up_hfstats1", "down_hfstats1",
+                "up_hfstats2", "down_hfstats2",
+                "up_lfstats1", "down_lfstats1",
+                "up_lfstats2", "down_lfstats2",
+                "up_cferr1", "down_cferr1",
+                "up_cferr2", "down_cferr2"
+            ]:
+            sf = get_event_SF(wrapped_jets, btag_syst, algo, btagSFhandle)
+            btag_weights_recomputed[btag_syst] = sf
+            if btag_syst == "central":
+                ret["btagWeightCSV"] = btag_weights_recomputed[btag_syst]
+            else:
+                sdir, syst_name = btag_syst.split("_")
+                ret["btagWeightCSV_{0}_{1}".format(sdir, syst_name)] = btag_weights_recomputed[btag_syst]
 
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1):
     """Summary
@@ -444,6 +500,19 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     ) for i in range(ev.njets)
                 ])
         ),
+        Var(name="jets_hadronFlavour",
+            nominal_func = Func("jets_hadronFlavour", func=lambda ev: None),
+            funcs_schema = {
+                "mc":Func(
+                    "jets_hadronFlavour",
+                    func=lambda ev: [ev.jets_hadronFlavour[i] for i in range(ev.njets)]
+                ),
+                "data": Func(
+                    "jets_hadronFlavour",
+                    func = lambda ev: None
+                )
+            }
+        ),
 
         Var(name="loose_jets_p4",
             nominal=Func(
@@ -588,12 +657,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     break_file_loop = False
 
     tf = None
+                    
 
     #Main loop
     for file_name in file_names:
         if break_file_loop:
-            if tf:
-                tf.Close()
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
@@ -627,11 +695,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if schema == "data" and not event.json:
                 continue
 
-            ##Found a monster event in ttH (bug?)
-            #if event.jets_pt[0] > 10000:
-            #    LOG_MODULE_NAME.error("ANOMALOUS MEGAPT EVENT: {0}:{1}:{2}".format(event.run, event.lumi, event.evt))
-            #    continue
-
             #Loop over systematics that transform the event
             ret_nominal = {}
             for iSyst, syst in enumerate(systematics_event):
@@ -648,7 +711,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                
                 #now load the full event
                 ret.update(desc.getValue(event, schema, syst, ret_nominal))
-                
+               
+                if syst == "nominal" and schema == "mc":
+                    recompute_btag_weights(ret)
+                   
                 ret["weight_nominal"] = 1.0
                 if schema == "mc":
                     ret["weight_nominal"] *= ret["puWeight"] * ret["btagWeightCSV"]# * ret["triggerEmulationWeight"] * ret["lep_SF_weight"]
@@ -700,7 +766,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
             #end of loop over event systematics
         #end of loop over events
-        tf.Close()
+        try:
+            tf.Close()
+        except Exception as e:
+            print(e)
     #end of loop over file names
 
     outdict = {}
@@ -745,10 +814,12 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
+        #sample = "SingleMuon"
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
+        #file_names = ["root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/jpata/tth/GC19ce068de9d3/SingleMuon/job_197_tree.root"]
 
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

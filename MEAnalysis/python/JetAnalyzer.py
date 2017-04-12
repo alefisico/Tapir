@@ -230,7 +230,7 @@ class JetAnalyzer(FilterAnalyzer):
                 if abs(j.mcFlavour) == 5:
                     event.n_tagwp_tagged_true_bjets += 1
 
-        #Require at least 2 good resolved jets to continue analysis
+        #Require at least 4 good resolved jets to continue analysis
         passes = True
         if event.systematic == "nominal":
             event_proxy = event
