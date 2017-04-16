@@ -132,24 +132,29 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #Here we define all the main analyzers
     import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
+    #throws away events that are not containing at least 4 jets
     prefilter = cfg.Analyzer(
         MECoreAnalyzers.PrefilterAnalyzer,
         'prefilter',
         _conf = python_conf
     )
-    #
+
+    #Checks that the event can be read
     counter = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter',
-        _conf = python_conf
+        _conf = python_conf,
+        counter_name = "",
     )
 
+    #Filters events by the run,lumi,event triplet
     evtid_filter = cfg.Analyzer(
         MECoreAnalyzers.EventIDFilterAnalyzer,
         'eventid',
         _conf = python_conf
     )
 
+    #fills the passPV flag 
     pvana = cfg.Analyzer(
         MECoreAnalyzers.PrimaryVertexAnalyzer,
         'pvana',
@@ -162,11 +167,24 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
+    counter_trg = cfg.Analyzer(
+        MECoreAnalyzers.CounterAnalyzer,
+        'counter_trg',
+        _conf = python_conf,
+        counter_name = "_trg",
+    )
+
     #This class performs lepton selection and SL/DL disambiguation
     leps = cfg.Analyzer(
         MECoreAnalyzers.LeptonAnalyzer,
         'leptons',
         _conf = python_conf
+    )
+    counter_lep = cfg.Analyzer(
+        MECoreAnalyzers.CounterAnalyzer,
+        'counter_lep',
+        _conf = python_conf,
+        counter_name = "_lep",
     )
 
     #This class performs jet selection and b-tag counting
@@ -174,6 +192,12 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         MECoreAnalyzers.JetAnalyzer,
         'jets',
         _conf = python_conf
+    )
+    counter_jet = cfg.Analyzer(
+        MECoreAnalyzers.CounterAnalyzer,
+        'counter_jet',
+        _conf = python_conf,
+        counter_name = "_jet",
     )
 
     #calculates the number of matched simulated B, C quarks for tt+XY matching
@@ -189,6 +213,12 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'btaglr',
         _conf = python_conf,
         btagAlgo = "btagCSV"
+    )
+    counter_blr = cfg.Analyzer(
+        MECoreAnalyzers.CounterAnalyzer,
+        'counter_blr',
+        _conf = python_conf,
+        counter_name = "_blr",
     )
 
     ##calculates the b-tag likelihood ratio
@@ -262,22 +292,32 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'memory',
         _conf = python_conf
     )
+    counter_final = cfg.Analyzer(
+        MECoreAnalyzers.CounterAnalyzer,
+        'counter_final',
+        _conf = python_conf,
+        counter_name = "_final",
+    )
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
 
     # definition of a sequence of analyzers,
     # the analyzers will process each event in this order
     sequence = cfg.Sequence([
-        memory_ana,
         counter,
+        memory_ana,
         evtid_filter,
         prefilter,
         evs,
         pvana,
         trigger,
+        counter_trg,
         leps,
+        counter_lep,
         jets,
+        counter_jet,
         btaglr,
+        counter_blr,
         #btaglr_bdt,
         qglr,
         wtag,
@@ -289,7 +329,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         mem_analyzer,
         #mva,
         treevar,
-        treeProducer
+        treeProducer,
+        counter_final,
     ])
 
     #Book the output file

@@ -106,7 +106,8 @@ class JetAnalyzer(FilterAnalyzer):
             evdict[syst].changes_jet_category = False
             if nj != nj_nominal or nt != nt_nominal:
                 evdict[syst].changes_jet_category = True
-        return self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
+        ret = self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
+        return ret
 
     def _process(self, event, evdict):
         
