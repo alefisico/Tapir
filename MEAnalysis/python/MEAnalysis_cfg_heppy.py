@@ -328,8 +328,8 @@ class Conf:
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            "TotalUp",
-            "TotalDown",
+        #    "TotalUp",
+        #    "TotalDown",
         ],
 
         "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)
