@@ -10,7 +10,25 @@ from rq import Queue
 from redis import Redis
 from multijob import draw_hist, get_count, draw_hist_wrap 
 
+def waitJobs(jobs):
+    done = False 
+    while not done:
+        num_finished = 0
+        for job in jobs:
+            if job.status == "finished":
+                num_finished += 1
+            if job.status == "failed":
+                job.refresh()
+                print job.exc_info
+                raise Exception("failed")
+        if num_finished == len(jobs):
+            done = True
+        time.sleep(1)
+
 if __name__ == "__main__":
+    redis_conn = Redis(host="t3ui02", port=6379)
+    qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
+    
     os.environ["CMSSW_BASE"] = "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW"
     sys.path.append("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/python/")
     from TTH.MEAnalysis.samples_base import getSitePrefix, chunks
@@ -20,15 +38,24 @@ if __name__ == "__main__":
     analysis = analysisFromConfig("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/data/lowtag_csv.cfg")
 
     print "getting weights"
+    ngen = {}
+    ngen["ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"] = 3754591.0
+    ngen["TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"] = 73672901.0
     weights = {}
     for samp in analysis.samples:
         if samp.schema == "mc":
-            ngen = get_count(samp.file_names)
-            print samp.name, ngen
-            #weight = samp.xsec * 524.965/float(ngen)
-            weight = samp.xsec * 4000.0/float(ngen)
+            #jobs = []
+            #for fi in samp.file_names:
+            #    jobs += [
+            #        qmain.enqueue_call(get_count, args=([fi], ), timeout=300)
+            #    ]
+            #waitJobs(jobs) 
+            #ngen = sum([j.result for j in jobs])
+            #print samp.name, ngen
+            weight = samp.xsec * 4000.0/float(ngen[samp.name])
             weights[samp.name] = weight
-    
+   
+
     def plot_cut(analysis, variable, bins, cut, weights):
         print variable, cut
         args = {}
@@ -43,8 +70,6 @@ if __name__ == "__main__":
             args[samp.name] = (samp.file_names, variable, bins, cutstring)
         
         t0 = time.time()
-        redis_conn = Redis(host="t3ui02", port=6379)
-        qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
         jobs = []
         
         jobs_sample = {}
@@ -58,19 +83,7 @@ if __name__ == "__main__":
                 jobs += [job]
                 jobs_sample[samp_name] += [job]
 
-        done = False 
-        while not done:
-            num_finished = 0
-            for job in jobs:
-                if job.status == "finished":
-                    num_finished += 1
-                if job.status == "failed":
-                    job.refresh()
-                    print job.exc_info
-                    raise Exception("failed")
-            if num_finished == len(jobs):
-                done = True
-            time.sleep(1)
+        waitJobs(jobs)
 
         res_multi = {}
         for samp in analysis.samples:
@@ -79,8 +92,8 @@ if __name__ == "__main__":
                 res_multi[samp.name] = sum(results)
         return res_multi
 
-    cutstring_mu = "(HLT_BIT_HLT_IsoMu24_v==1 || HLT_BIT_HLT_IsoTkMu24_v==1) && is_sl==1 && abs(leps_pdgId[0])==13 && numJets>=6 && nBCSVM==2"
-    cutstring_el = "(HLT_BIT_HLT_Ele27_WPTight_Gsf_v==1) && is_sl==1 && abs(leps_pdgId[0])==11 && numJets>=6 && nBCSVM==2"
+    cutstring_mu = "(HLT_BIT_HLT_IsoMu24_v==1 || HLT_BIT_HLT_IsoTkMu24_v==1) && is_sl==1 && abs(leps_pdgId[0])==13 && numJets>=4 && nBCSVM>=2"
+    cutstring_el = "(HLT_BIT_HLT_Ele27_WPTight_Gsf_v==1) && is_sl==1 && abs(leps_pdgId[0])==11 && numJets>=4 && nBCSVM>=2"
 
     results = {}
     for cutname, cutstring in [("mu", cutstring_mu), ("el", cutstring_el)]:

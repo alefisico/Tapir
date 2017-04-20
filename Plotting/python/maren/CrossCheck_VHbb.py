@@ -12,13 +12,7 @@ import socket # to get the hostname
 import math
 import numpy as np
 
-from ROOT import *
-
-if "CMSSW_VERSION" in os.environ.keys():
-    from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
-else:
-    from TTH.Plotting.python.Helpers.CompareDistributionsHelpers import *
-
+import ROOT
 
 ########################################
 # Define Input Files and
@@ -36,6 +30,8 @@ full_file_names = {}
 fn = os.environ['FILE_NAMES'].split(' ')
 for v in fn:
     full_file_names[v] = basepath + v
+
+dataset = os.environ["DATASETPATH"]
 
 #full_file_names = {}
 #full_file_names["v"] = "./testdata.root"
@@ -77,8 +73,9 @@ for l in full_file_names:
         for l in Histonames:
 
             #Event selection
-            if event.json!=1:
-                continue
+            if dataset == "SingleMuon" or dataset == "SingleElectron":
+                if event.json!=1:
+                    continue
 
             if (event.HLT_BIT_HLT_IsoMu24_v!=1 and event.HLT_BIT_HLT_IsoTkMu24_v!=1):
                 continue
@@ -114,7 +111,7 @@ for l in full_file_names:
     
        
 
-results = TFile("CrossCheck_VHbb.root","recreate")
+results = ROOT.TFile("CrossCheck_VHbb.root","recreate")
 for i in Histonames:
     Histograms[i].Write()
 

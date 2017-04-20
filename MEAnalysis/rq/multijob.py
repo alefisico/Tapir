@@ -15,6 +15,7 @@ def draw_hist(files, func, bins, cut):
     return h
 
 def get_count(files):
+    print files
     #import ROOT
     count = 0
     for fi in files:

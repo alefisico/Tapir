@@ -48,7 +48,7 @@ tt.SetBranchStatus("*", True)
 
 of = ROOT.TFile(ofname, "RECREATE")
 of.cd()
-tt.CopyTree("1")
+tt.CopyTree("run==277194")
 #tt.CopyTree("(is_sl && numJets>=4 && nBCSVM>=2) || (numJets>=4 && nBCSVM>=3) || (numJets==5 && nBCSVM>=2))) || (is_dl && (numJets>=3 && nBCSVM >=2)) || (is_fh && (numJets>=4 && nBCSVM>=3))")
 #tt.CopyTree("(is_sl && numJets>=4) || (is_dl && numJets>=4)")
 #tt.CopyTree("(is_sl || is_dl || is_fh)")

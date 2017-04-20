@@ -379,7 +379,7 @@ def getTreeProducer(conf):
         NTupleVariable("eta", lambda x : x.eta),
         NTupleVariable("phi", lambda x : x.phi),
         NTupleVariable("mass", lambda x : x.mass),
-        NTupleVariable("id", lambda x : x.id, mcOnly=True),  
+        NTupleVariable("id", lambda x : x.id),  
         NTupleVariable("qgl", lambda x : x.qgl),
         NTupleVariable("btagCSV", lambda x : x.btagCSV),
         NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
