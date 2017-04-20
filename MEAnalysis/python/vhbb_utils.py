@@ -70,9 +70,9 @@ class JetWrapper:
         return self.orig.hadronFlavour
 
     def btag(self, algo):
-        if algo == "newpfCombinedInclusiveSecondaryVertexV2BJetTags":
+        if algo == "pfCombinedInclusiveSecondaryVertexV2BJetTags":
             return self.orig.btagCSV
-        elif algo == "newpfCombinedMVAV2BJetTags":
+        elif algo == "pfCombinedMVAV2BJetTags":
             return self.orig.btagCMVA
         else:
             raise Exception("b-tag algorithm {0} undefined".format(algo))
