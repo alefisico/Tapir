@@ -102,3 +102,11 @@ tthbb13=bddd61c
 CommonClassifier=91f1d2f
 MEIntegratorStandalone=4a1ce78
 CMSSW=8c336cb
+
+
+Apr20_cmssw_v2
+-------------
+tthbb13=8b6d33d
+CommonClassifier=91f1d2f
+MEIntegratorStandalone=4a1ce78
+CMSSW=63846b5
