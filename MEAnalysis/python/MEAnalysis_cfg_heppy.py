@@ -232,7 +232,7 @@ class Conf:
     }
 
     general = {
-        "passall": False,
+        "passall": True,
         "QGLtoDo": {
          #3:[(3,0)] => "evalute qg LR of 3q vs 0q(+3g), considering only light jets, in events with 3 b-jets"
             3:[(3,0),(3,2),(4,0),(4,3),(5,0),(5,4)], 
@@ -320,7 +320,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True, #DS
+        "calcME": False,
         "n_integration_points_mult": 1.0,
         "factorized_sources": factorizedJetCorrections,
         #compute MEM variations for these sources in the nominal case
@@ -328,8 +328,8 @@ class Conf:
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-            #"TotalUp", #DS
-            #"TotalDown",
+        #    "TotalUp",
+        #    "TotalDown",
         ],
 
         "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)

@@ -118,8 +118,8 @@ for sd in sets_data:
     datasets[name] = {
         "ds": sd,
         "maxlumis": -1,
-        "perjob": 30,
-        "runtime": 10, #hours
+        "perjob": 10,
+        "runtime": 20, #hours
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'
     }
@@ -525,7 +525,7 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        #"ttHTobb",
+        "ttHTobb",
         #"ttHToNonbb",
         "TTbar_inc",
         #"TTbar_isr_up",
@@ -561,20 +561,20 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
 workflow_datasets["leptonic_nome"] = {}
 for k in [
         #"ttHTobb",
-        "ttHToNonbb",
-        #"TTbar_inc",
-        "TTbar_sl",
-        "TTbar_dl",
-        "ww1", "ww2",
-        "wz1", "wz2",
-        "zz1", "zz2",
-        "st_t", "stbar_t",
-        "st_tw", "stbar_tw",
-        "st_s",
-        "ttw_wlnu1",
-        "ttw_wlnu2",
-        "ttw_wqq",
-        "ttz_zqq",
+        #"ttHToNonbb",
+        "TTbar_inc",
+        #"TTbar_sl",
+        #"TTbar_dl",
+        #"ww1", "ww2",
+        #"wz1", "wz2",
+        #"zz1", "zz2",
+        #"st_t", "stbar_t",
+        #"st_tw", "stbar_tw",
+        #"st_s",
+        #"ttw_wlnu1",
+        #"ttw_wlnu2",
+        #"ttw_wqq",
+        #"ttz_zqq",
         # "wjets_ht_100_200",
         # "wjets_ht_200_400",
         # "wjets_ht_400_600",
@@ -659,7 +659,7 @@ workflow_datasets["testing"] = {}
 for k in [
     "ttHTobb",
     #"TTbar_inc",
-    "SingleMuon-Run2016H-03Feb2017_ver3-v1"
+    #"SingleMuon-Run2016H-03Feb2017_ver3-v1"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 5
@@ -729,7 +729,7 @@ if __name__ == '__main__':
     
     def localsubmit(config, dname, opts):
         TMPDIR = "/scratch/{0}/crab_work/{1}/crab_{2}".format(os.environ["USER"], args.tag, dname)
-        CMSSW_VERSION = "CMSSW_8_0_19"
+        CMSSW_VERSION = "CMSSW_8_0_25"
         workdir = os.path.join(TMPDIR, CMSSW_VERSION, "work")
         try: 
             shutil.rmtree(TMPDIR)

@@ -6,10 +6,11 @@ event = numpy.zeros(1, dtype=numpy.uint64)
 
 infiles = sys.argv[1:]
 
+runs = []
 lumidict = {}
 
 for infile in infiles:
-    tf = ROOT.TFile(infile)
+    tf = ROOT.TFile.Open(infile)
     tt = tf.Get("tree")
     
     tt.SetBranchAddress("run", run)
@@ -22,12 +23,17 @@ for infile in infiles:
     
     for i in range(tt.GetEntries()):
         tt.GetEntry(i)
+        runs += [(run[0], lumi[0])]
         if not lumidict.has_key((run[0], lumi[0], event[0])):
             lumidict[(run[0], lumi[0], event[0])] = [(infile, i)]
         else:
             lumidict[(run[0], lumi[0], event[0])] += [(infile, i)]
-    print "scanned file={0} Nentries={1}".format(infile, i)
+    print "scanned file={0} Nentries={1}".format(infile, tt.GetEntries())
     tf.Close()
+
+
+print "unique runs", sorted(list(set(runs)))
+
 for (k, v) in lumidict.items():
     if len(v) > 1:
         print "DUPE", k, len(v)

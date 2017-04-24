@@ -122,7 +122,7 @@ class SubjetAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_subjet = False
-        return np.any([v.passes_subjet for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_subjet for v in event.systResults.values()])
 
     def _process(self, event):
         event.passes_subjet = True

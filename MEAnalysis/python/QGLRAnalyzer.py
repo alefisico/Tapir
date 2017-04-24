@@ -100,7 +100,7 @@ class QGLRAnalyzer(FilterAnalyzer):
                 event.systResults[syst] = res
             else:
                 event.systResults[syst].passes_qgl = False
-        return np.any([v.passes_qgl for v in event.systResults.values()])
+        return self.conf.general["passall"] or np.any([v.passes_qgl for v in event.systResults.values()])
 
     def _process(self, event): 
         if "debug" in self.conf.general["verbosity"]:
