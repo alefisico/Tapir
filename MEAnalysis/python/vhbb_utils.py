@@ -51,6 +51,9 @@ class MET:
         return [MET(tree=event.input)]
 
 class JetWrapper:
+    """
+    Needed for Heppy btagSF calculator, which expects certain functions from the jet.
+    """
     def __init__(self, orig):
         self.orig = orig
     

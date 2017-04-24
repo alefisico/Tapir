@@ -31,7 +31,8 @@ FUNCTION_TABLE = {
     "mem_SL_0w2h2t_p": lambda ev: ev["mem_SL_0w2h2t_p"],
     "mem_SL_1w2h2t_p": lambda ev: ev["mem_SL_1w2h2t_p"],
     "mem_SL_2w2h2t_p": lambda ev: ev["mem_SL_2w2h2t_p"],
-    "Wmass": lambda ev: ev["Wmass"]
+    "Wmass": lambda ev: ev["Wmass"],
+    "counting": 1.0
 }
 
 class Cut(object):
