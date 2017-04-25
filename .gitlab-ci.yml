@@ -12,7 +12,7 @@ before_script:
   - git submodule update --init --recursive
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc530"
-  - export CMSSW_VERSION="CMSSW_8_0_25"
+  - export CMSSW_VERSION="CMSSW_8_0_26_patch2"
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
   - source /cvmfs/grid.cern.ch/emi-ui-3.15.3-1_sl6v1/etc/profile.d/setup-ui-example.sh
   - cd ..
