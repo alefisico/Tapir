@@ -38,21 +38,21 @@ if __name__ == "__main__":
     analysis = analysisFromConfig("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/data/lowtag_csv.cfg")
 
     print "getting weights"
-    ngen = {}
-    ngen["ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"] = 3754591.0
-    ngen["TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"] = 73672901.0
+    #ngen = {}
+    #ngen["ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"] = 3754591.0
+    #ngen["TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"] = 73672901.0
     weights = {}
     for samp in analysis.samples:
         if samp.schema == "mc":
-            #jobs = []
-            #for fi in samp.file_names:
-            #    jobs += [
-            #        qmain.enqueue_call(get_count, args=([fi], ), timeout=300)
-            #    ]
-            #waitJobs(jobs) 
-            #ngen = sum([j.result for j in jobs])
-            #print samp.name, ngen
-            weight = samp.xsec * 4000.0/float(ngen[samp.name])
+            jobs = []
+            for fi in samp.file_names:
+                jobs += [
+                    qmain.enqueue_call(get_count, args=([fi], ), timeout=300)
+                ]
+            waitJobs(jobs) 
+            ngen = sum([j.result for j in jobs])
+            print samp.name, ngen
+            weight = samp.xsec * 3970.0/float(ngen[samp.name])
             weights[samp.name] = weight
    
 

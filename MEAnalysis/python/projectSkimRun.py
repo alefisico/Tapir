@@ -13,6 +13,8 @@ for fi in os.environ["FILE_NAMES"].split():
     tf.Close() 
     tt.AddFile(fn)
 
+runnumber = int(sys.argv[2])
+
 tt.SetBranchStatus("*", True)
 #tt.SetBranchStatus("mem_*", True)
 #tt.SetBranchStatus("nMatch*", True)
@@ -48,7 +50,7 @@ tt.SetBranchStatus("*", True)
 
 of = ROOT.TFile(ofname, "RECREATE")
 of.cd()
-tt.CopyTree("1")
+tt.CopyTree("run=={0}".format(runnumber))
 #tt.CopyTree("(is_sl && numJets>=4 && nBCSVM>=2) || (numJets>=4 && nBCSVM>=3) || (numJets==5 && nBCSVM>=2))) || (is_dl && (numJets>=3 && nBCSVM >=2)) || (is_fh && (numJets>=4 && nBCSVM>=3))")
 #tt.CopyTree("(is_sl && numJets>=4) || (is_dl && numJets>=4)")
 #tt.CopyTree("(is_sl || is_dl || is_fh)")
