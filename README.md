@@ -4,7 +4,7 @@ Setup on SLC6 in a clean directory (no CMSSW) on a **shared file system**
 ~~~
 $ mkdir -p ~/tth/sw
 $ cd ~/tth/sw
-$ wget --no-check-certificate https://gitlab.cern.ch/jpata/tthbb13/raw/meanalysis-80x/setup.sh
+$ wget --no-check-certificate https://gitlab.cern.ch/jpata/tthbb13/raw/meanalysis-80x-V25/setup.sh
 $ source setup.sh
 ~~~
 This will download CMSSW, the tthbb code and all the dependencies.
@@ -204,6 +204,8 @@ From the output of makecategory, you can make data/MC plots using code in `plotl
 On the T3 using 10 cores, you can make about 100 pdf plots per minute.
 
 ## Step3-6 in one go: `launcher.py`
+
+If you are running this step for the first time, you need to create an empty "logs" folder in the rq directory.
 
 There is a new workflow in order to run all the post-ntuplization steps in one workflow. It relies on a central "job broker" and a launcher script.
 **Important**: only one broker can run per T3 UI!
