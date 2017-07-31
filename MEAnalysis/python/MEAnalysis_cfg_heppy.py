@@ -110,6 +110,32 @@ def el_baseline_medium(el):
 
     return ret
 
+def el_baseline_tight(el):
+
+    # Taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2?rev=42
+    sca = abs(el.etaSc)
+    ret = ((sca <= 1.479 and
+        el.eleSieie < 0.00998 and
+        el.eleHoE < 0.0414 and
+        abs(el.eleDEta) < 0.00308 and
+        abs(el.eleDPhi) < 0.0816 and
+        el.eleooEmooP < 0.0129 and
+        el.eleExpMissingInnerHits <= 1 and
+        el.combIsoAreaCorr < 0.0588 and
+        el.convVetoFull == True) or
+        (sca >1.479 and
+        el.eleSieie < 0.0292 and
+        el.eleHoE < 0.0641 and
+        abs(el.eleDEta) < 0.00605 and
+        abs(el.eleDPhi) < 0.0394 and
+        el.eleooEmooP < 0.0129 and
+        el.eleExpMissingInnerHits <= 1 and
+        el.combIsoAreaCorr < 0.0571 and
+        el.convVetoFull == True)
+
+        return ret
+    )
+
 def print_el(el):
     print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s, mvaIdFlag=%s, mvaId=%s, ecalIso=%s, hcalIso=%s)" % (
         el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
@@ -125,20 +151,20 @@ class Conf:
 
             #SL
             "SL": {
-                "pt": 25,
+                "pt": 26,
                 "eta":2.1,
                 "iso": 0.15,
                 "idcut": mu_baseline_tight,
             },
             "DL": {
-                "iso": 0.15,
+                "iso": 0.25,
                 "eta": 2.4,
                 "idcut": mu_baseline_tight,
             },
             "veto": {
                 "pt": 15.0,
                 "eta": 2.4,
-                "iso": 0.15,
+                "iso": 0.25,
                 "idcut": mu_baseline_tight,
             },
             "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
@@ -149,23 +175,23 @@ class Conf:
             "SL": {
                 "pt": 30,
                 "eta": 2.1,
-                "idcut": lambda el: el_baseline_medium(el),
+                "idcut": lambda el: el_baseline_tight(el),
             },
             "DL": {
                 "eta": 2.4,
-                "idcut": el_baseline_medium,
+                "idcut": el_baseline_tight,
             },
             "veto": {
                 "pt": 15.0,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_medium(el),
+                "idcut": lambda el: el_baseline_tight(el),
             },
             #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
             "isotype": "none", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr), none
             "debug" : print_el
         },
         "DL": {
-            "pt_leading": 20,
+            "pt_leading": 25,
             "pt_subleading": 15,
         },
         "selection": lambda event: event.is_sl or event.is_dl

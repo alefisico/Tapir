@@ -224,6 +224,14 @@ class MEAnalyzer(FilterAnalyzer):
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
 
+    def getRightCorrection(self,jet,corr):
+        corrfactor = 1
+        if corr == "JERUp" or corr == "JERDown":
+            corrfactor = jet.corr_JER
+        else:
+            corrfactor = jet.corr
+        return getattr(jet, "corr_" + corr)/corrfactor
+
     def configure_mem(self, event, mem_cfg):
         mem_cfg.cfg.num_jet_variations = len(self.conf.mem["jet_corrections"])
         self.vars_to_integrate.clear()
@@ -248,7 +256,7 @@ class MEAnalyzer(FilterAnalyzer):
         lquarks = sorted(list(mem_cfg.l_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
         for l in lquarks:
             l.btagFlag = 0.0
-
+            
         if len(lquarks) > mem_cfg.maxLJets:
             autolog("More than {0} l-quarks supplied, dropping last {1} from MEM".format(
                 mem_cfg.maxLJets, len(lquarks) - mem_cfg.maxLJets)
@@ -258,8 +266,9 @@ class MEAnalyzer(FilterAnalyzer):
             lquarks = lquarks[:mem_cfg.maxLJets]
 
         event.mem_jets = bquarks + lquarks
-        ##Only take up to 4 candidates, otherwise runtimes become too great
+        ##Only take up to 4 candidates, otherwise runtimes become too great        
         for jet in bquarks + lquarks:
+
             add_obj(
                 self.integrator,
                 MEM.ObjectType.Jet,
@@ -272,7 +281,7 @@ class MEAnalyzer(FilterAnalyzer):
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 },
-                corrections = [getattr(jet, "corr_" + x)/jet.corr for x in self.conf.mem["jet_corrections"]] if event.systematic == "nominal" and self.cfg_comp.isMC else [],
+                corrections = [self.getRightCorrection(jet,x) for x in self.conf.mem["jet_corrections"]] if event.systematic == "nominal" and self.cfg_comp.isMC else [],
             )
             if "meminput" in self.conf.general["verbosity"]:
                 autolog("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4}".format(
@@ -378,7 +387,7 @@ class MEAnalyzer(FilterAnalyzer):
                         ((event.systematic in self.conf.mem["enabled_systematics"]
                         or event.changes_jet_category) or event.systematic == "nominal")
                     ):
-                    
+
                     autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6} 3blr={7}".format(
                         hypo, confname,
                         event.input.run, event.input.lumi, event.input.evt,
