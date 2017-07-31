@@ -403,6 +403,7 @@ def getTreeProducer(conf):
         NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("corr", lambda x : x.corr, mcOnly=True),
+        NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
     ] + corrs)
 
     #Create the output TTree writer

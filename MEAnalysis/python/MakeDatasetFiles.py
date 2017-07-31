@@ -163,7 +163,7 @@ if __name__ == "__main__":
                     print "Could not parse nevents", fi["file"][0]
                     nevents = 0
                 if lumis_dict.has_key(name):
-                    tmp_lumis = LumiList(compactList = lumis_dict[name])
+                    tmp_lumis = LumiList(runsAndLumis = lumis_dict[name])
                     lumis += [tmp_lumis]
                 ofile.write("{0} = {1}\n".format(name, nevents))
             #merge lumi files

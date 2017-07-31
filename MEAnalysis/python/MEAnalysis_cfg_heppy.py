@@ -114,7 +114,7 @@ def el_baseline_tight(el):
 
     # Taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2?rev=42
     sca = abs(el.etaSc)
-    ret = ((sca <= 1.479 and
+    ret = ((sca < 1.4442 and
         el.eleSieie < 0.00998 and
         el.eleHoE < 0.0414 and
         abs(el.eleDEta) < 0.00308 and
@@ -123,7 +123,7 @@ def el_baseline_tight(el):
         el.eleExpMissingInnerHits <= 1 and
         el.combIsoAreaCorr < 0.0588 and
         el.convVetoFull == True) or
-        (sca >1.479 and
+        (sca >1.5669 and
         el.eleSieie < 0.0292 and
         el.eleHoE < 0.0641 and
         abs(el.eleDEta) < 0.00605 and
@@ -133,8 +133,10 @@ def el_baseline_tight(el):
         el.combIsoAreaCorr < 0.0571 and
         el.convVetoFull == True)
 
-        return ret
+    
     )
+
+    return ret
 
 def print_el(el):
     print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s, mvaIdFlag=%s, mvaId=%s, ecalIso=%s, hcalIso=%s)" % (
