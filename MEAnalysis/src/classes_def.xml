@@ -1,4 +1,16 @@
 <lcgdict>
-	<class name="std::vector<TLorentzVector>"/>
-	<class name="EventShapeVariables"/>
+    <class name="std::vector<TLorentzVector>"/>
+    <class name="std::vector<TTH_MEAnalysis::Jet>"/>
+    <class name="EventShapeVariables"/>
+
+    <enum name="TTH_MEAnalysis::Systematic::Event"/>
+    <enum name="TTH_MEAnalysis::Systematic::Direction"/>
+    <enum name="TTH_MEAnalysis::SampleDescription::Schema"/>
+
+    <class name="std::pair<TTH_MEAnalysis::Systematic::Event, TTH_MEAnalysis::Systematic::Direction>"/>
+    <class name="std::map<TTH_MEAnalysis::Systematic::SystId, double>"/>
+
+    <class name="TTH_MEAnalysis::TreeDescription"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMC"/>
+    <class name="TTH_MEAnalysis::EventDescription"/>
 </lcgdict>

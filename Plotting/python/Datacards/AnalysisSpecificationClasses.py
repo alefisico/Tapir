@@ -21,17 +21,17 @@ def triplewise(iterable):
     return izip(a, a, a)
 
 FUNCTION_TABLE = {
-    "btag_LR_4b_2b_btagCSV_logit": lambda ev: ev["btag_LR_4b_2b_btagCSV_logit"],
-    "common_bdt": lambda ev: ev["common_bdt"],
-    "jetsByPt_0_eta": lambda ev: ev["jets_p4"][0].Eta(),
-    "jetsByPt_0_pt": lambda ev: ev["jets_p4"][0].Pt(),
-    "jetsByPt_0_btagCSV": lambda ev: ev["jets_p4"][0].btagCSV,
-    "leps_0_pt": lambda ev: ev["leps_pt"][0],
-    "mem_DL_0w2h2t_p": lambda ev: ev["mem_DL_0w2h2t_p"],
-    "mem_SL_0w2h2t_p": lambda ev: ev["mem_SL_0w2h2t_p"],
-    "mem_SL_1w2h2t_p": lambda ev: ev["mem_SL_1w2h2t_p"],
-    "mem_SL_2w2h2t_p": lambda ev: ev["mem_SL_2w2h2t_p"],
-    "Wmass": lambda ev: ev["Wmass"],
+    "btag_LR_4b_2b_btagCSV_logit": lambda ev: ev.btag_LR_4b_2b_btagCSV_logit,
+    "common_bdt": lambda ev: ev.common_bdt,
+    "jetsByPt_0_eta": lambda ev: ev.jets[0].lv.Eta(),
+    "jetsByPt_0_pt": lambda ev: ev.jets[0].lv.Pt(),
+    "jetsByPt_0_btagCSV": lambda ev: ev.jets[0].btag,
+    "leps_0_pt": lambda ev: ev.leptons[0].lv.Pt(),
+    "mem_DL_0w2h2t_p": lambda ev: ev.mem_DL_0w2h2t_p,
+    "mem_SL_0w2h2t_p": lambda ev: ev.mem_SL_0w2h2t_p,
+    "mem_SL_1w2h2t_p": lambda ev: ev.mem_SL_1w2h2t_p,
+    "mem_SL_2w2h2t_p": lambda ev: ev.mem_SL_2w2h2t_p,
+    "Wmass": lambda ev: ev.Wmass,
     "counting": 1.0
 }
 
@@ -80,12 +80,14 @@ class Sample(object):
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
 
+        #Load the filenames for step2 (VHBB + tthbb13)
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
         except Exception as e:
             print "ERROR: could not load sample file {0}: {1}".format(self.files_load, e)
             self.file_names = []
 
+        #Load the filenames for step1 (VHBB)
         if self.files_load_step1 is None:
             self.file_names_step1 = self.file_names
         else:
@@ -95,6 +97,7 @@ class Sample(object):
                 print "ERROR: could not load sample file {0}: {1}".format(self.files_load_step1, e)
                 self.file_names_step1 = []
 
+        #Limit list of files in debug mode
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
@@ -128,7 +131,7 @@ class HistogramOutput:
         self.cut_name = cut_name
 
     def cut(self, event):
-        return event.get(self.cut_name, False)
+        return event.cuts.get(self.cut_name, False)
 
     def fill(self, event, weight = 1.0):
         self.hist.Fill(self.func(event), weight)
@@ -141,7 +144,7 @@ class CategoryCut:
         ret = True
         for cut in self.cuts:
             for cname, clow, chigh in cut.sparsinator:
-                v = event[cname]
+                v = getattr(event, cname)
                 ret = ret and (v >= clow and v < chigh)
                 if not ret:
                     return False
@@ -154,11 +157,14 @@ class Process(object):
     based on some event-level quantity such as ttCls
     """
     def __init__(self, *args, **kwargs):
+        #Name of the input sample
         self.input_name = kwargs.get("input_name")
+        #Name of the output process
         self.output_name = kwargs.get("output_name")
+
+        #Any cuts to apply on the input sample in order to generate this process
         self.cuts = kwargs.get("cuts", [])
         self.xs_weight = kwargs.get("xs_weight", 1.0)
-        #self.index = kwargs.get("index", -1)
         self.full_name = " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
 
     def __repr__(self):
