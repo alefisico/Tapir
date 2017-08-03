@@ -12,7 +12,7 @@ from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
 #FIXME: this is a hack to run heppy on non-EDM formats. Better to propagate it to heppy
 def fillCoreVariables(self, tr, event, isMC):
     if isMC:
-        for x in ["run", "lumi", "evt", "xsec", "genWeight"]:
+        for x in ["run", "lumi", "evt", "xsec", "genWeight", "puWeight"]:
             tr.fill(x, getattr(event.input, x))
     else:
         for x in ["run", "lumi", "evt"]:
@@ -685,7 +685,6 @@ def getTreeProducer(conf):
         ("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
-        ("puWeight",                float,    ""),
         ("puWeightUp",              float,    ""),
         ("puWeightDown",            float,    ""),
         ("qgWeight",                float,  ""),
