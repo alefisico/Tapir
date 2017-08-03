@@ -62,16 +62,12 @@ leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("pdgId", lambda x : x.pdgId),
-    NTupleVariable("relIso03", lambda x : x.pfRelIso03),
-    NTupleVariable("relIso04", lambda x : x.pfRelIso04),
+    NTupleVariable("iso", lambda x : x.iso),
     NTupleVariable("ele_mva_id", lambda x : x.eleMVAIdSpring15Trig),
     NTupleVariable("mu_id", lambda x : 1*getattr(x, "looseIdPOG", 0) + 2*getattr(x, "tightId", 0)),
 ] + [NTupleVariable(sf, lambda x, sf=sf : getattr(x, sf, -1.0))
     for sf in lepton_sf_kind + lepton_sf_kind_err
 ])
-
-
-
 
 p4type = NTupleObjectType("p4Type", variables = [
     NTupleVariable("pt", lambda x : x.Pt()),
@@ -559,6 +555,7 @@ def getTreeProducer(conf):
                     trignames += [tn]
 
     #MET filter flags added in VHBB
+    #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
         "Flag_goodVertices", 
         "Flag_GlobalTightHalo2016Filter",
@@ -566,6 +563,12 @@ def getTreeProducer(conf):
         "Flag_HBHENoiseIsoFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
         "Flag_eeBadScFilter",
+
+        #TODO: These need to be added to VHBB somehow
+        # "Flag_BadPFMuonFilter",
+        # "Flag_BadChargedCandidateFilter",
+        # "badGlobalMuonTagger",
+        # "cloneGlobalMuonTagger",
     ]
     for trig in trignames + metfilter_flags:
         treeProducer.globalVariables += [NTupleVariable(

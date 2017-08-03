@@ -9,10 +9,64 @@ import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 
-from TTH.Plotting.joosep.sparsinator import BufferedTree
-
 sys.modules["TFClasses"] = TFClasses
 ROOT.gROOT.SetBatch(True)
+
+class BufferedTree:
+    """Class with buffered TTree access, so that using tree.branch does not load the entry twice
+
+    Attributes:
+        branches (dict string->branch): TTree branches
+        buf (dict string->data): The buffer, according to branch name
+        iEv (int): Current event
+        maxEv (int): maximum number of events in the TTree
+        tree (TTree): Underlying TTree
+    """
+    def __init__(self, tree):
+        self.tree = tree
+        self.tree.SetCacheSize(10*1024*1024)
+        self.branches = {}
+        for br in self.tree.GetListOfBranches():
+            self.branches[br.GetName()] = br
+        self.tree.AddBranchToCache("*")
+        self.buf = {}
+        self.iEv = 0
+        self.maxEv = int(self.tree.GetEntries())
+
+    def __getattr__(self, attr, defval=None):
+        if self.__dict__["branches"].has_key(attr):
+            if self.__dict__["buf"].has_key(attr):
+                return self.__dict__["buf"][attr]
+            else:
+                val = getattr(self.__dict__["tree"], attr)
+                self.__dict__["buf"][attr] = val
+                return val
+        else:
+            if not defval is None:
+                return defval
+            raise Exception("Could not find branch with key: {0}".format(attr))
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.iEv > self.maxEv:
+            raise StopIteration
+        self.buf = {}
+        self.iEv += 1
+        bytes = self.tree.GetEntry(self.iEv)
+        if bytes < 0:
+            raise Exception("Could not read entry {0}".format(self.iEv))
+        return self
+        
+    def GetEntries(self):
+        return self.tree.GetEntries()
+
+    def GetEntry(self, idx):
+        self.buf = {}
+        self.iEv = idx
+        return self.tree.GetEntry(idx)
+
 
 class BufferedChain( object ):
     """Wrapper to TChain, with a python iterable interface.

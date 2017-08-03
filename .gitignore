@@ -24,3 +24,7 @@ Plotting/interface/categories.h
 Plotting/interface/gen.h
 Plotting/bin/categories.cc
 Plotting/bin/gen.cc
+RecoLikelihoodReconstruction
+MEAnalysis/rq/logs
+MEAnalysis/rq/results
+MEAnalysis/rq/status.md

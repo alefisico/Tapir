@@ -302,6 +302,7 @@ class vLeptons:
         self.eleMVAIdSpring15NonTrig = tree.vLeptons_eleMVAIdSpring15NonTrig[n];
         self.eleMVArawSpring16GenPurp = tree.vLeptons_eleMVArawSpring16GenPurp[n];
         self.eleMVAIdSppring16GenPurp = tree.vLeptons_eleMVAIdSppring16GenPurp[n];
+        self.eleCutIdSummer16 = tree.vLeptons_eleCutIdSummer16[n];
         self.nStations = tree.vLeptons_nStations[n];
         self.trkKink = tree.vLeptons_trkKink[n];
         self.segmentCompatibility = tree.vLeptons_segmentCompatibility[n];
@@ -580,6 +581,7 @@ class aLeptons:
         self.eleMVAIdSpring15NonTrig = tree.aLeptons_eleMVAIdSpring15NonTrig[n];
         self.eleMVArawSpring16GenPurp = tree.aLeptons_eleMVArawSpring16GenPurp[n];
         self.eleMVAIdSppring16GenPurp = tree.aLeptons_eleMVAIdSppring16GenPurp[n];
+        self.eleCutIdSummer16 = tree.aLeptons_eleCutIdSummer16[n];
         self.nStations = tree.aLeptons_nStations[n];
         self.trkKink = tree.aLeptons_trkKink[n];
         self.segmentCompatibility = tree.aLeptons_segmentCompatibility[n];
@@ -785,6 +787,7 @@ class selLeptons:
         self.eleMVAIdSpring15NonTrig = tree.selLeptons_eleMVAIdSpring15NonTrig[n];
         self.eleMVArawSpring16GenPurp = tree.selLeptons_eleMVArawSpring16GenPurp[n];
         self.eleMVAIdSppring16GenPurp = tree.selLeptons_eleMVAIdSppring16GenPurp[n];
+        self.eleCutIdSummer16 = tree.selLeptons_eleCutIdSummer16[n];
         self.nStations = tree.selLeptons_nStations[n];
         self.trkKink = tree.selLeptons_trkKink[n];
         self.segmentCompatibility = tree.selLeptons_segmentCompatibility[n];

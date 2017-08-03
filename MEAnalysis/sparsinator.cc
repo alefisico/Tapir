@@ -11,333 +11,12 @@
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
 #include "TTreeReaderArray.h"
-#include "TLorentzVector.h"
 #include "TStopwatch.h"
 
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
-
-class Jet {
-public:
-    TLorentzVector lv;
-    double btagCSV;
-
-    Jet(TLorentzVector _lv, double _btagCSV) :
-    lv(_lv),
-    btagCSV(_btagCSV)
-    {
-    }
-};
-
-
-namespace Systematic {
-
-enum Event {
-    Nominal,
-    CMS_scale_j,
-    CMS_res_j,
-    CMS_SubTotalPileUp_j,
-    CMS_AbsoluteStat_j,
-    CMS_AbsoluteScale_j,
-    CMS_AbsoluteFlavMap_j,
-    CMS_AbsoluteMPFBias_j,
-    CMS_Fragmentation_j,
-    CMS_SinglePionECAL_j,
-    CMS_SinglePionHCAL_j,
-    CMS_FlavorQCD_j,
-    CMS_TimePtEta_j,
-    CMS_RelativeJEREC1_j,
-    CMS_RelativeJEREC2_j,
-    CMS_RelativeJERHF_j,
-    CMS_RelativePtBB_j,
-    CMS_RelativePtEC1_j,
-    CMS_RelativePtEC2_j,
-    CMS_RelativePtHF_j,
-    CMS_RelativeFSR_j,
-    CMS_RelativeStatFSR_j,
-    CMS_RelativeStatEC_j,
-    CMS_RelativeStatHF_j,
-    CMS_PileUpDataMC_j,
-    CMS_PileUpPtRef_j,
-    CMS_PileUpPtBB_j,
-    CMS_PileUpPtEC1_j,
-    CMS_PileUpPtEC2_j,
-    CMS_PileUpPtHF_j,
-    CMS_ttH_CSVcferr1,
-    CMS_ttH_CSVcferr2,
-    CMS_ttH_CSVhf,
-    CMS_ttH_CSVhfstats1,
-    CMS_ttH_CSVhfstats2,
-    CMS_ttH_CSVjes,
-    CMS_ttH_CSVlf,
-    CMS_ttH_CSVlfstats1,
-    CMS_ttH_CSVlfstats2,
-    CMS_pu,
-};
-
-enum Direction {
-    None,
-    Up,
-    Down
-};
-
-typedef std::pair<Systematic::Event, Systematic::Direction> SystId;
-
-bool is_jec(SystId syst_id) {
-    return syst_id.first != CMS_res_j;
-}
-
-bool is_jer(SystId syst_id) {
-    return syst_id.first == CMS_res_j;
-}
-
-bool is_nominal(SystId syst_id) {
-    return syst_id.first == Nominal;
-}
-
-const static auto syst_id_nominal = std::make_pair(Systematic::Nominal, Systematic::None);
-} // namespace Systematic
-
-class EventDescription {
-public:
-    std::vector<Jet> jets;
-    std::vector<int> leps_pdgId;
-    int is_sl;
-    int numJets;
-    int nBCSVM;
-    Systematic::SystId syst_id;
-    std::map<Systematic::SystId, double> weights;
-};
-
-template <typename T>
-void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& values, const char* branch_name) {
-    values[std::make_pair(Systematic::Nominal, Systematic::None)] = new T(reader, branch_name);
-    
-    values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_TotalUp")).c_str());
-    values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_JERUp")).c_str());
-    values[std::make_pair(Systematic::CMS_SubTotalPileUp_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SubTotalPileUpUp")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteStat_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteStatUp")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteScale_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteScaleUp")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteFlavMap_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteFlavMapUp")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteMPFBias_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteMPFBiasUp")).c_str());
-    values[std::make_pair(Systematic::CMS_Fragmentation_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_FragmentationUp")).c_str());
-    values[std::make_pair(Systematic::CMS_SinglePionECAL_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionECALUp")).c_str());
-    values[std::make_pair(Systematic::CMS_SinglePionHCAL_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionHCALUp")).c_str());
-    values[std::make_pair(Systematic::CMS_FlavorQCD_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_FlavorQCDUp")).c_str());
-    values[std::make_pair(Systematic::CMS_TimePtEta_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_TimePtEtaUp")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeJEREC1_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC1Up")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeJEREC2_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC2Up")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeJERHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJERHFUp")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtBB_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtBBUp")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtEC1_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC1Up")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtEC2_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC2Up")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtHFUp")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeFSR_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeFSRUp")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeStatFSR_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatFSRUp")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeStatEC_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatECUp")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeStatHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatHFUp")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpDataMC_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpDataMCUp")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtRef_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtRefUp")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtBB_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtBBUp")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtEC1_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC1Up")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtEC2_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC2Up")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtHFUp")).c_str());
-
-    values[std::make_pair(Systematic::CMS_scale_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_TotalDown")).c_str());
-    values[std::make_pair(Systematic::CMS_res_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_JERDown")).c_str());
-    values[std::make_pair(Systematic::CMS_SubTotalPileUp_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_SubTotalPileUpDown")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteStat_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteStatDown")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteScale_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteScaleDown")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteFlavMap_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteFlavMapDown")).c_str());
-    values[std::make_pair(Systematic::CMS_AbsoluteMPFBias_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteMPFBiasDown")).c_str());
-    values[std::make_pair(Systematic::CMS_Fragmentation_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_FragmentationDown")).c_str());
-    values[std::make_pair(Systematic::CMS_SinglePionECAL_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionECALDown")).c_str());
-    values[std::make_pair(Systematic::CMS_SinglePionHCAL_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionHCALDown")).c_str());
-    values[std::make_pair(Systematic::CMS_FlavorQCD_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_FlavorQCDDown")).c_str());
-    values[std::make_pair(Systematic::CMS_TimePtEta_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_TimePtEtaDown")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeJEREC1_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC1Down")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeJEREC2_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC2Down")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeJERHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJERHFDown")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtBB_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtBBDown")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtEC1_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC1Down")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtEC2_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC2Down")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativePtHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtHFDown")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeFSR_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeFSRDown")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeStatFSR_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatFSRDown")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeStatEC_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatECDown")).c_str());
-    values[std::make_pair(Systematic::CMS_RelativeStatHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatHFDown")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpDataMC_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpDataMCDown")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtRef_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtRefDown")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtBB_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtBBDown")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtEC1_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC1Down")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtEC2_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC2Down")).c_str());
-    values[std::make_pair(Systematic::CMS_PileUpPtHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtHFDown")).c_str());
-}
-
-template <typename T>
-class TTreeReaderValueSystematic {
-public:
-    std::map<Systematic::SystId, TTreeReaderValue<T>* > values;
-
-    TTreeReaderValueSystematic(TTreeReader& reader, const char* branch_name) {
-        attachSystematics<TTreeReaderValue<T>>(reader, values, branch_name); 
-    }
-
-    T GetValue(Systematic::SystId syst_id) {
-        return **values.at(syst_id);
-    }
-};
-
-template <typename T>
-class TTreeReaderArraySystematic {
-public:
-    std::map<Systematic::SystId, TTreeReaderArray<T>* > values;
-
-    TTreeReaderArraySystematic(TTreeReader& reader, const char* branch_name) {
-        attachSystematics<TTreeReaderArray<T>>(reader, values, branch_name); 
-    }
-
-    TTreeReaderArray<T>* GetValue(Systematic::SystId syst_id) {
-        return values.at(syst_id);
-    }
-};
-
-class SampleDescription {
-public:
-    enum Schema {
-        MC,
-        DATA
-    };
-
-    Schema schema;
-
-    SampleDescription(Schema _schema) : schema(_schema) {};
-
-    bool isMC() const {
-        return schema == MC;
-    }
-};
-
-class TreeDescription {
-public:
-
-    TTreeReader reader;
-
-    TTreeReaderValue<unsigned long long> evt;
-    TTreeReaderValue<unsigned int> run;
-    TTreeReaderValue<unsigned int> lumi;
-
-    TTreeReaderValue<int> is_sl;
-    TTreeReaderValue<int> is_dl;
-    TTreeReaderValue<int> is_fh;
-
-    TTreeReaderValueSystematic<int> numJets;
-    TTreeReaderValueSystematic<int> nBCSVM;
-    
-    TTreeReaderValue<int> nleps;
-    TTreeReaderArray<double> leps_pdgId;
-    
-    TTreeReaderValue<int> njets;
-    TTreeReaderArray<double> jets_pt;
-    TTreeReaderArray<double> jets_eta;
-    TTreeReaderArray<double> jets_phi;
-    TTreeReaderArray<double> jets_mass;
-    TTreeReaderArray<double> jets_btagCSV;
-    TTreeReaderArraySystematic<double> jets_corr;
-    
-    TTreeReaderValue<double> btagWeightCSV;
-    TTreeReaderValue<double> btagWeightCSV_CSVcferr1Down;
-    TTreeReaderValue<double> btagWeightCSV_CSVcferr1Up;
-
-    std::map<Systematic::SystId, TTreeReaderArray<double>*> correction_branches;
-
-    SampleDescription sample;
-
-    TreeDescription(TFile* file, SampleDescription _sample) :
-        reader("tree", file),
-        evt(reader, "evt"),
-        run(reader, "run"),
-        lumi(reader, "lumi"),
-
-        is_sl(reader, "is_sl"),
-        is_dl(reader, "is_dl"),
-        is_fh(reader, "is_fh"),
-        
-        numJets(reader, "numJets"),
-        nBCSVM(reader, "nBCSVM"),
-        
-        nleps(reader, "nleps"),
-        leps_pdgId(reader, "leps_pdgId"),
-        
-        njets(reader, "njets"),
-        jets_pt(reader, "jets_pt"),
-        jets_eta(reader, "jets_eta"),
-        jets_phi(reader, "jets_phi"),
-        jets_mass(reader, "jets_mass"),
-        jets_btagCSV(reader, "jets_btagCSV"),
-        jets_corr(reader, "jets_corr"),
-        
-        btagWeightCSV(reader, "btagWeightCSV"),
-        btagWeightCSV_CSVcferr1Down(reader, "btagWeightCSV_down_cferr1"),
-        btagWeightCSV_CSVcferr1Up(reader, "btagWeightCSV_up_cferr1"),
-        sample(_sample)
-    {
-    }
-
-    TTreeReaderArray<double>* get_correction_branch(Systematic::SystId syst_id) {
-        return jets_corr.GetValue(syst_id);
-    };
-
-    std::vector<Jet> build_jets(Systematic::SystId syst_id) {
-        auto* correction_branch = get_correction_branch(syst_id);
-        std::vector<Jet> jets;
-        for (auto njet=0; njet < *njets; njet++) {
-            TLorentzVector lv;
-
-            double corr = 1.0;
-            double base_corr = 1.0;
-            
-            if (Systematic::is_jec(syst_id)) {
-                corr = (*correction_branch)[njet];
-                base_corr = (*jets_corr.GetValue(std::make_pair(Systematic::Nominal, Systematic::None)))[njet];
-            } else if (Systematic::is_jer(syst_id)) {
-                corr = (*correction_branch)[njet];
-                base_corr = (*jets_corr.GetValue(std::make_pair(Systematic::Nominal, Systematic::None)))[njet];
-            }
-
-            lv.SetPtEtaPhiM(jets_pt[njet] * corr/base_corr, jets_eta[njet], jets_phi[njet], jets_mass[njet]);
-            Jet jet(lv, jets_btagCSV[njet]);
-            jets.push_back(jet);
-        }
-        return jets;
-    }
-
-    EventDescription create_event(Systematic::SystId syst_id) {
-        std::vector<Jet> jets(build_jets(syst_id));
-        EventDescription event;
-        event.is_sl = *is_sl;
-        event.numJets = numJets.GetValue(syst_id);
-        event.nBCSVM = nBCSVM.GetValue(syst_id);
-        event.jets = jets;
-        event.syst_id = syst_id;
-        for (int ilep = 0; ilep < *nleps; ilep++) {
-            event.leps_pdgId.push_back((int)leps_pdgId[ilep]);
-        }
-
-        if (sample.isMC()) {
-            event.weights[Systematic::syst_id_nominal] = *btagWeightCSV;
-            if (Systematic::is_nominal(syst_id)) {
-                event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Up)] = *btagWeightCSV_CSVcferr1Up;
-                event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Down)] = *btagWeightCSV_CSVcferr1Down;
-            }
-        } else {
-            event.weights[Systematic::syst_id_nominal] = 1.0;
-        }
-        return event;
-    }
-};
 
 class OutputNode {
 public:
@@ -407,6 +86,7 @@ public:
         outputs.push_back(std::move(output));
     
         if (sample.isMC()) {
+            //Add all systematically modified histograms
             auto output_systev = make_unique<OutputNode>(
                 fill_func,
                 [](Systematic::SystId syst_id, const EventDescription& desc) {return desc.weights.at(Systematic::syst_id_nominal);},
@@ -417,6 +97,7 @@ public:
                 output_systev->histograms.at(systematic)->SetDirectory(0);
             }
 
+            //Add all systematically reweighted histograms 
             auto output_systw = make_unique<OutputNode>(
                 fill_func,
                 weight_systematic_map,
@@ -470,13 +151,7 @@ int main(int argc, const char** argv) {
     TH1::AddDirectory(false);
     TFile outfile("out.root", "RECREATE");
     auto filenames = {
-        "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GC4e85405795b1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_245_tree.root",
-        "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GC4e85405795b1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_246_tree.root",
-        "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GC4e85405795b1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_248_tree.root",
-        "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GC4e85405795b1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_249_tree.root",
-        "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GC4e85405795b1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_250_tree.root",
-        "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GC4e85405795b1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_251_tree.root",
-        "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GC4e85405795b1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_252_tree.root"
+        "file://./job_0_tree.root"
     };
 
     SampleDescription sample(SampleDescription::MC);
@@ -484,63 +159,63 @@ int main(int argc, const char** argv) {
     auto systematics_event = {
         std::make_pair(Systematic::CMS_scale_j, Systematic::Up),
         std::make_pair(Systematic::CMS_res_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_SubTotalPileUp_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_AbsoluteStat_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_AbsoluteScale_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_AbsoluteFlavMap_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_AbsoluteMPFBias_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_Fragmentation_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_SinglePionECAL_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_SinglePionHCAL_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_FlavorQCD_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_TimePtEta_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativeJEREC1_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativeJEREC2_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativeJERHF_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativePtBB_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativePtEC1_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativePtEC2_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativePtHF_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativeFSR_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativeStatFSR_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativeStatEC_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_RelativeStatHF_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_PileUpDataMC_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_PileUpPtRef_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_PileUpPtBB_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_PileUpPtEC1_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_PileUpPtEC2_j, Systematic::Up),
-//        std::make_pair(Systematic::CMS_PileUpPtHF_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_SubTotalPileUp_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_AbsoluteStat_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_AbsoluteScale_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_AbsoluteFlavMap_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_AbsoluteMPFBias_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_Fragmentation_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_SinglePionECAL_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_SinglePionHCAL_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_FlavorQCD_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_TimePtEta_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativeJEREC1_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativeJEREC2_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativeJERHF_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativePtBB_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativePtEC1_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativePtEC2_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativePtHF_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativeFSR_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativeStatFSR_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativeStatEC_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_RelativeStatHF_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_PileUpDataMC_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_PileUpPtRef_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_PileUpPtBB_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_PileUpPtEC1_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_PileUpPtEC2_j, Systematic::Up),
+        std::make_pair(Systematic::CMS_PileUpPtHF_j, Systematic::Up),
 
         std::make_pair(Systematic::CMS_scale_j, Systematic::Down),
         std::make_pair(Systematic::CMS_res_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_SubTotalPileUp_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_AbsoluteStat_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_AbsoluteScale_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_AbsoluteFlavMap_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_AbsoluteMPFBias_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_Fragmentation_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_SinglePionECAL_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_SinglePionHCAL_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_FlavorQCD_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_TimePtEta_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativeJEREC1_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativeJEREC2_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativeJERHF_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativePtBB_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativePtEC1_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativePtEC2_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativePtHF_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativeFSR_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativeStatFSR_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativeStatEC_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_RelativeStatHF_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_PileUpDataMC_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_PileUpPtRef_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_PileUpPtBB_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_PileUpPtEC1_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_PileUpPtEC2_j, Systematic::Down),
-//        std::make_pair(Systematic::CMS_PileUpPtHF_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_SubTotalPileUp_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_AbsoluteStat_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_AbsoluteScale_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_AbsoluteFlavMap_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_AbsoluteMPFBias_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_Fragmentation_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_SinglePionECAL_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_SinglePionHCAL_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_FlavorQCD_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_TimePtEta_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativeJEREC1_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativeJEREC2_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativeJERHF_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativePtBB_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativePtEC1_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativePtEC2_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativePtHF_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativeFSR_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativeStatFSR_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativeStatEC_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_RelativeStatHF_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_PileUpDataMC_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_PileUpPtRef_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_PileUpPtBB_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_PileUpPtEC1_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_PileUpPtEC2_j, Systematic::Down),
+        std::make_pair(Systematic::CMS_PileUpPtHF_j, Systematic::Down),
     };
     auto systematics_weight = {
         std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Up),

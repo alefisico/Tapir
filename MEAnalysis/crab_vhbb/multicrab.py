@@ -779,7 +779,6 @@ env
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
     config.JobType.maxMemoryMB = 3000 #DS
-    config.JobType.outputFiles = ["dump.txt"]
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")
