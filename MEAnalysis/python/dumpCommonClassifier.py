@@ -4,12 +4,6 @@ from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample
 from PhysicsTools.HeppyCore.statistics.tree import Tree
 import numpy as np
 
-class Correction:
-    def __init__(self, *args, **kwargs):
-        self.name = kwargs.get("name")
-        self.nominal = kwargs.get("nominal")
-        self.variated = kwargs.get("variated")
-
 class Jet:
     def __init__(self, *args, **kwargs):
         self.pt = kwargs.get("pt")
@@ -21,42 +15,6 @@ class Jet:
         self.cmva = kwargs.get("cmva")
         self.corrections = kwargs.get("corrections")
 
-    def correct(self, correction):
-        return Jet(
-            pt = correction.variated * self.pt / correction.nominal if correction.nominal > 0 else self.pt,
-            eta = self.eta,
-            phi = self.phi,
-            mass = correction.variated * self.mass / correction.nominal if correction.nominal > 0 else self.mass,
-            csv = self.csv,
-            cmva = self.cmva,
-            corrections = self.corrections
-        )
-
-def make_corrections(event, schema, jet_base, ijet):
-    corrs = []
-
-    corrs += [Correction(
-        name = "nominal",
-        nominal=1.0,
-        variated=1.0,
-    )]
-
-    if schema == "mc":
-        for nominal, variated in [
-            ("corr", "JESUp"),
-            ("corr", "JESDown"),
-            ("corr_JER", "JERUp"),
-            ("corr_JER", "JERDown"),
-        ]:
-            corrs += [
-                Correction(
-                    name = variated,
-                    nominal=getattr(event, "{0}_{1}".format(jet_base, nominal))[ijet],
-                    variated=getattr(event, "{0}_{1}".format(jet_base, "corr_" + variated))[ijet],
-                )
-            ]
-    return corrs
-
 class Scenario:
     def __init__(self, *args, **kwargs):
         self.jets = kwargs.get("jets")
@@ -66,6 +24,101 @@ class Scenario:
         self.met_phi = kwargs.get("met_phi")
         self.systematic_index = kwargs.get("systematic_index")
 
+def createOutput(jet_corrections, max_jets, max_leps):
+    outfile = ROOT.TFile('out.root', 'recreate')
+    tree = Tree('tree', 'MEM tree')
+
+    tree.var('numJets', the_type=int)
+    tree.var('numBTags', the_type=int)
+
+    tree.var('njets', the_type=int)
+    for v in ["jet_pt", "jet_eta", "jet_phi", "jet_mass", "jet_csv", "jet_cmva"]:
+        tree.vector(v, "njets", maxlen=max_jets, the_type=float, storageType="F")
+
+    for corr in jet_corrections:
+        tree.vector("jet_" + corr, "njets", maxlen=max_jets, the_type=float, storageType="F")
+        if corr != "corr" and corr != "corr_JER":
+            tree.var('numJets_' + corr.replace("corr_", ""), the_type=int)
+            tree.var('numBTags_' + corr.replace("corr_", ""), the_type=int)
+
+    for v in ["jet_type"]:
+        tree.vector(v, "njets", maxlen=max_jets, the_type=int, storageType="i")
+    
+    tree.var('nleps', the_type=int)
+    for v in ["lep_pt", "lep_eta", "lep_phi", "lep_mass", "lep_charge"]:
+        tree.vector(v, "nleps", maxlen=max_leps, the_type=float, storageType="F")
+    
+    tree.var('met_pt', the_type=float, storageType="F")
+    tree.var('met_phi', the_type=float, storageType="F")
+       
+    for v in ["event", "run", "lumi"]:
+        tree.var(v, the_type=int, storageType="L")
+    return outfile, tree
+
+def createLeptons(event, max_leps):
+    leps_p4 = []
+    leps_charge = []
+    for ilep in range(event.nleps)[:max_leps]:
+        p4 = [
+            event.leps_pt[ilep],
+            event.leps_eta[ilep],
+            event.leps_phi[ilep],
+            event.leps_mass[ilep]
+        ]
+        leps_p4 += [p4]
+        leps_charge += [math.copysign(1, event.leps_pdgId[ilep])]
+    return leps_p4, leps_charge
+
+def createJets(event, jet_corrections, max_jets):
+    jets = []
+
+    for ijet in range(event.njets)[:max_jets]:
+        jets += [Jet(
+            pt = event.jets_pt[ijet],
+            eta = event.jets_eta[ijet],
+            phi = event.jets_phi[ijet],
+            mass = event.jets_mass[ijet],
+            csv = event.jets_btagCSV[ijet],
+            cmva = event.jets_btagCMVA[ijet],
+            corrections = {corr: getattr(event, "jets_"+corr)[ijet] for corr in jet_corrections}
+        )]
+
+    return jets
+
+def fillTree(tree, event, jet_corrections, jets, leps_p4, leps_charge):
+    tree.fill('numJets', event.numJets)
+    tree.fill('numBTags', event.nBCSVM)
+
+    tree.fill('njets', len(jets))
+    tree.vfill('jet_pt', [x.pt for x in jets])
+    tree.vfill('jet_eta', [x.eta for x in jets])
+    tree.vfill('jet_phi', [x.phi for x in jets])
+    tree.vfill('jet_mass', [x.mass for x in jets])
+    tree.vfill('jet_csv', [x.csv for x in jets])
+    tree.vfill('jet_cmva', [x.cmva for x in jets])
+    for corr in jet_corrections:
+        tree.vfill('jet_' + corr, [x.corrections[corr] for x in jets])
+        if corr != "corr" and corr != "corr_JER":
+            corr_name = corr.replace("corr_", "")
+            tree.fill('numJets_' + corr_name, getattr(event, 'numJets_' + corr_name))
+            tree.fill('numBTags_' + corr_name, getattr(event, 'nBCSVM_' + corr_name))
+
+    tree.fill('nleps', len(leps_p4))
+    tree.vfill('lep_pt', [x[0] for x in leps_p4])
+    tree.vfill('lep_eta', [x[1] for x in leps_p4])
+    tree.vfill('lep_phi', [x[2] for x in leps_p4])
+    tree.vfill('lep_mass', [x[3] for x in leps_p4])
+    tree.vfill('lep_charge', leps_charge)
+    
+    tree.fill('met_pt', event.met_pt)
+    tree.fill('met_phi', event.met_phi)
+    
+    tree.fill('event', event.evt)
+    tree.fill('run', event.run)
+    tree.fill('lumi', event.lumi)
+        
+    tree.tree.Fill()
+
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
@@ -74,114 +127,39 @@ if __name__ == "__main__":
         prefix, sample_name = get_prefix_sample(os.environ["DATASETPATH"])
         an_name, analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG"))
     else:
-        file_names = map(getSitePrefix, [
-            "/store/user/jpata/tth/Sep14_leptonic_nome_v1/ttHTobb_M125_13TeV_powheg_pythia8/Sep14_leptonic_nome_v1/160914_142604/0000/tree_1.root"
-        ])
-        prefix = ""
-        sample_name = "ttHTobb_M125_13TeV_powheg_pythia8"
-        an_name, analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/python/Datacards/config_sldl.cfg")
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        file_names = analysis.get_sample(sample).file_names[:1]
 
-    sample = analysis.get_sample(sample_name)
-
-    ch = ROOT.TChain("tree")
+    chain = ROOT.TChain("tree")
     for fi in file_names:
-        ch.AddFile(getSitePrefix(fi))
+        chain.AddFile(getSitePrefix(fi))
     
-    outfile = ROOT.TFile('out.root', 'recreate')
-    tree = Tree('tree', 'MEM tree')
-    tree.var('systematic', type=int)
-    tree.var('njets', type=int)
     max_jets = 10
-    for v in ["jet_pt", "jet_eta", "jet_phi", "jet_mass", "jet_csv", "jet_cmva"]:
-        tree.vector(v, "njets", maxlen=max_jets, type=float, storageType="F")
-
-    for v in ["jet_type"]:
-        tree.vector(v, "njets", maxlen=max_jets, type=int, storageType="i")
-    
     max_leps = 2
-    tree.var('nleps', type=int)
-    for v in ["lep_pt", "lep_eta", "lep_phi", "lep_mass", "lep_charge"]:
-        tree.vector(v, "nleps", maxlen=max_leps, type=float, storageType="F")
-    
-    tree.var('met_pt', type=float, storageType="F")
-    tree.var('met_phi', type=float, storageType="F")
-    
-    tree.var('hypothesis', type=int, storageType="I")
-   
-    for v in ["event", "run", "lumi"]:
-        tree.var(v, type=int, storageType="L")
 
-    for iEv, ev in enumerate(ch):
-        accept = (ev.is_sl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
-        accept = accept or (ev.is_dl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
+    jet_corrections = map(
+        lambda x: x.replace("jets_", ""),
+        filter(
+            lambda x: x.startswith("jets_corr"),
+            [br.GetName() for br in chain.GetListOfBranches()]
+        )
+    )
+
+    outfile, tree = createOutput(jet_corrections, max_jets, max_leps)
+
+    for iEv, event in enumerate(chain):
+        if iEv % 100 == 0:
+            print iEv
+        accept = (event.is_sl or event.is_dl)
 
         if not accept:
             continue
         hypo = -1
 
-        leps_p4 = []
-        leps_charge = []
-        for ilep in range(ev.nleps)[:max_leps]:
-            p4 = [
-                ev.leps_pt[ilep],
-                ev.leps_eta[ilep],
-                ev.leps_phi[ilep],
-                ev.leps_mass[ilep]
-            ]
-            leps_p4 += [p4]
-            leps_charge += [math.copysign(1, ev.leps_pdgId[ilep])]
- 
-        jets = []
+        leps_p4, leps_charge = createLeptons(event, max_leps)
+        jets = createJets(event, jet_corrections, max_jets)
 
-        for ijet in range(ev.njets)[:max_jets]:
-            jets += [Jet(
-                pt = ev.jets_pt[ijet],
-                eta = ev.jets_eta[ijet],
-                phi = ev.jets_phi[ijet],
-                mass = ev.jets_mass[ijet],
-                csv = ev.jets_btagCSV[ijet],
-                cmva = ev.jets_btagCMVA[ijet],
-                corrections = make_corrections(ev, sample.schema, "jets", ijet)
-            )]
-
-        scenarios = []
-        for isf in range(len(jets[0].corrections)):
-            scenario = Scenario(
-                jets = [j.correct(j.corrections[isf]) for j in jets],
-                leps_p4 = leps_p4,
-                leps_charge = leps_charge,
-                met_pt = ev.met_pt,
-                met_phi = ev.met_phi,
-                systematic_index = isf
-            )
-            scenarios += [scenario]
-
-        for scenario in scenarios:
-            tree.fill('njets', len(scenario.jets))
-            tree.vfill('jet_pt', [x.pt for x in scenario.jets])
-            tree.vfill('jet_eta', [x.eta for x in scenario.jets])
-            tree.vfill('jet_phi', [x.phi for x in scenario.jets])
-            tree.vfill('jet_mass', [x.mass for x in scenario.jets])
-            tree.vfill('jet_csv', [x.csv for x in scenario.jets])
-            tree.vfill('jet_cmva', [x.cmva for x in scenario.jets])
-
-            tree.fill('nleps', len(scenario.leps_p4))
-            tree.vfill('lep_pt', [x[0] for x in scenario.leps_p4])
-            tree.vfill('lep_eta', [x[1] for x in scenario.leps_p4])
-            tree.vfill('lep_phi', [x[2] for x in scenario.leps_p4])
-            tree.vfill('lep_mass', [x[3] for x in scenario.leps_p4])
-            tree.vfill('lep_charge', scenario.leps_charge)
-            
-            tree.fill('met_pt', scenario.met_pt)
-            tree.fill('met_phi', scenario.met_phi)
-            
-            tree.fill('event', ev.evt)
-            tree.fill('run', ev.run)
-            tree.fill('lumi', ev.lumi)
-            
-            tree.fill('systematic', scenario.systematic_index)
-            tree.fill('hypothesis', hypo)
-            
-            tree.tree.Fill()
+        fillTree(tree, event, jet_corrections, jets, leps_p4, leps_charge)
     
     outfile.Write()

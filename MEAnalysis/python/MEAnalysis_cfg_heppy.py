@@ -196,7 +196,7 @@ class Conf:
             "pt_leading": 25,
             "pt_subleading": 15,
         },
-        "selection": lambda event: event.is_sl or event.is_dl
+        "selection": lambda event: event.is_sl or event.is_dl,
     }
 
     jets = {

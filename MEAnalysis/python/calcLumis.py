@@ -90,7 +90,7 @@ def calculate_lumi(
             line1 = inf.readline()
             if "Summary" in line1:
                 line2 = inf.readline()
-                line3 = inf.readline().strip()        
+                line3 = inf.readline().strip()
                 print "'{0}': {1},".format(process,line3.split(",")[-1])
                 break
 
@@ -101,14 +101,14 @@ if __name__ == "__main__":
                      "jpata"  : "jpata" }
 
     lxplus_username = lxplus_users[getpass.getuser()]
-    dataset_name = "Apr20_cmssw_v1"
+    dataset_name = "Aug3_data"
 
     processes = [
         "SingleMuon",
-#        "SingleElectron",
-#        "MuonEG",
-#        "DoubleEG",
-#        "DoubleMuon",
+        "SingleElectron",
+        "MuonEG",
+        "DoubleEG",
+        "DoubleMuon",
     ]
 
     dataset_base = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/gc/datasets/"

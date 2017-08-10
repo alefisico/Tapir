@@ -74,6 +74,10 @@ EventDescription TreeDescription::create_event(Systematic::SystId syst_id) {
     
     EventDescription event;
 
+    event.run = *run;
+    event.lumi = *lumi;
+    event.evt = *evt;
+
     event.is_sl = *is_sl;
     event.is_dl = *is_dl;
     event.is_fh = *is_fh;
@@ -83,7 +87,8 @@ EventDescription TreeDescription::create_event(Systematic::SystId syst_id) {
     event.HLT_ttH_DL_mumu = 1;
     event.HLT_ttH_DL_elmu = 1;
     event.HLT_ttH_DL_elel = 1;
-
+    event.HLT_ttH_FH = 1;
+    
     event.numJets = *numJets;
     event.nBCSVM = *nBCSVM;
     event.jets = jets;

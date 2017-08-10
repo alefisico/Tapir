@@ -78,9 +78,17 @@ class LeptonAnalyzer(FilterAnalyzer):
                 for lep in leps:
                     lep.iso = getattr(lep, isotype)
                 if not isocut is None:
-                    leps = filter(
-                        lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
-                    )
+
+                    #Inverted isolation cut
+                    if lepcuts.get("isoinverted", False):
+                        leps = filter(
+                            lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) >= isocut, leps
+                        )
+                    #Normal isolation cut
+                    else:
+                        leps = filter(
+                            lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
+                        )
                 
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("after iso", isotype)

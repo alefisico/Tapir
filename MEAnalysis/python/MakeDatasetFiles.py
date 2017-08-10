@@ -114,14 +114,14 @@ if __name__ == "__main__":
         
 
         files_json = subprocess.Popen([
-            "{0} --query='file dataset={1} instance={2}' --format=json --limit={3}".format(
+            "{0} --query='file dataset={1} instance={2}' --format=json --limit={3} --threshold=600".format(
             das_client, ds, args.instance, args.limit)
             ], stdout=subprocess.PIPE, shell=True
         ).stdout.read()
         files_di = json.loads(files_json)
         
         files_run_lumi_json = subprocess.Popen([
-            "{0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3}".format(
+            "{0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3} --threshold=600".format(
             das_client, ds, args.instance, args.limit)
             ], stdout=subprocess.PIPE, shell=True
         ).stdout.read()
@@ -133,14 +133,14 @@ if __name__ == "__main__":
             print "Could not parse 'data' in output json"
             print files_di
             raise e
+       
+        #Create dict of filename -> run -> lumis
         lumis_dict = {}
-        for fi, fi2 in zip(files_run_lumi["data"], files_di["data"]):
-            try:
-                fn = fi["file"][0]["name"]
-            #in case dataset did not have lumi info
-            except IndexError as e:
-                fn = fi2["file"][0]["name"]
-            lumis_dict[fn] = {}
+        for fi in files_run_lumi["data"]:
+            fn = fi["file"][0]["name"]
+           
+            if not lumis_dict.has_key(fn):
+                lumis_dict[fn] = {}
             for run, lumis in zip(fi["run"], fi["lumi"]):
                 run_num = run["run_number"]
                 if not lumis_dict[fn].has_key(run_num):
@@ -165,6 +165,8 @@ if __name__ == "__main__":
                 if lumis_dict.has_key(name):
                     tmp_lumis = LumiList(runsAndLumis = lumis_dict[name])
                     lumis += [tmp_lumis]
+                else:
+                    raise Exception("file {0} has no associated lumis (events={1})".format(name, nevents))
                 ofile.write("{0} = {1}\n".format(name, nevents))
             #merge lumi files
 
@@ -175,7 +177,7 @@ if __name__ == "__main__":
             total_lumis = LumiList(filename = lumi_fn)
             print "opened existing lumi file", len(total_lumis)
         for i in range(len(lumis)):
-            total_lumis = total_lumis | lumis[i]
+            total_lumis = total_lumis + lumis[i]
         total_lumis.writeJSON(fileName=lumi_fn)
         #end loop over files
 

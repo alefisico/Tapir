@@ -1,7 +1,12 @@
-import ROOT, sys
+import ROOT, sys, os
 from TTH.MEAnalysis.samples_base import getSitePrefix
 
-tf = ROOT.TFile.Open(getSitePrefix(sys.argv[1]))
+fn = sys.argv[1]
+if os.path.isfile(fn):
+    tf = ROOT.TFile(fn)
+else:
+    tf = ROOT.TFile.Open(getSitePrefix(fn))
+
 if not tf:
     raise Exception("Could not open file")
 tt = tf.Get(sys.argv[2])

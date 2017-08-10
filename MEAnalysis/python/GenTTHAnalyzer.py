@@ -250,9 +250,9 @@ class GenTTHAnalyzer(FilterAnalyzer):
         #gluons from b
         matches_bg = match_jets_to_quarks(event.good_jets, event.GenGluonFromB, "bg", 4)
         
-        matches_q_htt = match_jets_to_quarks(event.htt_subjets_W, event.l_quarks_gen, "q_htt", 6)
-        matches_b_htt = match_jets_to_quarks(event.htt_subjets_b, event.b_quarks_gen_t, "b_htt", 5)
-        matches_b_higgstagger = match_jets_to_quarks(event.higgs_subjets, event.b_quarks_gen_h, "b_higgstagger", 7)
+        #matches_q_htt = match_jets_to_quarks(event.htt_subjets_W, event.l_quarks_gen, "q_htt", 6)
+        #matches_b_htt = match_jets_to_quarks(event.htt_subjets_b, event.b_quarks_gen_t, "b_htt", 5)
+        #matches_b_higgstagger = match_jets_to_quarks(event.higgs_subjets, event.b_quarks_gen_h, "b_higgstagger", 7)
        
         for m in [matches_wq, matches_tb, matches_hb]:
             for ij, match in m.items():
@@ -330,17 +330,17 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 if jet.btagFlag == 1.0:
                     event.nMatch_hb_btag += 1
 
-        for ij, jet in enumerate(event.htt_subjets_W):
-            if matches_q_htt.has_key(ij):
-                event.nMatch_q_htt += 1
+        #for ij, jet in enumerate(event.htt_subjets_W):
+        #    if matches_q_htt.has_key(ij):
+        #        event.nMatch_q_htt += 1
 
-        for ij, jet in enumerate(event.htt_subjets_b):
-            if matches_b_htt.has_key(ij):
-                event.nMatch_b_htt += 1
+        #for ij, jet in enumerate(event.htt_subjets_b):
+        #    if matches_b_htt.has_key(ij):
+        #        event.nMatch_b_htt += 1
 
-        for ij, jet in enumerate(event.higgs_subjets):
-            if matches_b_higgstagger.has_key(ij):
-                event.nMatch_b_higgs += 1
+        #for ij, jet in enumerate(event.higgs_subjets):
+        #    if matches_b_higgstagger.has_key(ij):
+        #        event.nMatch_b_higgs += 1
 
         if "matching" in self.conf.general["verbosity"]:
             autolog("Selected quarks W={nsel_wq} t={nsel_tb} h={nsel_hb} nMatch W={nMatch_wq} t={nMatch_tb} h={nMatch_hb} nMatch_btag W={nMatch_wq_btag} t={nMatch_tb_btag} h={nMatch_hb_btag}".format(
@@ -354,11 +354,11 @@ class GenTTHAnalyzer(FilterAnalyzer):
                 nMatch_tb_btag = event.nMatch_tb_btag,
                 nMatch_hb_btag = event.nMatch_hb_btag,
             ))
-            autolog("Subjet match W={nMatch_q_htt} t={nMatch_b_htt} h={nMatch_b_higgs}".format(
-                nMatch_q_htt = event.nMatch_q_htt,
-                nMatch_b_htt = event.nMatch_b_htt,
-                nMatch_b_higgs = event.nMatch_b_higgs,
-            ))
+            #autolog("Subjet match W={nMatch_q_htt} t={nMatch_b_htt} h={nMatch_b_higgs}".format(
+            #    nMatch_q_htt = event.nMatch_q_htt,
+            #    nMatch_b_htt = event.nMatch_b_htt,
+            #    nMatch_b_higgs = event.nMatch_b_higgs,
+            #))
 
         #reco-level tth-matched system
         spx = 0.0

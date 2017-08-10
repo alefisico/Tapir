@@ -186,7 +186,7 @@ def pass_HLT_dl_elel(event):
     return event.is_dl and pass_hlt and st == 22
 
 def pass_HLT_fh(event):
-    pass_hlt = event["HLT_ttH_FH"]
+    pass_hlt = event.HLT_ttH_FH
     return event.is_fh and pass_hlt ## FIXME add: st == ??
 
 def triggerPath(event):
@@ -306,9 +306,13 @@ def createEvent(
     event.leps_pdgId = [x.pdgId for x in event.leptons]
     event.triggerPath = triggerPath(event)
     event.btag_LR_4b_2b_btagCSV_logit = logit(event.btag_LR_4b_2b_btagCSV)
-
     any_passes = applyCuts(event, matched_processes)
-
+   
+    #workaround for passall=False systematic migrations
+    if len(event.jets) == 0:
+        LOG_MODULE_NAME.info("Event has 0 reconstructed jets, likely a weird systematic migration")
+        return None
+    
     if not any_passes:
         return None
 
@@ -830,7 +834,7 @@ if __name__ == "__main__":
         skip_events = 0
         max_events = 5000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        file_names = analysis.get_sample(sample).file_names
-        #file_names = ["file://./job_0_tree.root"]
+        #file_names = analysis.get_sample(sample).file_names
+        file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

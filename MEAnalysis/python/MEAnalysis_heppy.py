@@ -376,7 +376,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         qglr,
         wtag,
         mecat,
-        subjet_analyzer,
+        #subjet_analyzer,
         genrad,
         gentth,
         #multiclass_analyzer,

@@ -217,6 +217,10 @@ public:
 
 class EventDescription {
 public:
+    unsigned long long evt;
+    unsigned int run;
+    unsigned int lumi;
+
     std::vector<Lepton> leptons;
 
     std::vector<Jet> jets;
@@ -234,6 +238,7 @@ public:
     int HLT_ttH_DL_mumu;
     int HLT_ttH_DL_elmu;
     int HLT_ttH_DL_elel;
+    int HLT_ttH_FH;
 
     double btag_LR_4b_2b_btagCSV;
     double mem_DL_0w2h2t_p;
