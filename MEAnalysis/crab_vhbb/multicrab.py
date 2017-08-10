@@ -97,16 +97,16 @@ sets_data = [
 #    "/BTagCSV/Run2016E-PromptReco-v2/MINIAOD",
 #    "/BTagCSV/Run2016F-PromptReco-v2/MINIAOD",
 
-    "/JetHT/Run2016B-23Sep2016-v2/MINIAOD",
-    "/JetHT/Run2016B-23Sep2016-v3/MINIAOD",
-    "/JetHT/Run2016C-23Sep2016-v1/MINIAOD",
-    "/JetHT/Run2016D-23Sep2016-v1/MINIAOD",
-    "/JetHT/Run2016E-23Sep2016-v1/MINIAOD",
-    "/JetHT/Run2016F-23Sep2016-v1/MINIAOD",
-    "/JetHT/Run2016G-23Sep2016-v1/MINIAOD",
-    "/JetHT/Run2016H-PromptReco-v1/MINIAOD",
-    "/JetHT/Run2016H-PromptReco-v2/MINIAOD",
-    "/JetHT/Run2016H-PromptReco-v3/MINIAOD",
+#    "/JetHT/Run2016B-23Sep2016-v2/MINIAOD",
+#    "/JetHT/Run2016B-23Sep2016-v3/MINIAOD",
+#    "/JetHT/Run2016C-23Sep2016-v1/MINIAOD",
+#    "/JetHT/Run2016D-23Sep2016-v1/MINIAOD",
+#    "/JetHT/Run2016E-23Sep2016-v1/MINIAOD",
+#    "/JetHT/Run2016F-23Sep2016-v1/MINIAOD",
+#    "/JetHT/Run2016G-23Sep2016-v1/MINIAOD",
+#    "/JetHT/Run2016H-PromptReco-v1/MINIAOD",
+#    "/JetHT/Run2016H-PromptReco-v2/MINIAOD",
+#    "/JetHT/Run2016H-PromptReco-v3/MINIAOD",
 ]
 
 #all available datasets.
@@ -118,7 +118,7 @@ for sd in sets_data:
     datasets[name] = {
         "ds": sd,
         "maxlumis": -1,
-        "perjob": 10,
+        "perjob": 30,
         "runtime": 20, #hours
         "mem_cfg": me_cfgs["nome"],
         "script": 'heppy_crab_script_data.sh'
@@ -525,12 +525,12 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        "ttHTobb",
+        #"ttHTobb",
         #"ttHToNonbb",
-        "TTbar_inc",
-        #"TTbar_isr_up",
-        #"TTbar_isr_down1",
-        #"TTbar_isr_down2",
+        #"TTbar_inc",
+        "TTbar_isr_up",
+        "TTbar_isr_down1",
+        "TTbar_isr_down2",
         #"TTbar_fsr_up1",
         #"TTbar_fsr_up2",
         #"TTbar_fsr_down",
@@ -726,7 +726,9 @@ if __name__ == '__main__':
 
     def submit(config):
         res = crabCommand('submit', config = config)
-    
+        with open(config.General.workArea + "/crab_" + config.General.requestName + "/crab_config.py", "w") as fi:
+            fi.write(config.pythonise_())
+
     def localsubmit(config, dname, opts):
         TMPDIR = "/scratch/{0}/crab_work/{1}/crab_{2}".format(os.environ["USER"], args.tag, dname)
         CMSSW_VERSION = "CMSSW_8_0_25"
@@ -829,7 +831,7 @@ env
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
     #config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin", "T2_US_Vanderbilt"]
 
-    config.Site.storageSite = "T2_CH_CSCS"
+    config.Site.storageSite = "T3_CH_PSI"
 
     #loop over samples
     for sample in sel_datasets.keys():
