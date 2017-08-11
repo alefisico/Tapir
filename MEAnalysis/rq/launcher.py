@@ -228,6 +228,12 @@ class TaskValidateFiles(Task):
                 len(sample.file_names),
                 len(good_files),
             ))
+            
+            #save list of bad files
+            bad_files = set(sample.file_names) - set(good_files)
+            with open(self.workdir + "/{0}_bad.txt".format(sample.name), "w") as fi:
+                for badfi in bad_files:
+                    fi.write(badfi + "\n")
             sample.file_names = good_files
         self.save_state()
     
@@ -241,7 +247,7 @@ class TaskValidateFiles(Task):
         #split the sample input files into a number of chunks based on the prescribed size
         for ijob, inputs in enumerate(chunks(sample.file_names, sample.step_size_sparsinator)):
             jobs += [
-                enqueue_nomemoize(
+                enqueue_memoize(
                     queue,
                     func = validateFiles,
                     args = (inputs, ),
@@ -703,7 +709,7 @@ if __name__ == "__main__":
 
     tasks = []
     tasks += [
-        #TaskValidateFiles(workdir, "VALIDATE", analysis),
+        TaskValidateFiles(workdir, "VALIDATE", analysis),
         TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),

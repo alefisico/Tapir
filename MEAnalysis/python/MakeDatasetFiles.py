@@ -181,6 +181,10 @@ if __name__ == "__main__":
         total_lumis.writeJSON(fileName=lumi_fn)
         #end loop over files
 
+        #write per-file lumi dictionary 
+        with open(ofile_fn.replace(".txt", "_lumi_per_file.json"), "w") as fi:
+            fi.write(json.dumps(lumis_dict, indent=2))
+
         ofile.close()
         samples_processed += [sample_short]
         #sleep so as to not overload the DAS server
