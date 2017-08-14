@@ -17469,7 +17469,6 @@
 /store/user/jpata/tth/Aug3_data/SingleElectron/Aug3_data/170804_092718/0001/tree_1229.root = 42
 /store/user/jpata/tth/Aug3_data/SingleElectron/Aug3_data/170804_092718/0001/tree_1230.root = 67
 /store/user/jpata/tth/Aug3_data/SingleElectron/Aug3_data/170804_092718/0001/tree_1231.root = 46
-/store/user/jpata/tth/Aug3_data/SingleElectron/Aug3_data/170804_092718/0001/tree_1232.root = 49
 /store/user/jpata/tth/Aug3_data/SingleElectron/Aug3_data/170804_092718/0001/tree_1233.root = 51
 /store/user/jpata/tth/Aug3_data/SingleElectron/Aug3_data/170804_092718/0001/tree_1234.root = 55
 /store/user/jpata/tth/Aug3_data/SingleElectron/Aug3_data/170804_092718/0001/tree_1235.root = 61

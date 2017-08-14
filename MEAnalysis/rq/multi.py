@@ -5,6 +5,7 @@ import rootpy
 import uuid
 import glob, time
 import multiprocessing
+from collections import Counter
 
 from rq import Queue
 from redis import Redis
@@ -14,6 +15,7 @@ def waitJobs(jobs):
     done = False 
     while not done:
         num_finished = 0
+        statuses = Counter([j.status for j in jobs])
         for job in jobs:
             if job.status == "finished":
                 num_finished += 1
@@ -24,41 +26,48 @@ def waitJobs(jobs):
         if num_finished == len(jobs):
             done = True
         time.sleep(1)
+        sys.stdout.write("\033[K") # Clear this line
+        print statuses
+        sys.stdout.write("\033[F") # Cursor up one line
 
 if __name__ == "__main__":
     redis_conn = Redis(host="t3ui02", port=6379)
     qmain = Queue("default", connection=redis_conn)  # no args implies the default queue
-    
+    qmain.empty()
+
+    get_ngen = False
+
     os.environ["CMSSW_BASE"] = "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW"
     sys.path.append("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/python/")
     from TTH.MEAnalysis.samples_base import getSitePrefix, chunks
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
     print "opening analysis"
-    analysis = analysisFromConfig("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/data/lowtag_csv.cfg")
+    analysis = analysisFromConfig("/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/data/default.cfg")
 
     print "getting weights"
-    #ngen = {}
-    #ngen["ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"] = 3754591.0
-    #ngen["TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"] = 73672901.0
     weights = {}
     for samp in analysis.samples:
         if samp.schema == "mc":
-            jobs = []
-            for fi in samp.file_names:
-                jobs += [
-                    qmain.enqueue_call(get_count, args=([fi], ), timeout=300)
-                ]
-            waitJobs(jobs) 
-            ngen = sum([j.result for j in jobs])
-            print samp.name, ngen
-            weight = samp.xsec * 3970.0/float(ngen[samp.name])
+            if get_ngen:
+                jobs = []
+                for fi in samp.file_names:
+                    jobs += [
+                        qmain.enqueue_call(get_count, args=([fi], ), timeout=3600, ttl=3600, result_ttl=3600)
+                    ]
+                waitJobs(jobs) 
+                ngen = sum([j.result for j in jobs])
+                print samp.name, ngen
+            else:
+                ngen = samp.ngen
+            weight = samp.xsec * 35000.0/float(ngen)
             weights[samp.name] = weight
    
 
     def plot_cut(analysis, variable, bins, cut, weights):
         print variable, cut
         args = {}
+        step_sizes = {}
         for samp in analysis.samples:
             weight = "1.0"
             if samp.schema == "mc":
@@ -68,7 +77,7 @@ if __name__ == "__main__":
                 _cut = cut + " && json==1"
             cutstring = "({0}) * ({1})".format(weight, _cut)
             args[samp.name] = (samp.file_names, variable, bins, cutstring)
-        
+            step_sizes[samp.name] = samp.step_size_sparsinator
         t0 = time.time()
         jobs = []
         
@@ -77,9 +86,9 @@ if __name__ == "__main__":
             jobs_sample[samp.name] = []
 
         for samp_name, arg in args.items():
-            for fn in arg[0]:
-                newarg = ([fn], arg[1], arg[2], arg[3])
-                job = qmain.enqueue_call(draw_hist_wrap, args=(newarg,), timeout=300)
+            for ijob, inputs in enumerate(chunks(arg[0], step_sizes[samp_name])):
+                newarg = (inputs, arg[1], arg[2], arg[3])
+                job = qmain.enqueue_call(draw_hist_wrap, args=(newarg,), timeout=3600, ttl=3600, result_ttl=3600)
                 jobs += [job]
                 jobs_sample[samp_name] += [job]
 

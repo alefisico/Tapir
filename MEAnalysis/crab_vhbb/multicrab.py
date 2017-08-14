@@ -529,8 +529,8 @@ for k in [
         #"ttHToNonbb",
         #"TTbar_inc",
         "TTbar_isr_up",
-        "TTbar_isr_down1",
-        "TTbar_isr_down2",
+        #"TTbar_isr_down1",
+        #"TTbar_isr_down2",
         #"TTbar_fsr_up1",
         #"TTbar_fsr_up2",
         #"TTbar_fsr_down",
@@ -780,7 +780,9 @@ env
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 3000 #DS
+    config.JobType.maxMemoryMB = 2500
+    #with 3000MB, almost no jobs will run at T2_CH_CSCS, our default site.
+    #therefore, 3000MB should only be used for resubmissions
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")

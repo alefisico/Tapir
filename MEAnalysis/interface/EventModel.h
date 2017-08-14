@@ -1,6 +1,7 @@
 #ifndef EVENTMODEL_H // header guards
 #define EVENTMODEL_H
 
+#include <iostream>
 #include "TLorentzVector.h"
 #include "TH1.h"
 #include "TH1D.h"
@@ -327,11 +328,12 @@ public:
         Wmass(reader, "Wmass"),
         sample(sample) {
     }
+    virtual ~TreeDescription() {}
 
     
     std::vector<Lepton> build_leptons(Systematic::SystId syst_id = Systematic::syst_id_nominal);
-    std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
-    EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    virtual std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
 };
 
 class TreeDescriptionMC : TreeDescription {
@@ -410,6 +412,8 @@ public:
 
     {}
     
+    ~TreeDescriptionMC() {}
+
     TTreeReaderArray<double>* get_correction_branch(Systematic::SystId syst_id = Systematic::syst_id_nominal);
 
     EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);

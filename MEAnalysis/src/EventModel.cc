@@ -8,7 +8,7 @@ template <typename T> int sgn(T val) {
 }
 
 bool Systematic::is_jec(Systematic::SystId syst_id) {
-    return syst_id.first != CMS_scale_j;
+    return syst_id.first == CMS_scale_j;
 }
 
 bool Systematic::is_jer(Systematic::SystId syst_id) {
@@ -145,6 +145,7 @@ std::vector<Jet> TreeDescriptionMC::build_jets(Systematic::SystId syst_id) {
 
         double corr = 1.0;
         double base_corr = 1.0;
+        
         
         if (Systematic::is_jec(syst_id)) {
             corr = (*correction_branch)[njet];

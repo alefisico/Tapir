@@ -25,7 +25,7 @@ CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 
 
 #Need to access this to initialize the library (?)
-print(ROOT.TTH_MEAnalysis.TreeDescription)
+dummy = ROOT.TTH_MEAnalysis.TreeDescription
 
 syst_pairs = OrderedDict([
     (x+d, ROOT.TTH_MEAnalysis.Systematic.make_id(
@@ -302,6 +302,7 @@ def createEvent(
     cls_bdt_sl, cls_bdt_dl,
     calculate_bdt, do_recompute_btag_weights
     ):
+
     event = events.create_event(syst_pairs[syst])
     event.leps_pdgId = [x.pdgId for x in event.leptons]
     event.triggerPath = triggerPath(event)
@@ -834,7 +835,7 @@ if __name__ == "__main__":
         skip_events = 0
         max_events = 5000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        #file_names = analysis.get_sample(sample).file_names
-        file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
+        file_names = analysis.get_sample(sample).file_names
+        #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

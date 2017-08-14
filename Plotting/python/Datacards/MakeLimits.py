@@ -2,7 +2,7 @@
 # Imports
 ########################################
 
-import imp, os, sys
+import imp, os, sys, time
 import subprocess
 
 from CombineHelper import LimitGetter, ConstraintGetter
@@ -83,6 +83,10 @@ def main(
             constraints = constraint_getter(group_dcard_filename, sig)
             of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
             of.write(constraints)
+            of.flush()
+            time.sleep(10)
+            os.fsync(of)
+            time.sleep(10)
             of.close()
 
     # End loop over groups
@@ -92,14 +96,11 @@ def main(
 
 
 if __name__ == "__main__":
-
-
-
     from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 
-    workdir = "results/53223e4b-4719-4dc9-a161-592be9572201/limits/"
-    analysis = Analysis.deserialize("results/53223e4b-4719-4dc9-a161-592be9572201/analysis.pickle")
-    group = "group_sl"
+    workdir = "results/d960163d-8d5b-4300-8d8b-88e29c9650d5/limits/"
+    analysis = Analysis.deserialize("results/d960163d-8d5b-4300-8d8b-88e29c9650d5/analysis.pickle")
+    group = "dl_jge4_tge4__mem_DL_0w2h2t_p"
 
     print analysis.groups.keys()
     main(workdir, analysis, group)
