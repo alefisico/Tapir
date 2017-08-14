@@ -51,6 +51,7 @@ class PrefilterAnalyzer(Analyzer):
     """
     Performs a very basic prefiltering of the event before fully
     loading the event from disk into memory.
+    NB: Actually we can't use this, since systematics may migrate the event into a different category
     """
     
     def __init__(self, cfg_ana, cfg_comp, looperName):
@@ -58,7 +59,6 @@ class PrefilterAnalyzer(Analyzer):
         self.conf = cfg_ana._conf
     
     def process(self, event):
-        super(PrefilterAnalyzer, self).process(event)
         njet = event.input.nJet
         btag_csv = [getattr(event.input, "Jet_btagCSV")[nj] for nj in range(njet)]
         btag_cmva = [getattr(event.input, "Jet_btagCMVA")[nj] for nj in range(njet)]

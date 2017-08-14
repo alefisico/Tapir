@@ -7,3 +7,6 @@
 [submodule "GenLevel"]
 	path = GenLevel
 	url = https://gitlab.cern.ch/jpata/ttH-Hbb-GenLevel.git
+[submodule "RecoLikelihoodReconstruction"]
+	path = RecoLikelihoodReconstruction
+	url = https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git

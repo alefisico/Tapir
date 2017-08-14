@@ -388,18 +388,19 @@ class MEAnalyzer(FilterAnalyzer):
                         or event.changes_jet_category) or event.systematic == "nominal")
                     ):
 
-                    autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6} 3blr={7}".format(
-                        hypo, confname,
-                        event.input.run, event.input.lumi, event.input.evt,
-                        event.category_string, event.btag_LR_4b_2b, event.btag_LR_3b_2b
-                    ))
-                    autolog("Integrator conf: b={0} l={1} syst={2}".format(
-                        len(mem_cfg.b_quark_candidates(event)),
-                        len(mem_cfg.l_quark_candidates(event)),
-                        event.systematic
-                    ))
                     self.configure_mem(event, mem_cfg)
                     if self.conf.mem["calcME"]:
+                        autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6} 3blr={7}".format(
+                            hypo, confname,
+                            event.input.run, event.input.lumi, event.input.evt,
+                            event.category_string, event.btag_LR_4b_2b, event.btag_LR_3b_2b
+                        ))
+                        autolog("Integrator conf: b={0} l={1} syst={2}".format(
+                            len(mem_cfg.b_quark_candidates(event)),
+                            len(mem_cfg.l_quark_candidates(event)),
+                            event.systematic
+                        ))
+
                         r = self.integrator.run(
                             fstate,
                             hypo,
@@ -408,10 +409,12 @@ class MEAnalyzer(FilterAnalyzer):
                             0 #max number of calls per iteration (if > 0)
                         )
                         event.was_run[confname] = True
+                        autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
                     else:
+                        #Create a dummy output
                         r = MEM.MEMOutput()
-                    autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
 
+                    #Compute the gradient-based jet corrections
                     dw = {}
                     for fc in self.conf.mem["jet_corrections"]:
                         dw[fc] = 0.0

@@ -12,7 +12,7 @@ from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
 #FIXME: this is a hack to run heppy on non-EDM formats. Better to propagate it to heppy
 def fillCoreVariables(self, tr, event, isMC):
     if isMC:
-        for x in ["run", "lumi", "evt", "xsec", "genWeight"]:
+        for x in ["run", "lumi", "evt", "xsec", "genWeight", "puWeight"]:
             tr.fill(x, getattr(event.input, x))
     else:
         for x in ["run", "lumi", "evt"]:
@@ -20,20 +20,12 @@ def fillCoreVariables(self, tr, event, isMC):
 
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
-#bweights = [
-#    "btagWeightCSV", "btagWeightCMVAV2"
-#]
-#
-#for sdir in ["up", "down"]:
-#    for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-#        for tagger in ["CSV", "CMVAV2"]:
-#            bweights += ["btagWeight{0}_{1}_{2}".format(tagger, sdir, syst)]
-
 from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
+from VHbbAnalysis.Heppy.btagSF import systematicsCSV, systematicsCMVAV2
 #recompute b-tag weights
 btag_weights = {}
-for algo in ["CSV", "CMVAV2"]:
-    for syst in ["central", "up_jes", "down_jes", "up_lf", "down_lf", "up_hf", "down_hf", "up_hfstats1", "down_hfstats1", "up_hfstats2", "down_hfstats2", "up_lfstats1", "down_lfstats1", "up_lfstats2", "down_lfstats2", "up_cferr1", "down_cferr1", "up_cferr2", "down_cferr2"]:
+for algo, systematics in [("CSV", systematicsCSV), ("CMVAV2", systematicsCMVAV2)]:
+    for syst in systematics:
         syst_name = "" if syst=="central" else ("_"+syst) 
         btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
             lambda ev, get_event_SF=get_event_SF, syst=syst, algo=algo, btagSFhandle=btagSFhandle : get_event_SF(map(JetWrapper, ev.good_jets_nominal), syst, algo, btagSFhandle)
@@ -62,16 +54,12 @@ leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("pdgId", lambda x : x.pdgId),
-    NTupleVariable("relIso03", lambda x : x.pfRelIso03),
-    NTupleVariable("relIso04", lambda x : x.pfRelIso04),
+    NTupleVariable("iso", lambda x : x.iso),
     NTupleVariable("ele_mva_id", lambda x : x.eleMVAIdSpring15Trig),
     NTupleVariable("mu_id", lambda x : 1*getattr(x, "looseIdPOG", 0) + 2*getattr(x, "tightId", 0)),
 ] + [NTupleVariable(sf, lambda x, sf=sf : getattr(x, sf, -1.0))
     for sf in lepton_sf_kind + lepton_sf_kind_err
 ])
-
-
-
 
 p4type = NTupleObjectType("p4Type", variables = [
     NTupleVariable("pt", lambda x : x.Pt()),
@@ -402,7 +390,7 @@ def getTreeProducer(conf):
         NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
         NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-        NTupleVariable("corr", lambda x : x.corr, mcOnly=True),
+        NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
         NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
     ] + corrs)
 
@@ -415,41 +403,41 @@ def getTreeProducer(conf):
         globalVariables = [
 
             # Used by Subjet Analyzer
-            NTupleVariable(
-                "n_bjets",
-                lambda ev: getattr(ev, "n_bjets_nominal", -1),
-                help="Number of selected bjets in event"
-            ),
+            #NTupleVariable(
+            #    "n_bjets",
+            #    lambda ev: getattr(ev, "n_bjets_nominal", -1),
+            #    help="Number of selected bjets in event"
+            #),
 
-            NTupleVariable(
-                "n_ljets",
-                lambda ev: getattr(ev, "n_ljets_nominal", -1),
-                help="Number of selected ljets in event"
-            ),
+            #NTupleVariable(
+            #    "n_ljets",
+            #    lambda ev: getattr(ev, "n_ljets_nominal", -1),
+            #    help="Number of selected ljets in event"
+            #),
 
-            NTupleVariable(
-                "n_boosted_bjets",
-                lambda ev: getattr(ev, "n_boosted_bjets_nominal", -1),
-                help="Number of selected bjets in subjet-modified bjet list"
-            ),
+            #NTupleVariable(
+            #    "n_boosted_bjets",
+            #    lambda ev: getattr(ev, "n_boosted_bjets_nominal", -1),
+            #    help="Number of selected bjets in subjet-modified bjet list"
+            #),
 
-            NTupleVariable(
-                "n_boosted_ljets",
-                lambda ev: getattr(ev, "n_boosted_ljets_nominal", -1),
-                help="Number of selected ljets in subjet-modified ljet list"
-            ),
+            #NTupleVariable(
+            #    "n_boosted_ljets",
+            #    lambda ev: getattr(ev, "n_boosted_ljets_nominal", -1),
+            #    help="Number of selected ljets in subjet-modified ljet list"
+            #),
 
-            NTupleVariable(
-                "n_excluded_bjets",
-                lambda ev: getattr(ev, "n_excluded_bjets_nominal", -1),
-                help="Number of excluded bjets: reco resolved b-jets that match a subjet in the HTT-candidate"
-            ),
+            #NTupleVariable(
+            #    "n_excluded_bjets",
+            #    lambda ev: getattr(ev, "n_excluded_bjets_nominal", -1),
+            #    help="Number of excluded bjets: reco resolved b-jets that match a subjet in the HTT-candidate"
+            #),
 
-            NTupleVariable(
-                "n_excluded_ljets",
-                lambda ev: getattr(ev, "n_excluded_ljets_nominal", -1),
-                help="Number of excluded ljets: "
-            ),
+            #NTupleVariable(
+            #    "n_excluded_ljets",
+            #    lambda ev: getattr(ev, "n_excluded_ljets_nominal", -1),
+            #    help="Number of excluded ljets: "
+            #),
             #--END OF USED BY SUBJETANALYZER--#
 
             NTupleVariable(
@@ -526,17 +514,17 @@ def getTreeProducer(conf):
             "genTopLep" : NTupleCollection("genTopLep", genTopType, 2, help="Generated top quark (leptonic)", mcOnly=True),
             "genTopHad" : NTupleCollection("genTopHad", genTopType, 2, help="Generated top quark (hadronic)", mcOnly=True),
 
-            "FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
+            #"FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 16, help="Selected resolved jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
             
             "loose_jets_nominal" : NTupleCollection("loose_jets", jetType, 6, help="Additional jets with 20<pt<30"),
             
-            "topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
+            #"topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton"),
 
-            "othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
-            "topCandidatesSync_nominal": NTupleCollection("topCandidatesSync" , topCandidateType, 4, help=""),
-            "higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates"),
+            #"othertopCandidate_nominal": NTupleCollection("othertopCandidate", topCandidateType, 4, help="All other top candidates that pass HTTv2 cuts"),
+            #"topCandidatesSync_nominal": NTupleCollection("topCandidatesSync" , topCandidateType, 4, help=""),
+            #"higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates"),
 
         }
     )
@@ -559,6 +547,7 @@ def getTreeProducer(conf):
                     trignames += [tn]
 
     #MET filter flags added in VHBB
+    #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
         "Flag_goodVertices", 
         "Flag_GlobalTightHalo2016Filter",
@@ -566,6 +555,12 @@ def getTreeProducer(conf):
         "Flag_HBHENoiseIsoFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
         "Flag_eeBadScFilter",
+
+        #TODO: These need to be added to VHBB somehow
+        # "Flag_BadPFMuonFilter",
+        # "Flag_BadChargedCandidateFilter",
+        # "badGlobalMuonTagger",
+        # "cloneGlobalMuonTagger",
     ]
     for trig in trignames + metfilter_flags:
         treeProducer.globalVariables += [NTupleVariable(
@@ -590,8 +585,8 @@ def getTreeProducer(conf):
             #("btag_LR_4b_2b_btagCMVA_log",   float,      ""),
             ("btag_LR_4b_2b_btagCMVA",        float,      "4b vs 2b b-tag likelihood ratio using the cMVA tagger"),
             ("btag_LR_4b_2b_btagCSV",        float,      "4b vs 2b b-tag likelihood ratio using the CSV tagger"),
-            ("htt_mass",        float,      "HEPTopTagger candidate mass"),
-            ("htt_frec",        float,      "HEPTopTagger candidate mass"),
+            #("htt_mass",        float,      "HEPTopTagger candidate mass"),
+            #("htt_frec",        float,      "HEPTopTagger candidate mass"),
             ("higgs_mass",      float,      "Higgs candidate mass"),
             #("btag_LR_4b_3b_btagCMVA_log",   float,      ""),
             ("btag_LR_4b_3b_btagCMVA",       float,      ""),
@@ -677,12 +672,11 @@ def getTreeProducer(conf):
         ("nMatch_tb_btag",          int,    ""),
         ("nMatch_hb",               int,    ""),
         ("nMatch_hb_btag",          int,    ""),
-        ("nMatch_q_htt",            int,    "number of light quarks matched to HEPTopTagger subjets"),
-        ("nMatch_b_htt",            int,    "number of b-quarks matched to HEPTopTagger subjets"),
-        ("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
+        #("nMatch_q_htt",            int,    "number of light quarks matched to HEPTopTagger subjets"),
+        #("nMatch_b_htt",            int,    "number of b-quarks matched to HEPTopTagger subjets"),
+        #("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
-        ("puWeight",                float,    ""),
         ("puWeightUp",              float,    ""),
         ("puWeightDown",            float,    ""),
         ("qgWeight",                float,  ""),

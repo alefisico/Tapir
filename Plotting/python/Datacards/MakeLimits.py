@@ -9,9 +9,6 @@ from CombineHelper import LimitGetter, ConstraintGetter
 
 from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH
 
-print "MakeLimits.py called from cwd={0}".format(os.getcwd())
-
-
 ########################################
 # Actual work
 ########################################
@@ -19,7 +16,7 @@ print "MakeLimits.py called from cwd={0}".format(os.getcwd())
 def main(
         workdir,
         analysis,
-        group
+        group = None
 ):
     
     limits = {}
@@ -27,6 +24,7 @@ def main(
     # Decide what to run on
     if group:
         groups = [group]
+    #Run on all groups
     else:
         groups = analysis.groups.keys()
 
@@ -83,7 +81,7 @@ def main(
         #write constraints
         for sig in [1, 0]:
             constraints = constraint_getter(group_dcard_filename, sig)
-            of = open(workdir + "/contraints_{0}_sig{1}.txt".format(group_name, sig), "w")
+            of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
             of.write(constraints)
             of.close()
 
@@ -93,27 +91,15 @@ def main(
     return limits
 
 
-#if __name__ == "__main__":
-#
-#    if not len(sys.argv) in [3,4,5]:
-#        print "Wrong number of arguments"
-#        print "Usage: "
-#        print "{0} datacard_file.py workdir [analysis_to_process [group to_process]]".format(sys.argv[0])
-#        sys.exit()
-#
-#    dcard_path = sys.argv[1]
-#
-#    # Get the input/output directory
-#    workdir = sys.argv[2]
-#
-#    if len(sys.argv) >= 4:
-#        analysis_arg = sys.argv[3]
-#    else:
-#        analysis_arg = ""
-#
-#    if len(sys.argv) == 5:
-#        group_arg = sys.argv[4]
-#    else:
-#        group_arg = ""
-#
-#    main(dcard_path, workdir, analysis_arg, group_arg)
+if __name__ == "__main__":
+
+
+
+    from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
+
+    workdir = "results/53223e4b-4719-4dc9-a161-592be9572201/limits/"
+    analysis = Analysis.deserialize("results/53223e4b-4719-4dc9-a161-592be9572201/analysis.pickle")
+    group = "group_sl"
+
+    print analysis.groups.keys()
+    main(workdir, analysis, group)

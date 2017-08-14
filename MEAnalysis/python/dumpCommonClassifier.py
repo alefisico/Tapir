@@ -18,6 +18,7 @@ class Jet:
 
         self.csv = kwargs.get("csv")
         self.cmva = kwargs.get("cmva")
+        self.corrections = kwargs.get("corrections")
 
 
     def correct(self, correction):

@@ -103,6 +103,9 @@ def run_plots(workdir, analysis, path_to_files, redis_conn, qmain, qfail):
 
 if __name__ == "__main__":
 
+    from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
+
+
     import argparse
     parser = argparse.ArgumentParser(
         description='Runs the workflow'
@@ -110,7 +113,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--config',
         action = "store",
-        help = "Analysis configuration",
+        help = "Analysis configuration pickle file",
         type = str,
         required = True
     )
@@ -131,10 +134,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     redis_conn = Redis(host=args.hostname, port=args.port)
-    qmain = Queue("default", connection=redis_conn, async=True)  # no args implies the default queue
+    qmain = Queue("default", connection=redis_conn, async=False)  # no args implies the default queue
     qfail = get_failed_queue(redis_conn)
 
-    analysis_name, analysis = analysisFromConfig(args.config)
+    analysis = Analysis.deserialize(args.config)
 
     workdir = make_workdir()
 

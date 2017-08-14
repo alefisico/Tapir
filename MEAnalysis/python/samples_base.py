@@ -78,18 +78,22 @@ def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(l), n):
         yield l[i:i + n]
-        
+
 def get_files(fname):
     # Expect fname relative to CMSSW BASE
     fname = fname.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+    #Load list of file names from textfile
     if fname.endswith(".txt"):
         lines = open(fname).readlines()
         lines = map(lambda x: x.strip(), lines)
         lines = filter(lambda x: "root" in x, lines)
         lines = map(lambda x: x.split()[0], lines)
+    #Filename is a globstring
     elif fname.endswith("*"):
+        #Files in T3_CH_PSI storage element
         if "/pnfs/" in fname:
             lines = ["root://t3dcachedb.psi.ch/" + f for f in glob.glob(fname)]
+        #Files are really on local filesystem
         else:
             lines = ["file://" + f for f in glob.glob(fname)]
     return lines

@@ -50,33 +50,51 @@ class LeptonAnalyzer(FilterAnalyzer):
             for lep_flavour in ["mu", "el"]:
                 lepcuts = self.conf.leptons[lep_flavour][id_type]
                 incoll = getattr(event, lep_flavour)
+               
+                #The isolation type and cut value to be used
                 isotype = self.conf.leptons[lep_flavour]["isotype"]
-                isocut = lepcuts.get("iso", 99)
+                isocut = lepcuts.get("iso", None)
+
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("input collection", id_type, lep_flavour)
                     for lep in incoll:
                         autolog(lep.pt, lep.eta, lep.pdgId)
 
+                #Filter leptons by pt and eta
                 leps = filter(
                     lambda x, lepcuts=lepcuts: (
                         x.pt > lepcuts.get("pt", 0) #pt cut may be optional in case of DL
                         and abs(x.eta) < lepcuts["eta"]
                     ), incoll
                 )
+
+
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("after eta")
                     for lep in leps:
                         autolog(lep.pt, lep.eta, lep.pdgId)
 
                 #Apply isolation cut
-                if isotype != "none":
-                    leps = filter(
-                        lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
-                    )
+                for lep in leps:
+                    lep.iso = getattr(lep, isotype)
+                if not isocut is None:
+
+                    #Inverted isolation cut
+                    if lepcuts.get("isoinverted", False):
+                        leps = filter(
+                            lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) >= isocut, leps
+                        )
+                    #Normal isolation cut
+                    else:
+                        leps = filter(
+                            lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
+                        )
+                
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("after iso", isotype)
                     for lep in leps:
                         autolog(lep.pt, lep.eta, lep.pdgId)
+                
                 #Apply ID cut 
                 leps = filter(lepcuts["idcut"], leps)
                 if "debug" in self.conf.general["verbosity"]:

@@ -188,16 +188,15 @@ class Conf:
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_tight(el),
             },
-            #"isotype": "pfRelIso03", #pfRelIso - delta-beta, relIso - rho
-            "isotype": "none", #pfRelIso - delta-beta, relIso - rho (Heppy.LeptonAnalyzer.ele/mu_isoCorr), none
+            #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff is not defined
+            "isotype": "combIsoAreaCorr",
             "debug" : print_el
         },
         "DL": {
             "pt_leading": 25,
             "pt_subleading": 15,
         },
-        "selection": lambda event: event.is_sl or event.is_dl
-        #"selection": lambda event: event.is_fh #DS
+        "selection": lambda event: event.is_sl or event.is_dl,
     }
 
     jets = {
