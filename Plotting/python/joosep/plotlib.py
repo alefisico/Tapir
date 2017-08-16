@@ -276,8 +276,8 @@ def mc_stack(
     )
 
     return {
-        "hists":stack,
-        "tot":htot,
+        "hists": stack,
+        "tot": htot,
         "stat_error_bar": stat_error_bar,
         "syst_error_bar": syst_error_bar,
         "stat_error": errs_stat_sym,
@@ -471,6 +471,11 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #Create the normalized signal shape
     histogram_signal = sum([histograms_nominal[sig] for sig in signal_processes])
     histogram_total_mc = sum(histograms_nominal.values())
+
+    xs = np.array([i for i in histogram_total_mc.x()])
+    ws = np.array([i for i in histogram_total_mc.xwidth()])
+    ys = np.array([i for i in histogram_total_mc.y()])
+
     if not histogram_signal:
         histogram_signal = histogram_total_mc.Clone()
         histogram_signal.Scale(0.0)
@@ -506,6 +511,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         if show_overflow:
             fill_overflow(data)
         data.title = "data ({0:.2f})".format(data.Integral())
+        data.marker = "o"
+        data.linecolor = "black"
         
         #set data error to 0 in case no data (FIXME) 
         for ibin in range(data.GetNbinsX()):
@@ -549,6 +556,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     a2 = a1
     
+    ys_data = None
+
     #do ratio panel
     if data:
         a2 = plt.axes([0.0,0.0, 1.0, 0.18], sharex=a1)
@@ -556,13 +565,11 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         plt.xlabel(xlabel)
         a2.grid()
         
-        xs = np.array([i for i in histogram_total_mc.x()])
-        ws = np.array([i for i in histogram_total_mc.xwidth()])
-        ys = np.array([i for i in histogram_total_mc.y()])
         ys_data = np.array([i for i in data.y()])
         
         data_ratio = data.clone()
         data_ratio.linecolor = "black"
+        data_ratio.marker = "o"
         data_ratio.Divide(histogram_total_mc)
 
         #In case MC was empty, set data/mc ratio to 0
@@ -577,53 +584,45 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         errorbar(data_ratio)
         
         #Draw the stat
-        down = ys - stacked_hists["stat_error"]
-        down[down<=0] = 0.0
-        ratio_down = ys_data/down
-        ratio_down[np.isnan(ratio_down)] = 1.0
-        ratio_down[np.isinf(ratio_down)] = 1.0
-        up = ys + stacked_hists["stat_error"]
-        ratio_up = ys_data/up
-        ratio_up[np.isnan(ratio_up)] = 1.0
-        ratio_up[np.isinf(ratio_up)] = 1.0
+        ratio = stacked_hists["stat_error"]/ys
+        ratio[np.isnan(ratio)] = 1.0
+        ratio[np.isinf(ratio)] = 1.0
   
         plt.bar(
             xs,
-            np.abs(1.0 - ratio_down) + np.abs(1.0 - ratio_up),
+            2.0*ratio,
             width=ws,
-            bottom=1.0 - np.abs(1.0 - ratio_up),
+            bottom=1.0 - ratio,
             hatch="//////",
             facecolor="none",
             zorder=10,
             alpha=1.0
         )
         
-        #Draw the syst+stat
-        down = ys - stacked_hists["syst_error"]
-        down[down<=0] = 0.0
-        ratio_down = ys_data/down
-        ratio_down[np.isnan(ratio_down)] = 1.0
-        ratio_down[np.isinf(ratio_down)] = 1.0
-        up = ys + stacked_hists["syst_error"]
-        ratio_up = ys_data/up
-        ratio_up[np.isnan(ratio_up)] = 1.0
-        ratio_up[np.isinf(ratio_up)] = 1.0
-        
+        # #Draw the syst+stat
+        ratio = stacked_hists["syst_error"]/ys
+        ratio[np.isnan(ratio)] = 1.0
+        ratio[np.isinf(ratio)] = 1.0
+
         plt.bar(
             xs,
-            np.abs(1.0 - ratio_down) + np.abs(1.0 - ratio_up),
+            2.0*ratio,
             width=ws,
-            bottom=1.0 - np.abs(1.0 - ratio_up),
+            bottom=1.0 - ratio,
             hatch="\\\\\\\\",
             facecolor="none",
             zorder=10,
             alpha=1.0
         )
 
-        plt.title("data={0:.1f} MC={1:.1f}".format(
+        pvalue = data.Chi2Test(histogram_total_mc, "UW")
+        print data.Integral(), histogram_total_mc.Integral(), pvalue
+        plt.title("data={0:.1f} MC={1:.1f} r={2:.2f} p={3:.4E}".format(
             data.Integral(),
-            stacked_hists["tot"].Integral()
-            ), x=0.01, y=0.8, fontsize=10, horizontalalignment="left"
+            stacked_hists["tot"].Integral(),
+            data.Integral()/stacked_hists["tot"].Integral(),
+            pvalue
+            ), x=0.01, y=1.00, fontsize=10, horizontalalignment="left"
         )
         plt.ylabel(r"$\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
         plt.axhline(1.0, color="black")
@@ -634,6 +633,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     return {
         "axes": (a1, a2),
+        "xs": xs,
+        "ys": ys,
+        "ws": ws,
+        "ys_data": ys_data,
         "nominal": histograms_nominal,
         "stacked": stacked_hists,
         "systematic": histograms_systematic,
@@ -844,18 +847,18 @@ def make_df_hist(bins, x, w=1.0):
 
 if __name__ == "__main__":
     tf = rootpy.io.File("test.root")
-    hists = [tf.Get("ttjets_heavy__pt"), tf.Get("ttjets_light__pt")]
 
-    r = draw_data_mc(tf, "pt",
+    r = draw_data_mc(tf, "mu__jet_pt",
         [
             ("ttjets_heavy", "tt+hf"),
             ("ttjets_light", "tt+lf")
         ], [],
-        systematics = [("_TotalUp", "_TotalDown")],
-        dataname="data_obs",
+        systematics = [("__TotalUp", "__TotalDown")],
+        dataname="data",
         legend_loc="best",
         legend_fontsize=16,
-        colors={"ttjets_heavy": "darkred", "ttjets_light": "red"}
+        colors={"ttjets_heavy": "darkred", "ttjets_light": "red"},
+        rebin=2
     );
     svfg("./test_data_mc.pdf")
 
