@@ -264,6 +264,13 @@ public:
     TTreeReaderValue<int> is_sl;
     TTreeReaderValue<int> is_dl;
     TTreeReaderValue<int> is_fh;
+    
+    TTreeReaderValue<int> HLT_ttH_SL_mu;
+    TTreeReaderValue<int> HLT_ttH_SL_el;
+    TTreeReaderValue<int> HLT_ttH_DL_elmu;
+    TTreeReaderValue<int> HLT_ttH_DL_elel;
+    TTreeReaderValue<int> HLT_ttH_DL_mumu;
+    TTreeReaderValue<int> HLT_ttH_FH;
 
     TTreeReaderValue<int> numJets;
     TTreeReaderValue<int> nBCSVM;
@@ -303,6 +310,13 @@ public:
         is_dl(reader, "is_dl"),
         is_fh(reader, "is_fh"),
         
+        HLT_ttH_SL_mu(reader, "HLT_ttH_SL_mu"),
+        HLT_ttH_SL_el(reader, "HLT_ttH_SL_el"),
+        HLT_ttH_DL_elmu(reader, "HLT_ttH_DL_elmu"),
+        HLT_ttH_DL_elel(reader, "HLT_ttH_DL_elel"),
+        HLT_ttH_DL_mumu(reader, "HLT_ttH_DL_mumu"),
+        HLT_ttH_FH(reader, "HLT_ttH_FH"),
+        
         numJets(reader, "numJets"),
         nBCSVM(reader, "nBCSVM"),
         
@@ -334,6 +348,21 @@ public:
     std::vector<Lepton> build_leptons(Systematic::SystId syst_id = Systematic::syst_id_nominal);
     virtual std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
     virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+};
+
+class TreeDescriptionMCSystematic : TreeDescription {
+public:
+
+    TTreeReaderValue<int> ttCls;
+    
+    TreeDescriptionMCSystematic(TFile* file, SampleDescription sample) :
+        TreeDescription(file, sample),
+        ttCls(reader, "ttCls")
+    {}
+    
+    ~TreeDescriptionMCSystematic() {}
+    
+    EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
 };
 
 class TreeDescriptionMC : TreeDescription {

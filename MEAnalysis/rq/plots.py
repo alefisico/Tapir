@@ -63,7 +63,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "",
         "legend_fontsize": 12,
         "legend_loc": "best",
-        "colors": [plotlib.colors.get(p) for p in procs],
+        "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
         "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",

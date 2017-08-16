@@ -8,6 +8,9 @@ import ROOT
 from TTH.MEAnalysis import samples_base
 from TTH.MEAnalysis.samples_base import get_files, getSitePrefix
 
+import logging
+LOG_MODULE_NAME = logging.getLogger(__name__)
+
 # From:
 # http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
 def pairwise(iterable):
@@ -167,12 +170,15 @@ class Process(object):
         self.xs_weight = kwargs.get("xs_weight", 1.0)
         self.full_name = " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
 
+        #extra category name, in case you want to make a distinction
+        self.category_name = kwargs.get("category_name", "")
+
     def __repr__(self):
         s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
         return s
 
     def output_path(self, category_name, discriminator_name, systematic_string=None):
-        to_join = [self.output_name, category_name, discriminator_name]
+        to_join = [self.output_name, category_name + self.category_name, discriminator_name]
         if systematic_string:
             to_join += [systematic_string]
         name = "__".join(to_join)
@@ -337,8 +343,10 @@ class Category:
             self.shape_uncertainties[k].update(v)
 
         for k, v in self.proc_scale_uncertainties.items():
-            self.scale_uncertainties[k].update(v)
-
+            if k in self.scale_uncertainties.keys():
+                self.scale_uncertainties[k].update(v)
+            else:
+                LOG_MODULE_NAME.info("Could not find process {0} to update scale uncertainties".format(k))
     
     def __str__(self):
         s = "Category(full_name={0})".format(

@@ -313,7 +313,7 @@ def createEvent(
     if len(event.jets) == 0:
         LOG_MODULE_NAME.info("Event has 0 reconstructed jets, likely a weird systematic migration")
         return None
-    
+  
     if not any_passes:
         return None
 
@@ -638,7 +638,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     #now we find which processes are matched to have this sample as an input
     #these processes are used to generate histograms
     matched_processes = [p for p in analysis.processes if p.input_name == sample.name]
-    
+   
+    #Find the processes for which we have up/down variated samples
     systematics_sample = analysis.config.get("systematics", "sample").split()
     matched_procs_new = []
     for syst_sample in systematics_sample:
@@ -673,7 +674,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     if len(matched_processes) == 0:
         LOG_MODULE_NAME.error("Could not match any processes to sample, will not generate histograms {0}".format(sample.name))
     for proc in matched_processes:
-        print(proc.input_name, proc.output_name, ",".join([c.name for c in proc.cuts]), proc.xs_weight)
+        LOG_MODULE_NAME.info(proc.input_name, proc.output_name, proc.category_name, ",".join([c.name for c in proc.cuts]), proc.xs_weight)
     LOG_MODULE_NAME.info("matched processes: {0}".format(len(matched_processes)))
 
     do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
@@ -686,7 +687,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     if schema == "mc":
         systematics_event = ["nominal"] + systematics_event
         systematics_weight = [k[0] for k in systematic_weights]
-    elif schema == "data":
+    else:
         systematics_event = ["nominal"]
         systematics_weight = []
     LOG_MODULE_NAME.info("systematics_event: " + str(systematics_event))
@@ -718,6 +719,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         tf = ROOT.TFile.Open(file_name)
         if schema == "mc":
             events = ROOT.TTH_MEAnalysis.TreeDescriptionMC(
+                tf,
+                ROOT.TTH_MEAnalysis.SampleDescription(
+                    ROOT.TTH_MEAnalysis.SampleDescription.MC
+                )
+            )
+        elif schema == "mc_syst":
+            events = ROOT.TTH_MEAnalysis.TreeDescriptionMCSystematic(
                 tf,
                 ROOT.TTH_MEAnalysis.SampleDescription(
                     ROOT.TTH_MEAnalysis.SampleDescription.MC
@@ -828,8 +836,6 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        #sample = "SingleMuon"
-        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         
         skip_events = 0

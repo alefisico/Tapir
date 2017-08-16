@@ -23,6 +23,12 @@ Systematic::SystId Systematic::make_id(Systematic::Event e, Systematic::Directio
     return std::make_pair(e, d);
 }
 
+EventDescription TreeDescriptionMCSystematic::create_event(Systematic::SystId syst_id) {
+    auto event = TreeDescription::create_event(syst_id);
+    event.ttCls = *ttCls;
+    return event;
+}
+
 EventDescription TreeDescriptionMC::create_event(Systematic::SystId syst_id) {
     auto event = TreeDescription::create_event(syst_id);
 
@@ -82,12 +88,12 @@ EventDescription TreeDescription::create_event(Systematic::SystId syst_id) {
     event.is_dl = *is_dl;
     event.is_fh = *is_fh;
 
-    event.HLT_ttH_SL_mu = 1;
-    event.HLT_ttH_SL_el = 1;
-    event.HLT_ttH_DL_mumu = 1;
-    event.HLT_ttH_DL_elmu = 1;
-    event.HLT_ttH_DL_elel = 1;
-    event.HLT_ttH_FH = 1;
+    event.HLT_ttH_SL_mu = *HLT_ttH_SL_mu;
+    event.HLT_ttH_SL_el = *HLT_ttH_SL_el;
+    event.HLT_ttH_DL_mumu = *HLT_ttH_DL_mumu;
+    event.HLT_ttH_DL_elmu = *HLT_ttH_DL_elmu;
+    event.HLT_ttH_DL_elel = *HLT_ttH_DL_elel;
+    event.HLT_ttH_FH = *HLT_ttH_FH;
     
     event.numJets = *numJets;
     event.nBCSVM = *nBCSVM;

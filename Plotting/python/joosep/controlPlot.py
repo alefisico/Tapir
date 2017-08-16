@@ -19,7 +19,8 @@ from plotlib import escape_string, zero_error
 import rootpy
 from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
-import sklearn 
+import sklearn
+import sklearn.metrics
 
 DO_PARALLEL = False
 
@@ -40,18 +41,18 @@ procs = [x[0] for x in procs_names]
 syst_pairs = []
 
 syst_pairs.extend([
-    ("__puUp", "__puDown"),
-    # ("_CMS_scale_jUp", "_CMS_scale_jDown"),
-    # ("_CMS_res_jUp", "_CMS_res_jDown"),
-    # ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
-    # ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
-    # ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
-    # ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
-    # ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
-    # ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
-    # ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
-    # ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
-    # ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
+    ("__CMS_puUp", "__CMS_puDown"),
+    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
+    ("__CMS_res_jUp", "__CMS_res_jDown"),
+    ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
+    ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
+    ("__CMS_ttH_CSVhfUp", "__CMS_ttH_CSVhfDown"),
+    ("__CMS_ttH_CSVhfstats1Up", "__CMS_ttH_CSVhfstats1Down"),
+    ("__CMS_ttH_CSVhfstats2Up", "__CMS_ttH_CSVhfstats2Down"),
+    ("__CMS_ttH_CSVjesUp", "__CMS_ttH_CSVjesDown"),
+    ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
+    ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
+    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down")
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -106,7 +107,12 @@ blind_funcs = {
 
 def plot_worker(kwargs):
     #temporarily disable true latex for fast testing
-    rc('text', usetex=False)
+    do_tex = kwargs.get("do_tex", False)
+
+    if do_tex:
+        rc('text', usetex=True)
+    else:
+        rc('text', usetex=False)
     matplotlib.use('PS') #needed on T3
 
     inf = rootpy.io.File(kwargs.pop("infile"))
@@ -176,7 +182,7 @@ def plot_worker(kwargs):
     yields = [ret["nominal"][samp].Integral() for samp, sampname in procs]
     plt.pie(
         yields,
-        colors=kwargs.get("colors"),
+        colors=[kwargs.get("colors")[p] for p, _ in procs],
         labels=[s[1] + "\n{0:.1f}".format(y) for s, y in zip(procs, yields)]
     )
     yield_s = 0.0
@@ -188,9 +194,9 @@ def plot_worker(kwargs):
             yield_b += y
 
     if yield_b == 0:
-        plt.title(kwargs.get("category", "unknown_category"))
+        plt.title(escape_string(kwargs.get("category", "unknown_category")))
     else:
-        plt.title(kwargs.get("category", "unknown category") + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
+        plt.title(escape_string(kwargs.get("category", "unknown category")) + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
     plotlib.svfg(outname + "_pie.pdf")
     plt.clf()
 
@@ -206,16 +212,16 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "category": category,
         "procs": procs_names,
         "signal_procs": ["ttH_hbb"],
-        "dataname": None,#"data", #data_obs for fake data
+        "dataname": "data_obs",#"data", #data_obs for fake data
         "rebin": 1,
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
         "legend_fontsize": 12,
         "legend_loc": "best",
-        "colors": [plotlib.colors.get(p) for p in procs],
+        "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
-        "title_extended": r"$,\ \mathcal{L}=00.0\ \mathrm{fb}^{-1}$, ",
+        "title_extended": "",
         "systematics": syst_pairs,
         "do_syst": False,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
@@ -240,7 +246,7 @@ if __name__ == "__main__":
     args = []
 
     args += [get_base_plot(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/c85d8a67-ca1a-4b0f-ba9e-d3695589f9c7/",
+        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/90e1a412-bc51-4650-a19c-61af33480485/",
         "test", "categories", cat, var) for cat in cats for var in simple_vars 
     ]
 

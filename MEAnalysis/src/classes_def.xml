@@ -12,5 +12,6 @@
 
     <class name="TTH_MEAnalysis::TreeDescription"/>
     <class name="TTH_MEAnalysis::TreeDescriptionMC"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMCSystematic"/>
     <class name="TTH_MEAnalysis::EventDescription"/>
 </lcgdict>

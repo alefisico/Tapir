@@ -65,13 +65,6 @@ def sparse(config_path, filenames, sample, outfile):
     os.remove(ofname)
     return outfile
 
-#def plot_syst_updown(nominal, up, down):
-#    plt.figure(figsize=(6,6))
-#    heplot.barhist(nominal, color="black")
-#    heplot.barhist(up, color="red")
-#    heplot.barhist(down, color="blue")
-
-
 def mergeFiles(outfile, infiles, remove_inputs=False):
     basepath = os.path.dirname(outfile)
     if not os.path.isdir(basepath):
