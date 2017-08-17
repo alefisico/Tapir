@@ -360,7 +360,14 @@ def getTreeProducer(conf):
     ])
    
     #create jet up/down variations
-    corrs = [NTupleVariable("corr_"+c, lambda x,c="corr_"+c : getattr(x, c), mcOnly=True) for c in conf.mem["jet_corrections"]]
+    corrs = [NTupleVariable(
+            "corr_"+c,
+            lambda x,c="corr_"+c : getattr(x, c),
+            mcOnly=True,
+            the_type=float,
+        ) for c in conf.mem["jet_corrections"]
+    ]
+
     #Specifies what to save for jets
     jetType = NTupleObjectType("jetType", variables = [
         NTupleVariable("pt", lambda x : x.pt),
@@ -398,6 +405,7 @@ def getTreeProducer(conf):
     #Here we define all the variables that we want to save in the output TTree
     treeProducer = cfg.Analyzer(
         class_object = AutoFillTreeProducer,
+        defaultFloatType = "F",
         verbose = False,
         vectorTree = True,
         globalVariables = [
