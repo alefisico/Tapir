@@ -513,7 +513,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         data.title = "data ({0:.2f})".format(data.Integral())
         data.marker = "o"
         data.linecolor = "black"
-        
+
         #set data error to 0 in case no data (FIXME) 
         for ibin in range(data.GetNbinsX()):
             if data.GetBinContent(ibin) == 0:
@@ -853,7 +853,10 @@ if __name__ == "__main__":
             ("ttjets_heavy", "tt+hf"),
             ("ttjets_light", "tt+lf")
         ], [],
-        systematics = [("__TotalUp", "__TotalDown")],
+        systematics = [
+            ("__jecUp", "__jecDown"),
+            ("__jerUp", "__jerDown"),
+        ],
         dataname="data",
         legend_loc="best",
         legend_fontsize=16,
