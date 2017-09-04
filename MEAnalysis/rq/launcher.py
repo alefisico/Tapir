@@ -105,6 +105,10 @@ def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_s
                     "worker {0} running job {1} has died".format(worker._name, ret.get("current_job", None))
                 )
                 redis_conn.delete(worker.key)
+                cur_job = ret.get("current_job", None)
+                if cur_job:
+                    logging.getLogger('launcher').info("cancelling job {0}".format(cur_job))
+                    rq.cancel_job(cur_job, redis_conn)
 
         for job in jobs:
             job.refresh()
@@ -220,10 +224,20 @@ def enqueue_memoize(queue, **kwargs):
         res2 = redis_conn.hgetall(job_key)
         logging.getLogger('launcher').debug("found key {0}, res={1}".format(hkey, res))
 
-        return JobMemoize(
-            res, kwargs.get("func"), kwargs.get("args"), kwargs.get("meta"),
-            datetime.strptime(res2["started_at"], "%Y-%m-%dT%H:%M:%SZ"), datetime.strptime(res2["ended_at"], "%Y-%m-%dT%H:%M:%SZ")
-        )
+
+        #job may have been forgotten by scheduler
+        if res2.has_key("started_at") and res2.has_key("ended_at"):
+            return JobMemoize(
+                res, kwargs.get("func"), kwargs.get("args"), kwargs.get("meta"),
+                datetime.strptime(res2["started_at"], "%Y-%m-%dT%H:%M:%SZ"),
+                datetime.strptime(res2["ended_at"], "%Y-%m-%dT%H:%M:%SZ")
+            )
+        else:
+            return JobMemoize(
+                res, kwargs.get("func"), kwargs.get("args"), kwargs.get("meta"),
+                None,
+                None
+            ) 
     else:
         logging.getLogger('launcher').debug("didn't find key, enqueueing")
         return queue.enqueue_call(**kwargs)
@@ -309,8 +323,8 @@ class TaskValidateFiles(Task):
                     func = validateFiles,
                     args = (inputs, ),
                     timeout = 2*60, #if job didn't finish in 2 minutes, consider lost
-                    ttl = 10*60,
-                    result_ttl = 2*60*60, #result lives 2h
+                    ttl = -1,
+                    result_ttl = -1, #result lives 2h
                     meta = {"retries": 5, "args": str((inputs, ))}
                 )
             ]
@@ -381,8 +395,8 @@ class TaskNumGen(Task):
                     func = count,
                     args = (inputs, ),
                     timeout = 10*60,
-                    ttl = 2*60*60,
-                    result_ttl = 2*60*60,
+                    ttl = -1,
+                    result_ttl = -1,
                     meta = {"retries": 5, "args": str((inputs, ))}
                 )
             ]
@@ -463,8 +477,8 @@ class TaskSparsinator(Task):
                     func = sparse,
                     args = (config_path, inputs, sample.name, ofname),
                     timeout = 1*60*60,
-                    ttl = 2*60*60,
-                    result_ttl = 2*60*60,
+                    ttl = -1,
+                    result_ttl = -1,
                     meta = {"retries": 2, "args": str((inputs, sample.name))}
                 )
             ]
@@ -498,7 +512,8 @@ class TaskSparseMerge(Task):
                     func = mergeFiles,
                     args = (outfile + "." + str(ijob), sample_inputs),
                     timeout = 20*60,
-                    result_ttl = 60*60,
+                    ttl = -1,
+                    result_ttl = -1,
                     meta = {"retries": 0, "args": sample_inputs}
                 )
                 jobs_by_sample[sample.name] += [job]
@@ -513,7 +528,8 @@ class TaskSparseMerge(Task):
             func = mergeFiles,
             args = (final_merge, results),
             timeout = 20*60,
-            result_ttl = 60*60,
+            ttl = -1,
+            result_ttl = -1,
             meta = {"retries": 2, "args": ("final", final_merge, results)}
         )
         waitJobs([job], redis_conn, qmain, qfail, callback=TaskSparseMerge.status_callback)
@@ -521,9 +537,9 @@ class TaskSparseMerge(Task):
         return final_merge
 
     @staticmethod
-    def status_callback(jobs):
+    def status_callback(jobs, workers=0):
 
-        basic_job_status(jobs)
+        basic_job_status(jobs, workers)
 
         res = []
         samples = set()
@@ -654,7 +670,8 @@ class TaskLimits(Task):
                         group
                     ],
                     timeout = 40*60,
-                    result_ttl = 60*60,
+                    ttl = -1,
+                    result_ttl = -1,
                     meta = {"retries": 0, "args": ""})]
             
         limits = waitJobs(all_jobs, redis_conn, qmain, qfail)
@@ -692,7 +709,7 @@ class TaskTables(Task):
         of.close()
 
 def make_workdir():
-    workflow_id = uuid.uuid4()
+    workflow_id = datetime.now().isoformat().replace(":", "-").replace(".", "-") + "_" + str(uuid.uuid4())
     workdir = "results/{0}".format(workflow_id)
     os.makedirs(workdir)
     return workdir

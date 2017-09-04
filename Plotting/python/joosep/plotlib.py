@@ -246,7 +246,7 @@ def mc_stack(
     err2 = np.array([i for i in htot.yerrh()])
 
     #Plot MC statistical error
-    stat_error_bar = plt.bar(xs, err1+err2, width=ws, bottom=ys-err1, hatch="//////", facecolor="none", zorder=10)
+    stat_error_bar = plt.bar(xs, err1+err2, width=ws, bottom=ys-err1, hatch="//////", facecolor="none", zorder=100)
 
     #Symmetrize statistical error
     errs_stat_sym = (err2 + err1)/2.0
@@ -272,7 +272,7 @@ def mc_stack(
         bottom=ys - errs_syst_tot,
         hatch="\\\\\\\\",
         facecolor="none",
-        zorder=10
+        zorder=100
     )
 
     return {
@@ -353,7 +353,9 @@ def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=la
                     h = rootpy.asrootpy(tf.get(key.GetName()).Clone())
             if not h:
                 raise Exception("Could not find histogram with name {0} or replacement".format(pat))
-            for ibin in range(0, h.GetNbinsX() + 1):
+
+            #set all bins, including underflow and overflow, to 0
+            for ibin in range(0, h.GetNbinsX() + 2):
                 h.SetBinContent(ibin, 0.0)
                 h.SetBinError(ibin, 0.0)
             h.SetEntries(0.0)
@@ -512,6 +514,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             fill_overflow(data)
         data.title = "data ({0:.2f})".format(data.Integral())
         data.marker = "o"
+        data.markersize = 2
         data.linecolor = "black"
 
         #set data error to 0 in case no data (FIXME) 
@@ -570,6 +573,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         data_ratio = data.clone()
         data_ratio.linecolor = "black"
         data_ratio.marker = "o"
+        data_ratio.markersize = 2
         data_ratio.Divide(histogram_total_mc)
 
         #In case MC was empty, set data/mc ratio to 0
@@ -595,7 +599,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             bottom=1.0 - ratio,
             hatch="//////",
             facecolor="none",
-            zorder=10,
+            zorder=100,
             alpha=1.0
         )
         
@@ -611,7 +615,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             bottom=1.0 - ratio,
             hatch="\\\\\\\\",
             facecolor="none",
-            zorder=10,
+            zorder=100,
             alpha=1.0
         )
 

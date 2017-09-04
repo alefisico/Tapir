@@ -26,8 +26,8 @@ procs_names = [
     ("diboson", "diboson"),
     ("stop", "single top"),
     ("ttv", "tt+V"),
-    #("wjets", "w+jets"),
-    #("dy", "dy")
+    ("wjets", "w+jets"),
+    ("dy", "dy")
 ]
 procs = [x[0] for x in procs_names]
 
@@ -66,7 +66,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
-        "title_extended": r"$,\ \mathcal{L}=17\ \mathrm{fb}^{-1}$, ",
+        "title_extended": r"$,\ \mathcal{L}=36\ \mathrm{fb}^{-1}$, " + category.replace("_", " "),
         "systematics": syst_pairs,
         "do_syst": True, #currently crashes with True due to some dvipng/DISPLAY issue
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",

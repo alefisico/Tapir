@@ -26,20 +26,22 @@ DO_PARALLEL = False
 
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
-    #("ttH_nonhbb", "tt+H(non-bb)"),
+    ("ttH_nonhbb", "tt+H(non-bb)"),
     ("ttbarOther", "tt+light"),
     ("ttbarPlusBBbar", "tt+bb"),
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-    #("diboson", "diboson"),
+    ("diboson", "diboson"),
+    ("stop", "single top"),
+    ("ttv", "tt+V"),
+    ("wjets", "w+jets"),
+    ("dy", "dy")
 ]
 
 procs = [x[0] for x in procs_names]
 
-
 syst_pairs = []
-
 syst_pairs.extend([
     ("__CMS_puUp", "__CMS_puDown"),
     ("__CMS_scale_jUp", "__CMS_scale_jDown"),
@@ -66,9 +68,11 @@ def blind(h):
 def plot_syst_updown(nominal, up, down):
     plt.figure(figsize=(6,6))
     a1 = plt.axes([0.0, 0.52, 1.0, 0.5])
-    heplot.barhist(nominal, color="black", label="nominal")
-    heplot.barhist(up, color="red", label="up")
-    heplot.barhist(down, color="blue", label="down")
+    up.color = "red"
+    down.color = "blue"
+    rplt.step(nominal, label="nominal")
+    rplt.step(up, label="up")
+    rplt.step(down, label="down")
     ticks = a1.get_xticks()
     a1.get_xaxis().set_visible(False)
     a1.grid()
@@ -82,8 +86,10 @@ def plot_syst_updown(nominal, up, down):
     down.Divide(nominal)
     zero_error(down)
 
-    heplot.barhist(up, color="red")
-    heplot.barhist(down, color="blue")
+    up.color = "red"
+    down.color = "blue"
+    rplt.step(up, color="red")
+    rplt.step(down, color="blue")
     plt.axhline(1.0, color="black")
     a2.set_ylim(0.5, 1.5)
     a2.grid()
@@ -212,7 +218,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "category": category,
         "procs": procs_names,
         "signal_procs": ["ttH_hbb"],
-        "dataname": "data_obs",#"data", #data_obs for fake data
+        "dataname": "data",#"data", #data_obs for fake data
         "rebin": 1,
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
@@ -233,12 +239,13 @@ if __name__ == "__main__":
     # Plot for all SL categories
     simple_vars = [
         "jetsByPt_0_pt",
-        "leps_0_pt",
-        "btag_LR_4b_2b_btagCSV_logit",
+        #"leps_0_pt",
+        #"btag_LR_4b_2b_btagCSV_logit",
         #"common_mem"
     ]
 
     cats = [
+        "sl_jge6_t2",
         "sl_jge6_tge4",
         "dl_jge4_tge4",
     ]
@@ -246,7 +253,7 @@ if __name__ == "__main__":
     args = []
 
     args += [get_base_plot(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/90e1a412-bc51-4650-a19c-61af33480485/",
+        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/2017-08-21T10-42-10-152723_0f75a98b-9585-4f79-a5a1-80f3c743d9f6/",
         "test", "categories", cat, var) for cat in cats for var in simple_vars 
     ]
 

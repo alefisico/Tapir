@@ -35,6 +35,8 @@ FUNCTION_TABLE = {
     "mem_SL_1w2h2t_p": lambda ev: ev.mem_SL_1w2h2t_p,
     "mem_SL_2w2h2t_p": lambda ev: ev.mem_SL_2w2h2t_p,
     "Wmass": lambda ev: ev.Wmass,
+    "numJets": lambda ev: ev.numJets,
+    "nBCSVM": lambda ev: ev.nBCSVM,
     "counting": 1.0
 }
 
@@ -137,7 +139,10 @@ class HistogramOutput:
         return event.cuts.get(self.cut_name, False)
 
     def fill(self, event, weight = 1.0):
-        self.hist.Fill(self.func(event), weight)
+        if weight == 1.0:
+            self.hist.Fill(self.func(event))
+        else:
+            self.hist.Fill(self.func(event), weight)
 
 class CategoryCut:
     def __init__(self, cuts):
@@ -299,6 +304,7 @@ class Histogram:
 
     def get_TH1(self, name):
         th = ROOT.TH1D(name, name, *self.get_binning())
+        th.Sumw2()
         return th
 
 class Category:

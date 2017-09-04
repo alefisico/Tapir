@@ -146,7 +146,7 @@ def fakeData(infile, outfile, categories):
     dircache = {}
     for cat in categories:
 
-        #get first histogram
+        #get first nominal histogram
         hn = "{0}__{1}__{2}".format(
             cat.out_processes[0], cat.name, cat.discriminator.name
         )
@@ -154,6 +154,8 @@ def fakeData(infile, outfile, categories):
         if not h or h.IsZombie():
             raise Exception("Could not get histo {0}".format(hn)) 
         h = h.Clone()
+
+        #Get and add the rest of the nominal histograms
         for proc in cat.out_processes[1:]:
             name = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
