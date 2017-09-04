@@ -123,9 +123,11 @@ namespace Systematic {
 } // namespace Systematic
 
 template <typename T>
-void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& values, const char* branch_name) {
-    values[std::make_pair(Systematic::Nominal, Systematic::None)] = new T(reader, branch_name);
-    
+void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& values, const char* branch_name, bool add_nominal) {
+    if (add_nominal) {
+        values[std::make_pair(Systematic::Nominal, Systematic::None)] = new T(reader, branch_name);
+    }
+
     values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_TotalUp")).c_str());
     values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_JERUp")).c_str());
     values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SubTotalPileUpUp")).c_str());
@@ -192,8 +194,8 @@ class TTreeReaderValueSystematic {
 public:
     std::map<Systematic::SystId, TTreeReaderValue<T>* > values;
 
-    TTreeReaderValueSystematic(TTreeReader& reader, const char* branch_name) {
-        attachSystematics<TTreeReaderValue<T>>(reader, values, branch_name); 
+    TTreeReaderValueSystematic(TTreeReader& reader, const char* branch_name, bool add_nominal = true) {
+        attachSystematics<TTreeReaderValue<T>>(reader, values, branch_name, add_nominal); 
     }
 
     T GetValue(Systematic::SystId syst_id) {
@@ -207,8 +209,8 @@ class TTreeReaderArraySystematic {
 public:
     std::map<Systematic::SystId, TTreeReaderArray<T>* > values;
 
-    TTreeReaderArraySystematic(TTreeReader& reader, const char* branch_name) {
-        attachSystematics<TTreeReaderArray<T>>(reader, values, branch_name); 
+    TTreeReaderArraySystematic(TTreeReader& reader, const char* branch_name, bool add_nominal = true) {
+        attachSystematics<TTreeReaderArray<T>>(reader, values, branch_name, add_nominal); 
     }
 
     TTreeReaderArray<T>* GetValue(Systematic::SystId syst_id) {
@@ -375,6 +377,7 @@ public:
 
     TTreeReaderArray<int> jets_hadronFlavour;
     TTreeReaderArraySystematic<double> jets_corr;
+    TTreeReaderArray<double> jets_corr_JEC;
     TTreeReaderArray<double> jets_corr_JER;
 
     TTreeReaderValue<double> puWeight;
@@ -410,7 +413,8 @@ public:
         nBCSVM(reader, "nBCSVM"),
 
         jets_hadronFlavour(reader, "jets_hadronFlavour"),
-        jets_corr(reader, "jets_corr"),
+        jets_corr(reader, "jets_corr", false),
+        jets_corr_JEC(reader, "jets_corr_JEC"),
         jets_corr_JER(reader, "jets_corr_JER"),
 
         puWeight(reader, "puWeight"),

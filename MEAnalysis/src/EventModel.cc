@@ -144,7 +144,6 @@ std::vector<Jet> TreeDescription::build_jets(Systematic::SystId syst_id) {
 }
 
 std::vector<Jet> TreeDescriptionMC::build_jets(Systematic::SystId syst_id) {
-    auto* correction_branch = get_correction_branch(syst_id);
     std::vector<Jet> jets;
     for (auto njet=0; njet < *njets; njet++) {
         TLorentzVector lv;
@@ -154,9 +153,11 @@ std::vector<Jet> TreeDescriptionMC::build_jets(Systematic::SystId syst_id) {
         
         
         if (Systematic::is_jec(syst_id)) {
+            auto* correction_branch = get_correction_branch(syst_id);
             corr = (*correction_branch)[njet];
-            base_corr = (*jets_corr.GetValue(std::make_pair(Systematic::Nominal, Systematic::None)))[njet];
+            base_corr = jets_corr_JEC[njet];
         } else if (Systematic::is_jer(syst_id)) {
+            auto* correction_branch = get_correction_branch(syst_id);
             corr = (*correction_branch)[njet];
             base_corr = jets_corr_JER[njet];
         }
