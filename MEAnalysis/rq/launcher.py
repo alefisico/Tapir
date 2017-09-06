@@ -619,7 +619,7 @@ class TaskCategories(Task):
             stdout=subprocess.PIPE
         )
 
-        time.sleep(1) #NFS
+        time.sleep(60) #NFS
 
         result = "{0}/categories".format(workdir)
         self.save_state()
@@ -816,7 +816,7 @@ if __name__ == "__main__":
     tasks = []
     tasks += [
         TaskValidateFiles(workdir, "VALIDATE", analysis),
-        TaskNumGen(workdir, "NGEN", analysis),
+        #TaskNumGen(workdir, "NGEN", analysis),
         TaskSparsinator(workdir, "SPARSE", analysis),
         TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),

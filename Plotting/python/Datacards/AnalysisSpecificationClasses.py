@@ -80,6 +80,7 @@ class Sample(object):
         self.debug = kwargs.get("debug")
         self.name = kwargs.get("name")
         self.schema = kwargs.get("schema")
+        self.treemodel = kwargs.get("treemodel")
         self.files_load = kwargs.get("files_load")
         self.files_load_step1 = kwargs.get("files_load_step1", None)
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
@@ -119,6 +120,7 @@ class Sample(object):
             files_load = config.get(sample_name, "files_load"),
             files_load_step1 = config.get(sample_name, "files_load_step1"),
             schema = config.get(sample_name, "schema"),
+            treemodel = config.get(sample_name, "treemodel"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen"),

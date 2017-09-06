@@ -253,7 +253,7 @@ if __name__ == "__main__":
     args = []
 
     args += [get_base_plot(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/2017-08-21T10-42-10-152723_0f75a98b-9585-4f79-a5a1-80f3c743d9f6/",
+        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/2017-09-06T09-38-52-750559_1e0d2085-b4e8-4168-8000-696670f8d144/",
         "test", "categories", cat, var) for cat in cats for var in simple_vars 
     ]
 

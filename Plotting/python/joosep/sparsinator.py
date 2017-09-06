@@ -311,7 +311,7 @@ def createEvent(
    
     #workaround for passall=False systematic migrations
     if len(event.jets) == 0:
-        LOG_MODULE_NAME.info("Event has 0 reconstructed jets, likely a weird systematic migration")
+        LOG_MODULE_NAME.info("Event {0}:{1}:{2} has 0 reconstructed jets, likely a weird systematic migration".format(event.run, event.lumi, event.evt))
         return None
   
     if not any_passes:
@@ -534,22 +534,18 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
-        if schema == "mc":
-            events = ROOT.TTH_MEAnalysis.TreeDescriptionMC(
-                tf,
-                ROOT.TTH_MEAnalysis.SampleDescription(
-                    ROOT.TTH_MEAnalysis.SampleDescription.MC
-                )
-            )
-        elif schema == "mc_syst":
-            events = ROOT.TTH_MEAnalysis.TreeDescriptionMCSystematic(
+        treemodel = getattr(ROOT.TTH_MEAnalysis, sample.treemodel.split(".")[-1])
+        LOG_MODULE_NAME.debug("treemodel {0}".format(treemodel))
+
+        if schema == "mc" or schema == "mc_syst":
+            events = treemodel(
                 tf,
                 ROOT.TTH_MEAnalysis.SampleDescription(
                     ROOT.TTH_MEAnalysis.SampleDescription.MC
                 )
             )
         else:
-             events = ROOT.TTH_MEAnalysis.TreeDescription(
+             events = treemodel(
                 tf,
                 ROOT.TTH_MEAnalysis.SampleDescription(
                     ROOT.TTH_MEAnalysis.SampleDescription.DATA
@@ -653,7 +649,8 @@ if __name__ == "__main__":
 
     else:
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        
+        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "SingleMuon"
         skip_events = 0
         max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")

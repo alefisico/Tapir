@@ -39,6 +39,7 @@ if __name__ == "__main__":
     parser.add_argument('--limit', action="store", help="max files per dataset", default=0)
     parser.add_argument('--debug', action="store", help="debug mode", default=False)
     parser.add_argument('--name', action="store", help="search only this dataset", default="*")
+    parser.add_argument('--prefix', action="store", help="Prefix to add to filename", default="")
     args = parser.parse_args()
     
     version = args.version
@@ -166,8 +167,11 @@ if __name__ == "__main__":
                     tmp_lumis = LumiList(runsAndLumis = lumis_dict[name])
                     lumis += [tmp_lumis]
                 else:
-                    raise Exception("file {0} has no associated lumis (events={1})".format(name, nevents))
-                ofile.write("{0} = {1}\n".format(name, nevents))
+                    if nevents > 0:
+                        raise Exception("file {0} has no associated lumis (events={1})".format(name, nevents))
+                    else:
+                        print "file {0} has no associated lumis (events={1})".format(name, nevents)
+                ofile.write("{0} = {1}\n".format(args.prefix + name, nevents))
             #merge lumi files
 
         #merge lumi files
