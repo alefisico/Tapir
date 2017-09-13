@@ -24,7 +24,8 @@ workflows = [
     "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
-    "testing_hadronic_withme" #single-lumi jobs, a few samples   
+    "testing_hadronic_withme", #single-lumi jobs, a few samples
+    "memcheck" #specific MEM jobs that contain lots of hypotheses for validation
 ]
 
 import argparse
@@ -42,6 +43,7 @@ me_cfgs = {
     "nome": "cfg_noME.py",
     "leptonic": "cfg_leptonic.py",
     "hadronic": "cfg_FH.py",
+    "memcheck": "cfg_memcheck.py"
 }
 
 sets_data = [
@@ -143,6 +145,15 @@ datasets.update({
 
     'TTbar_inc': {
         "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'ttbb': {
+        "ds": '/ttbb_4FS_OpenLoops_13TeV-sherpa/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 50,
         "runtime": 20,
@@ -525,33 +536,49 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        "ttHTobb",
-        "ttHToNonbb",
+        #"ttHTobb",
+        #"ttHToNonbb",
         #"TTbar_inc",
-        #"TTbar_isr_up",
-        #"TTbar_isr_down1",
-        #"TTbar_isr_down2",
-        #"TTbar_fsr_up1",
-        #"TTbar_fsr_up2",
-        #"TTbar_fsr_down",
+        "ttbb",
+        "TTbar_isr_up",
+        "TTbar_isr_down1",
+        "TTbar_isr_down2",
+        "TTbar_fsr_up1",
+        "TTbar_fsr_up2",
+        "TTbar_fsr_down",
         #"TTbar_sl",
         #"TTbar_dl",
-        "ww1", "ww2",
-        "wz1", "wz2",
-        "zz1", "zz2",
-        "st_t", "stbar_t",
-        "st_tw", "stbar_tw",
-        "st_s",
-        "ttw_wlnu1",
-        "ttw_wlnu2",
-        "ttz_zllnunu1",
-        "ttz_zllnunu2",
-        "ttw_wqq",
-        "ttz_zqq",
+        #"ww1", "ww2",
+        #"wz1", "wz2",
+        #"zz1", "zz2",
+        #"st_t", "stbar_t",
+        #"st_tw", "stbar_tw",
+        #"st_s",
+        #"ttw_wlnu1",
+        #"ttw_wlnu2",
+        #"ttz_zllnunu1",
+        #"ttz_zllnunu2",
+        #"ttw_wqq",
+        #"ttz_zqq",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
     workflow_datasets["leptonic"][k] = D
+
+#now we construct the workflows from all the base datasets
+workflow_datasets = {}
+workflow_datasets["memcheck"] = {}
+for k in [
+        "ttHTobb",
+        "ttHToNonbb",
+        "TTbar_inc",
+        "ttbb",
+        "TTbar_sl",
+        "TTbar_dl",
+    ]:
+    D = deepcopy(datasets[k])
+    D["mem_cfg"] = "cfg_memcheck.py"
+    workflow_datasets["memcheck"][k] = D
 
 workflow_datasets["signal"] = {}
 for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:

@@ -691,6 +691,10 @@ def getTreeProducer(conf):
         ("nPU0",                    float,  ""),
         ("nTrueInt",                int,  ""),
         ("triggerEmulationWeight",  float,  ""),
+        ("tth_rho_px_gen",  float,  ""),
+        ("tth_rho_py_gen",  float,  ""),
+        ("tth_rho_px_reco",  float,  ""),
+        ("tth_rho_py_reco",  float,  ""),
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
    
