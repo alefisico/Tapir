@@ -361,10 +361,10 @@ def Make_config(tf_gc_path, filename):
 def main():
 
     # !!! Change this line to point to output from make_TF.sh gridcontrol run !!!
-    path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/tf/V25/"
+    path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/transfer/GCecb606ea5572/"
     #path = "file:///mnt/t3nfs01/data01/shome/dsalerno/TTH_2016/TTH_80X_M17/transfer/ttbar"
 
-    for jettype in ["resolved", "subjet"]:
+    for jettype in ["resolved"]:
         Make_config(path, jettype)
 
 

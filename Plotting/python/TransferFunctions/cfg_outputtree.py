@@ -51,10 +51,10 @@ def Make_config(do_subjets=False):
     config['input_tree_name'] = 'vhbb/tree'
 
     #the path to the root files
-    config["root_file_base"] = samples_base.site_prefix
+    config["root_file_base"] = ""
 
     # The config file will be copied to 'runs/{config['run_name']}'
-    config['run_name'] = "Feb1_leptonic_nome"
+    config['run_name'] = "Aug24_v1"
     #config['run_name'] = "Feb6_leptonic_nome_ttbar"
     if do_subjets:
         config['run_name'] += "_subjet"
@@ -127,7 +127,6 @@ def Make_config(do_subjets=False):
         config['jet_extra_vars'] = [
             '{particle}hadronFlavour',
             '{particle}btagCSV',
-            '{particle}btagBDT',
         ]
     else:
         config['jet_extra_vars'] = [
