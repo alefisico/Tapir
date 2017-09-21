@@ -161,7 +161,7 @@ class ConstraintGetter(object):
         
         output, stderr = process.communicate()
         if process.returncode != 0:
-            print "error running limit", stderr
+            raise Exception("error running limit: " + stderr)
         print output
 
         diff_cmd = "python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py --format text -a mlfit{0}.root -g plots{0}.root".format(process_name)
@@ -198,5 +198,9 @@ class DummyLimitGetter(object):
 if __name__ == "__main__":
     datacard = sys.argv[1]
     workdir = os.path.dirname(datacard)
-    lg = LimitGetter(workdir)
-    lg.runSignalInjection(datacard)
+    #lg = LimitGetter(workdir)
+    #lg.runSignalInjection(datacard)
+
+    cg = ConstraintGetter(workdir)
+    constraints = cg(datacard, 0.0)
+    print constraints

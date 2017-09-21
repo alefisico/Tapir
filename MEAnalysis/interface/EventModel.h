@@ -1,6 +1,7 @@
 #ifndef EVENTMODEL_H // header guards
 #define EVENTMODEL_H
 
+#include <iostream>
 #include "TLorentzVector.h"
 #include "TH1.h"
 #include "TH1D.h"
@@ -122,9 +123,11 @@ namespace Systematic {
 } // namespace Systematic
 
 template <typename T>
-void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& values, const char* branch_name) {
-    values[std::make_pair(Systematic::Nominal, Systematic::None)] = new T(reader, branch_name);
-    
+void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& values, const char* branch_name, bool add_nominal) {
+    if (add_nominal) {
+        values[std::make_pair(Systematic::Nominal, Systematic::None)] = new T(reader, branch_name);
+    }
+
     values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_TotalUp")).c_str());
     values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_JERUp")).c_str());
     values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SubTotalPileUpUp")).c_str());
@@ -191,8 +194,8 @@ class TTreeReaderValueSystematic {
 public:
     std::map<Systematic::SystId, TTreeReaderValue<T>* > values;
 
-    TTreeReaderValueSystematic(TTreeReader& reader, const char* branch_name) {
-        attachSystematics<TTreeReaderValue<T>>(reader, values, branch_name); 
+    TTreeReaderValueSystematic(TTreeReader& reader, const char* branch_name, bool add_nominal = true) {
+        attachSystematics<TTreeReaderValue<T>>(reader, values, branch_name, add_nominal); 
     }
 
     T GetValue(Systematic::SystId syst_id) {
@@ -206,8 +209,8 @@ class TTreeReaderArraySystematic {
 public:
     std::map<Systematic::SystId, TTreeReaderArray<T>* > values;
 
-    TTreeReaderArraySystematic(TTreeReader& reader, const char* branch_name) {
-        attachSystematics<TTreeReaderArray<T>>(reader, values, branch_name); 
+    TTreeReaderArraySystematic(TTreeReader& reader, const char* branch_name, bool add_nominal = true) {
+        attachSystematics<TTreeReaderArray<T>>(reader, values, branch_name, add_nominal); 
     }
 
     TTreeReaderArray<T>* GetValue(Systematic::SystId syst_id) {
@@ -251,6 +254,7 @@ public:
     std::map<Systematic::SystId, double> weights;
 };
 
+template <typename T>
 class TreeDescription {
 public:
 
@@ -263,32 +267,39 @@ public:
     TTreeReaderValue<int> is_sl;
     TTreeReaderValue<int> is_dl;
     TTreeReaderValue<int> is_fh;
+    
+    TTreeReaderValue<int> HLT_ttH_SL_mu;
+    TTreeReaderValue<int> HLT_ttH_SL_el;
+    TTreeReaderValue<int> HLT_ttH_DL_elmu;
+    TTreeReaderValue<int> HLT_ttH_DL_elel;
+    TTreeReaderValue<int> HLT_ttH_DL_mumu;
+    TTreeReaderValue<int> HLT_ttH_FH;
 
     TTreeReaderValue<int> numJets;
     TTreeReaderValue<int> nBCSVM;
     
     TTreeReaderValue<int> nleps;
-    TTreeReaderArray<double> leps_pdgId;
-    TTreeReaderArray<double> leps_pt;
-    TTreeReaderArray<double> leps_eta;
-    TTreeReaderArray<double> leps_phi;
-    TTreeReaderArray<double> leps_mass;
+    TTreeReaderArray<T> leps_pdgId;
+    TTreeReaderArray<T> leps_pt;
+    TTreeReaderArray<T> leps_eta;
+    TTreeReaderArray<T> leps_phi;
+    TTreeReaderArray<T> leps_mass;
 
     TTreeReaderValue<int> njets;
-    TTreeReaderArray<double> jets_pt;
-    TTreeReaderArray<double> jets_eta;
-    TTreeReaderArray<double> jets_phi;
-    TTreeReaderArray<double> jets_mass;
-    TTreeReaderArray<double> jets_btagCSV;
+    TTreeReaderArray<T> jets_pt;
+    TTreeReaderArray<T> jets_eta;
+    TTreeReaderArray<T> jets_phi;
+    TTreeReaderArray<T> jets_mass;
+    TTreeReaderArray<T> jets_btagCSV;
 
-    TTreeReaderValue<double> btag_LR_4b_2b_btagCSV;
-    TTreeReaderValue<double> mem_DL_0w2h2t_p;
-    TTreeReaderValue<double> mem_SL_0w2h2t_p;
-    TTreeReaderValue<double> mem_SL_1w2h2t_p;
-    TTreeReaderValue<double> mem_SL_2w2h2t_p;
-    TTreeReaderValue<double> Wmass;
+    TTreeReaderValue<T> btag_LR_4b_2b_btagCSV;
+    TTreeReaderValue<T> mem_DL_0w2h2t_p;
+    TTreeReaderValue<T> mem_SL_0w2h2t_p;
+    TTreeReaderValue<T> mem_SL_1w2h2t_p;
+    TTreeReaderValue<T> mem_SL_2w2h2t_p;
+    TTreeReaderValue<T> Wmass;
 
-    std::map<Systematic::SystId, TTreeReaderArray<double>*> correction_branches;
+    std::map<Systematic::SystId, TTreeReaderArray<T>*> correction_branches;
 
     SampleDescription sample;
 
@@ -301,6 +312,13 @@ public:
         is_sl(reader, "is_sl"),
         is_dl(reader, "is_dl"),
         is_fh(reader, "is_fh"),
+        
+        HLT_ttH_SL_mu(reader, "HLT_ttH_SL_mu"),
+        HLT_ttH_SL_el(reader, "HLT_ttH_SL_el"),
+        HLT_ttH_DL_elmu(reader, "HLT_ttH_DL_elmu"),
+        HLT_ttH_DL_elel(reader, "HLT_ttH_DL_elel"),
+        HLT_ttH_DL_mumu(reader, "HLT_ttH_DL_mumu"),
+        HLT_ttH_FH(reader, "HLT_ttH_FH"),
         
         numJets(reader, "numJets"),
         nBCSVM(reader, "nBCSVM"),
@@ -327,14 +345,32 @@ public:
         Wmass(reader, "Wmass"),
         sample(sample) {
     }
+    virtual ~TreeDescription() {}
 
     
     std::vector<Lepton> build_leptons(Systematic::SystId syst_id = Systematic::syst_id_nominal);
-    std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
-    EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    virtual std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
 };
 
-class TreeDescriptionMC : TreeDescription {
+template <typename T>
+class TreeDescriptionMCSystematic : public TreeDescription<T> {
+public:
+
+    TTreeReaderValue<int> ttCls;
+    
+    TreeDescriptionMCSystematic(TFile* file, SampleDescription sample) :
+        TreeDescription<T>(file, sample),
+        ttCls(TreeDescription<T>::reader, "ttCls")
+    {}
+    
+    ~TreeDescriptionMCSystematic() {}
+    
+    virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+};
+
+template <typename T>
+class TreeDescriptionMC : public TreeDescription<T> {
 public:
 
     TTreeReaderValue<int> ttCls;
@@ -343,79 +379,91 @@ public:
     TTreeReaderValueSystematic<int> nBCSVM;
 
     TTreeReaderArray<int> jets_hadronFlavour;
-    TTreeReaderArraySystematic<double> jets_corr;
-    TTreeReaderArray<double> jets_corr_JER;
+    TTreeReaderArraySystematic<T> jets_corr;
+    TTreeReaderArray<T> jets_corr_JEC;
+    TTreeReaderArray<T> jets_corr_JER;
 
-    TTreeReaderValue<double> puWeight;
-    TTreeReaderValue<double> puWeightUp;
-    TTreeReaderValue<double> puWeightDown;
+    TTreeReaderValue<T> puWeight;
+    TTreeReaderValue<T> puWeightUp;
+    TTreeReaderValue<T> puWeightDown;
     
-    TTreeReaderValue<double> btagWeightCSV;
-    TTreeReaderValue<double> btagWeightCSV_CSVcferr1Up;
-    TTreeReaderValue<double> btagWeightCSV_CSVcferr2Up;
-    TTreeReaderValue<double> btagWeightCSV_CSVhfUp;
-    TTreeReaderValue<double> btagWeightCSV_CSVhfstats1Up;
-    TTreeReaderValue<double> btagWeightCSV_CSVhfstats2Up;
-    TTreeReaderValue<double> btagWeightCSV_CSVjesUp;
-    TTreeReaderValue<double> btagWeightCSV_CSVlfUp;
-    TTreeReaderValue<double> btagWeightCSV_CSVlfstats1Up;
-    TTreeReaderValue<double> btagWeightCSV_CSVlfstats2Up;
+    TTreeReaderValue<T> btagWeightCSV;
+    TTreeReaderValue<T> btagWeightCSV_CSVcferr1Up;
+    TTreeReaderValue<T> btagWeightCSV_CSVcferr2Up;
+    TTreeReaderValue<T> btagWeightCSV_CSVhfUp;
+    TTreeReaderValue<T> btagWeightCSV_CSVhfstats1Up;
+    TTreeReaderValue<T> btagWeightCSV_CSVhfstats2Up;
+    TTreeReaderValue<T> btagWeightCSV_CSVjesUp;
+    TTreeReaderValue<T> btagWeightCSV_CSVlfUp;
+    TTreeReaderValue<T> btagWeightCSV_CSVlfstats1Up;
+    TTreeReaderValue<T> btagWeightCSV_CSVlfstats2Up;
 
-    TTreeReaderValue<double> btagWeightCSV_CSVcferr1Down;
-    TTreeReaderValue<double> btagWeightCSV_CSVcferr2Down;
-    TTreeReaderValue<double> btagWeightCSV_CSVhfDown;
-    TTreeReaderValue<double> btagWeightCSV_CSVhfstats1Down;
-    TTreeReaderValue<double> btagWeightCSV_CSVhfstats2Down;
-    TTreeReaderValue<double> btagWeightCSV_CSVjesDown;
-    TTreeReaderValue<double> btagWeightCSV_CSVlfDown;
-    TTreeReaderValue<double> btagWeightCSV_CSVlfstats1Down;
-    TTreeReaderValue<double> btagWeightCSV_CSVlfstats2Down;
-
+    TTreeReaderValue<T> btagWeightCSV_CSVcferr1Down;
+    TTreeReaderValue<T> btagWeightCSV_CSVcferr2Down;
+    TTreeReaderValue<T> btagWeightCSV_CSVhfDown;
+    TTreeReaderValue<T> btagWeightCSV_CSVhfstats1Down;
+    TTreeReaderValue<T> btagWeightCSV_CSVhfstats2Down;
+    TTreeReaderValue<T> btagWeightCSV_CSVjesDown;
+    TTreeReaderValue<T> btagWeightCSV_CSVlfDown;
+    TTreeReaderValue<T> btagWeightCSV_CSVlfstats1Down;
+    TTreeReaderValue<T> btagWeightCSV_CSVlfstats2Down;
+    
     TreeDescriptionMC(TFile* file, SampleDescription sample) :
-        TreeDescription(file, sample),
-        ttCls(reader, "ttCls"),
+        TreeDescription<T>(file, sample),
+        ttCls(TreeDescription<T>::reader, "ttCls"),
         
-        numJets(reader, "numJets"),
-        nBCSVM(reader, "nBCSVM"),
+        numJets(TreeDescription<T>::reader, "numJets"),
+        nBCSVM(TreeDescription<T>::reader, "nBCSVM"),
 
-        jets_hadronFlavour(reader, "jets_hadronFlavour"),
-        jets_corr(reader, "jets_corr"),
-        jets_corr_JER(reader, "jets_corr_JER"),
+        jets_hadronFlavour(TreeDescription<T>::reader, "jets_hadronFlavour"),
+        jets_corr(TreeDescription<T>::reader, "jets_corr", false),
+        jets_corr_JEC(TreeDescription<T>::reader, "jets_corr_JEC"),
+        jets_corr_JER(TreeDescription<T>::reader, "jets_corr_JER"),
 
-        puWeight(reader, "puWeight"),
-        puWeightUp(reader, "puWeightUp"),
-        puWeightDown(reader, "puWeightDown"),
+        puWeight(TreeDescription<T>::reader, "puWeight"),
+        puWeightUp(TreeDescription<T>::reader, "puWeightUp"),
+        puWeightDown(TreeDescription<T>::reader, "puWeightDown"),
 
-        btagWeightCSV(reader, "btagWeightCSV"),
+        btagWeightCSV(TreeDescription<T>::reader, "btagWeightCSV"),
 
-        btagWeightCSV_CSVcferr1Up(reader, "btagWeightCSV_up_cferr1"),
-        btagWeightCSV_CSVcferr2Up(reader, "btagWeightCSV_up_cferr2"),
-        btagWeightCSV_CSVhfUp(reader, "btagWeightCSV_up_hf"),
-        btagWeightCSV_CSVhfstats1Up(reader, "btagWeightCSV_up_hfstats1"),
-        btagWeightCSV_CSVhfstats2Up(reader, "btagWeightCSV_up_hfstats2"),
-        btagWeightCSV_CSVjesUp(reader, "btagWeightCSV_up_jes"),
-        btagWeightCSV_CSVlfUp(reader, "btagWeightCSV_up_lf"),
-        btagWeightCSV_CSVlfstats1Up(reader, "btagWeightCSV_up_lfstats1"),
-        btagWeightCSV_CSVlfstats2Up(reader, "btagWeightCSV_up_lfstats2"),
+        btagWeightCSV_CSVcferr1Up(TreeDescription<T>::reader, "btagWeightCSV_up_cferr1"),
+        btagWeightCSV_CSVcferr2Up(TreeDescription<T>::reader, "btagWeightCSV_up_cferr2"),
+        btagWeightCSV_CSVhfUp(TreeDescription<T>::reader, "btagWeightCSV_up_hf"),
+        btagWeightCSV_CSVhfstats1Up(TreeDescription<T>::reader, "btagWeightCSV_up_hfstats1"),
+        btagWeightCSV_CSVhfstats2Up(TreeDescription<T>::reader, "btagWeightCSV_up_hfstats2"),
+        btagWeightCSV_CSVjesUp(TreeDescription<T>::reader, "btagWeightCSV_up_jes"),
+        btagWeightCSV_CSVlfUp(TreeDescription<T>::reader, "btagWeightCSV_up_lf"),
+        btagWeightCSV_CSVlfstats1Up(TreeDescription<T>::reader, "btagWeightCSV_up_lfstats1"),
+        btagWeightCSV_CSVlfstats2Up(TreeDescription<T>::reader, "btagWeightCSV_up_lfstats2"),
 
-        btagWeightCSV_CSVcferr1Down(reader, "btagWeightCSV_down_cferr1"),
-        btagWeightCSV_CSVcferr2Down(reader, "btagWeightCSV_down_cferr2"),
-        btagWeightCSV_CSVhfDown(reader, "btagWeightCSV_down_hf"),
-        btagWeightCSV_CSVhfstats1Down(reader, "btagWeightCSV_down_hfstats1"),
-        btagWeightCSV_CSVhfstats2Down(reader, "btagWeightCSV_down_hfstats2"),
-        btagWeightCSV_CSVjesDown(reader, "btagWeightCSV_down_jes"),
-        btagWeightCSV_CSVlfDown(reader, "btagWeightCSV_down_lf"),
-        btagWeightCSV_CSVlfstats1Down(reader, "btagWeightCSV_down_lfstats1"),
-        btagWeightCSV_CSVlfstats2Down(reader, "btagWeightCSV_down_lfstats2")
+        btagWeightCSV_CSVcferr1Down(TreeDescription<T>::reader, "btagWeightCSV_down_cferr1"),
+        btagWeightCSV_CSVcferr2Down(TreeDescription<T>::reader, "btagWeightCSV_down_cferr2"),
+        btagWeightCSV_CSVhfDown(TreeDescription<T>::reader, "btagWeightCSV_down_hf"),
+        btagWeightCSV_CSVhfstats1Down(TreeDescription<T>::reader, "btagWeightCSV_down_hfstats1"),
+        btagWeightCSV_CSVhfstats2Down(TreeDescription<T>::reader, "btagWeightCSV_down_hfstats2"),
+        btagWeightCSV_CSVjesDown(TreeDescription<T>::reader, "btagWeightCSV_down_jes"),
+        btagWeightCSV_CSVlfDown(TreeDescription<T>::reader, "btagWeightCSV_down_lf"),
+        btagWeightCSV_CSVlfstats1Down(TreeDescription<T>::reader, "btagWeightCSV_down_lfstats1"),
+        btagWeightCSV_CSVlfstats2Down(TreeDescription<T>::reader, "btagWeightCSV_down_lfstats2")
 
     {}
     
-    TTreeReaderArray<double>* get_correction_branch(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    ~TreeDescriptionMC() {}
 
-    EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
-    std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    TTreeReaderArray<T>* get_correction_branch(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+
+    virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    virtual std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
 
 };
+
+typedef TreeDescription<float> TreeDescriptionFloat;
+typedef TreeDescriptionMC<float> TreeDescriptionMCFloat;
+typedef TreeDescriptionMCSystematic<float> TreeDescriptionMCSystematicFloat;
+
+typedef TreeDescription<double> TreeDescriptionDouble;
+typedef TreeDescriptionMC<double> TreeDescriptionMCDouble;
+typedef TreeDescriptionMCSystematic<double> TreeDescriptionMCSystematicDouble;
 
 } //namespace TTH_MEAnalysis
 #endif

@@ -10,7 +10,13 @@
     <class name="std::pair<TTH_MEAnalysis::Systematic::Event, TTH_MEAnalysis::Systematic::Direction>"/>
     <class name="std::map<TTH_MEAnalysis::Systematic::SystId, double>"/>
 
-    <class name="TTH_MEAnalysis::TreeDescription"/>
-    <class name="TTH_MEAnalysis::TreeDescriptionMC"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMCFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMCSystematicFloat"/>
+        
+    <class name="TTH_MEAnalysis::TreeDescriptionDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMCDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMCSystematicDouble"/>
+
     <class name="TTH_MEAnalysis::EventDescription"/>
 </lcgdict>

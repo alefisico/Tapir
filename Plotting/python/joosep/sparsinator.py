@@ -25,7 +25,7 @@ CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 
 
 #Need to access this to initialize the library (?)
-print(ROOT.TTH_MEAnalysis.TreeDescription)
+dummy = ROOT.TTH_MEAnalysis.TreeDescription
 
 syst_pairs = OrderedDict([
     (x+d, ROOT.TTH_MEAnalysis.Systematic.make_id(
@@ -302,6 +302,7 @@ def createEvent(
     cls_bdt_sl, cls_bdt_dl,
     calculate_bdt, do_recompute_btag_weights
     ):
+
     event = events.create_event(syst_pairs[syst])
     event.leps_pdgId = [x.pdgId for x in event.leptons]
     event.triggerPath = triggerPath(event)
@@ -310,9 +311,9 @@ def createEvent(
    
     #workaround for passall=False systematic migrations
     if len(event.jets) == 0:
-        LOG_MODULE_NAME.info("Event has 0 reconstructed jets, likely a weird systematic migration")
+        LOG_MODULE_NAME.info("Event {0}:{1}:{2} has 0 reconstructed jets, likely a weird systematic migration".format(event.run, event.lumi, event.evt))
         return None
-    
+  
     if not any_passes:
         return None
 
@@ -320,7 +321,7 @@ def createEvent(
         recompute_btag_weights(event)
        
     event.weight_nominal = 1.0
-    if schema == "mc":
+    if schema == "mc" or schema == "mc_syst":
         event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
    
     ##get MEM from the classifier database
@@ -441,189 +442,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ("unweighted", lambda ev: 1.0)
         ]
 
-    
-    #create the event description
-
-#     #This is a small description based on which we decide if this event is used or not
-#     desc_cut = EventDescription(
-#         systematics_event,
-#         [
-#         Var(name="is_sl"),
-#         Var(name="is_dl"),
-#         Var(name="is_fh"),
-        
-#         Var(name="leps_pdgId", nominal=Func("leps_pdgId", func=lambda ev: [int(ev.leps_pdgId[i]) for i in range(ev.nleps)])),
-
-#         Var(name="numJets", systematics = generateSystematicsSuffix("numJets", systematics_suffix_list)),
-#         Var(name="nBCSVM", systematics = generateSystematicsSuffix("nBCSVM", systematics_suffix_list)),
-#         Var(name="HLT_ttH_DL_mumu", funcs_schema={
-#             "mc": lambda ev: ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v,
-#             "data": lambda ev: ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v or ev.HLT_BIT_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
-#         }),
-#         Var(name="HLT_ttH_DL_elel", funcs_schema={
-#             "mc": lambda ev: ev.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v,
-#             "data": lambda ev: ev.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
-#         }),
-#         Var(name="HLT_ttH_DL_elmu", funcs_schema={
-#             "mc": lambda ev: ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v,
-#             "data": lambda ev: ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v or ev.HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v or ev.HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v
-#         }),
-#         Var(name="HLT_ttH_SL_el", funcs_schema={
-#             "mc": lambda ev: ev.HLT_BIT_HLT_Ele27_WPTight_Gsf_v,
-#             "data": lambda ev: ev.HLT_BIT_HLT_Ele27_WPTight_Gsf_v
-#         }),
-#         Var(name="HLT_ttH_SL_mu", funcs_schema={
-#             "mc": lambda ev: ev.HLT_BIT_HLT_IsoMu24_v or ev.HLT_BIT_HLT_IsoTkMu24_v,
-#             "data": lambda ev: ev.HLT_BIT_HLT_IsoMu24_v or ev.HLT_BIT_HLT_IsoTkMu24_v
-#         }),
-#         Var(name="ttCls", schema=["mc"]),
-#         ]
-#     )
-
-#     #This is the full event, loaded only in case this event is expected to pass the cuts
-#     desc = EventDescription(
-#         systematics_event,
-#         [
-#         Var(name="run"),
-#         Var(name="lumi"),
-#         Var(name="evt"),
-
-#         Var(name="leps_pt"),
-#         Var(name="leps_eta"),
-
-#         Var(name="Wmass", systematics = generateSystematicsSuffix("Wmass", systematics_suffix_list)),
-            
-#         Var(name="btag_LR_4b_2b_btagCSV", systematics = generateSystematicsSuffix("btag_LR_4b_2b_btagCSV", systematics_suffix_list)),
-
-#         Var(name="btag_LR_4b_2b_btagCSV_logit",
-#             nominal=Func("btag_LR_4b_2b_btagCSV",
-#             func=lambda ev: logit(ev.btag_LR_4b_2b_btagCSV)),
-#             systematics = generateSystematicsSuffix("btag_LR_4b_2b_btagCSV", systematics_suffix_list, func=lambda x, ev: logit(x))
-#         ),
-
-#         Var(name="leps_charge", nominal=Func("leps_charge", func=lambda ev: [float(math.copysign(1.0, ev.leps_pdgId[i])) for i in range(ev.nleps)])),
-#         Var(name="leps_p4",
-#             nominal=Func(
-#                 "leps_p4",
-#                 func=lambda ev: [l4p(ev.leps_pt[i], ev.leps_eta[i], ev.leps_phi[i], ev.leps_mass[i]) for i in range(ev.nleps)]
-#             )
-#         ),
-
-#         # Var(name="jets_p4",
-#         #     nominal=Func(
-#         #         "jets_p4",
-#         #         func=lambda ev: [lv_p4s(
-#         #             ev.jets_pt[i],
-#         #             ev.jets_eta[i],
-#         #             ev.jets_phi[i],
-#         #             ev.jets_mass[i],
-#         #             ev.jets_btagCSV[i]
-#         #         ) for i in range(ev.njets)]
-#         #     ),
-#         #     systematics = generateSystematicsSuffix(
-#         #         "jets_corr",
-#         #         systematics_suffix_list,
-#         #         func=lambda x, ev: [
-#         #             lv_p4s(
-#         #                 ev.jets_pt[i]*float(x[i])/float(ev.jets_corr[i]),
-#         #                 ev.jets_eta[i],
-#         #                 ev.jets_phi[i],
-#         #                 ev.jets_mass[i],
-#         #                 ev.jets_btagCSV[i]
-#         #             ) for i in range(ev.njets)
-#         #         ])
-#         # ),
-#         Var(name="jets_hadronFlavour",
-#             nominal_func = Func("jets_hadronFlavour", func=lambda ev: None),
-#             funcs_schema = {
-#                 "mc":Func(
-#                     "jets_hadronFlavour",
-#                     func=lambda ev: [ev.jets_hadronFlavour[i] for i in range(ev.njets)]
-#                 ),
-#                 "data": Func(
-#                     "jets_hadronFlavour",
-#                     func = lambda ev: None
-#                 )
-#             }
-#         ),
-
-#         # Var(name="loose_jets_p4",
-#         #     nominal=Func(
-#         #         "loose_jets_p4",
-#         #         func=lambda ev: [lv_p4s(
-#         #             ev.loose_jets_pt[i],
-#         #             ev.loose_jets_eta[i],
-#         #             ev.loose_jets_phi[i],
-#         #             ev.loose_jets_mass[i],
-#         #             ev.loose_jets_btagCSV[i]
-#         #         ) for i in range(ev.nloose_jets)]
-#         #     ),
-#         #     systematics = generateSystematicsSuffix(
-#         #         "loose_jets_corr",
-#         #         systematics_suffix_list,
-#         #         func=lambda x, ev: [lv_p4s(
-#         #             ev.loose_jets_pt[i]*float(x[i])/float(ev.loose_jets_corr[i]),
-#         #             ev.loose_jets_eta[i],
-#         #             ev.loose_jets_phi[i],
-#         #             ev.loose_jets_mass[i],
-#         #             ev.loose_jets_btagCSV[i]
-#         #         ) for i in range(ev.nloose_jets)])
-#         # ),
-
-#         Var(name="mem_DL_0w2h2t_p",
-#             nominal=Func("mem_DL_0w2h2t_p", func=lambda ev: ev.mem_DL_0w2h2t_p),
-#             systematics = generateSystematicsSuffix("mem_DL_0w2h2t_p", systematics_suffix_list)
-#         ),
-#         Var(name="mem_SL_0w2h2t_p",
-#             nominal=Func("mem_SL_0w2h2t_p", func=lambda ev: ev.mem_SL_0w2h2t_p),
-#             systematics = generateSystematicsSuffix("mem_SL_0w2h2t_p", systematics_suffix_list)
-
-#         ),
-#         Var(name="mem_SL_1w2h2t_p",
-#             nominal=Func("mem_SL_1w2h2t_p", func=lambda ev: ev.mem_SL_1w2h2t_p),
-#             systematics = generateSystematicsSuffix("mem_SL_1w2h2t_p", systematics_suffix_list)
-#         ),
-#         Var(name="mem_SL_2w2h2t_p",
-#             nominal=Func("mem_SL_2w2h2t_p", func=lambda ev: ev.mem_SL_2w2h2t_p),
-#             systematics = generateSystematicsSuffix("mem_SL_2w2h2t_p", systematics_suffix_list)
-#         ),
-
-
-# #        Var(name="mem_DL_0w2h2t_p",
-# #            nominal=Func("mem_p_DL_0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_DL_0w2h2t_p/(ev.mem_tth_DL_0w2h2t_p + sf*ev.mem_ttbb_DL_0w2h2t_p) if getattr(ev,"mem_tth_DL_0w2h2t_p",0)>0 else 0.0),
-# #        ),
-# #        Var(name="mem_FH_4w2h2t_p",
-# #            nominal=Func("mem_p_FH_4w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h2t_p/(ev.mem_tth_FH_4w2h2t_p + sf*ev.mem_ttbb_FH_4w2h2t_p) if getattr(ev,"mem_tth_FH_4w2h2t_p",0)>0 else 0.0),
-# #        ),
-# #        Var(name="mem_FH_3w2h2t_p",
-# #            nominal=Func("mem_p_FH_3w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_3w2h2t_p/(ev.mem_tth_FH_3w2h2t_p + sf*ev.mem_ttbb_FH_3w2h2t_p) if getattr(ev,"mem_tth_FH_3w2h2t_p",0)>0 else 0.0),
-# #        ),
-# #        Var(name="mem_FH_4w2h1t_p",
-# #            nominal=Func("mem_p_FH_4w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_4w2h1t_p/(ev.mem_tth_FH_4w2h1t_p + sf*ev.mem_ttbb_FH_4w2h1t_p) if getattr(ev,"mem_tth_FH_4w2h1t_p",0)>0 else 0.0),
-# #        ),
-# #        Var(name="mem_FH_0w0w2h2t_p",
-# #            nominal=Func("mem_p_FH_0w0w2h2t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h2t_p/(ev.mem_tth_FH_0w0w2h2t_p + sf*ev.mem_ttbb_FH_0w0w2h2t_p) if getattr(ev,"mem_tth_FH_0w0w2h2t_p",0)>0 else 0.0),
-# #        ),
-# #        Var(name="mem_FH_0w0w2h1t_p",
-# #            nominal=Func("mem_p_FH_0w0w2h1t", func=lambda ev, sf=MEM_SF: ev.mem_tth_FH_0w0w2h1t_p/(ev.mem_tth_FH_0w0w2h1t_p + sf*ev.mem_ttbb_FH_0w0w2h1t_p) if getattr(ev,"mem_tth_FH_0w0w2h1t_p",0)>0 else 0.0),
-# #        ),
-
-# #        Var(name="lep_SF_weight", 
-# #            funcs_schema={"mc": lambda ev: calc_lepton_SF(ev), 
-# #                          "data": lambda ev: 1.0}),
-
-
-#     #MC-only branches
-#         Var(name="puWeight", schema=["mc"]),
-#         Var(name="puWeightUp", schema=["mc"]),
-#         Var(name="puWeightDown", schema=["mc"]),
-
-#         #nominal b-tag weight, systematic weights added later
-#         Var(name="btagWeightCSV", schema=["mc"]),
-#         Var(name="btagWeightCMVAV2", schema=["mc"]),
-#         ] + [Var(name=n, schema=["mc"]) for n in btag_weights]
-#     )
-
     if len(file_names) == 0:
         raise Exception("No files specified")
     if max_events == 0:
@@ -637,7 +455,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     #now we find which processes are matched to have this sample as an input
     #these processes are used to generate histograms
     matched_processes = [p for p in analysis.processes if p.input_name == sample.name]
-    
+   
+    #Find the processes for which we have up/down variated samples
     systematics_sample = analysis.config.get("systematics", "sample").split()
     matched_procs_new = []
     for syst_sample in systematics_sample:
@@ -672,7 +491,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     if len(matched_processes) == 0:
         LOG_MODULE_NAME.error("Could not match any processes to sample, will not generate histograms {0}".format(sample.name))
     for proc in matched_processes:
-        print(proc.input_name, proc.output_name, ",".join([c.name for c in proc.cuts]), proc.xs_weight)
+        LOG_MODULE_NAME.info(proc.input_name, proc.output_name, proc.category_name, ",".join([c.name for c in proc.cuts]), proc.xs_weight)
     LOG_MODULE_NAME.info("matched processes: {0}".format(len(matched_processes)))
 
     do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
@@ -685,7 +504,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     if schema == "mc":
         systematics_event = ["nominal"] + systematics_event
         systematics_weight = [k[0] for k in systematic_weights]
-    elif schema == "data":
+    else:
         systematics_event = ["nominal"]
         systematics_weight = []
     LOG_MODULE_NAME.info("systematics_event: " + str(systematics_event))
@@ -715,15 +534,18 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             break
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
-        if schema == "mc":
-            events = ROOT.TTH_MEAnalysis.TreeDescriptionMC(
+        treemodel = getattr(ROOT.TTH_MEAnalysis, sample.treemodel.split(".")[-1])
+        LOG_MODULE_NAME.debug("treemodel {0}".format(treemodel))
+
+        if schema == "mc" or schema == "mc_syst":
+            events = treemodel(
                 tf,
                 ROOT.TTH_MEAnalysis.SampleDescription(
                     ROOT.TTH_MEAnalysis.SampleDescription.MC
                 )
             )
         else:
-             events = ROOT.TTH_MEAnalysis.TreeDescription(
+             events = treemodel(
                 tf,
                 ROOT.TTH_MEAnalysis.SampleDescription(
                     ROOT.TTH_MEAnalysis.SampleDescription.DATA
@@ -793,23 +615,22 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     #put underflow and overflow entries into the first and last visible bin
     for k in sorted(outdict.keys()):
         v = outdict[k]
-        b0 = v.GetBinContent(0)
-        e0 = v.GetBinError(0)
-        nb = v.GetNbinsX()
-        bn = v.GetBinContent(nb + 1)
-        en = v.GetBinError(nb + 1)
+        #b0 = v.GetBinContent(0)
+        #e0 = v.GetBinError(0)
+        #nb = v.GetNbinsX()
+        #bn = v.GetBinContent(nb + 1)
+        #en = v.GetBinError(nb + 1)
 
-        v.SetBinContent(0, 0)
-        v.SetBinContent(nb+1, 0)
-        v.SetBinError(0, 0)
-        v.SetBinError(nb+1, 0)
+        #v.SetBinContent(0, 0)
+        #v.SetBinContent(nb+1, 0)
+        #v.SetBinError(0, 0)
+        #v.SetBinError(nb+1, 0)
 
-        v.SetBinContent(1, v.GetBinContent(1) + b0)
-        v.SetBinError(1, math.sqrt(v.GetBinError(1)**2 + e0**2))
-        
-        v.SetBinContent(nb, v.GetBinContent(nb) + bn)
-        v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
-        print(k, v.Integral(), v.GetEntries())
+        #v.SetBinContent(1, v.GetBinContent(1) + b0)
+        #v.SetBinError(1, math.sqrt(v.GetBinError(1)**2 + e0**2))
+        #
+        #v.SetBinContent(nb, v.GetBinContent(nb) + bn)
+        #v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
     
     
     LOG_MODULE_NAME.info("writing output")
@@ -827,14 +648,13 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        #sample = "SingleMuon"
-        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        
+        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "SingleMuon"
         skip_events = 0
-        max_events = 5000
+        max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
-        #file_names = analysis.get_sample(sample).file_names
-        file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
+        file_names = analysis.get_sample(sample).file_names
+        #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 
     main(analysis, file_names, sample, "out.root", skip_events, max_events)

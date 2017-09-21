@@ -19,39 +19,42 @@ from plotlib import escape_string, zero_error
 import rootpy
 from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
-import sklearn 
+import sklearn
+import sklearn.metrics
 
 DO_PARALLEL = False
 
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
-    #("ttH_nonhbb", "tt+H(non-bb)"),
+    ("ttH_nonhbb", "tt+H(non-bb)"),
     ("ttbarOther", "tt+light"),
     ("ttbarPlusBBbar", "tt+bb"),
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-    #("diboson", "diboson"),
+    ("diboson", "diboson"),
+    ("stop", "single top"),
+    ("ttv", "tt+V"),
+    ("wjets", "w+jets"),
+    ("dy", "dy")
 ]
 
 procs = [x[0] for x in procs_names]
 
-
 syst_pairs = []
-
 syst_pairs.extend([
-    ("__puUp", "__puDown"),
-    # ("_CMS_scale_jUp", "_CMS_scale_jDown"),
-    # ("_CMS_res_jUp", "_CMS_res_jDown"),
-    # ("_CMS_ttH_CSVcferr1Up", "_CMS_ttH_CSVcferr1Down"),
-    # ("_CMS_ttH_CSVcferr2Up", "_CMS_ttH_CSVcferr2Down"),
-    # ("_CMS_ttH_CSVhfUp", "_CMS_ttH_CSVhfDown"),
-    # ("_CMS_ttH_CSVhfstats1Up", "_CMS_ttH_CSVhfstats1Down"),
-    # ("_CMS_ttH_CSVhfstats2Up", "_CMS_ttH_CSVhfstats2Down"),
-    # ("_CMS_ttH_CSVjesUp", "_CMS_ttH_CSVjesDown"),
-    # ("_CMS_ttH_CSVlfUp", "_CMS_ttH_CSVlfDown"),
-    # ("_CMS_ttH_CSVlfstats1Up", "_CMS_ttH_CSVlfstats1Down"),
-    # ("_CMS_ttH_CSVlfstats2Up", "_CMS_ttH_CSVlfstats2Down")
+    ("__CMS_puUp", "__CMS_puDown"),
+    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
+    ("__CMS_res_jUp", "__CMS_res_jDown"),
+    ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
+    ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
+    ("__CMS_ttH_CSVhfUp", "__CMS_ttH_CSVhfDown"),
+    ("__CMS_ttH_CSVhfstats1Up", "__CMS_ttH_CSVhfstats1Down"),
+    ("__CMS_ttH_CSVhfstats2Up", "__CMS_ttH_CSVhfstats2Down"),
+    ("__CMS_ttH_CSVjesUp", "__CMS_ttH_CSVjesDown"),
+    ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
+    ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
+    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down")
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -65,9 +68,11 @@ def blind(h):
 def plot_syst_updown(nominal, up, down):
     plt.figure(figsize=(6,6))
     a1 = plt.axes([0.0, 0.52, 1.0, 0.5])
-    heplot.barhist(nominal, color="black", label="nominal")
-    heplot.barhist(up, color="red", label="up")
-    heplot.barhist(down, color="blue", label="down")
+    up.color = "red"
+    down.color = "blue"
+    rplt.step(nominal, label="nominal")
+    rplt.step(up, label="up")
+    rplt.step(down, label="down")
     ticks = a1.get_xticks()
     a1.get_xaxis().set_visible(False)
     a1.grid()
@@ -81,8 +86,10 @@ def plot_syst_updown(nominal, up, down):
     down.Divide(nominal)
     zero_error(down)
 
-    heplot.barhist(up, color="red")
-    heplot.barhist(down, color="blue")
+    up.color = "red"
+    down.color = "blue"
+    rplt.step(up, color="red")
+    rplt.step(down, color="blue")
     plt.axhline(1.0, color="black")
     a2.set_ylim(0.5, 1.5)
     a2.grid()
@@ -106,7 +113,12 @@ blind_funcs = {
 
 def plot_worker(kwargs):
     #temporarily disable true latex for fast testing
-    rc('text', usetex=False)
+    do_tex = kwargs.get("do_tex", False)
+
+    if do_tex:
+        rc('text', usetex=True)
+    else:
+        rc('text', usetex=False)
     matplotlib.use('PS') #needed on T3
 
     inf = rootpy.io.File(kwargs.pop("infile"))
@@ -176,7 +188,7 @@ def plot_worker(kwargs):
     yields = [ret["nominal"][samp].Integral() for samp, sampname in procs]
     plt.pie(
         yields,
-        colors=kwargs.get("colors"),
+        colors=[kwargs.get("colors")[p] for p, _ in procs],
         labels=[s[1] + "\n{0:.1f}".format(y) for s, y in zip(procs, yields)]
     )
     yield_s = 0.0
@@ -188,9 +200,9 @@ def plot_worker(kwargs):
             yield_b += y
 
     if yield_b == 0:
-        plt.title(kwargs.get("category", "unknown_category"))
+        plt.title(escape_string(kwargs.get("category", "unknown_category")))
     else:
-        plt.title(kwargs.get("category", "unknown category") + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
+        plt.title(escape_string(kwargs.get("category", "unknown category")) + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
     plotlib.svfg(outname + "_pie.pdf")
     plt.clf()
 
@@ -206,16 +218,16 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "category": category,
         "procs": procs_names,
         "signal_procs": ["ttH_hbb"],
-        "dataname": None,#"data", #data_obs for fake data
+        "dataname": "data",#"data", #data_obs for fake data
         "rebin": 1,
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
         "legend_fontsize": 12,
         "legend_loc": "best",
-        "colors": [plotlib.colors.get(p) for p in procs],
+        "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
-        "title_extended": r"$,\ \mathcal{L}=00.0\ \mathrm{fb}^{-1}$, ",
+        "title_extended": "",
         "systematics": syst_pairs,
         "do_syst": False,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
@@ -227,12 +239,13 @@ if __name__ == "__main__":
     # Plot for all SL categories
     simple_vars = [
         "jetsByPt_0_pt",
-        "leps_0_pt",
-        "btag_LR_4b_2b_btagCSV_logit",
+        #"leps_0_pt",
+        #"btag_LR_4b_2b_btagCSV_logit",
         #"common_mem"
     ]
 
     cats = [
+        "sl_jge6_t2",
         "sl_jge6_tge4",
         "dl_jge4_tge4",
     ]
@@ -240,7 +253,7 @@ if __name__ == "__main__":
     args = []
 
     args += [get_base_plot(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/c85d8a67-ca1a-4b0f-ba9e-d3695589f9c7/",
+        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/2017-09-06T09-38-52-750559_1e0d2085-b4e8-4168-8000-696670f8d144/",
         "test", "categories", cat, var) for cat in cats for var in simple_vars 
     ]
 

@@ -30,14 +30,33 @@ def splitByTriggerPath(processes, lumi, cuts_dict):
         "fh": lumi["BTagCSV"],
     }
 
-    for name, trigpath in TRIGGERPATH_MAP.items():
-        for proc in processes:
+    for proc in processes:
+        #Don't need to split data process
+        if type(proc) is DataProcess:
+            out += [proc]
+            continue
+        for name, trigpath in TRIGGERPATH_MAP.items():
+            
+            #Don't need to split data process
+            if type(proc) is DataProcess:
+                continue
+
+            #Process where the trigger paths are split and then merged
             newproc = Process(
                 input_name = proc.input_name,
                 output_name = proc.output_name,
                 xs_weight = _lumis[name] * proc.xs_weight,
                 cuts = [cuts_dict["triggerPath_{0}".format(name)]] + proc.cuts,
             )
+
+            # #Process where the trigger path is explicitly kept separate
+            # newproc2 = Process(
+            #     input_name = proc.input_name,
+            #     output_name = proc.output_name,
+            #     category_name = "_" + name,
+            #     xs_weight = _lumis[name] * proc.xs_weight,
+            #     cuts = [cuts_dict["triggerPath_{0}".format(name)]] + proc.cuts,
+            # )
             out += [newproc]
     return out
 

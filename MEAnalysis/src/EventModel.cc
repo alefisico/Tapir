@@ -8,7 +8,7 @@ template <typename T> int sgn(T val) {
 }
 
 bool Systematic::is_jec(Systematic::SystId syst_id) {
-    return syst_id.first != CMS_scale_j;
+    return syst_id.first == CMS_scale_j;
 }
 
 bool Systematic::is_jer(Systematic::SystId syst_id) {
@@ -23,11 +23,19 @@ Systematic::SystId Systematic::make_id(Systematic::Event e, Systematic::Directio
     return std::make_pair(e, d);
 }
 
-EventDescription TreeDescriptionMC::create_event(Systematic::SystId syst_id) {
-    auto event = TreeDescription::create_event(syst_id);
+template <typename T>
+EventDescription TreeDescriptionMCSystematic<T>::create_event(Systematic::SystId syst_id) {
+    auto event = TreeDescription<T>::create_event(syst_id);
+    event.ttCls = *ttCls;
+    return event;
+}
+
+template <typename T>
+EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) {
+    auto event = TreeDescription<T>::create_event(syst_id);
 
     std::vector<int> jets_hadronflavour;
-    for (auto njet=0; njet < *njets; njet++) {
+    for (auto njet=0; njet < *(this->njets); njet++) {
         jets_hadronflavour.push_back(this->jets_hadronFlavour[njet]);
     }
 
@@ -69,100 +77,116 @@ EventDescription TreeDescriptionMC::create_event(Systematic::SystId syst_id) {
     return event;
 }
 
-EventDescription TreeDescription::create_event(Systematic::SystId syst_id) {
-    std::vector<Jet> jets(build_jets(syst_id));
+template <typename T>
+EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
+    std::vector<Jet> jets(this->build_jets(syst_id));
     
     EventDescription event;
 
-    event.run = *run;
-    event.lumi = *lumi;
-    event.evt = *evt;
+    event.run = *(this->run);
+    event.lumi = *(this->lumi);
+    event.evt = *(this->evt);
 
-    event.is_sl = *is_sl;
-    event.is_dl = *is_dl;
-    event.is_fh = *is_fh;
+    event.is_sl = *(this->is_sl);
+    event.is_dl = *(this->is_dl);
+    event.is_fh = *(this->is_fh);
 
-    event.HLT_ttH_SL_mu = 1;
-    event.HLT_ttH_SL_el = 1;
-    event.HLT_ttH_DL_mumu = 1;
-    event.HLT_ttH_DL_elmu = 1;
-    event.HLT_ttH_DL_elel = 1;
-    event.HLT_ttH_FH = 1;
+    event.HLT_ttH_SL_mu = *(this->HLT_ttH_SL_mu);
+    event.HLT_ttH_SL_el = *(this->HLT_ttH_SL_el);
+    event.HLT_ttH_DL_mumu = *(this->HLT_ttH_DL_mumu);
+    event.HLT_ttH_DL_elmu = *(this->HLT_ttH_DL_elmu);
+    event.HLT_ttH_DL_elel = *(this->HLT_ttH_DL_elel);
+    event.HLT_ttH_FH = *(this->HLT_ttH_FH);
     
-    event.numJets = *numJets;
-    event.nBCSVM = *nBCSVM;
+    event.numJets = *(this->numJets);
+    event.nBCSVM = *(this->nBCSVM);
     event.jets = jets;
     event.syst_id = syst_id;
     event.leptons = build_leptons(syst_id);
 
-    event.btag_LR_4b_2b_btagCSV = *btag_LR_4b_2b_btagCSV;
-    event.mem_DL_0w2h2t_p = *mem_DL_0w2h2t_p;
-    event.mem_SL_0w2h2t_p = *mem_SL_0w2h2t_p;
-    event.mem_SL_1w2h2t_p = *mem_SL_1w2h2t_p;
-    event.mem_SL_2w2h2t_p = *mem_SL_2w2h2t_p;
-    event.Wmass = *Wmass;
+    event.btag_LR_4b_2b_btagCSV = *(this->btag_LR_4b_2b_btagCSV);
+    event.mem_DL_0w2h2t_p = *(this->mem_DL_0w2h2t_p);
+    event.mem_SL_0w2h2t_p = *(this->mem_SL_0w2h2t_p);
+    event.mem_SL_1w2h2t_p = *(this->mem_SL_1w2h2t_p);
+    event.mem_SL_2w2h2t_p = *(this->mem_SL_2w2h2t_p);
+    event.Wmass = *(this->Wmass);
 
     event.weights[Systematic::syst_id_nominal] = 1.0;
     return event;
 }
 
-std::vector<Lepton> TreeDescription::build_leptons(Systematic::SystId syst_id) {
+template <typename T>
+std::vector<Lepton> TreeDescription<T>::build_leptons(Systematic::SystId syst_id) {
     std::vector<Lepton> leps;
 
-    for (int ilep = 0; ilep < *nleps; ilep++) {
+    for (int ilep = 0; ilep < *(this->nleps); ilep++) {
         TLorentzVector lv;
         lv.SetPtEtaPhiM(
-            leps_pt[ilep],
-            leps_eta[ilep],
-            leps_phi[ilep],
-            leps_mass[ilep]
+            this->leps_pt[ilep],
+            this->leps_eta[ilep],
+            this->leps_phi[ilep],
+            this->leps_mass[ilep]
         );
-        leps.push_back(Lepton(lv, sgn(leps_pdgId[ilep]), leps_pdgId[ilep]));
+        leps.push_back(Lepton(lv, sgn(this->leps_pdgId[ilep]), this->leps_pdgId[ilep]));
     }
     return leps;
 }
 
-std::vector<Jet> TreeDescription::build_jets(Systematic::SystId syst_id) {
+template <typename T>
+std::vector<Jet> TreeDescription<T>::build_jets(Systematic::SystId syst_id) {
     std::vector<Jet> jets;
-    for (auto njet=0; njet < *njets; njet++) {
+    for (auto njet=0; njet < *(this->njets); njet++) {
         TLorentzVector lv;
 
         double corr = 1.0;
         double base_corr = 1.0;
 
-        lv.SetPtEtaPhiM(jets_pt[njet] * corr/base_corr, jets_eta[njet], jets_phi[njet], jets_mass[njet]);
-        Jet jet(lv, jets_btagCSV[njet]);
+        lv.SetPtEtaPhiM(this->jets_pt[njet] * corr/base_corr, this->jets_eta[njet], this->jets_phi[njet], this->jets_mass[njet]);
+        Jet jet(lv, this->jets_btagCSV[njet]);
         jets.push_back(jet);
     }
     return jets;
 }
 
-std::vector<Jet> TreeDescriptionMC::build_jets(Systematic::SystId syst_id) {
-    auto* correction_branch = get_correction_branch(syst_id);
+template <typename T>
+std::vector<Jet> TreeDescriptionMC<T>::build_jets(Systematic::SystId syst_id) {
     std::vector<Jet> jets;
-    for (auto njet=0; njet < *njets; njet++) {
+    for (auto njet=0; njet < *(this->njets); njet++) {
         TLorentzVector lv;
 
         double corr = 1.0;
         double base_corr = 1.0;
         
+        
         if (Systematic::is_jec(syst_id)) {
+            auto* correction_branch = get_correction_branch(syst_id);
             corr = (*correction_branch)[njet];
-            base_corr = (*jets_corr.GetValue(std::make_pair(Systematic::Nominal, Systematic::None)))[njet];
+            base_corr = this->jets_corr_JEC[njet];
         } else if (Systematic::is_jer(syst_id)) {
+            auto* correction_branch = get_correction_branch(syst_id);
             corr = (*correction_branch)[njet];
-            base_corr = jets_corr_JER[njet];
+            base_corr = this->jets_corr_JER[njet];
         }
 
-        lv.SetPtEtaPhiM(jets_pt[njet] * corr/base_corr, jets_eta[njet], jets_phi[njet], jets_mass[njet]);
-        Jet jet(lv, jets_btagCSV[njet]);
+        lv.SetPtEtaPhiM(this->jets_pt[njet] * corr/base_corr, this->jets_eta[njet], this->jets_phi[njet], this->jets_mass[njet]);
+        Jet jet(lv, this->jets_btagCSV[njet]);
         jets.push_back(jet);
     }
     return jets;
 }
 
-TTreeReaderArray<double>* TreeDescriptionMC::get_correction_branch(Systematic::SystId syst_id) {
-    return jets_corr.GetValue(syst_id);
+template <typename T>
+TTreeReaderArray<T>* TreeDescriptionMC<T>::get_correction_branch(Systematic::SystId syst_id) {
+    return this->jets_corr.GetValue(syst_id);
 }
+
+template class TreeDescription<float>;
+template class TreeDescription<double>;
+
+template class TreeDescriptionMC<float>;
+template class TreeDescriptionMC<double>;
+
+template class TreeDescriptionMCSystematic<float>;
+template class TreeDescriptionMCSystematic<double>;
 
 } //namespace TTH_MEAnalysis

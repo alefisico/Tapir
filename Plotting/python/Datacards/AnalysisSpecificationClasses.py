@@ -8,6 +8,9 @@ import ROOT
 from TTH.MEAnalysis import samples_base
 from TTH.MEAnalysis.samples_base import get_files, getSitePrefix
 
+import logging
+LOG_MODULE_NAME = logging.getLogger(__name__)
+
 # From:
 # http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
 def pairwise(iterable):
@@ -32,6 +35,8 @@ FUNCTION_TABLE = {
     "mem_SL_1w2h2t_p": lambda ev: ev.mem_SL_1w2h2t_p,
     "mem_SL_2w2h2t_p": lambda ev: ev.mem_SL_2w2h2t_p,
     "Wmass": lambda ev: ev.Wmass,
+    "numJets": lambda ev: ev.numJets,
+    "nBCSVM": lambda ev: ev.nBCSVM,
     "counting": 1.0
 }
 
@@ -75,6 +80,7 @@ class Sample(object):
         self.debug = kwargs.get("debug")
         self.name = kwargs.get("name")
         self.schema = kwargs.get("schema")
+        self.treemodel = kwargs.get("treemodel")
         self.files_load = kwargs.get("files_load")
         self.files_load_step1 = kwargs.get("files_load_step1", None)
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
@@ -114,6 +120,7 @@ class Sample(object):
             files_load = config.get(sample_name, "files_load"),
             files_load_step1 = config.get(sample_name, "files_load_step1"),
             schema = config.get(sample_name, "schema"),
+            treemodel = config.get(sample_name, "treemodel"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen"),
@@ -134,7 +141,10 @@ class HistogramOutput:
         return event.cuts.get(self.cut_name, False)
 
     def fill(self, event, weight = 1.0):
-        self.hist.Fill(self.func(event), weight)
+        if weight == 1.0:
+            self.hist.Fill(self.func(event))
+        else:
+            self.hist.Fill(self.func(event), weight)
 
 class CategoryCut:
     def __init__(self, cuts):
@@ -167,12 +177,15 @@ class Process(object):
         self.xs_weight = kwargs.get("xs_weight", 1.0)
         self.full_name = " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
 
+        #extra category name, in case you want to make a distinction
+        self.category_name = kwargs.get("category_name", "")
+
     def __repr__(self):
         s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
         return s
 
     def output_path(self, category_name, discriminator_name, systematic_string=None):
-        to_join = [self.output_name, category_name, discriminator_name]
+        to_join = [self.output_name, category_name + self.category_name, discriminator_name]
         if systematic_string:
             to_join += [systematic_string]
         name = "__".join(to_join)
@@ -293,6 +306,7 @@ class Histogram:
 
     def get_TH1(self, name):
         th = ROOT.TH1D(name, name, *self.get_binning())
+        th.Sumw2()
         return th
 
 class Category:
@@ -337,8 +351,10 @@ class Category:
             self.shape_uncertainties[k].update(v)
 
         for k, v in self.proc_scale_uncertainties.items():
-            self.scale_uncertainties[k].update(v)
-
+            if k in self.scale_uncertainties.keys():
+                self.scale_uncertainties[k].update(v)
+            else:
+                LOG_MODULE_NAME.info("Could not find process {0} to update scale uncertainties".format(k))
     
     def __str__(self):
         s = "Category(full_name={0})".format(
