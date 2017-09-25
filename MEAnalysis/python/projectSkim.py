@@ -2,6 +2,8 @@ import ROOT
 import sys, os
 from TTH.MEAnalysis.samples_base import getSitePrefix
 
+datatype = sys.argv[2]
+
 ofname = sys.argv[1]
 tt = ROOT.TChain("tree")
 for fi in os.environ["FILE_NAMES"].split():
@@ -14,7 +16,7 @@ for fi in os.environ["FILE_NAMES"].split():
     tt.AddFile(fn)
 
 tt.SetBranchStatus("*", False)
-if sys.argv[2] == "memcheck":
+if datatype in ["memcheck", "kinematics"]:
     tt.SetBranchStatus("mem_*", True)
     tt.SetBranchStatus("nMatch*", True)
     tt.SetBranchStatus("nGen*", True)
@@ -25,6 +27,17 @@ if sys.argv[2] == "memcheck":
     tt.SetBranchStatus("ttCls", True)
     tt.SetBranchStatus("tth_rho_*", True)
     tt.SetBranchStatus("met_*", True)
+
+if datatype in ["kinematics"]:
+    tt.SetBranchStatus("jets_pt*", True)
+    tt.SetBranchStatus("jets_eta*", True)
+    tt.SetBranchStatus("jets_btagCSV*", True)
+    tt.SetBranchStatus("njets", True)
+    tt.SetBranchStatus("leps_pt*", True)
+    tt.SetBranchStatus("leps_eta*", True)
+    tt.SetBranchStatus("nleps", True)
+    tt.SetBranchStatus("Wmass", True)
+    tt.SetBranchStatus("HLT*", True)
 
 #tt.SetBranchStatus("run", True)
 #tt.SetBranchStatus("lumi", True)

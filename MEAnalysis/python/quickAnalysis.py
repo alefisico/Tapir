@@ -11,6 +11,7 @@ def process_chain(chain, func, bins, cut, max_entries=ROOT.TTree.kMaxEntries):
     elif ndims == 2:
         h = ROOT.TH2D(_hname, "", *bins)
 
+    print cut
     h.Sumw2()
     h.SetDirectory(ROOT.gROOT)
     n = chain.Draw("{0} >> {1}".format(func, _hname), cut, "goff", max_entries, 0)
@@ -31,7 +32,8 @@ def is_ttbar(s):
 def get_hists(dataset, chain, variable, bins, cut, mc_weight, name=""):
     hists = {}
    
-    if is_data(dataset): 
+    if is_data(dataset):
+        print "adding json cut"
         hists[dataset + name] = process_chain(
             chain,
             variable,
@@ -84,11 +86,11 @@ if __name__ == "__main__":
 
     hists = get_hists(
         dataset, chain,
-        "jets_pt[0]",
-        (100, 0, 500),
-        "((HLT_ttH_SL_mu==1 && abs(leps_pdgId[0]==13)) || (HLT_ttH_SL_el==1 && abs(leps_pdgId[0]==11))) && is_sl==1 && numJets>=4 && nBCSVM>=2",
+        "numJets",
+        (10, 4, 14),
+        "((HLT_ttH_SL_mu==1 && abs(leps_pdgId[0]==13))) && is_sl==1 && numJets>=4 && nBCSVM>=2",
         "btagWeightCSV * puWeight",
-        "__jet_pt"
+        "__numJets"
     )
     if hc:
         print "saving counts", hc.GetBinContent(1)

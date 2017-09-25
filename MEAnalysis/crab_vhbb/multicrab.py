@@ -64,7 +64,7 @@ sets_data = [
     "/DoubleMuon/Run2016G-03Feb2017-v1/MINIAOD",
     "/DoubleMuon/Run2016H-03Feb2017_ver2-v1/MINIAOD",
     "/DoubleMuon/Run2016H-03Feb2017_ver3-v1/MINIAOD",
-       
+      
     "/MuonEG/Run2016B-03Feb2017_ver2-v2/MINIAOD",
     "/MuonEG/Run2016C-03Feb2017-v1/MINIAOD",
     "/MuonEG/Run2016D-03Feb2017-v1/MINIAOD",
