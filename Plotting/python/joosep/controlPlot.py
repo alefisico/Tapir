@@ -1,4 +1,5 @@
 import math
+import json
 
 import ROOT
 import logging
@@ -70,12 +71,18 @@ def plot_syst_updown(nominal, up, down):
     a1 = plt.axes([0.0, 0.52, 1.0, 0.5])
     up.color = "red"
     down.color = "blue"
-    rplt.step(nominal, label="nominal")
-    rplt.step(up, label="up")
-    rplt.step(down, label="down")
+    
+    In = float(nominal.Integral())
+    Iu = float(up.Integral())
+    Id = float(down.Integral())
+    
+    rplt.step(nominal, label="nominal ({0:.2f})".format(In), linewidth=2)
+    rplt.step(up, label="up ({0:.2f}, {1:.2f}%)".format(Iu, 100.0*(Iu-In)/In) if In>0 else 0.0, linewidth=2)
+    rplt.step(down, label="down ({0:.2f}, {1:.2f}%)".format(Id, 100.0*(Id-In)/In) if In>0 else 0.0, linewidth=2)
     ticks = a1.get_xticks()
     a1.get_xaxis().set_visible(False)
     a1.grid()
+    plt.legend(loc="best", fontsize=12)
 
     a2 = plt.axes([0.0, 0.0, 1.0, 0.48], sharex=a1)
     up = up.Clone()
@@ -88,9 +95,9 @@ def plot_syst_updown(nominal, up, down):
 
     up.color = "red"
     down.color = "blue"
-    rplt.step(up, color="red")
-    rplt.step(down, color="blue")
-    plt.axhline(1.0, color="black")
+    rplt.step(up, color="red", linewidth=2)
+    rplt.step(down, color="blue", linewidth=2)
+    plt.axhline(1.0, color="black", linewidth=2)
     a2.set_ylim(0.5, 1.5)
     a2.grid()
 
@@ -157,7 +164,7 @@ def plot_worker(kwargs):
                 hup = ret["systematic"][systUp][samp]
                 hdown = ret["systematic"][systDown][samp]
                 plot_syst_updown(hnom, hup, hdown)
-                plt.suptitle(escape_string(systUp.replace("Up", "")) + " " + sampname)
+                plt.suptitle(escape_string(systUp.replace("Up", "")) + " " + sampname, y=1.1)
                 plt.xlabel(kwargs["xlabel"]) 
                 outname_syst = os.path.join(outname, syst_name, samp)
                 logging.info("saving systematic {0}".format(outname_syst))
@@ -210,8 +217,9 @@ def plot_worker(kwargs):
     #return ret["nominal"]
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
-    s = "{0}/{1}/{2}".format(basepath, analysis, category)
-    return {
+    #s = "{0}/{1}/{2}".format(basepath, analysis, category)
+    s = "{0}".format(basepath, analysis, category)
+    ret = {
         "infile": s + ".root",
         "histname": "__".join([category, variable]),
         "outname": "/".join(["out", outpath, analysis, category, variable]),
@@ -223,7 +231,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
         "legend_fontsize": 12,
-        "legend_loc": "best",
+        "legend_loc": (1.01, 0.01),
         "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
@@ -232,31 +240,36 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "do_syst": False,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
     }
+    if variable in ["numJets", "nBCSVM"]:
+        ret["do_log"] = True
+    return ret
 
 if __name__ == "__main__":
 
 
     # Plot for all SL categories
     simple_vars = [
-        "jetsByPt_0_pt",
-        #"leps_0_pt",
-        #"btag_LR_4b_2b_btagCSV_logit",
-        #"common_mem"
+        "numJets",
+        "jetsByPt_0_btagCSV",
+        "jetsByPt_0_pt"
     ]
 
     cats = [
-        "sl_jge6_t2",
-        "sl_jge6_tge4",
-        "dl_jge4_tge4",
+        "sl_jge4_tge2",
+        "dl_jge4_tge2",
     ]
 
     args = []
 
     args += [get_base_plot(
-        "/mnt/t3nfs01/data01/shome/jpata/tth/sw/CMSSW/src/TTH/MEAnalysis/rq/results/2017-09-06T09-38-52-750559_1e0d2085-b4e8-4168-8000-696670f8d144/",
+        "q",
         "test", "categories", cat, var) for cat in cats for var in simple_vars 
     ]
 
     for arg in args:
+        arg["do_syst"] = True
+        if "numJets" in arg["histname"]:
+            arg["do_log"] = True
+        print json.dumps(arg, indent=2)
         plot_worker(arg)
 

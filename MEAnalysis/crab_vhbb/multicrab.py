@@ -214,6 +214,72 @@ datasets.update({
         "mem_cfg": me_cfgs["default"],
         "script": 'heppy_crab_script.sh'
     },
+   
+    'TTbar_tune_up1': {
+        "ds": '/TT_TuneCUETP8M2T4up_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_tune_up2': {
+        "ds": '/TT_TuneCUETP8M2T4up_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_tune_down1': {
+        "ds": '/TT_TuneCUETP8M2T4down_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_tune_down2': {
+        "ds": '/TT_TuneCUETP8M2T4down_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'TTbar_hdamp_up1': {
+        "ds": '/TT_hdampUP_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_hdamp_up2': {
+        "ds": '/TT_hdampUP_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_hdamp_down1': {
+        "ds": '/TT_hdampDOWN_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_hdamp_down2': {
+        "ds": '/TT_hdampDOWN_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
 
     'TTbar_sl': {
         "ds": '/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
@@ -330,6 +396,15 @@ datasets.update({
        "script": 'heppy_crab_script.sh'
    },
    
+   'wjets': {
+       "ds": '/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   
    # 'wjets_ht_100_200': {
    #     "ds": '/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
    #     "maxlumis": -1,
@@ -391,23 +466,31 @@ datasets.update({
    #     "script": 'heppy_crab_script.sh'
    # },
 
-   # 'dy_10_50': {
-   #     "ds": '/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'dy_50_inf': {
-   #     "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 40,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 
+   'dy_10_50': {
+       "ds": '/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 80,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'dy_50_inf1': {
+       "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 80,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'dy_50_inf2': {
+       "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 80,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   
    'st_t': {
        "ds": '/ST_t-channel_top_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
        "maxlumis": -1,
@@ -539,13 +622,21 @@ for k in [
         #"ttHTobb",
         #"ttHToNonbb",
         #"TTbar_inc",
-        "ttbb",
-        "TTbar_isr_up",
-        "TTbar_isr_down1",
-        "TTbar_isr_down2",
-        "TTbar_fsr_up1",
-        "TTbar_fsr_up2",
-        "TTbar_fsr_down",
+        #"ttbb",
+        #"TTbar_isr_up",
+        #"TTbar_isr_down1",
+        #"TTbar_isr_down2",
+        #"TTbar_fsr_up1",
+        #"TTbar_fsr_up2",
+        #"TTbar_fsr_down",
+        "TTbar_tune_up1",
+        "TTbar_tune_up2",
+        "TTbar_tune_down1",
+        "TTbar_tune_down2",
+        "TTbar_hdamp_up1",
+        "TTbar_hdamp_up2",
+        "TTbar_hdamp_down1",
+        "TTbar_hdamp_down2",
         #"TTbar_sl",
         #"TTbar_dl",
         #"ww1", "ww2",
@@ -560,13 +651,13 @@ for k in [
         #"ttz_zllnunu2",
         #"ttw_wqq",
         #"ttz_zqq",
+        #"wjets", "dy_50_inf1", "dy_50_inf2", "dy_10_50"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
     workflow_datasets["leptonic"][k] = D
 
 #now we construct the workflows from all the base datasets
-workflow_datasets = {}
 workflow_datasets["memcheck"] = {}
 for k in [
         "ttHTobb",

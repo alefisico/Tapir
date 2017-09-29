@@ -50,7 +50,7 @@ syst_pairs = [
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
     s = "{0}/{1}/{2}".format(basepath, analysis, category)
-    return {
+    ret = {
         "infile": s + ".root",
         "histname": "__".join([category, variable]),
         "category": category,
@@ -66,11 +66,15 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
-        "title_extended": r"$,\ \mathcal{L}=36\ \mathrm{fb}^{-1}$, " + category.replace("_", " "),
+        "title_extended": category.replace("_", " "),
         "systematics": syst_pairs,
-        "do_syst": True, #currently crashes with True due to some dvipng/DISPLAY issue
+        "do_syst": True,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
+        "do_tex": False
     }
+    if variable in ["numJets", "nBCSVM"]:
+        ret["do_log"] = True
+    return ret
 
 
 def run_plots(workdir, analysis, path_to_files, redis_conn, qmain, qfail):

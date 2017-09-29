@@ -2,6 +2,7 @@ import os
 import ConfigParser
 from itertools import izip
 import cPickle as pickle
+import fnmatch
 
 import ROOT
 
@@ -109,7 +110,6 @@ class Sample(object):
         self.ngen = int(kwargs.get("ngen"))
         self.xsec = kwargs.get("xsec")
         self.classifier_db_path = kwargs.get("classifier_db_path")
-        self.skim_file = kwargs.get("skim_file")
         self.vhbb_tree_name = kwargs.get("vhbb_tree_name", "vhbb/tree")
         
     @staticmethod
@@ -125,7 +125,6 @@ class Sample(object):
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen"),
             classifier_db_path = config.get(sample_name, "classifier_db_path", None),
-            skim_file = config.get(sample_name, "skim_file", None),
             vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),
         )
@@ -191,7 +190,7 @@ class Process(object):
         name = "__".join(to_join)
         return name
     
-    def createOutputs(self, outdir, analysis, systematics):
+    def createOutputs(self, outdir, analysis, systematics, outfilter=None):
         """Creates an output dictionary with fillable objects in TDirectories based on categories and systematics. 
         
         Args:
@@ -225,6 +224,13 @@ class Process(object):
                     if not outdict_cuts.has_key(cut_name):
                         outdict_cuts[cut_name] = category_cut
                     name = self.output_path(category.name, category.discriminator.name, syst_str)
+
+                    #optionally create only a subset of categories
+                    if outfilter:
+                        if not fnmatch.fnmatch(name, outfilter):
+                            LOG_MODULE_NAME.info("filtering {0} with {1}".format(name, outfilter))
+                            continue
+
                     if not outdict_syst[syst].has_key(name):
                         h = category.discriminator.get_TH1(name)
                         outdict_syst[syst][name] = HistogramOutput(
@@ -246,7 +252,7 @@ class SystematicProcess(Process):
             self.systematic_name
         )
     
-    def createOutputs(self, outdir, analysis, systematics):
+    def createOutputs(self, outdir, analysis, systematics, outfilter=None):
         outdict_syst = {"nominal": {}}
         outdict_cuts = {}
     
@@ -261,6 +267,13 @@ class SystematicProcess(Process):
                 if not outdict_cuts.has_key(cut_name):
                     outdict_cuts[cut_name] = category_cut
                 name = self.output_path(category.name, category.discriminator.name)
+                
+                #optionally create only a subset of categories
+                if outfilter:
+                    if not fnmatch.fnmatch(name, outfilter):
+                        LOG_MODULE_NAME.info("filtering {0} with {1}".format(name, outfilter))
+                        continue
+                
                 if not outdict_syst["nominal"].has_key(name):
                     h = category.discriminator.get_TH1(name)
                     outdict_syst["nominal"][name] = HistogramOutput(

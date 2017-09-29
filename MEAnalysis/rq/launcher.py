@@ -771,6 +771,19 @@ if __name__ == "__main__":
         default = None, 
     )
     
+    parser.add_argument(
+        '--sparsefile',
+        action = "store",
+        help = "Input sparse file",
+        type = str,
+        default = None,
+    )
+    parser.add_argument(
+        '--numgen',
+        action = "store_true",
+        help = "Run step that gets the number of generated events",
+    )
+    
     args = parser.parse_args()
    
     new_workflow = True
@@ -814,18 +827,33 @@ if __name__ == "__main__":
         Exception("Unknown analysis input file")
 
     tasks = []
+
+
+    inputs = []
+    if not args.sparsefile and args.numgen:
+        tasks += [
+            TaskValidateFiles(workdir, "VALIDATE", analysis),
+            TaskNumGen(workdir, "NGEN", analysis),
+        ]
+
+    #Create histogram file using sparsinator.py
+    #this can run several hours
+    if not args.sparsefile:
+        tasks += [
+            TaskSparsinator(workdir, "SPARSE", analysis),
+            TaskSparseMerge(workdir, "MERGE", analysis),
+        ]
+    #load pre-existing histogram file
+    else:
+        inputs = args.sparsefile
+
     tasks += [
-        TaskValidateFiles(workdir, "VALIDATE", analysis),
-        #TaskNumGen(workdir, "NGEN", analysis),
-        TaskSparsinator(workdir, "SPARSE", analysis),
-        TaskSparseMerge(workdir, "MERGE", analysis),
         TaskCategories(workdir, "CAT", analysis),
         TaskPlotting(workdir, "PLOT", analysis),
         TaskLimits(workdir, "LIMIT", analysis),
         TaskTables(workdir, "TABLES", analysis)
     ]
 
-    inputs = []
 
     #create first analysis pickle file
     if new_workflow:

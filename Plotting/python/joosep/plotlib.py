@@ -393,6 +393,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     #legend properties
     do_legend = kwargs.get("do_legend", True)
+    do_log = kwargs.get("do_log", False)
     legend_loc = kwargs.get("legend_loc", (1.1,0.1))
     legend_fontsize = kwargs.get("legend_fontsize", 6)
 
@@ -556,6 +557,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     
     a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
     a1.grid(zorder=100000)
+
+    if do_log:
+        a1.set_yscale("log")
+        a1.set_ylim(bottom=0.1, top=2*a1.get_ylim()[1])
 
     a2 = a1
     

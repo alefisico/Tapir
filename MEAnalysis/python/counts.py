@@ -35,7 +35,7 @@ def main(filenames, ofname):
         for k in vhbb_dir.GetListOfKeys():
             kn = k.GetName()
             print kn
-            if "CounterAnalyzer_count" in kn:
+            if "Count" in kn:
                 o = k.ReadObj()
                 if not count_dict.has_key(kn):
                     count_dict[kn] = 0

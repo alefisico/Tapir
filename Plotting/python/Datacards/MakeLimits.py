@@ -52,11 +52,12 @@ def main(
         process = subprocess.Popen(add_dcard_command, 
                                    stdout=subprocess.PIPE, 
                                    cwd=workdir,
-                                   env=dict(os.environ, 
-                                            PATH=PATH,
-                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-                                            PYTHONPATH=PYTHONPATH
-                                        ))
+                                   #env=dict(os.environ, 
+                                   #         PATH=PATH,
+                                   #         LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                   #         PYTHONPATH=PYTHONPATH
+                                   #     )
+            )
 
         group_dcard, stderr = process.communicate()
         if process.returncode != 0:
@@ -98,9 +99,9 @@ def main(
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 
-    workdir = "results/d960163d-8d5b-4300-8d8b-88e29c9650d5/limits/"
-    analysis = Analysis.deserialize("results/d960163d-8d5b-4300-8d8b-88e29c9650d5/analysis.pickle")
-    group = "dl_jge4_tge4__mem_DL_0w2h2t_p"
+    workdir = "results/2017-09-29T15-39-00-355453_171eb770-b9ed-4dfb-ac39-f25eaf0debaa/limits"
+    analysis = Analysis.deserialize("results/2017-09-29T15-39-00-355453_171eb770-b9ed-4dfb-ac39-f25eaf0debaa/analysis.pickle")
+    group = "sl_j5_t3_blrH__mem_SL_1w2h2t_p"
 
     print analysis.groups.keys()
     main(workdir, analysis, group)

@@ -64,8 +64,6 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     dcof.write("rate\t"+"\t".join(rates)+"\n")
     dcof.write("---------------\n")
 
-
-
     # Gather all shape uncerainties
     all_shape_uncerts = []
     all_scale_uncerts = []
@@ -101,6 +99,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
+    dcof.write("* autoMCStats 5\n")
     #
     # shapename = os.path.basename(datacard.output_datacardname)
     # shapename_base = shapename.split(".")[0]

@@ -14,7 +14,7 @@ import subprocess
 import ROOT
 import numpy as np
 
-from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
+#from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
 
 def get_limits_asymptotic(fn):
     """
@@ -44,11 +44,11 @@ def get_limits_asymptotic(fn):
     f.Close()
     return lims, quantiles
 
-def get_limits_mlfit(fn):
+def get_limits_mlfit(fn, treename="limit"):
     f = ROOT.TFile(fn)
-    tt = f.Get("tree_fit_sb")
+    tt = f.Get(treename)
     tt.GetEntry(0)
-    return tt.mu, 0.0
+    return tt.limit, 0.0
 
 class LimitGetter(object):
     
@@ -64,7 +64,6 @@ class LimitGetter(object):
         ):
 
         datacard_path, datacard_name = os.path.split(datacard)
-
         # Add a timestamp to the name
         process_name = "{0}".format(
             os.path.splitext(datacard_name)[0]
@@ -82,14 +81,15 @@ class LimitGetter(object):
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
                                    cwd=datacard_path,
-                                   env=dict(os.environ, 
-                                            PATH=PATH,
-                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-                                            PYTHONPATH=PYTHONPATH,
-                                            ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
-                                            ROOTSYS = ROOTSYS,
-                                            GENREFLEX = GENREFLEX
-                                        ))
+        #                           env=dict(os.environ, 
+        #                                    PATH=PATH,
+        #                                    LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+        #                                    PYTHONPATH=PYTHONPATH,
+        #                                    ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+        #                                    ROOTSYS = ROOTSYS,
+        #                                    GENREFLEX = GENREFLEX
+        #                                )
+        )
         
         output, stderr = process.communicate()
         if process.returncode != 0:
@@ -120,7 +120,7 @@ class LimitGetter(object):
                 name_extended="_sig_{0:.2f}".format(sig).replace(".", "_"),
                 opts=["-M", "MaxLikelihoodFit",
                 "--expectSignal", str(sig)],
-                output_format="mlfit{process_name}.root",
+                output_format="higgsCombine{process_name}.MaxLikelihoodFit.mH120.root",
                 get_limits=get_limits_mlfit
             )[0]
             limits += [res]
@@ -134,7 +134,7 @@ class ConstraintGetter(object):
 
         datacard_path, datacard_name = os.path.split(datacard)
        
-        process_name = "_sig_{0:.2f}".format(signal_coef).replace(".", "_")
+        process_name = os.path.splitext(datacard_name)[0] + "_sig_{0:.2f}".format(signal_coef).replace(".", "_")
 
         # Run combine
         combine_command = ["combine", 
@@ -150,35 +150,44 @@ class ConstraintGetter(object):
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
                                    cwd=datacard_path,
-                                   env=dict(os.environ, 
-                                            PATH=PATH,
-                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-                                            PYTHONPATH=PYTHONPATH,
-                                            ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
-                                            ROOTSYS = ROOTSYS,
-                                            GENREFLEX = GENREFLEX
-                                        ))
+                                   #env=dict(os.environ, 
+                                   #         PATH=PATH,
+                                   #         LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                   #         PYTHONPATH=PYTHONPATH,
+                                   #         ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                   #         ROOTSYS = ROOTSYS,
+                                   #         GENREFLEX = GENREFLEX
+                                   #     )
+        )
         
         output, stderr = process.communicate()
         if process.returncode != 0:
             raise Exception("error running limit: " + stderr)
         print output
 
-        diff_cmd = "python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py --format text -a mlfit{0}.root -g plots{0}.root".format(process_name)
+        diff_cmd = [
+            "python",
+            os.environ["CMSSW_BASE"] + "/src/TTH/Plotting/test/diffNuisances.py",
+            "--format",
+            "text",
+            "-a",
+            "fitDiagnostics{0}.root".format(process_name),
+            "-g",
+            "plots{0}.root".format(process_name)
+        ]
         print diff_cmd
         process = subprocess.Popen(diff_cmd,
                                    stdout=subprocess.PIPE,
                                    cwd=datacard_path,
-                                   env=dict(os.environ,
-                                           CMSSW_BASE=CMSSW_BASE,
-                                           PATH=PATH,
-                                           LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-                                           PYTHONPATH=PYTHONPATH,
-                                           ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
-                                           ROOTSYS = ROOTSYS,
-                                           GENREFLEX = GENREFLEX
-                                   ),
-                                   shell=True
+                                   #env=dict(os.environ,
+                                   #        CMSSW_BASE=CMSSW_BASE,
+                                   #        PATH=PATH,
+                                   #        LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                   #        PYTHONPATH=PYTHONPATH,
+                                   #        ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                   #        ROOTSYS = ROOTSYS,
+                                   #        GENREFLEX = GENREFLEX
+                                   #),
         )
         
         output, stderr = process.communicate()
@@ -198,9 +207,10 @@ class DummyLimitGetter(object):
 if __name__ == "__main__":
     datacard = sys.argv[1]
     workdir = os.path.dirname(datacard)
-    #lg = LimitGetter(workdir)
-    #lg.runSignalInjection(datacard)
+    lg = LimitGetter(workdir)
+    lg(datacard)
+    lg.runSignalInjection(datacard)
 
     cg = ConstraintGetter(workdir)
-    constraints = cg(datacard, 0.0)
+    constraints = cg(datacard, 1.0)
     print constraints
