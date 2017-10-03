@@ -277,7 +277,7 @@ def createEvent(
     any_passes = applyCuts(event, matched_processes)
    
     #workaround for passall=False systematic migrations
-    if len(event.jets) == 0:
+    if any_passes and len(event.jets) == 0:
         LOG_MODULE_NAME.info("Event {0}:{1}:{2} has 0 reconstructed jets, likely a weird systematic migration".format(event.run, event.lumi, event.evt))
         return None
   
@@ -620,7 +620,7 @@ if __name__ == "__main__":
 
     else:
         #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
         #sample = "SingleMuon"

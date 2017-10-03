@@ -13,7 +13,9 @@ import datetime
 import subprocess
 import ROOT
 import numpy as np
+import logging
 
+LOG_MODULE_NAME = logging.getLogger(__name__)
 #from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
 
 def get_limits_asymptotic(fn):
@@ -75,8 +77,7 @@ class LimitGetter(object):
                            "-t", "-1"
         ] + opts + [datacard_name]
         
-        print "running combine"
-        print " ".join(combine_command)
+        LOG_MODULE_NAME.info("running combine: {0}".format(" ".join(combine_command)))
         
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
@@ -93,8 +94,8 @@ class LimitGetter(object):
         
         output, stderr = process.communicate()
         if process.returncode != 0:
-            print "error running limit", stderr
-        print output
+            LOG_MODULE_NAME.error("error running combine: {0}".format(stderr))
+        LOG_MODULE_NAME.info(output)
 
         # Put the output file in the correct place..
         # ..root file
@@ -109,20 +110,28 @@ class LimitGetter(object):
         
         # And extact the limit
         lims, quantiles = get_limits(targetpath)
+        LOG_MODULE_NAME.info("lims={0} quantiles={1}".format(lims, quantiles))
         return lims, quantiles
     # End of get_limit
 
     def runSignalInjection(self, datacard):
+        LOG_MODULE_NAME.info("running signal injection on {0}".format(datacard))
         limits = []
         for sig in [0.0, 1.0, 2.0, 3.0]:
+            LOG_MODULE_NAME.info("signal injection s={0}".format(sig))
             res = self(
                 datacard,
                 name_extended="_sig_{0:.2f}".format(sig).replace(".", "_"),
                 opts=["-M", "MaxLikelihoodFit",
-                "--expectSignal", str(sig)],
+                "--expectSignal", str(sig),
+                "--rMin", "{0}".format(sig - 1),
+                "--rMax", "{0}".format(sig + 1),
+                "--robustFit", "1",
+                ],
                 output_format="higgsCombine{process_name}.MaxLikelihoodFit.mH120.root",
                 get_limits=get_limits_mlfit
             )[0]
+            LOG_MODULE_NAME.info("mu={0}".format(res))
             limits += [res]
         return limits
 
@@ -141,11 +150,14 @@ class ConstraintGetter(object):
                            "-n", process_name,
                            "-M", "MaxLikelihoodFit",
                            "-t", "-1",
+                           "--rMin", "-3",
+                           "--rMax", "3",
+                           "--robustFit", "1",
+                           "--keepFailures",
                            "--expectSignal", str(signal_coef),
                            datacard_name]
         
-        print "running combine with "
-        print " ".join(combine_command)
+        LOG_MODULE_NAME.info("running combine: {0}".format(" ".join(combine_command)))
         
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
@@ -162,8 +174,8 @@ class ConstraintGetter(object):
         
         output, stderr = process.communicate()
         if process.returncode != 0:
-            raise Exception("error running limit: " + stderr)
-        print output
+            LOG_MODULE_NAME.error("error running combine: {0}".format(stderr))
+        LOG_MODULE_NAME.info(output)
 
         diff_cmd = [
             "python",
@@ -175,9 +187,10 @@ class ConstraintGetter(object):
             "-g",
             "plots{0}.root".format(process_name)
         ]
-        print diff_cmd
+        LOG_MODULE_NAME.info("diff command: {0}".format(" ".join(diff_cmd)))
         process = subprocess.Popen(diff_cmd,
                                    stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
                                    cwd=datacard_path,
                                    #env=dict(os.environ,
                                    #        CMSSW_BASE=CMSSW_BASE,
@@ -191,7 +204,6 @@ class ConstraintGetter(object):
         )
         
         output, stderr = process.communicate()
-        print output
         return output
 
 class DummyLimitGetter(object):

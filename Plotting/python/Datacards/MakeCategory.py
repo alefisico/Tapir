@@ -17,18 +17,18 @@ import gc
 def make_datacard(analysis, categories, outdir, hdict):
     #split the big dictionary to category-based dictionaries
     #produce the event counts per category
-    logging.info("main: producing event counts")
+    logging.getLogger('MakeCategory').info("main: producing event counts")
     event_counts = {}
     hdict_cat = {}
     for cat in categories:
         event_counts[cat.full_name] = {}
         hdict_cat[cat.full_name] = {}
-        logging.info("category {0} with processes {1}".format(cat.full_name, cat.out_processes))
+        logging.getLogger('MakeCategory').info("category {0} with processes {1}".format(cat.full_name, cat.out_processes))
         for proc in cat.out_processes:
             k = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
             )
-            logging.debug("getting {0}".format(k))
+            logging.getLogger('MakeCategory').debug("getting {0}".format(k))
             v = 0.0
             if hdict.has_key(k):
                 v = hdict[k].Integral()
@@ -36,17 +36,17 @@ def make_datacard(analysis, categories, outdir, hdict):
                     hdict_cat[cat.full_name][k] = hdict[k].Clone()
                 else:
                     hdict_cat[cat.full_name][k].Add(hdict[k])
-                logging.debug("I={0:.2f} N={1:.2f}".format(
+                logging.getLogger('MakeCategory').debug("I={0:.2f} N={1:.2f}".format(
                     hdict[k].Integral(), hdict[k].GetEntries())
                 )
             else:
-                logging.error("didn't find key {0}".format(k))
+                logging.getLogger('MakeCategory').error("didn't find key {0}".format(k))
             if not event_counts[cat.full_name].has_key(proc):
                 event_counts[cat.full_name][proc] = 0.0
             event_counts[cat.full_name][proc] += v
 
             for syst_key in filter(lambda x: x.startswith(k), hdict.keys()):
-                logging.debug("getting {0} I={1:.2f} N={2:.2f}".format(
+                logging.getLogger('MakeCategory').debug("getting {0} I={1:.2f} N={2:.2f}".format(
                     syst_key, hdict[syst_key].Integral(), hdict[syst_key].GetEntries()
                 ))
                 hdict_cat[cat.full_name][syst_key] = hdict[syst_key]
@@ -55,10 +55,10 @@ def make_datacard(analysis, categories, outdir, hdict):
     category_files = {}
 
     #save the histograms into per-category files
-    logging.info("main: saving {0} categories".format(len(categories)))
+    logging.getLogger('MakeCategory').info("main: saving {0} categories".format(len(categories)))
     for catname in hdict_cat.keys():
         hfile = os.path.join(outdir, "{0}.root".format(catname))
-        logging.info("saving {0} histograms to {1}".format(
+        logging.getLogger('MakeCategory').info("saving {0} histograms to {1}".format(
             len(hdict_cat[catname]), hfile)
         )
         category_files[catname] = hfile
@@ -66,7 +66,7 @@ def make_datacard(analysis, categories, outdir, hdict):
     
     #add the fake data
     if analysis.do_fake_data:
-        logging.info("main: adding fake data")
+        logging.getLogger('MakeCategory').info("main: adding fake data")
         for cat in categories:
             hfile = category_files[cat.full_name]
             tf = ROOT.TFile(hfile, "UPDATE")
@@ -75,7 +75,7 @@ def make_datacard(analysis, categories, outdir, hdict):
 
     #add the stat variations
     if analysis.do_stat_variations:
-        logging.info("main: adding stat variations")
+        logging.getLogger('MakeCategory').info("main: adding stat variations")
         from utils import makeStatVariations
         for cat in categories:
             hfile = category_files[cat.full_name]
@@ -91,13 +91,8 @@ def make_datacard(analysis, categories, outdir, hdict):
     from utils import PrintDatacard
     #make combine datacards (.txt) for individual categories 
     for cat in categories:
-        print cat.full_name, cat.do_limit
-        # import pdb
-        # pdb.set_trace()
-        # if not cat.do_limit:
-        #     continue
         fn = os.path.join(outdir, "shapes_{0}.txt".format(cat.full_name))
-        logging.debug("main: writing shape file {0}".format(fn))
+        logging.getLogger('MakeCategory').debug("main: writing shape file {0}".format(fn))
         dcof = open(fn, "w")
         PrintDatacard([cat], event_counts, category_files, dcof)
         dcof.write("# execute with\n")

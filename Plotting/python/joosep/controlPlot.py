@@ -69,6 +69,7 @@ def blind(h):
 def plot_syst_updown(nominal, up, down):
     plt.figure(figsize=(6,6))
     a1 = plt.axes([0.0, 0.52, 1.0, 0.5])
+    nominal.color = "black"
     up.color = "red"
     down.color = "blue"
     
@@ -76,7 +77,7 @@ def plot_syst_updown(nominal, up, down):
     Iu = float(up.Integral())
     Id = float(down.Integral())
     
-    rplt.step(nominal, label="nominal ({0:.2f})".format(In), linewidth=2)
+    rplt.step(nominal, label="nominal ({0:.2f})".format(In), linewidth=2, color="black")
     rplt.step(up, label="up ({0:.2f}, {1:.2f}%)".format(Iu, 100.0*(Iu-In)/In) if In>0 else 0.0, linewidth=2)
     rplt.step(down, label="down ({0:.2f}, {1:.2f}%)".format(Id, 100.0*(Id-In)/In) if In>0 else 0.0, linewidth=2)
     ticks = a1.get_xticks()

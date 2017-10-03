@@ -76,6 +76,9 @@ class Cut(object):
             s += ["({1} <= {0} < {2})".format(*c)]
         return "AND".join(s)
 
+    def __repr__(self):
+        return str(self)
+
 class Sample(object):
     def __init__(self, *args, **kwargs):
         self.debug = kwargs.get("debug")
@@ -91,7 +94,7 @@ class Sample(object):
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
         except Exception as e:
-            print "ERROR: could not load sample file {0}: {1}".format(self.files_load, e)
+            LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
             self.file_names = []
 
         #Load the filenames for step1 (VHBB)
@@ -101,7 +104,7 @@ class Sample(object):
             try:
                 self.file_names_step1 = [getSitePrefix(fn) for fn in get_files(self.files_load_step1)]
             except Exception as e:
-                print "ERROR: could not load sample file {0}: {1}".format(self.files_load_step1, e)
+                LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
                 self.file_names_step1 = []
 
         #Limit list of files in debug mode
@@ -129,6 +132,9 @@ class Sample(object):
             xsec = config.getfloat(sample_name, "xsec"),
         )
         return sample
+
+    def __repr__(self):
+        return "Sample(name={0})".format(self.name)
 
 class HistogramOutput:
     def __init__(self, hist, func, cut_name):
@@ -180,7 +186,7 @@ class Process(object):
         self.category_name = kwargs.get("category_name", "")
 
     def __repr__(self):
-        s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
+        s = "Process(input_name={0}, output_name={1}, cuts={2})".format(self.input_name, self.output_name, self.cuts)
         return s
 
     def output_path(self, category_name, discriminator_name, systematic_string=None):
@@ -327,7 +333,6 @@ class Category:
         self.name = kwargs.get("name")
         self.discriminator = kwargs.get("discriminator")
         self.full_name = "{0}__{1}".format(self.name, self.discriminator.name)
-        self.src_histogram = kwargs.get("src_histogram")
         self.rebin = kwargs.get("rebin", 1)
         self.do_limit = kwargs.get("do_limit", True)
 
@@ -340,7 +345,9 @@ class Category:
         #self.lumi = sum([d.lumi for d in self.data_samples])
 
         self.signal_processes = kwargs.get("signal_processes", [])
-        self.out_processes = list(set([s.output_name for s in self.processes + self.data_processes]))
+        self.out_processes_mc = list(set([s.output_name for s in self.processes]))
+        self.out_processes_data = list(set([s.output_name for s in self.data_processes]))
+        self.out_processes = self.out_processes_mc + self.out_processes_data 
 
         #[process][syst]
         self.shape_uncertainties = {}
@@ -349,7 +356,7 @@ class Category:
         #[syst] -> scale factor, common for all processes
         self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})
         self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})
-        for proc in self.out_processes:
+        for proc in self.out_processes_mc:
             self.shape_uncertainties[proc] = {}
             self.scale_uncertainties[proc] = {}
             for systname, systval in self.common_shape_uncertainties.items():

@@ -21,6 +21,7 @@ from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
 from TTH.Plotting.Datacards.MakeCategory import make_datacard
 
 import numpy as np
+import math
 
 from datetime import datetime
 
@@ -581,6 +582,7 @@ class TaskCategories(Task):
         
         #make all the datacards for all the categories
         for cat in self.analysis.categories:
+            print cat.full_name
             for proc in cat.out_processes:
                 print proc
                 if proc == "data":
@@ -599,10 +601,10 @@ class TaskCategories(Task):
                 os.makedirs(category_dir)
             make_datacard(self.analysis, [cat], category_dir, hdict)
 
-        # hadd Results        
-        cat_names = list(set([cat.name for cat in self.analysis.categories]))        
+        # hadd Results
+        cat_names = list(set([cat.name for cat in self.analysis.categories]))
 
-        for cat_name in cat_names:                                                        
+        for cat_name in cat_names:
             logging.getLogger('launcher').info("hadd-ing: {0}".format(cat_name))
             
             process = subprocess.Popen(
@@ -701,11 +703,33 @@ class TaskTables(Task):
             for cat in limit_categories:
                 tf = ROOT.TFile(self.workdir + "/limits/{0}.root".format(cat.full_name))
                 for proc in cat.out_processes:
+
+                    #get the nominal yield
                     h = tf.Get("{0}__{1}".format(proc, cat.full_name))
-                    ih = -1
+                    ih = 0
+                    e = ROOT.Double()
                     if h:
-                        ih = "{0:.2f}".format(h.Integral())
-                    of.write(",".join([groupname, cat.full_name, proc, ih]) + "\n")
+                        ih = h.IntegralAndError(1, h.GetNbinsX(), e)
+
+                    #Find the prefit uncertainties on the yields
+                    #Find all the yield uncertainties resulting from shape modifications
+                    #symmetrize and add in quadrature
+                    syst_yield_diff = {"stat": e}
+                    for syst in cat.shape_uncertainties[proc].keys():
+                        yields_updown = {}
+                        for sdir in ["Up", "Down"]:
+                            h = tf.Get("{0}__{1}__{2}".format(proc, cat.full_name, syst+sdir))
+                            yields_updown[sdir] = 0
+                            if h:
+                                yields_updown[sdir] = ih - h.Integral()
+                        yield_sym = math.sqrt(yields_updown["Up"]**2 + yields_updown["Down"]**2)
+                        syst_yield_diff[syst] = yield_sym
+                    #Find the uncertainties from simple normalization variations
+                    for syst in cat.scale_uncertainties[proc].keys():
+                        syst_yield_diff[syst] = (cat.scale_uncertainties[proc][syst] - 1.0) * ih 
+                    logging.getLogger('launcher').debug("syst {0}".format(syst_yield_diff))
+                    tot_yield_diff = math.sqrt(sum([x**2 for x in syst_yield_diff.values()]))
+                    of.write(",".join([groupname, cat.full_name, proc, "{0:.2f}".format(ih), "{0:.2f}".format(tot_yield_diff)]) + "\n")
         of.close()
 
 def make_workdir():

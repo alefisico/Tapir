@@ -112,8 +112,6 @@ def analysisFromConfig(config_file_path):
     process_lists = {}
     process_lists_original = {}
     for process_list in config.get("general","process_lists").split():
-        print "adding process list", process_list
-
         process_lists_original[process_list] = []
         process_lists[process_list] = []
 
@@ -122,7 +120,6 @@ def analysisFromConfig(config_file_path):
 
         for process in config.get(process_list,"processes").split():
 
-            print "adding process", process
             in_name  = config.get(process,"in")
             out_name = config.get(process,"out")
 
@@ -303,34 +300,16 @@ def analysisFromConfig(config_file_path):
 
 if __name__ == "__main__":
     an = analysisFromConfig(sys.argv[1])
-
-
-# TODO: handle
-#control_variables = [
-#    "jetsByPt_0_pt",
-#    "btag_LR_4b_2b_btagCSV_logit",
-##    "btag_LR_4b_2b_btagCMVA_logit"
-#]
-#
-# all_cats = make_control_categories(sl_categories)
-#def make_control_categories(input_categories):
-#    all_cats = copy.deepcopy(input_categories)
-#    for discr in control_variables:
-#        for cat in input_categories:
-#            #Update only the discriminator, note that this is hacky and may not
-#            #work in the future, because we assume the object is final
-#            #after the constructor
-#            newcat_d = cat.__dict__
-#            newcat_d["discriminator"] = discr
-#            newcat_d["do_limit"] = False
-#            newcat = Category(**newcat_d)
-#            all_cats += [newcat]
-#    return all_cats
-#
-# TODO: Implement
-##add single-category groups
-#for cat in sl_categories:
-#    analysis.groups[cat.full_name] = [cat]
-## for cat in sl_categories_bdt:
-##     analysis_bdt.groups[cat.full_name] = [cat]
-#
+    print an
+    
+    print "processes"
+    for proc in an.processes:
+        print "  ", proc
+   
+    print "samples"
+    for samp in an.samples:
+        print "  ", samp
+    
+    print "categories"
+    for cat in an.categories:
+        print "  ", cat

@@ -13,9 +13,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     backgrounds = []
     #FIXME: check what happens with ttH_nonhbb
     for cat in categories:
-        for proc in cat.out_processes:
-            if proc == "data":
-                continue
+        for proc in cat.out_processes_mc:
             backgrounds += [proc]
     backgrounds = set(backgrounds)
     number_of_backgrounds = len(backgrounds) - 1
@@ -48,9 +46,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     # Example: ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb -> ttH_hbb
 
     for cat in categories:
-        for i_sample, sample in enumerate(cat.out_processes):
-            if sample == "data":
-                continue
+        for i_sample, sample in enumerate(cat.out_processes_mc):
             bins.append(cat.full_name)
             processes_0.append(sample)
             if sample in cat.signal_processes:
@@ -68,7 +64,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     all_shape_uncerts = []
     all_scale_uncerts = []
     for cat in categories:
-        for proc in cat.out_processes:
+        for proc in cat.out_processes_mc:
             all_shape_uncerts.extend(cat.shape_uncertainties[proc].keys())
             all_scale_uncerts.extend(cat.scale_uncertainties[proc].keys())
     # Uniquify
@@ -78,7 +74,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     for syst in all_shape_uncerts:
         dcof.write(syst + "\t shape \t")
         for cat in categories:
-            for proc in cat.out_processes:
+            for proc in cat.out_processes_mc:
                 if (cat.shape_uncertainties.has_key(proc) and
                     cat.shape_uncertainties[proc].has_key(syst)):
                     dcof.write(str(cat.shape_uncertainties[proc][syst]))
@@ -91,7 +87,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     for syst in all_scale_uncerts:
         dcof.write(syst + "\t lnN \t")
         for cat in categories:
-            for proc in cat.out_processes:
+            for proc in cat.out_processes_mc:
                 if (cat.scale_uncertainties.has_key(proc) and
                     cat.scale_uncertainties[proc].has_key(syst)):
                     dcof.write(str(cat.scale_uncertainties[proc][syst]))
@@ -115,7 +111,7 @@ def makeStatVariations(tf, of, categories):
     ret = {}
     for cat in categories:
         ret[cat.name] = {}
-        for proc in cat.out_processes:
+        for proc in cat.out_processes_mc:
             ret[cat.name][proc] = []
             hn = "{0}/{1}/{2}".format(proc, cat.name, cat.discriminator)
             h = tf.Get(hn)
@@ -147,7 +143,7 @@ def fakeData(infile, outfile, categories):
 
         #get first nominal histogram
         hn = "{0}__{1}__{2}".format(
-            cat.out_processes[0], cat.name, cat.discriminator.name
+            cat.out_processes_mc[0], cat.name, cat.discriminator.name
         )
         h = infile.Get(hn)
         if not h or h.IsZombie():
@@ -155,7 +151,7 @@ def fakeData(infile, outfile, categories):
         h = h.Clone()
 
         #Get and add the rest of the nominal histograms
-        for proc in cat.out_processes[1:]:
+        for proc in cat.out_processes_mc[1:]:
             name = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
             )
