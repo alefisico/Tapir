@@ -12,11 +12,17 @@ from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
 #FIXME: this is a hack to run heppy on non-EDM formats. Better to propagate it to heppy
 def fillCoreVariables(self, tr, event, isMC):
     if isMC:
-        for x in ["run", "lumi", "evt", "xsec", "genWeight", "puWeight"]:
-            tr.fill(x, getattr(event.input, x))
+        for x in ["run", "lumi", "evt", "genWeight"]: # Removed "xsec",  "puWeight"
+            if x == "lumi" or x == "evt":
+                tr.fill(x, getattr(event, x))
+            else:
+                tr.fill(x, getattr(event.input, x))
     else:
         for x in ["run", "lumi", "evt"]:
-            tr.fill(x, getattr(event.input, x))
+            if x == "lumi" or x == "evt":
+                tr.fill(x, getattr(event, x))
+            else:
+                tr.fill(x, getattr(event.input, x))
 
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
@@ -24,7 +30,7 @@ from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
 from VHbbAnalysis.Heppy.btagSF import systematicsCSV, systematicsCMVAV2
 #recompute b-tag weights
 btag_weights = {}
-for algo, systematics in [("CSV", systematicsCSV), ("CMVAV2", systematicsCMVAV2)]:
+for algo, systematics in [("CMVAV2", systematicsCMVAV2)]:
     for syst in systematics:
         syst_name = "" if syst=="central" else ("_"+syst) 
         btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
@@ -55,7 +61,7 @@ leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("pdgId", lambda x : x.pdgId),
     NTupleVariable("iso", lambda x : x.iso),
-    NTupleVariable("ele_mva_id", lambda x : x.eleMVAIdSpring15Trig),
+    #NTupleVariable("ele_mva_id", lambda x : x.eleMVAIdSpring15Trig),
     NTupleVariable("mu_id", lambda x : 1*getattr(x, "looseIdPOG", 0) + 2*getattr(x, "tightId", 0)),
 ] + [NTupleVariable(sf, lambda x, sf=sf : getattr(x, sf, -1.0))
     for sf in lepton_sf_kind + lepton_sf_kind_err
@@ -367,15 +373,15 @@ def getTreeProducer(conf):
         NTupleVariable("eta", lambda x : x.eta),
         NTupleVariable("phi", lambda x : x.phi),
         NTupleVariable("mass", lambda x : x.mass),
-        NTupleVariable("id", lambda x : x.id),  
+        NTupleVariable("id", lambda x : x.jetId),  
         NTupleVariable("qgl", lambda x : x.qgl),
-        NTupleVariable("btagCSV", lambda x : x.btagCSV),
+        #NTupleVariable("btagCSV", lambda x : x.btagCSV),
         NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
         #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
         NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
         NTupleVariable("qg_sf", lambda x : getattr(x,"qg_sf",1.), the_type=float, mcOnly=True),
-        NTupleVariable("mcFlavour", lambda x : x.mcFlavour, the_type=int, mcOnly=True),
-        NTupleVariable("mcMatchId", lambda x : x.mcMatchId, the_type=int, mcOnly=True),
+        #NTupleVariable("mcFlavour", lambda x : x.mcFlavour, the_type=int, mcOnly=True),
+        #NTupleVariable("mcMatchId", lambda x : x.mcMatchId, the_type=int, mcOnly=True),
         NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, the_type=int, mcOnly=True),
         NTupleVariable("matchFlag",
             lambda x : getattr(x, "tth_match_label_numeric", -1),
@@ -388,10 +394,10 @@ def getTreeProducer(conf):
         NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
         NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
         NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
-        NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-        NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-        NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
-        NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        #NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+        #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
+        #NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
+        #NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
     ] + corrs)
 
     #Create the output TTree writer
@@ -532,10 +538,13 @@ def getTreeProducer(conf):
     
     #add HLT bits to final tree
     trignames = []
+    print "im there"
     for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
+        print pathname, trigs
         for pref in ["HLT"]:
             #add trigger path (combination of trigger)
             _pathname = "_".join([pref, pathname])
+            print _pathname
             if not _pathname in trignames:
                 trignames += [_pathname]
 
@@ -562,10 +571,10 @@ def getTreeProducer(conf):
         # "badGlobalMuonTagger",
         # "cloneGlobalMuonTagger",
     ]
-    for trig in trignames + metfilter_flags:
-        treeProducer.globalVariables += [NTupleVariable(
-            trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
-        )]
+    """for trig in trignames + metfilter_flags:
+                    treeProducer.globalVariables += [NTupleVariable(
+                        trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
+                    )]"""
        
     #Add systematically variated quantities
     for systematic in conf.general["systematics"]:

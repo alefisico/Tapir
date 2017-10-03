@@ -9,7 +9,7 @@ import VHbbAnalysis.Heppy.TriggerTable as trig
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID
     #Look in Heppy autophobj.py and Jet.py
-    return (jet.id >= 1)
+    return (jet.jetId >= 1)
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
@@ -20,65 +20,9 @@ def mu_baseline_tight(mu):
     )
 
 def print_mu(mu):
-    print "Muon: (pt=%s, eta=%s, tight=%s, pf=%s, glo=%s, dxy=%s, dz=%s, chi2=%s, nhits=%s, pix=%s, stat=%s, pfRelIso04=%s)" % (mu.pt, mu.eta, mu.tightId, mu.isPFMuon,  mu.isGlobalMuon, mu.dxy , mu.dz, mu.globalTrackChi2, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.pixelHits , mu.nStations, mu.pfRelIso04)
+    print "Muon: (pt=%s, eta=%s, tight=%s, dxy=%s, dz=%s, nhits=%s, stat=%s)" % (mu.pt, mu.eta, mu.tightId, mu.dxy , mu.dz, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.nStations)
 
-factorizedJetCorrections = [
-        "AbsoluteStat",
-        "AbsoluteScale",
-        "AbsoluteFlavMap",
-        "AbsoluteMPFBias",
-        "Fragmentation",
-        "SinglePionECAL",
-        "SinglePionHCAL",
-        "FlavorQCD",
-        "TimePtEta",
-        "RelativeJEREC1",
-        "RelativeJEREC2",
-        "RelativeJERHF",
-        "RelativePtBB",
-        "RelativePtEC1",
-        "RelativePtEC2",
-        "RelativePtHF",
-        "RelativeBal",
-        "RelativeFSR",
-        "RelativeStatFSR",
-        "RelativeStatEC",
-        "RelativeStatHF",
-        "PileUpDataMC",
-        "PileUpPtRef",
-        "PileUpPtBB",
-        "PileUpPtEC1",
-        "PileUpPtEC2",
-        "PileUpPtHF",
-        "PileUpMuZero",
-        "PileUpEnvelope",
-        "SubTotalPileUp",
-        "SubTotalRelative",
-        "SubTotalPt",
-        "SubTotalScale",
-        "SubTotalAbsolute",
-        "SubTotalMC",
-        "Total",
-        "TotalNoFlavor",
-        "TotalNoTime",
-        "TotalNoFlavorNoTime",
-        "FlavorZJet",
-        "FlavorPhotonJet",
-        "FlavorPureGluon",
-        "FlavorPureQuark",
-        "FlavorPureCharm",
-        "FlavorPureBottom",
-        "TimeRunBCD",
-        "TimeRunEF",
-        "TimeRunG",
-        "TimeRunH",
-        "CorrelationGroupMPFInSitu",
-        "CorrelationGroupIntercalibration",
-        "CorrelationGroupbJES",
-        "CorrelationGroupFlavor",
-        "CorrelationGroupUncorrelated",
-        "JER"
-]
+factorizedJetCorrections = []
 
 def el_baseline_medium(el):
 
@@ -115,23 +59,25 @@ def el_baseline_tight(el):
     # Taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2?rev=42
     sca = abs(el.etaSc)
     ret = ((sca < 1.4442 and
-        el.eleSieie < 0.00998 and
-        el.eleHoE < 0.0414 and
-        abs(el.eleDEta) < 0.00308 and
-        abs(el.eleDPhi) < 0.0816 and
-        el.eleooEmooP < 0.0129 and
-        el.eleExpMissingInnerHits <= 1 and
-        el.combIsoAreaCorr < 0.0588 and
-        el.convVetoFull == True) or
+        el.sieie < 0.00998 and
+        el.hoe < 0.0414 and
+        abs(el.DEta) < 0.00308 and
+        abs(el.DPhi) < 0.0816 and
+        el.ooEmooP < 0.0129) or
+        #el.ooEmooP < 0.0129 and
+        #el.ExpMissingInnerHits <= 1 and
+        #el.combIsoAreaCorr < 0.0588 and
+        #el.convVetoFull == True) or
         (sca >1.5669 and
-        el.eleSieie < 0.0292 and
-        el.eleHoE < 0.0641 and
-        abs(el.eleDEta) < 0.00605 and
-        abs(el.eleDPhi) < 0.0394 and
-        el.eleooEmooP < 0.0129 and
-        el.eleExpMissingInnerHits <= 1 and
-        el.combIsoAreaCorr < 0.0571 and
-        el.convVetoFull == True)
+        el.sieie < 0.0292 and
+        el.hoe < 0.0641 and
+        abs(el.DEta) < 0.00605 and
+        abs(el.DPhi) < 0.0394 and
+        el.ooEmooP < 0.0129)
+        #el.ooEmooP < 0.0129 and
+        #el.ExpMissingInnerHits <= 1 and
+        #el.combIsoAreaCorr < 0.0571 and
+        #el.convVetoFull == True)
 
     
     )
@@ -139,12 +85,11 @@ def el_baseline_tight(el):
     return ret
 
 def print_el(el):
-    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, iso03=%s, nhits=%s, eOp=%s, pfRelIso03=%s, mvaIdFlag=%s, mvaId=%s, ecalIso=%s, hcalIso=%s)" % (
-        el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.eleDEta),
-        abs(el.eleDPhi), el.eleSieie, el.eleHoE, abs(el.dxy),
-        abs(el.dz), el.relIso03 , getattr(el, "eleExpMissingInnerHits", 0),
-        getattr(el, "eleooEmooP", 0), el.pfRelIso03, el.eleMVAIdSpring15Trig, el.eleMVArawSpring15Trig,
-        el.eleEcalClusterIso/el.pt, el.eleHcalClusterIso/el.pt
+    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, nhits=%s, eOp=%s)" % (
+        el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.DEta),
+        abs(el.DPhi), el.sieie, el.hoe, abs(el.dxy),
+        abs(el.dz), getattr(el, "eleExpMissingInnerHits", 0),
+        getattr(el, "eleooEmooP", 0)
     )
 
 class Conf:
@@ -169,7 +114,7 @@ class Conf:
                 "iso": 0.25,
                 "idcut": mu_baseline_tight,
             },
-            "isotype": "pfRelIso04", #pfRelIso - delta-beta, relIso - rho
+            "isotype": "PFIso04_all", #pfRelIso - delta-beta, relIso - rho
             "debug" : print_mu
         },
 
@@ -189,7 +134,7 @@ class Conf:
                 "idcut": lambda el: el_baseline_tight(el),
             },
             #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff is not defined
-            "isotype": "combIsoAreaCorr",
+            "isotype": "ooEmooP",
             "debug" : print_el
         },
         "DL": {
@@ -222,17 +167,17 @@ class Conf:
         "minjets_fh": 6,
 
         #The default b-tagging algorithm (branch name)
-        "btagAlgo": "btagCSV",
+        "btagAlgo": "btagCMVA",
 
         #The default b-tagging WP
-        "btagWP": "CSVM",
+        "btagWP": "CMVAM",
 
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
         "btagWPs": {
-            "CSVL": ("btagCSV", 0.5426),
-            "CSVM": ("btagCSV", 0.8484),
-            "CSVT": ("btagCSV", 0.9535),
+            #"CSVL": ("btagCSV", 0.5426),
+            #"CSVM": ("btagCSV", 0.8484),
+            #"CSVT": ("btagCSV", 0.9535),
 
             "CMVAL": ("btagCMVA", -0.5884),
             "CMVAM": ("btagCMVA", 0.4432),
@@ -245,7 +190,7 @@ class Conf:
         "untaggedSelection": "btagLR",
 
         #how many jets to consider for the btag LR permutations
-        "NJetsForBTagLR": 9, #DS
+        "NJetsForBTagLR": 15, #DS
 
         #base jet selection
         "selection": jet_baseline
@@ -347,7 +292,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": False,
+        "calcME": True,
         "n_integration_points_mult": 1.0,
         "factorized_sources": factorizedJetCorrections,
         #compute MEM variations for these sources in the nominal case

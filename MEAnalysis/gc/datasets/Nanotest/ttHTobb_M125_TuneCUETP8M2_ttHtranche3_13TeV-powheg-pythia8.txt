@@ -1,0 +1,2 @@
+[ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8]
+/mnt/t3nfs01/data01/shome/mameinha/testNanoAOD/CMSSW_9_4_0_pre1/src/PhysicsTools/NanoAOD/test/nano_v4.root = 10000

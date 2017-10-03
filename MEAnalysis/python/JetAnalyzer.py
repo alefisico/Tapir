@@ -63,6 +63,7 @@ class JetAnalyzer(FilterAnalyzer):
         return newjets
 
     def process(self, event):
+        print "EVENT ", event.input.event
         event.MET = MET(pt=event.met.pt, phi=event.met.phi)
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
@@ -76,7 +77,7 @@ class JetAnalyzer(FilterAnalyzer):
         #add events with variated jets
         if self.cfg_comp.isMC:
             jets_variated = {}
-            for fjc in self.conf.mem["factorized_sources"] + ["JER"]:
+            for fjc in self.conf.mem["factorized_sources"]:
                 for sdir, sigma in [("Up", 1.0), ("Down", -1.0)]:
                     jet_var = self.variateJets(event.Jet, fjc, sigma)
                     jets_variated[fjc+sdir] = jet_var
@@ -94,15 +95,17 @@ class JetAnalyzer(FilterAnalyzer):
             if syst != "nominal":
                 res.nominal_event = evdict["nominal"]
             evdict[syst] = res
-        event.systResults = evdict
+        event.systResults = evdict 
+
+        btag_wp = self.conf.jets["btagWP"]
         
         event.systResults["nominal"].changes_jet_category = False
         event.systResults["nominal"].nominal_event = event.systResults["nominal"]
         nj_nominal = event.systResults["nominal"].numJets
-        nt_nominal = event.systResults["nominal"].nBCSVM
+        nt_nominal = getattr(event.systResults["nominal"],"nB"+btag_wp)
         for syst in evdict.keys():
             nj = evdict[syst].numJets
-            nt = evdict[syst].nBCSVM
+            nt = getattr(evdict[syst],"nB"+btag_wp)
             evdict[syst].changes_jet_category = False
             if nj != nj_nominal or nt != nt_nominal:
                 evdict[syst].changes_jet_category = True
@@ -118,7 +121,7 @@ class JetAnalyzer(FilterAnalyzer):
         if "input" in self.conf.general["verbosity"]:
             autolog("jets input") 
             for ij, j in enumerate(event.injets):
-                autolog("InJetReco", ij, j.pt, j.eta, j.phi, j.mass, j.btagCSV, j.mcFlavour)
+                autolog("InJetReco", ij, j.pt, j.eta, j.phi, j.mass, j.btagCMVA, j.partonFlavour)
                 autolog("InJetGen", ij, j.mcPt, j.mcEta, j.mcPhi, j.mcM)
 
         #choose pt cut key based on lepton channel
@@ -228,17 +231,19 @@ class JetAnalyzer(FilterAnalyzer):
         if self.cfg_comp.isMC:
             event.n_tagwp_tagged_true_bjets = 0
             for j in event.btagged_jets_bdisc:
-                if abs(j.mcFlavour) == 5:
+                if abs(j.partonFlavour) == 5:
                     event.n_tagwp_tagged_true_bjets += 1
+
+        btag_wp = self.conf.jets["btagWP"]
 
         #Require at least 4 good resolved jets to continue analysis
         passes = True
-        if event.is_sl and not (len(event.good_jets) >= 4 and event.nBCSVM>=2):
+        if event.is_sl and not (len(event.good_jets) >= 4 and getattr(event,"nB"+btag_wp)>=2):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("fails because SL NJ<3")
             passes = False
         elif event.is_dl:
-            if not (len(event.good_jets) >= 4 and event.nBCSVM>=2):
+            if not (len(event.good_jets) >= 4 and getattr(event,"nB"+btag_wp)>=2):
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False
@@ -301,7 +306,7 @@ class JetAnalyzer(FilterAnalyzer):
                 qgSF = -99.0
                 if jet.qgl<0:
                     qgSF = 1.0
-                elif jet.mcFlavour==21:
+                elif jet.partonFlavour==21:
                     qgSF = ( -55.7067*pow(jet.qgl,7) + 113.218*pow(jet.qgl,6)
                              -21.1421*pow(jet.qgl,5) -99.927*pow(jet.qgl,4) 
                              + 92.8668*pow(jet.qgl,3) -34.3663*pow(jet.qgl,2) 
@@ -316,11 +321,11 @@ class JetAnalyzer(FilterAnalyzer):
                 count += 1
                 if jet.pt>30:
                     ht30 += jet.pt
-                    if jet.btagCSV>csv1:
-                        csv2 = csv1
-                        csv1 = jet.btagCSV
-                    elif jet.btagCSV>csv2:
-                        csv2 = jet.btagCSV
+                    #if jet.btagCSV>csv1:
+                    #    csv2 = csv1
+                    #    csv1 = jet.btagCSV
+                    #elif jet.btagCSV>csv2:
+                    #    csv2 = jet.btagCSV
                 if jet.pt>40:
                     ht40 += jet.pt
                 

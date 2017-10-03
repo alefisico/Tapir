@@ -27,19 +27,23 @@ class LeptonAnalyzer(FilterAnalyzer):
 
     def process(self, event):
 
-        event.mu = filter(
-            lambda x: abs(x.pdgId) == 13,
-            event.selLeptons,
-        )
+        #event.mu = filter(
+        #    lambda x: abs(x.pdgId) == 13,
+        #    event.selLeptons,
+        #)
+        event.mu = event.Muon
+
         if "debug" in self.conf.general["verbosity"]:
             autolog("input muons: ", len(event.mu))
             for it in event.mu:
                 (self.conf.leptons["mu"]["debug"])(it)
 
-        event.el = filter(
-            lambda x: abs(x.pdgId) == 11,
-            event.selLeptons,
-        )
+        #event.el = filter(
+        #    lambda x: abs(x.pdgId) == 11,
+        #    event.selLeptons,
+        #)
+        event.el = event.Electron
+        
         if "debug" in self.conf.general["verbosity"]:
             autolog("input electrons: ", len(event.el))
             for it in event.el:

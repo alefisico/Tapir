@@ -2,7 +2,7 @@ from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 import resource
 import ROOT
-from TTH.MEAnalysis.VHbbTree import LHE_weights_pdf
+from TTH.MEAnalysis.VHbbTree import LHEPdfWeight
 import logging
 
 class FilterAnalyzer(Analyzer):
@@ -60,9 +60,9 @@ class PrefilterAnalyzer(Analyzer):
     
     def process(self, event):
         njet = event.input.nJet
-        btag_csv = [getattr(event.input, "Jet_btagCSV")[nj] for nj in range(njet)]
+        #btag_csv = [getattr(event.input, "Jet_btagCSV")[nj] for nj in range(njet)]
         btag_cmva = [getattr(event.input, "Jet_btagCMVA")[nj] for nj in range(njet)]
-        btag_csv_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CSVM"][1]: x>=wp, btag_csv)
+        #btag_csv_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CSVM"][1]: x>=wp, btag_csv)
         btag_cmva_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CMVAM"][1]: x>=wp, btag_cmva)
         #if not njet >= 4:
         #if not (len(btag_csv_m) >= 2 or len(btag_cmva_m) >= 2):
@@ -104,15 +104,15 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
         passes = True
         if not self.event_whitelist is None:
             passes = False
-            if (event.input.run, event.input.lumi, event.input.evt) in self.event_whitelist:
-                print "IDFilter", (event.input.run, event.input.lumi, event.input.evt)
+            if (event.input.run, event.input.luminosityBlock, event.input.evt) in self.event_whitelist:
+                print "IDFilter", (event.input.run, event.input.luminosityBlock, event.input.event)
                 passes = True
 
         if passes and (
             "eventboundary" in self.conf.general["verbosity"] or
             "debug" in self.conf.general["verbosity"]
             ):
-            print "---starting EVENT r:l:e", event.input.run, event.input.lumi, event.input.evt
+            print "---starting EVENT r:l:e", event.input.run, event.input.luminosityBlock, event.input.event
         return passes
 
 
@@ -147,7 +147,7 @@ class PrimaryVertexAnalyzer(FilterAnalyzer):
         super(PrimaryVertexAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
-        pvs = event.primaryVertices
+        pvs = event.PV
         if len(pvs) > 0:
             event.primaryVertex = pvs[0]
             event.passPV = (not event.primaryVertex.isFake) and (event.primaryVertex.ndof >= 4 and event.primaryVertex.Rho <= 2)
