@@ -21,3 +21,6 @@ cd $CMSSW_BASE/src
 cp -R TTH/MEIntegratorStandalone/libs/* ../lib/$SCRAM_ARCH/
 scram setup lhapdf
 scram setup TTH/MEIntegratorStandalone/deps/gsl.xml
+
+cd $CMSSW_BASE/src
+git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
