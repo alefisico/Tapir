@@ -181,8 +181,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
 
     from TTH.MEAnalysis.nanoAODWrapper import FormatVariables
 
-    print "passed2"
-
     #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
     evs = cfg.Analyzer(
         EventAnalyzer,

@@ -1,14 +1,14 @@
-export SCRAM_ARCH=slc6_amd64_gcc530
+export SCRAM_ARCH=slc6_amd64_gcc630
 
-scram project -n CMSSW CMSSW CMSSW_8_0_26_patch2
+scram project -n CMSSW CMSSW CMSSW_9_4_0_pre1
 cd CMSSW/src/
 eval `scramv1 runtime -sh`
 
 git cms-init
-git cms-merge-topic -u jpata:vhbbHeppy80X_july31
+git cms-merge-topic -u cms-nanoAOD:nano_94X
 
 #get the TTH code
-git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch meanalysis-80x-V25
+git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch SwitchNanoAOD
 cd $CMSSW_BASE/src/TTH
 
 git submodule update --init --recursive
