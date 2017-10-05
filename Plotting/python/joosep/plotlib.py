@@ -71,6 +71,8 @@ varnames = {
     "jetsByPt_0_pt": r"leading jet $p_T$ [GeV]",
     "jetsByPt_1_pt": r"subleading jet $p_T$ [GeV]",
     "jetsByPt_2_pt": r"third jet $p_T$ [GeV]",
+    
+    "jetsByPt_0_btagCSV": r"leading jet CSV",
 
     # "jet0_btagCSV": r"leading jet $b_{\mathrm{CSV}}$",
     # "jet1_btagCSV": r"subleading jet $b_{\mathrm{CSV}}$",

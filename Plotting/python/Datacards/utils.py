@@ -95,7 +95,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
-    dcof.write("* autoMCStats 5\n")
+    #dcof.write("* autoMCStats 20\n")
     #
     # shapename = os.path.basename(datacard.output_datacardname)
     # shapename_base = shapename.split(".")[0]

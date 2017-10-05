@@ -17,7 +17,7 @@ from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProcess, CategoryCut
 from TTH.CommonClassifier.db import ClassifierDB
 
-from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
+from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF, initBTagSF
 
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
@@ -63,13 +63,23 @@ syst_pairs = OrderedDict([
         "CMS_scalePileUpPtEC2_j",
         "CMS_scalePileUpPtHF_j",
 
-        "CMS_ttH_CSV",
         "CMS_ttH_CSVcferr1",
         "CMS_ttH_CSVcferr2",
         "CMS_ttH_CSVhf",
         "CMS_ttH_CSVhfstats1",
         "CMS_ttH_CSVhfstats2",
         "CMS_ttH_CSVjes",
+        "CMS_ttH_CSVjesAbsoluteMPFBias",
+        "CMS_ttH_CSVjesAbsoluteScale",
+        "CMS_ttH_CSVjesFlavorQCD",
+        "CMS_ttH_CSVjesPileUpDataMC",
+        "CMS_ttH_CSVjesPileUpPtBB",
+        "CMS_ttH_CSVjesPileUpPtEC1",
+        "CMS_ttH_CSVjesPileUpPtRef",
+        "CMS_ttH_CSVjesRelativeFSR",
+        "CMS_ttH_CSVjesSinglePionECAL",
+        "CMS_ttH_CSVjesSinglePionHCAL",
+        "CMS_ttH_CSVjesTimePtEta",
         "CMS_ttH_CSVlf",
         "CMS_ttH_CSVlfstats1",
         "CMS_ttH_CSVlfstats2",
@@ -79,6 +89,7 @@ syst_pairs = OrderedDict([
     for d in ["Up", "Down", ""]
 ])
 syst_pairs["nominal"] = ROOT.TTH_MEAnalysis.Systematic.make_id(ROOT.TTH_MEAnalysis.Systematic.Nominal, ROOT.TTH_MEAnalysis.Systematic.None)
+syst_pairs["CMS_ttH_CSV"] = ROOT.TTH_MEAnalysis.Systematic.make_id(ROOT.TTH_MEAnalysis.Systematic.CMS_ttH_CSV, ROOT.TTH_MEAnalysis.Systematic.None)
 
 def vec_from_list(vec_type, src):
     """
@@ -229,40 +240,58 @@ class FakeJet:
 
 def recompute_btag_weights(event):
     p4 = [j.lv for j in event.jets]
-    hadronFlavour = event.jets_hadronFlavour
-
+    btag = [j.btag for j in event.jets]
+    hadronFlavour = [hf for hf in event.jets_hadronFlavour]
+    
     wrapped_jets = []
-    for _p4, hf in zip(p4, hadronFlavour):
+    for _p4, btag, hf in zip(p4, btag, hadronFlavour):
         jet = FakeJet(
             _p4.Pt(),
             _p4.Eta(),
             hf,
-            _p4.btagCSV
+            btag
         )
         wrapped_jets += [jet]
+
+    btag_weights = [
+        "up_cferr1",
+        "up_cferr2",
+        "up_hf",
+        "up_hfstats1",
+        "up_hfstats2",
+        "up_jes",
+        "up_jesAbsoluteMPFBias",
+        "up_jesAbsoluteScale",
+        "up_jesFlavorQCD",
+        "up_jesPileUpDataMC",
+        "up_jesPileUpPtBB",
+        "up_jesPileUpPtEC1",
+        "up_jesPileUpPtRef",
+        "up_jesRelativeFSR",
+        "up_jesSinglePionECAL",
+        "up_jesSinglePionHCAL",
+        "up_jesTimePtEta",
+        "up_lf",
+        "up_lfstats1",
+        "up_lfstats2",
+    ]
 
     btag_weights_recomputed = {}
     for algo in ["CSV"]:
         for btag_syst in [
                 "central",
-                "up_jes", "down_jes",
-                "up_lf", "down_lf",
-                "up_hf", "down_hf",
-                "up_hfstats1", "down_hfstats1",
-                "up_hfstats2", "down_hfstats2",
-                "up_lfstats1", "down_lfstats1",
-                "up_lfstats2", "down_lfstats2",
-                "up_cferr1", "down_cferr1",
-                "up_cferr2", "down_cferr2"
-            ]:
+            ] + btag_weights + [bw.replace("up_", "down_") for bw in btag_weights]:
             sf = get_event_SF(wrapped_jets, btag_syst, algo, btagSFhandle)
             btag_weights_recomputed[btag_syst] = sf
             if btag_syst == "central":
-                event.btagWeightCSV = btag_weights_recomputed[btag_syst]
+                LOG_MODULE_NAME.debug("replacing bweight {0} with {1}".format(event.weights[syst_pairs["CMS_ttH_CSV"]], btag_weights_recomputed[btag_syst]))
+                event.weights[syst_pairs["CMS_ttH_CSV"]] = btag_weights_recomputed[btag_syst]
             else:
                 sdir, syst_name = btag_syst.split("_")
-                setattr(event, "btagWeightCSV_{0}_{1}".format(sdir, syst_name), btag_weights_recomputed[btag_syst])
-
+                sp = syst_pairs["CMS_ttH_CSV{0}{1}".format(syst_name, sdir.capitalize())]
+                LOG_MODULE_NAME.debug("replacing bweight {0} with {1} ({2})".format(event.weights[sp], btag_weights_recomputed[btag_syst], btag_syst))
+                event.weights[sp] = btag_weights_recomputed[btag_syst]
+ 
 def createEvent(
     events, syst, schema,
     matched_processes,
@@ -392,23 +421,24 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     systematics_suffix_list += [(syst_event_sdir, syst_event_sdir.replace("CMS_scale", "").replace("_j", ""))]
 
         #systematics with weight
+        systematics_weight_nosdir = analysis.config.get("systematics", "weight").split()
         
         ##create b-tagging systematics
+        systematics_btag = [s.replace("CMS_ttH_CSV", "") for s in systematics_weight_nosdir if s.startswith("CMS_ttH_CSV")]
         for sdir in ["Up", "Down"]:
-           for syst in ["cferr1", "cferr2", "hf", "hfstats1", "hfstats2", "jes", "lf", "lfstats1", "lfstats2"]:
-               for tagger in ["CSV"]:
-                   bweight = "CMS_ttH_{0}{1}{2}".format(tagger, syst, sdir)
-                   systematic_weights += [
-                       (bweight, lambda ev, bweight=bweight:
-                           ev.weights[syst_pairs["CMS_pu"]] * ev.weights[syst_pairs[bweight]])
-                   ]
-                   btag_weights += [bweight]
+           for syst in systematics_btag:
+               bweight = "CMS_ttH_CSV{0}{1}".format(syst, sdir)
+               systematic_weights += [
+                   (bweight, lambda ev, bweight=bweight:
+                       ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs[bweight]))
+               ]
+               btag_weights += [bweight]
 
         systematic_weights += [
-                ("CMS_puUp", lambda ev: ev.weights[syst_pairs["CMS_puUp"]] * ev.weights[syst_pairs["CMS_ttH_CSV"]] ),
-                ("CMS_puDown", lambda ev: ev.weights[syst_pairs["CMS_puDown"]] * ev.weights[syst_pairs["CMS_ttH_CSV"]] ),
-                ("only_bweight", lambda ev: ev.weights[syst_pairs["CMS_ttH_CSV"]] ),
-                ("only_pu", lambda ev: ev.weights[syst_pairs["CMS_pu"]] ),
+                ("CMS_puUp", lambda ev: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) ),
+                ("CMS_puDown", lambda ev: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) ),
+                ("only_bweight", lambda ev: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) ),
+                ("only_pu", lambda ev: ev.weights.at(syst_pairs["CMS_pu"]) ),
                 ("unweighted", lambda ev: 1.0)
         ]
 
@@ -462,12 +492,16 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     if len(matched_processes) == 0:
         LOG_MODULE_NAME.error("Could not match any processes to sample, will not generate histograms {0}".format(sample.name))
     for proc in matched_processes:
-        LOG_MODULE_NAME.info(proc.input_name, proc.output_name, proc.category_name, ",".join([c.name for c in proc.cuts]), proc.xs_weight)
+        LOG_MODULE_NAME.info("process: " + str(proc))
     LOG_MODULE_NAME.info("matched processes: {0}".format(len(matched_processes)))
 
     do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
     do_recompute_btag_weights = analysis.config.getboolean("sparsinator", "recompute_btag_weights")
     
+    if do_recompute_btag_weights:
+        LOG_MODULE_NAME.info("Initializing btag weights")
+        initBTagSF()
+
     if do_classifier_db:
         cls_db = ClassifierDB(filename=sample.classifier_db_path)
     
@@ -492,7 +526,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         outdict_syst, outdict_cuts = proc.createOutputs(outfile, analysis, all_systematics, outfilter)
         proc.outdict_syst = outdict_syst
         proc.outdict_cuts = outdict_cuts
-
+    
     nevents = 0
 
     break_file_loop = False
@@ -619,13 +653,13 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
         #sample = "SingleMuon"
         skip_events = 0
-        max_events = 10000
+        max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]

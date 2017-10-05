@@ -77,9 +77,9 @@ def plot_syst_updown(nominal, up, down):
     Iu = float(up.Integral())
     Id = float(down.Integral())
     
-    rplt.step(nominal, label="nominal ({0:.2f})".format(In), linewidth=2, color="black")
-    rplt.step(up, label="up ({0:.2f}, {1:.2f}%)".format(Iu, 100.0*(Iu-In)/In) if In>0 else 0.0, linewidth=2)
-    rplt.step(down, label="down ({0:.2f}, {1:.2f}%)".format(Id, 100.0*(Id-In)/In) if In>0 else 0.0, linewidth=2)
+    rplt.step(nominal, label="nominal ({0:.2f}, {1})".format(In, nominal.GetEntries()), linewidth=2, color="black")
+    rplt.step(up, label="up ({0:.2f}, {1:.2f}%, {2})".format(Iu, 100.0*(Iu-In)/In, up.GetEntries()) if In>0 else 0.0, linewidth=2)
+    rplt.step(down, label="down ({0:.2f}, {1:.2f}%, {2})".format(Id, 100.0*(Id-In)/In if In>0 else 0.0, down.GetEntries()), linewidth=2)
     ticks = a1.get_xticks()
     a1.get_xaxis().set_visible(False)
     a1.grid()
@@ -173,46 +173,46 @@ def plot_worker(kwargs):
                 plt.clf()
 
 
-    #ROC plots
-    plt.figure(figsize=(6,6))
-    plt.plot([0,1],[0,1], color="black")
-    hsig = sum([ret["nominal"][s] for s in signal_procs])
-    #draw rocs
-    for samp, sampname in procs:
-        if samp in signal_procs:
-            continue
-        hbkg = ret["nominal"][samp]
-        r, e = plotlib.calc_roc(hsig, hbkg)
-        plt.plot(r[:, 0], r[:, 1], marker=".", label=sampname + " AUC={0:.2f}".format(sklearn.metrics.auc(r[:, 0], r[:, 1])))
-    plt.legend(loc="best", fontsize=8)
-    plt.xlim(0,1)
-    plt.ylim(0,1)
-    outname_roc = outname + "_roc"
-    plotlib.svfg(outname_roc + ".pdf")
-    plt.clf()
+    ##ROC plots
+    #plt.figure(figsize=(6,6))
+    #plt.plot([0,1],[0,1], color="black")
+    #hsig = sum([ret["nominal"][s] for s in signal_procs])
+    ##draw rocs
+    #for samp, sampname in procs:
+    #    if samp in signal_procs:
+    #        continue
+    #    hbkg = ret["nominal"][samp]
+    #    r, e = plotlib.calc_roc(hsig, hbkg)
+    #    plt.plot(r[:, 0], r[:, 1], marker=".", label=sampname + " AUC={0:.2f}".format(sklearn.metrics.auc(r[:, 0], r[:, 1])))
+    #plt.legend(loc="best", fontsize=8)
+    #plt.xlim(0,1)
+    #plt.ylim(0,1)
+    #outname_roc = outname + "_roc"
+    #plotlib.svfg(outname_roc + ".pdf")
+    #plt.clf()
 
     #pie plot
-    plt.figure(figsize=(3,3))
-    yields = [ret["nominal"][samp].Integral() for samp, sampname in procs]
-    plt.pie(
-        yields,
-        colors=[kwargs.get("colors")[p] for p, _ in procs],
-        labels=[s[1] + "\n{0:.1f}".format(y) for s, y in zip(procs, yields)]
-    )
-    yield_s = 0.0
-    yield_b = 0.0
-    for y, (samp, sampname) in zip(yields, procs):
-        if samp in signal_procs:
-            yield_s += y
-        else:
-            yield_b += y
+    #plt.figure(figsize=(3,3))
+    #yields = [ret["nominal"][samp].Integral() for samp, sampname in procs]
+    #plt.pie(
+    #    yields,
+    #    colors=[kwargs.get("colors")[p] for p, _ in procs],
+    #    labels=[s[1] + "\n{0:.1f}".format(y) for s, y in zip(procs, yields)]
+    #)
+    #yield_s = 0.0
+    #yield_b = 0.0
+    #for y, (samp, sampname) in zip(yields, procs):
+    #    if samp in signal_procs:
+    #        yield_s += y
+    #    else:
+    #        yield_b += y
 
-    if yield_b == 0:
-        plt.title(escape_string(kwargs.get("category", "unknown_category")))
-    else:
-        plt.title(escape_string(kwargs.get("category", "unknown category")) + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
-    plotlib.svfg(outname + "_pie.pdf")
-    plt.clf()
+    #if yield_b == 0:
+    #    plt.title(escape_string(kwargs.get("category", "unknown_category")))
+    #else:
+    #    plt.title(escape_string(kwargs.get("category", "unknown category")) + "\n" + r"$S/\sqrt{B} = " + "{0:.2f}$".format(yield_s / math.sqrt(yield_b)))
+    #plotlib.svfg(outname + "_pie.pdf")
+    #plt.clf()
 
     inf.Close()
     #return ret["nominal"]

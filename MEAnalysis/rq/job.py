@@ -15,6 +15,7 @@ from shutil import copyfile
 import glob
 
 import sys, os, copy
+import tempfile
 from collections import OrderedDict
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
 import subprocess
@@ -96,6 +97,7 @@ def makecategory(*args):
     return MakeCategory.main(*new_args)
 
 def plot(*kwargs):
+    os.environ["MPLCONFIGDIR"] = tempfile.gettempdir()
     return controlPlot.plot_worker(*kwargs)
 
 def makelimits(*args):

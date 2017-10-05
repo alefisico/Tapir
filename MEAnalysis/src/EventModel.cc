@@ -34,9 +34,8 @@ template <typename T>
 EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) {
     auto event = TreeDescription<T>::create_event(syst_id);
 
-    std::vector<int> jets_hadronflavour;
     for (auto njet=0; njet < *(this->njets); njet++) {
-        jets_hadronflavour.push_back(this->jets_hadronFlavour[njet]);
+        event.jets_hadronFlavour.push_back(this->jets_hadronFlavour[njet]);
     }
 
     event.ttCls = *ttCls;

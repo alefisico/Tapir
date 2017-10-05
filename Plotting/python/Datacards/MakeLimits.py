@@ -80,18 +80,28 @@ def main(
         # And run limit setting on it
         limits[group_name] = lg(group_dcard_filename)[0][2]
         
+        limits[group_name + "_quantiles"] = [
+            lg(group_dcard_filename)[1],
+        ]
+        limits[group_name + "_lims"] = [
+            lg(group_dcard_filename)[0],
+        ]
+        
         limits[group_name + "_siginject"] = lg.runSignalInjection(group_dcard_filename)
 
         #write constraints
         for sig in [1, 0]:
+            #Run Asimov constraints
             constraints = constraint_getter(group_dcard_filename, sig)
-            of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
+            of = open(workdir + "/constraints_{0}_sig{1}_asimov.txt".format(group_name, sig), "w")
             of.write(constraints)
-            of.flush()
-            time.sleep(10)
-            os.fsync(of)
-            time.sleep(10)
             of.close()
+           
+            ##Run constraints with toys
+            #constraints = constraint_getter(group_dcard_filename, sig, False)
+            #of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
+            #of.write(constraints)
+            #of.close()
 
     # End loop over groups
 
@@ -105,9 +115,9 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG
     )
-    workdir = "results/2017-10-03T11-03-54-028815_2cb4de87-30f6-4098-a634-850696533ad0/limits"
-    analysis = Analysis.deserialize("results/2017-10-03T11-03-54-028815_2cb4de87-30f6-4098-a634-850696533ad0/analysis.pickle")
-    group = "group_sldl"
+    workdir = "results/2017-10-04T15-57-01-626612_7274692f-23a4-4e84-ba63-6e3f75216c3e/limits"
+    analysis = Analysis.deserialize("results/2017-10-04T15-57-01-626612_7274692f-23a4-4e84-ba63-6e3f75216c3e/analysis.pickle")
+    group = "sl_jge6_t3__btag_LR_4b_2b_btagCSV_logit"
 
     print analysis.groups.keys()
     main(workdir, analysis, group)

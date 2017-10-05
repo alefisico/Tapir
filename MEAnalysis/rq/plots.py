@@ -46,6 +46,8 @@ syst_pairs = [
     ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down"),
     ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
     ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
+    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
+    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
 ]
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
@@ -59,18 +61,18 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "signal_procs": ["ttH_hbb"],
         "dataname": "data",
         "rebin": 1,
-        "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames in plotlib.py",
+        "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add {0} to Varnames in plotlib.py".format(variable),
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "",
-        "legend_fontsize": 12,
-        "legend_loc": "best",
         "colors": plotlib.colors,
         "do_legend": True,
+        "legend_loc": "best",
+        "legend_fontsize": 6,
         "show_overflow": True,
-        "title_extended": category.replace("_", " "),
+        "title_extended": "\n" + category + r", $\sqrt{s} = 13$ TeV, $\mathcal{L} = 36$~$\mathrm{fb}^{-1}$",
         "systematics": syst_pairs,
         "do_syst": True,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
-        "do_tex": False
+        "do_tex": False 
     }
     if variable in ["numJets", "nBCSVM"]:
         ret["do_log"] = True

@@ -23,6 +23,9 @@ for path, dirs, files in os.walk(sys.argv[1]):
         continue
     #Add the full path
     rootfiles = map(lambda f: os.path.join(path, f), rootfiles)
+    import pdb
+    pdb.set_trace()
+
     print "adding", path
     #do the hadd (in parallel)
     if(destination == ""):

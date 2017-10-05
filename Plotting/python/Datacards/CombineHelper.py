@@ -124,8 +124,8 @@ class LimitGetter(object):
                 name_extended="_sig_{0:.2f}".format(sig).replace(".", "_"),
                 opts=["-M", "MaxLikelihoodFit",
                 "--expectSignal", str(sig),
-                "--rMin", "{0}".format(sig - 1),
-                "--rMax", "{0}".format(sig + 1),
+                "--rMin", "-10",
+                "--rMax", "10",
                 "--robustFit", "1",
                 ],
                 output_format="higgsCombine{process_name}.MaxLikelihoodFit.mH120.root",
@@ -139,23 +139,39 @@ class ConstraintGetter(object):
     def __init__(self, output_path = "."):
         self.output_path = output_path
 
-    def __call__(self, datacard, signal_coef):
+    def __call__(self, datacard, signal_coef, asimov=True):
 
         datacard_path, datacard_name = os.path.split(datacard)
        
         process_name = os.path.splitext(datacard_name)[0] + "_sig_{0:.2f}".format(signal_coef).replace(".", "_")
-
+        if asimov:
+            process_name += "_asimov"
+        else:
+            process_name += "_toys"
         # Run combine
         combine_command = ["combine", 
                            "-n", process_name,
                            "-M", "MaxLikelihoodFit",
-                           "-t", "-1",
-                           "--rMin", "-3",
-                           "--rMax", "3",
-                           "--robustFit", "1",
-                           "--keepFailures",
                            "--expectSignal", str(signal_coef),
                            datacard_name]
+        if asimov:
+            combine_command += [
+                "-t", "-1",
+                "--robustFit", "1",
+                "--setRobustFitTolerance=0.00001",
+                "--setCrossingTolerance=0.00001",
+                "--minos", "all",
+                #"--rMin", "-10",
+                #"--rMax", "10",
+            ]
+        else:
+            combine_command += [
+                "-t", "5000",
+                "--toysFrequentist",
+                "--noErrors",
+                "--minos", "none",
+            ]
+
         
         LOG_MODULE_NAME.info("running combine: {0}".format(" ".join(combine_command)))
         

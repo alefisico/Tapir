@@ -108,8 +108,9 @@ def waitJobs(jobs, redis_conn, qmain, qfail, num_retries=0, callback=basic_job_s
                 redis_conn.delete(worker.key)
                 cur_job = ret.get("current_job", None)
                 if cur_job:
-                    logging.getLogger('launcher').info("cancelling job {0}".format(cur_job))
-                    rq.cancel_job(cur_job, redis_conn)
+                    logging.getLogger('launcher').error("cancelling job {0}".format(cur_job))
+                    #rq.cancel_job(cur_job, redis_conn)
+                    #qfail.requeue(cur_job)
 
         for job in jobs:
             job.refresh()
@@ -671,7 +672,7 @@ class TaskLimits(Task):
                         self.analysis,
                         group
                     ],
-                    timeout = 40*60,
+                    timeout = 5*60*60,
                     ttl = -1,
                     result_ttl = -1,
                     meta = {"retries": 0, "args": ""})]
@@ -683,9 +684,7 @@ class TaskLimits(Task):
 
         of = open(self.workdir + "/limits.csv", "w")
         for k in sorted(lims_tot.keys()):
-            if not "inject" in k:
-                print k, lims_tot[k]
-            of.write("{0},{1}\n".format(k, lims_tot[k]))
+            of.write("{0};{1}\n".format(k, lims_tot[k]))
         of.close()
 
         self.save_state()
@@ -715,21 +714,24 @@ class TaskTables(Task):
                     #Find all the yield uncertainties resulting from shape modifications
                     #symmetrize and add in quadrature
                     syst_yield_diff = {"stat": e}
-                    for syst in cat.shape_uncertainties[proc].keys():
-                        yields_updown = {}
-                        for sdir in ["Up", "Down"]:
-                            h = tf.Get("{0}__{1}__{2}".format(proc, cat.full_name, syst+sdir))
-                            yields_updown[sdir] = 0
-                            if h:
-                                yields_updown[sdir] = ih - h.Integral()
-                        yield_sym = math.sqrt(yields_updown["Up"]**2 + yields_updown["Down"]**2)
-                        syst_yield_diff[syst] = yield_sym
-                    #Find the uncertainties from simple normalization variations
-                    for syst in cat.scale_uncertainties[proc].keys():
-                        syst_yield_diff[syst] = (cat.scale_uncertainties[proc][syst] - 1.0) * ih 
+
+                    if proc in cat.shape_uncertainties.keys():
+                        for syst in cat.shape_uncertainties[proc].keys():
+                            yields_updown = {}
+                            for sdir in ["Up", "Down"]:
+                                h = tf.Get("{0}__{1}__{2}".format(proc, cat.full_name, syst+sdir))
+                                yields_updown[sdir] = 0
+                                if h:
+                                    yields_updown[sdir] = ih - h.Integral()
+                            yield_sym = math.sqrt(yields_updown["Up"]**2 + yields_updown["Down"]**2)
+                            syst_yield_diff[syst] = yield_sym
+                        #Find the uncertainties from simple normalization variations
+                    if proc in cat.scale_uncertainties.keys():
+                        for syst in cat.scale_uncertainties[proc].keys():
+                            syst_yield_diff[syst] = (cat.scale_uncertainties[proc][syst] - 1.0) * ih 
                     logging.getLogger('launcher').debug("syst {0}".format(syst_yield_diff))
                     tot_yield_diff = math.sqrt(sum([x**2 for x in syst_yield_diff.values()]))
-                    of.write(",".join([groupname, cat.full_name, proc, "{0:.2f}".format(ih), "{0:.2f}".format(tot_yield_diff)]) + "\n")
+                    of.write(";".join([groupname, cat.full_name, proc, "{0:.2f}".format(ih), "{0:.2f}".format(tot_yield_diff)]) + "\n")
         of.close()
 
 def make_workdir():

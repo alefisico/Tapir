@@ -99,9 +99,21 @@ namespace Systematic {
         CMS_ttH_CSVhfstats1,
         CMS_ttH_CSVhfstats2,
         CMS_ttH_CSVjes,
+        CMS_ttH_CSVjesAbsoluteMPFBias,
+        CMS_ttH_CSVjesAbsoluteScale,
+        CMS_ttH_CSVjesFlavorQCD,
+        CMS_ttH_CSVjesPileUpDataMC,
+        CMS_ttH_CSVjesPileUpPtBB,
+        CMS_ttH_CSVjesPileUpPtEC1,
+        CMS_ttH_CSVjesPileUpPtRef,
+        CMS_ttH_CSVjesRelativeFSR,
+        CMS_ttH_CSVjesSinglePionECAL,
+        CMS_ttH_CSVjesSinglePionHCAL,
+        CMS_ttH_CSVjesTimePtEta,
         CMS_ttH_CSVlf,
         CMS_ttH_CSVlfstats1,
         CMS_ttH_CSVlfstats2,
+
         CMS_pu,
     };
 
