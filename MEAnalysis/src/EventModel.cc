@@ -27,6 +27,8 @@ template <typename T>
 EventDescription TreeDescriptionMCSystematic<T>::create_event(Systematic::SystId syst_id) {
     auto event = TreeDescription<T>::create_event(syst_id);
     event.ttCls = *ttCls;
+    event.genTopHad_pt = *genTopHad_pt;
+    event.genTopLep_pt = *genTopLep_pt;
     return event;
 }
 
@@ -73,6 +75,9 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
 
 
     }
+    
+    event.genTopHad_pt = *genTopHad_pt;
+    event.genTopLep_pt = *genTopLep_pt;
     return event;
 }
 
@@ -85,6 +90,7 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.run = *(this->run);
     event.lumi = *(this->lumi);
     event.evt = *(this->evt);
+    event.json = *(this->json);
 
     event.is_sl = *(this->is_sl);
     event.is_dl = *(this->is_dl);

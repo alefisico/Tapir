@@ -24,7 +24,7 @@ import numpy as np
 import math
 
 from datetime import datetime
-
+import json
 import matplotlib
 from matplotlib import rc
 #temporarily disable true latex for fast testing
@@ -682,9 +682,8 @@ class TaskLimits(Task):
         for lim in limits:
             lims_tot.update(lim)
 
-        of = open(self.workdir + "/limits.csv", "w")
-        for k in sorted(lims_tot.keys()):
-            of.write("{0};{1}\n".format(k, lims_tot[k]))
+        of = open(self.workdir + "/limits.json", "w")
+        of.write(json.dumps(lims_tot, indent=2))
         of.close()
 
         self.save_state()
@@ -731,7 +730,14 @@ class TaskTables(Task):
                             syst_yield_diff[syst] = (cat.scale_uncertainties[proc][syst] - 1.0) * ih 
                     logging.getLogger('launcher').debug("syst {0}".format(syst_yield_diff))
                     tot_yield_diff = math.sqrt(sum([x**2 for x in syst_yield_diff.values()]))
-                    of.write(";".join([groupname, cat.full_name, proc, "{0:.2f}".format(ih), "{0:.2f}".format(tot_yield_diff)]) + "\n")
+                    of.write(";".join([
+                        groupname,
+                        cat.full_name,
+                        proc,
+                        "{0:.2f}".format(ih),
+                        "{0:.2f}".format(syst_yield_diff["stat"]),
+                        "{0:.2f}".format(tot_yield_diff)]
+                    ) + "\n")
         of.close()
 
 def make_workdir():

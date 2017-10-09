@@ -27,6 +27,12 @@ CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 #Need to access this to initialize the library (?)
 dummy = ROOT.TTH_MEAnalysis.TreeDescription
 
+#From https://gitlab.cern.ch/jpata/tthbb13/blob/FH_systematics/Plotting/Daniel/Helper.py#L7
+#Derived by Silvio in a manual fit to semileptonic differential top pt data: CMS-PAS-TOP-17-002
+topPTreweight = lambda x,y: math.exp(0.5*((0.0843616-0.000743051*x)+(0.0843616-0.000743051*y)))
+topPTreweightUp = lambda x,y: math.exp(0.5*((0.00160296-0.000411375*x)+(0.00160296-0.000411375*y)))
+topPTreweightDown = lambda x,y: math.exp(0.5*((0.16712-0.00107473*x)+(0.16712-0.00107473*y)))
+
 syst_pairs = OrderedDict([
     (x+d, ROOT.TTH_MEAnalysis.Systematic.make_id(
         getattr(ROOT.TTH_MEAnalysis.Systematic, x),
@@ -300,6 +306,14 @@ def createEvent(
     ):
 
     event = events.create_event(syst_pairs[syst])
+    if schema.startswith("mc"): 
+        event.topPTweight = 1.0
+        event.topPTweightUp = 1.0
+        event.topPTweightDown = 1.0
+        if event.is_sl and event.genTopLep_pt>0 and event.genTopHad_pt>0:
+            event.topPTweight = topPTreweight(event.genTopLep_pt, event.genTopHad_pt)
+            event.topPTweightUp = topPTreweightUp(event.genTopLep_pt, event.genTopHad_pt)
+            event.topPTweightDown = topPTreweightDown(event.genTopLep_pt, event.genTopHad_pt)
     event.leps_pdgId = [x.pdgId for x in event.leptons]
     event.triggerPath = triggerPath(event)
     event.btag_LR_4b_2b_btagCSV_logit = logit(event.btag_LR_4b_2b_btagCSV)
@@ -318,7 +332,7 @@ def createEvent(
        
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
-        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
+        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.topPTweight
    
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
@@ -430,13 +444,15 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                bweight = "CMS_ttH_CSV{0}{1}".format(syst, sdir)
                systematic_weights += [
                    (bweight, lambda ev, bweight=bweight:
-                       ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs[bweight]))
+                       ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs[bweight]) * ev.topPTweight)
                ]
                btag_weights += [bweight]
 
         systematic_weights += [
-                ("CMS_puUp", lambda ev: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) ),
-                ("CMS_puDown", lambda ev: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) ),
+                ("CMS_puUp", lambda ev: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweight ),
+                ("CMS_puDown", lambda ev: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweight ),
+                ("CMS_topPTUp", lambda ev: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweightUp ),
+                ("CMS_topPTDown", lambda ev: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweightDown ),
                 ("only_bweight", lambda ev: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) ),
                 ("only_pu", lambda ev: ev.weights.at(syst_pairs["CMS_pu"]) ),
                 ("unweighted", lambda ev: 1.0)
@@ -583,8 +599,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             # #apply some basic preselection that does not depend on jet systematics
             # if not (event.is_sl or event.is_dl):
             #     continue
-            # if schema == "data" and not event.json:
-            #     continue
 
             #Loop over systematics that transform the event
             for iSyst, syst in enumerate(systematics_event):
@@ -595,7 +609,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     calculate_bdt, do_recompute_btag_weights
                 )
                 if event is None:
-                    continue 
+                    continue
+                if schema == "data" and not event.json:
+                    continue
 
                 fillBase(matched_processes, event, syst, schema)
                 #Fill the base histogram
@@ -620,22 +636,22 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     #put underflow and overflow entries into the first and last visible bin
     for k in sorted(outdict.keys()):
         v = outdict[k]
-        #b0 = v.GetBinContent(0)
-        #e0 = v.GetBinError(0)
-        #nb = v.GetNbinsX()
-        #bn = v.GetBinContent(nb + 1)
-        #en = v.GetBinError(nb + 1)
+        b0 = v.GetBinContent(0)
+        e0 = v.GetBinError(0)
+        nb = v.GetNbinsX()
+        bn = v.GetBinContent(nb + 1)
+        en = v.GetBinError(nb + 1)
 
-        #v.SetBinContent(0, 0)
-        #v.SetBinContent(nb+1, 0)
-        #v.SetBinError(0, 0)
-        #v.SetBinError(nb+1, 0)
+        v.SetBinContent(0, 0)
+        v.SetBinContent(nb+1, 0)
+        v.SetBinError(0, 0)
+        v.SetBinError(nb+1, 0)
 
-        #v.SetBinContent(1, v.GetBinContent(1) + b0)
-        #v.SetBinError(1, math.sqrt(v.GetBinError(1)**2 + e0**2))
-        #
-        #v.SetBinContent(nb, v.GetBinContent(nb) + bn)
-        #v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
+        v.SetBinContent(1, v.GetBinContent(1) + b0)
+        v.SetBinError(1, math.sqrt(v.GetBinError(1)**2 + e0**2))
+        
+        v.SetBinContent(nb, v.GetBinContent(nb) + bn)
+        v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
     
     
     LOG_MODULE_NAME.info("writing output")
@@ -658,6 +674,7 @@ if __name__ == "__main__":
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
         #sample = "SingleMuon"
+        #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
         max_events = 1000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")

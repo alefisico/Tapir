@@ -20,7 +20,8 @@ LOG_MODULE_NAME = logging.getLogger(__name__)
 def main(
         workdir,
         analysis,
-        group = None
+        group = None,
+        runToys = False
 ):
     
     limits = {}
@@ -80,12 +81,8 @@ def main(
         # And run limit setting on it
         limits[group_name] = lg(group_dcard_filename)[0][2]
         
-        limits[group_name + "_quantiles"] = [
-            lg(group_dcard_filename)[1],
-        ]
-        limits[group_name + "_lims"] = [
-            lg(group_dcard_filename)[0],
-        ]
+        limits[group_name + "_lims"] = lg(group_dcard_filename)[0]
+        
         
         limits[group_name + "_siginject"] = lg.runSignalInjection(group_dcard_filename)
 
@@ -96,12 +93,13 @@ def main(
             of = open(workdir + "/constraints_{0}_sig{1}_asimov.txt".format(group_name, sig), "w")
             of.write(constraints)
             of.close()
-           
-            ##Run constraints with toys
-            #constraints = constraint_getter(group_dcard_filename, sig, False)
-            #of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
-            #of.write(constraints)
-            #of.close()
+          
+            if runToys:
+                #Run constraints with toys
+                constraints = constraint_getter(group_dcard_filename, sig, False)
+                of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
+                of.write(constraints)
+                of.close()
 
     # End loop over groups
 
@@ -112,12 +110,38 @@ def main(
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Analysis
     
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Runs the workflow'
+    )
+    parser.add_argument(
+        '--analysis',
+        action = "store",
+        help = "Path to analysis pickle file",
+        type = str,
+        required = True
+    )
+    parser.add_argument(
+        '--category',
+        action = "store",
+        help = "Fit category",
+        type = str,
+    )
+    parser.add_argument(
+        '--runToys',
+        action = "store_true",
+        help = "Run toy experiments for pull distributions",
+    )
+    args = parser.parse_args()
+    
     logging.basicConfig(
         level=logging.DEBUG
     )
-    workdir = "results/2017-10-04T15-57-01-626612_7274692f-23a4-4e84-ba63-6e3f75216c3e/limits"
-    analysis = Analysis.deserialize("results/2017-10-04T15-57-01-626612_7274692f-23a4-4e84-ba63-6e3f75216c3e/analysis.pickle")
-    group = "sl_jge6_t3__btag_LR_4b_2b_btagCSV_logit"
+    analysis = Analysis.deserialize(args.analysis)
+    workdir = os.path.dirname(args.analysis) + "/limits"
 
-    print analysis.groups.keys()
-    main(workdir, analysis, group)
+    if not args.category:
+        print "choose a category:", sorted(analysis.groups.keys())
+    else:
+        print analysis.groups.keys()
+        main(workdir, analysis, args.category, args.runToys)

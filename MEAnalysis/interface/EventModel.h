@@ -235,6 +235,7 @@ public:
     unsigned long long evt;
     unsigned int run;
     unsigned int lumi;
+    int json;
 
     std::vector<Lepton> leptons;
 
@@ -242,6 +243,8 @@ public:
     std::vector<int> jets_hadronFlavour;
 
     int ttCls;
+    float genTopLep_pt;
+    float genTopHad_pt;
     int is_sl;
     int is_dl;
     int is_fh;
@@ -275,6 +278,7 @@ public:
     TTreeReaderValue<unsigned long long> evt;
     TTreeReaderValue<unsigned int> run;
     TTreeReaderValue<unsigned int> lumi;
+    TTreeReaderValue<float> json;
 
     TTreeReaderValue<int> is_sl;
     TTreeReaderValue<int> is_dl;
@@ -320,6 +324,7 @@ public:
         evt(reader, "evt"),
         run(reader, "run"),
         lumi(reader, "lumi"),
+        json(reader, "json"),
 
         is_sl(reader, "is_sl"),
         is_dl(reader, "is_dl"),
@@ -370,10 +375,14 @@ class TreeDescriptionMCSystematic : public TreeDescription<T> {
 public:
 
     TTreeReaderValue<int> ttCls;
+    TTreeReaderValue<T> genTopHad_pt;
+    TTreeReaderValue<T> genTopLep_pt;
     
     TreeDescriptionMCSystematic(TFile* file, SampleDescription sample) :
         TreeDescription<T>(file, sample),
-        ttCls(TreeDescription<T>::reader, "ttCls")
+        ttCls(TreeDescription<T>::reader, "ttCls"),
+        genTopHad_pt(TreeDescription<T>::reader, "genTopHad_pt"),
+        genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt")
     {}
     
     ~TreeDescriptionMCSystematic() {}
@@ -386,6 +395,8 @@ class TreeDescriptionMC : public TreeDescription<T> {
 public:
 
     TTreeReaderValue<int> ttCls;
+    TTreeReaderValue<T> genTopHad_pt;
+    TTreeReaderValue<T> genTopLep_pt;
 
     TTreeReaderValueSystematic<int> numJets;
     TTreeReaderValueSystematic<int> nBCSVM;
@@ -423,6 +434,8 @@ public:
     TreeDescriptionMC(TFile* file, SampleDescription sample) :
         TreeDescription<T>(file, sample),
         ttCls(TreeDescription<T>::reader, "ttCls"),
+        genTopHad_pt(TreeDescription<T>::reader, "genTopHad_pt"),
+        genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt"),
         
         numJets(TreeDescription<T>::reader, "numJets"),
         nBCSVM(TreeDescription<T>::reader, "nBCSVM"),

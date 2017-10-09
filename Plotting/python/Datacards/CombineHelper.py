@@ -27,18 +27,18 @@ def get_limits_asymptotic(fn):
 
     #No root file created, fit failed
     if f==None or f.IsZombie():
-        lims = np.zeros(6)
-        quantiles = np.zeros(6)
+        lims = [0,0,0,0,0,0]
+        quantiles = [0,0,0,0,0,0]
         lims[:] = 99999
         return lims, quantiles
     tt = f.Get("limit")
     if tt==None or tt.IsZombie():
-        lims = np.zeros(6)
-        quantiles = np.zeros(6)
+        lims = [0,0,0,0,0,0]
+        quantiles = [0,0,0,0,0,0]
         lims[:] = 99999
         return lims, quantiles
-    lims = np.zeros(6)
-    quantiles = np.zeros(6)
+    lims = [0,0,0,0,0,0]
+    quantiles = [0,0,0,0,0,0]
     for i in range(tt.GetEntries()):
         tt.GetEntry(i)
         lims[i] = tt.limit
@@ -161,6 +161,8 @@ class ConstraintGetter(object):
                 "--setRobustFitTolerance=0.00001",
                 "--setCrossingTolerance=0.00001",
                 "--minos", "all",
+                "--saveShapes",
+                "--saveWithUncertainties",
                 #"--rMin", "-10",
                 #"--rMax", "10",
             ]
@@ -229,7 +231,7 @@ class DummyLimitGetter(object):
 
     def __call__(self, datacard):
         print "calling limit on datacard", datacard
-        return np.array([0,0,0,0,0,0]), None
+        return [0,0,0,0,0,0], None
     # End of get_limit
 
 if __name__ == "__main__":
