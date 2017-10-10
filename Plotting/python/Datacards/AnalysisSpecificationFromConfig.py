@@ -4,6 +4,7 @@
 
 import sys
 from copy import deepcopy
+import fnmatch
 
 from TTH.MEAnalysis.samples_base import xsec
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Histogram, Cut, Sample, Process, DataProcess, Category, Analysis, pairwise, triplewise, make_csv_categories_abstract, make_csv_groups_abstract
@@ -203,18 +204,28 @@ def analysisFromConfig(config_file_path):
             common_scale_name = config.get(template, "common_scale_uncertainties")
             common_scale_uncertainties = {k:float(v) for k,v in config.items(common_scale_name)}        
 
+            unique_output_processes = list(set([p.output_name for p in mc_processes]))
+            
             scale_name = config.get(template, "scale_uncertainties")
             scale_uncertainties = {}
-            for k,v in config.items(scale_name):
-                scale_uncertainties[k] = {}
-                for name, uncert in pairwise(v.split()):
-                    scale_uncertainties[k][name] = float(uncert)
+            for process, name_uncert in config.items(scale_name):
+                scale_uncertainties[process] = {}
+                for name, uncert in pairwise(name_uncert.split()):
+                    scale_uncertainties[process][name] = float(uncert)
+
+            #Add any additional category-dependent scale uncertainties
+            if config.has_option(category_name, "additional_scale_uncertainties"):
+                print config.get(category_name, "additional_scale_uncertainties").strip().split("\n")
+                for line in config.get(category_name, "additional_scale_uncertainties").strip().split("\n"):
+                    name, process_pattern, uncert = line.split()
+                    matching_procs = [proc for proc in unique_output_processes if fnmatch.fnmatch(proc, process_pattern)]
+                    for matching_proc in matching_procs:
+                        scale_uncertainties[matching_proc][name] = uncert
 
             if config.has_option(category_name, "rebin"):
                 rebin = int(config.get(category_name,"rebin"))
             else:
                 rebin = 1
-
             category = Category(
                 name = category_name,
                 cuts = [cut],

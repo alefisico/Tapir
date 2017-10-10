@@ -75,17 +75,17 @@ syst_pairs = OrderedDict([
         "CMS_ttH_CSVhfstats1",
         "CMS_ttH_CSVhfstats2",
         "CMS_ttH_CSVjes",
-        "CMS_ttH_CSVjesAbsoluteMPFBias",
-        "CMS_ttH_CSVjesAbsoluteScale",
-        "CMS_ttH_CSVjesFlavorQCD",
-        "CMS_ttH_CSVjesPileUpDataMC",
-        "CMS_ttH_CSVjesPileUpPtBB",
-        "CMS_ttH_CSVjesPileUpPtEC1",
-        "CMS_ttH_CSVjesPileUpPtRef",
-        "CMS_ttH_CSVjesRelativeFSR",
-        "CMS_ttH_CSVjesSinglePionECAL",
-        "CMS_ttH_CSVjesSinglePionHCAL",
-        "CMS_ttH_CSVjesTimePtEta",
+#        "CMS_ttH_CSVjesAbsoluteMPFBias",
+#        "CMS_ttH_CSVjesAbsoluteScale",
+#        "CMS_ttH_CSVjesFlavorQCD",
+#        "CMS_ttH_CSVjesPileUpDataMC",
+#        "CMS_ttH_CSVjesPileUpPtBB",
+#        "CMS_ttH_CSVjesPileUpPtEC1",
+#        "CMS_ttH_CSVjesPileUpPtRef",
+#        "CMS_ttH_CSVjesRelativeFSR",
+#        "CMS_ttH_CSVjesSinglePionECAL",
+#        "CMS_ttH_CSVjesSinglePionHCAL",
+#        "CMS_ttH_CSVjesTimePtEta",
         "CMS_ttH_CSVlf",
         "CMS_ttH_CSVlfstats1",
         "CMS_ttH_CSVlfstats2",
@@ -123,24 +123,130 @@ def lv_p4s(pt, eta, phi, m, btagCSV=-100):
     return ret
 
 
-# Calculate lepton SF on the fly
-# Currently only add muons
-# TODO: Add electrons as well
-def calc_lepton_SF(ev):
+tfile_ele_id = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/el_id_bcdef.root")
+hist_ele_id = tfile_ele_id.Get("EGamma_SF2D")
+
+tfile_ele_reco = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/el_reco.root")
+hist_ele_reco = tfile_ele_reco.Get("EGamma_SF2D")
+
+#https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults#Results_on_the_full_2016_data
+tfile_mu_id = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/mu_id_bcdef.root")
+hist_mu_id = tfile_mu_id.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio")
+
+tfile_mu_iso = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/mu_iso_bcdef.root")
+hist_mu_iso = tfile_mu_iso.Get("TightISO_TightID_pt_eta/pt_abseta_ratio")
+
+tfile_mu_track = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/mu_tracking_bcdef.root")
+hist_mu_track = tfile_mu_track.Get("ratio_eff_aeta_dr030e030_corr")
+
+# helper function to find the first occurance of a point whose x-error bars cover a certain value
+def findGraphPoint(tgraph, x):
+    x_, y_ = ROOT.Double(), ROOT.Double()
+    for i in range(0, tgraph.GetN()):
+        tgraph.GetPoint(i, x_, y_)
+        # use same edge treatment as root histograms use, so inclusive at the left edge
+        # and exclusive at the right edge
+        l, r = x_ - tgraph.GetErrorXlow(i), x_ + tgraph.GetErrorXhigh(i)
+        if float(l) <= x < float(r):
+            return i
+    return -1
+
+# helper function to get the y-value of a point defined by it's x-value with optional error handling
+def getGraphValue(tgraph, x, err="nominal"):
+    assert(err in ("nominal", "up", "down"))
+
+    i = findGraphPoint(tgraph, x)
+    if i < 0:
+        raise Exception("x-value %f cannot be assigned to a valid point" % x)
+
+    x_, y_ = ROOT.Double(), ROOT.Double()
+    tgraph.GetPoint(i, x_, y_)
+    y = float(y_)
+
+    if err == "up":
+        return y + tgraph.GetErrorYhigh(i)
+    elif err == "down":
+        return y - tgraph.GetErrorYlow(i)
+    else:
+        return y
+
+
+def calc_lepton_SF(ev, syst="nominal"):
     
     weight = 1.
 
     # Leading muon
-    if ev.nleps >= 1:
-        if abs(ev.leps_pdgId[0] == 13):
-            weight *= ev.leps_SF_IdCutTight[0]
-            weight *= ev.leps_SF_IsoTight[0]
+    for ilep in range(ev.leptons.size()):
+        pt = ev.leptons.at(ilep).lv.Pt()
+        aeta = abs(ev.leptons.at(ilep).lv.Eta())
         
-    # Subleading muon
-    if ev.nleps >= 2:
-        if abs(ev.leps_pdgId[1] == 13):
-            weight *= ev.leps_SF_IdCutTight[1]
-            weight *= ev.leps_SF_IsoTight[1]
+        if abs(ev.leps_pdgId[ilep]) == 13:
+            #ID
+            if pt > 120:
+                pt = 119
+            b = hist_mu_id.FindBin(pt, aeta)
+            w = hist_mu_id.GetBinContent(b)
+            LOG_MODULE_NAME.debug("mu ID sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+            if w == 0:
+                LOG_MODULE_NAME.error("mu ID sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+                w = 1
+            if syst == "CMS_effID_mUp":
+                w = w + hist_mu_id.GetBinError(b)
+            elif syst == "CMS_effID_mDown":
+                w = w - hist_mu_id.GetBinError(b)
+            weight *= w 
+           
+            #Tracking
+            w = getGraphValue(hist_mu_track, aeta)
+            LOG_MODULE_NAME.debug("mu track sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+            if w == 0:
+                LOG_MODULE_NAME.error("mu track sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+                w = 1
+            if syst == "CMS_effTracking_mUp":
+                w = getGraphValue(hist_mu_track, aeta, "up")
+            elif syst == "CMS_effTracking_mDown":
+                w = getGraphValue(hist_mu_track, aeta, "down")
+            
+            #iso
+            b = hist_mu_iso.FindBin(pt, aeta)
+            w = hist_mu_iso.GetBinContent(b)
+            LOG_MODULE_NAME.debug("mu iso sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+            if w == 0:
+                LOG_MODULE_NAME.error("mu iso sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+                w = 1
+            if syst == "CMS_effIso_mUp":
+                w = w + hist_mu_iso.GetBinError(b)
+            elif syst == "CMS_effIso_mDown":
+                w = w - hist_mu_iso.GetBinError(b)
+
+            weight *= w
+        elif abs(ev.leps_pdgId[ilep]) == 11:
+
+            if pt > 150:
+                pt = 149 
+            #ID
+            b = hist_ele_id.FindBin(abs(ev.leps_superclustereta.at(ilep)), pt)
+            w = hist_ele_id.GetBinContent(b)
+            if w == 0:
+                LOG_MODULE_NAME.error("ele ID sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
+                w = 1
+            if syst == "CMS_effID_eUp":
+                w = w + hist_ele_id.GetBinError(b)
+            elif syst == "CMS_effID_eDown":
+                w = w - hist_ele_id.GetBinError(b)
+            weight *= w
+            
+            #Reco
+            b = hist_ele_reco.FindBin(abs(ev.leps_superclustereta.at(ilep)), pt)
+            w = hist_ele_reco.GetBinContent(b)
+            if w == 0:
+                LOG_MODULE_NAME.error("ele reco sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
+                w = 1
+            if syst == "CMS_effReco_eUp":
+                w = w + hist_ele_reco.GetBinError(b)
+            elif syst == "CMS_effReco_eDown":
+                w = w - hist_ele_reco.GetBinError(b)
+            weight *= w
 
     return weight
 
@@ -192,6 +298,8 @@ def fillBase(matched_processes, event, syst, schema):
             weight = 1.0 
             if schema == "mc" or schema == "mc_syst":
                 weight = event.weight_nominal * proc.xs_weight
+                if weight == 0:
+                    LOG_MODULE_NAME.error("weight_nominal=0")
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -332,7 +440,16 @@ def createEvent(
        
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
-        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.topPTweight
+        event.lepton_weight = calc_lepton_SF(event)
+        if syst == "nominal":
+            event.lepton_weights_syst = {w: calc_lepton_SF(event, w) for w in [
+                "CMS_effID_eUp", "CMS_effID_eDown",
+                "CMS_effReco_eUp", "CMS_effReco_eDown",
+                "CMS_effID_mUp", "CMS_effID_mDown",
+                "CMS_effIso_mUp", "CMS_effIso_mDown",
+                "CMS_effTracking_mUp", "CMS_effTracking_mDown",
+            ]}
+        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
    
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
@@ -443,20 +560,27 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
            for syst in systematics_btag:
                bweight = "CMS_ttH_CSV{0}{1}".format(syst, sdir)
                systematic_weights += [
-                   (bweight, lambda ev, bweight=bweight:
-                       ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs[bweight]) * ev.topPTweight)
+                   (bweight, lambda ev, bweight=bweight, syst_pairs=syst_pairs:
+                       ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs[bweight]) * ev.lepton_weight)
                ]
                btag_weights += [bweight]
 
         systematic_weights += [
-                ("CMS_puUp", lambda ev: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweight ),
-                ("CMS_puDown", lambda ev: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweight ),
-                ("CMS_topPTUp", lambda ev: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweightUp ),
-                ("CMS_topPTDown", lambda ev: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.topPTweightDown ),
-                ("only_bweight", lambda ev: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) ),
-                ("only_pu", lambda ev: ev.weights.at(syst_pairs["CMS_pu"]) ),
+                ("CMS_puUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("unweighted", lambda ev: 1.0)
         ]
+
+        for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
+                "CMS_effReco_eUp", "CMS_effReco_eDown",
+                "CMS_effID_mUp", "CMS_effID_mDown",
+                "CMS_effIso_mUp", "CMS_effIso_mDown",
+                "CMS_effTracking_mUp", "CMS_effTracking_mDown"]:
+            systematic_weights += [
+                (lep_syst, lambda ev, syst_pairs=syst_pairs, lep_syst=lep_syst: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weights_syst[lep_syst])
+            ]
 
     if len(file_names) == 0:
         raise Exception("No files specified")

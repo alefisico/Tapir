@@ -107,6 +107,13 @@ if __name__ == "__main__":
         description='Creates datacards in categories based on a sparse histogram'
     )
     parser.add_argument(
+        '--rootfile',
+        action = "store",
+        help = "Input root file",
+        type = str,
+        required = True
+    )
+    parser.add_argument(
         '--config',
         action = "store",
         help = "Analysis configuration",
@@ -136,4 +143,10 @@ if __name__ == "__main__":
     if len(categories) == 0:
         print "no categories matched out of:"
         print "\n".join([c.full_name for c in analysis.categories])
-    main(analysis, categories, outdir=".")
+    tf = ROOT.TFile(args.rootfile)
+
+    hdict = {}
+    for k in tf.GetListOfKeys():
+        hdict[k.GetName()] = k.ReadObj()
+
+    make_datacard(analysis, categories, args.outdir, hdict)

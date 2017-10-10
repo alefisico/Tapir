@@ -108,6 +108,10 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.jets = jets;
     event.syst_id = syst_id;
     event.leptons = build_leptons(syst_id);
+    
+    for (int ilep=0; ilep < *(this->nleps); ilep++) {
+        event.leps_superclustereta.push_back(this->leps_scEta[ilep]);
+    }
 
     event.btag_LR_4b_2b_btagCSV = *(this->btag_LR_4b_2b_btagCSV);
     event.mem_DL_0w2h2t_p = *(this->mem_DL_0w2h2t_p);

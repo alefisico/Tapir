@@ -16,7 +16,7 @@ import numpy as np
 import logging
 
 LOG_MODULE_NAME = logging.getLogger(__name__)
-#from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
+from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
 
 def get_limits_asymptotic(fn):
     """
@@ -82,14 +82,14 @@ class LimitGetter(object):
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
                                    cwd=datacard_path,
-        #                           env=dict(os.environ, 
-        #                                    PATH=PATH,
-        #                                    LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-        #                                    PYTHONPATH=PYTHONPATH,
-        #                                    ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
-        #                                    ROOTSYS = ROOTSYS,
-        #                                    GENREFLEX = GENREFLEX
-        #                                )
+                                   env=dict(os.environ, 
+                                            PATH=PATH,
+                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                            PYTHONPATH=PYTHONPATH,
+                                            ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                            ROOTSYS = ROOTSYS,
+                                            GENREFLEX = GENREFLEX
+                                        )
         )
         
         output, stderr = process.communicate()
@@ -126,7 +126,7 @@ class LimitGetter(object):
                 "--expectSignal", str(sig),
                 "--rMin", "-10",
                 "--rMax", "10",
-                "--robustFit", "1",
+                #"--robustFit", "1",
                 ],
                 output_format="higgsCombine{process_name}.MaxLikelihoodFit.mH120.root",
                 get_limits=get_limits_mlfit
@@ -157,14 +157,16 @@ class ConstraintGetter(object):
         if asimov:
             combine_command += [
                 "-t", "-1",
-                "--robustFit", "1",
-                "--setRobustFitTolerance=0.00001",
-                "--setCrossingTolerance=0.00001",
+                #"--robustFit", "1",
+                #"--setRobustFitTolerance=0.00001",
+                #"--setCrossingTolerance=0.00001",
+                "--minimizerStrategy=0",
+                "--minimizerTolerance=0.00001",
                 "--minos", "all",
                 "--saveShapes",
                 "--saveWithUncertainties",
-                #"--rMin", "-10",
-                #"--rMax", "10",
+                "--rMin", "-10",
+                "--rMax", "10",
             ]
         else:
             combine_command += [
@@ -180,14 +182,14 @@ class ConstraintGetter(object):
         process = subprocess.Popen(combine_command,
                                    stdout=subprocess.PIPE,
                                    cwd=datacard_path,
-                                   #env=dict(os.environ, 
-                                   #         PATH=PATH,
-                                   #         LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-                                   #         PYTHONPATH=PYTHONPATH,
-                                   #         ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
-                                   #         ROOTSYS = ROOTSYS,
-                                   #         GENREFLEX = GENREFLEX
-                                   #     )
+                                   env=dict(os.environ, 
+                                            PATH=PATH,
+                                            LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                            PYTHONPATH=PYTHONPATH,
+                                            ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                            ROOTSYS = ROOTSYS,
+                                            GENREFLEX = GENREFLEX
+                                        )
         )
         
         output, stderr = process.communicate()
@@ -201,7 +203,8 @@ class ConstraintGetter(object):
             "--format",
             "text",
             "-a",
-            "fitDiagnostics{0}.root".format(process_name),
+            #"fitDiagnostics{0}.root".format(process_name),
+            "mlfit{0}.root".format(process_name),
             "-g",
             "plots{0}.root".format(process_name)
         ]
@@ -210,15 +213,15 @@ class ConstraintGetter(object):
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
                                    cwd=datacard_path,
-                                   #env=dict(os.environ,
-                                   #        CMSSW_BASE=CMSSW_BASE,
-                                   #        PATH=PATH,
-                                   #        LD_LIBRARY_PATH = LD_LIBRARY_PATH,
-                                   #        PYTHONPATH=PYTHONPATH,
-                                   #        ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
-                                   #        ROOTSYS = ROOTSYS,
-                                   #        GENREFLEX = GENREFLEX
-                                   #),
+                                   env=dict(os.environ,
+                                           CMSSW_BASE=CMSSW_BASE,
+                                           PATH=PATH,
+                                           LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                                           PYTHONPATH=PYTHONPATH,
+                                           ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                                           ROOTSYS = ROOTSYS,
+                                           GENREFLEX = GENREFLEX
+                                   ),
         )
         
         output, stderr = process.communicate()

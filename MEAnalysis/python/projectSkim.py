@@ -27,6 +27,8 @@ if datatype in ["memcheck", "kinematics"]:
     tt.SetBranchStatus("ttCls", True)
     tt.SetBranchStatus("tth_rho_*", True)
     tt.SetBranchStatus("met_*", True)
+    tt.SetBranchStatus("btagWeight*", True)
+    tt.SetBranchStatus("puWeight*", True)
 
 if datatype in ["kinematics"]:
     tt.SetBranchStatus("jets_pt*", True)

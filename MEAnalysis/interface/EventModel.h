@@ -241,6 +241,8 @@ public:
 
     std::vector<Jet> jets;
     std::vector<int> jets_hadronFlavour;
+    
+    std::vector<float> leps_superclustereta;
 
     int ttCls;
     float genTopLep_pt;
@@ -300,6 +302,7 @@ public:
     TTreeReaderArray<T> leps_eta;
     TTreeReaderArray<T> leps_phi;
     TTreeReaderArray<T> leps_mass;
+    TTreeReaderArray<T> leps_scEta;
 
     TTreeReaderValue<int> njets;
     TTreeReaderArray<T> jets_pt;
@@ -346,6 +349,8 @@ public:
         leps_eta(reader, "leps_eta"),
         leps_phi(reader, "leps_phi"),
         leps_mass(reader, "leps_mass"),
+        //FIXME: add scEta to tthbb13 tree
+        leps_scEta(reader, "leps_eta"),
 
         njets(reader, "njets"),
         jets_pt(reader, "jets_pt"),
