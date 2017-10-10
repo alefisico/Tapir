@@ -280,7 +280,7 @@ public:
     TTreeReaderValue<unsigned long long> evt;
     TTreeReaderValue<unsigned int> run;
     TTreeReaderValue<unsigned int> lumi;
-    TTreeReaderValue<float> json;
+    TTreeReaderValue<T> json;
 
     TTreeReaderValue<int> is_sl;
     TTreeReaderValue<int> is_dl;

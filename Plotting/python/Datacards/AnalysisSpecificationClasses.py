@@ -146,10 +146,19 @@ class HistogramOutput:
         return event.cuts.get(self.cut_name, False)
 
     def fill(self, event, weight = 1.0):
+
+        #make sure underflow is filled to first visible bin and overflow to last visible
+        val = self.func(event)
+        if val < self.hist.GetBinLowEdge(1):
+            val = self.hist.GetBinLowEdge(1)
+        if val >= self.hist.GetBinLowEdge(self.hist.GetNbinsX()+1):
+            print "oveflow", val, self.hist.GetBinLowEdge(self.hist.GetNbinsX())
+            val = self.hist.GetBinLowEdge(self.hist.GetNbinsX())
+        
         if weight == 1.0:
-            self.hist.Fill(self.func(event))
+            self.hist.Fill(val)
         else:
-            self.hist.Fill(self.func(event), weight)
+            self.hist.Fill(val, weight)
 
 class CategoryCut:
     def __init__(self, cuts):

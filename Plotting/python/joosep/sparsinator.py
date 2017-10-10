@@ -298,8 +298,8 @@ def fillBase(matched_processes, event, syst, schema):
             weight = 1.0 
             if schema == "mc" or schema == "mc_syst":
                 weight = event.weight_nominal * proc.xs_weight
-                if weight == 0:
-                    LOG_MODULE_NAME.error("weight_nominal=0")
+                if weight <= 0:
+                    LOG_MODULE_NAME.error("weight_nominal<=0")
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -760,22 +760,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     #put underflow and overflow entries into the first and last visible bin
     for k in sorted(outdict.keys()):
         v = outdict[k]
-        b0 = v.GetBinContent(0)
-        e0 = v.GetBinError(0)
-        nb = v.GetNbinsX()
-        bn = v.GetBinContent(nb + 1)
-        en = v.GetBinError(nb + 1)
+        print(k, v.GetEntries(), v.Integral())
+        #b0 = v.GetBinContent(0)
+        #e0 = v.GetBinError(0)
+        #nb = v.GetNbinsX()
+        #bn = v.GetBinContent(nb + 1)
+        #en = v.GetBinError(nb + 1)
 
-        v.SetBinContent(0, 0)
-        v.SetBinContent(nb+1, 0)
-        v.SetBinError(0, 0)
-        v.SetBinError(nb+1, 0)
+        #v.SetBinContent(0, 0)
+        #v.SetBinContent(nb+1, 0)
+        #v.SetBinError(0, 0)
+        #v.SetBinError(nb+1, 0)
 
-        v.SetBinContent(1, v.GetBinContent(1) + b0)
-        v.SetBinError(1, math.sqrt(v.GetBinError(1)**2 + e0**2))
-        
-        v.SetBinContent(nb, v.GetBinContent(nb) + bn)
-        v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
+        #v.SetBinContent(1, v.GetBinContent(1) + b0)
+        #v.SetBinError(1, math.sqrt(v.GetBinError(1)**2 + e0**2))
+        #
+        #v.SetBinContent(nb, v.GetBinContent(nb) + bn)
+        #v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
     
     
     LOG_MODULE_NAME.info("writing output")
@@ -793,14 +794,14 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        #sample = "SingleMuon"
+        sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = 1000
+        max_events = 1000000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
