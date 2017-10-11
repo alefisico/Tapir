@@ -14,6 +14,7 @@ import subprocess
 import ROOT
 import numpy as np
 import logging
+import multiprocessing
 
 LOG_MODULE_NAME = logging.getLogger(__name__)
 from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
@@ -237,13 +238,121 @@ class DummyLimitGetter(object):
         return [0,0,0,0,0,0], None
     # End of get_limit
 
+def likelihoodScan(datacard, poi):
+    datacard_path, datacard_name = os.path.split(datacard)
+    process_name = os.path.splitext(datacard_name)[0] + "_poi_{0}".format(poi)
+    
+    combine_cmd = [
+        "combine", datacard_name,
+        "-n", process_name,
+        "-M", "MultiDimFit",
+        "-t", "-1",
+        "-P", poi,
+        "--point", "100",
+        "--algo", "grid"
+        #"--robustFit", "1",
+        #"--setRobustFitTolerance=0.00001",
+        #"--setCrossingTolerance=0.00001",
+        #"--minimizerStrategy=0",
+        #"--minimizerTolerance=0.00001",
+    ]
+    process = subprocess.Popen(combine_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=datacard_path,
+        env=dict(os.environ,
+                CMSSW_BASE=CMSSW_BASE,
+                PATH=PATH,
+                LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                PYTHONPATH=PYTHONPATH,
+                ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                ROOTSYS = ROOTSYS,
+                GENREFLEX = GENREFLEX
+        ),
+    )
+    output, stderr = process.communicate()
+    print output
+   
+    scan_cmd = [
+        CMSSW_BASE + "/src/CombineHarvester/CombineTools/scripts/plot1DScan.py",
+        "higgsCombine{0}.MultiDimFit.mH120.root".format(process_name),
+        "--POI", poi,
+        "--output", "scan_{0}".format(process_name)
+    ]
+
+    process = subprocess.Popen(scan_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=datacard_path,
+        env=dict(os.environ,
+                CMSSW_BASE=CMSSW_BASE,
+                PATH=PATH,
+                LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                PYTHONPATH=PYTHONPATH,
+                ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                ROOTSYS = ROOTSYS,
+                GENREFLEX = GENREFLEX
+        ),
+    )
+    output, stderr = process.communicate()
+    print output
+    
+def likelihoodScanTuple(tup):
+    datacard, poi = tup
+    return likelihoodScan(datacard, poi)
+
 if __name__ == "__main__":
     datacard = sys.argv[1]
     workdir = os.path.dirname(datacard)
-    lg = LimitGetter(workdir)
-    lg(datacard)
-    lg.runSignalInjection(datacard)
+    
+    #lg = LimitGetter(workdir)
+    #lg(datacard)
+    #lg.runSignalInjection(datacard)
 
-    cg = ConstraintGetter(workdir)
-    constraints = cg(datacard, 1.0)
-    print constraints
+    #cg = ConstraintGetter(workdir)
+    #constraints = cg(datacard, 1.0)
+    #print constraints
+
+    pois = [
+        "CMS_res_j",
+        "CMS_scaleAbsoluteStat_j",
+        "CMS_scaleAbsoluteScale_j",
+        "CMS_scaleAbsoluteFlavMap_j",
+        "CMS_scaleAbsoluteMPFBias_j",
+        "CMS_scaleFragmentation_j",
+        "CMS_scaleSinglePionECAL_j",
+        "CMS_scaleSinglePionHCAL_j",
+        "CMS_scaleFlavorQCD_j",
+        "CMS_scaleTimePtEta_j",
+        "CMS_scaleRelativeJEREC1_j",
+        "CMS_scaleRelativeJEREC2_j",
+        "CMS_scaleRelativeJERHF_j",
+        "CMS_scaleRelativePtBB_j",
+        "CMS_scaleRelativePtEC1_j",
+        "CMS_scaleRelativePtEC2_j",
+        "CMS_scaleRelativePtHF_j",
+        "CMS_scaleRelativeFSR_j",
+        "CMS_scaleRelativeStatFSR_j",
+        "CMS_scaleRelativeStatEC_j",
+        "CMS_scaleRelativeStatHF_j",
+        "CMS_scalePileUpDataMC_j",
+        "CMS_scalePileUpPtRef_j",
+        "CMS_scalePileUpPtBB_j",
+        "CMS_scalePileUpPtEC1_j",
+        "CMS_scalePileUpPtEC2_j",
+        "CMS_scalePileUpPtHF_j",
+        "CMS_ttH_CSVcferr1",
+        "CMS_ttH_CSVcferr2",
+        "CMS_ttH_CSVhf",
+        "CMS_ttH_CSVhfstats1",
+        "CMS_ttH_CSVhfstats2",
+        "CMS_ttH_CSVjes",
+        "CMS_ttH_CSVlf",
+        "CMS_ttH_CSVlfstats1",
+        "CMS_ttH_CSVlfstats2",
+        "CMS_pu",
+        "bgnorm_ttbarPlusBBbar",
+        ]
+    pool = multiprocessing.Pool(10)
+    pool.map(likelihoodScanTuple, [(datacard, poi) for poi in pois])
+    pool.close()

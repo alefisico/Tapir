@@ -734,6 +734,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 )
                 if event is None:
                     continue
+                
+                #make sure data event is in golden JSON
                 if schema == "data" and not event.json:
                     continue
 
