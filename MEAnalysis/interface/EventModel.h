@@ -139,7 +139,7 @@ void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& va
     if (add_nominal) {
         values[std::make_pair(Systematic::Nominal, Systematic::None)] = new T(reader, branch_name);
     }
-
+    std::cout << "making syst for " << branch_name << std::endl;
     values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_TotalUp")).c_str());
     values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_JERUp")).c_str());
     values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SubTotalPileUpUp")).c_str());
@@ -211,6 +211,10 @@ public:
     }
 
     T GetValue(Systematic::SystId syst_id) {
+        if (!values.count(syst_id)) {
+            std::cerr << "could not find key " << syst_id.first << " " << syst_id.second << std::endl;
+            throw std::exception();
+        }
         return **values.at(syst_id);
     }
 
@@ -411,6 +415,18 @@ public:
     TTreeReaderArray<T> jets_corr_JEC;
     TTreeReaderArray<T> jets_corr_JER;
 
+    TTreeReaderValueSystematic<T> mem_tth_DL_0w2h2t_var;
+    TTreeReaderValueSystematic<T> mem_ttbb_DL_0w2h2t_var;
+
+    TTreeReaderValueSystematic<T> mem_tth_SL_0w2h2t_var;
+    TTreeReaderValueSystematic<T> mem_ttbb_SL_0w2h2t_var;
+
+    TTreeReaderValueSystematic<T> mem_tth_SL_1w2h2t_var;
+    TTreeReaderValueSystematic<T> mem_ttbb_SL_1w2h2t_var;
+
+    TTreeReaderValueSystematic<T> mem_tth_SL_2w2h2t_var;
+    TTreeReaderValueSystematic<T> mem_ttbb_SL_2w2h2t_var;
+
     TTreeReaderValue<T> puWeight;
     TTreeReaderValue<T> puWeightUp;
     TTreeReaderValue<T> puWeightDown;
@@ -449,6 +465,18 @@ public:
         jets_corr(TreeDescription<T>::reader, "jets_corr", false),
         jets_corr_JEC(TreeDescription<T>::reader, "jets_corr_JEC"),
         jets_corr_JER(TreeDescription<T>::reader, "jets_corr_JER"),
+
+        mem_tth_DL_0w2h2t_var(TreeDescription<T>::reader, "mem_tth_DL_0w2h2t_var", false),
+        mem_ttbb_DL_0w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_DL_0w2h2t_var", false),
+
+        mem_tth_SL_0w2h2t_var(TreeDescription<T>::reader, "mem_tth_SL_0w2h2t_var", false),
+        mem_ttbb_SL_0w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_SL_0w2h2t_var", false),
+
+        mem_tth_SL_1w2h2t_var(TreeDescription<T>::reader, "mem_tth_SL_1w2h2t_var", false),
+        mem_ttbb_SL_1w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_SL_1w2h2t_var", false),
+
+        mem_tth_SL_2w2h2t_var(TreeDescription<T>::reader, "mem_tth_SL_2w2h2t_var", false),
+        mem_ttbb_SL_2w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_SL_2w2h2t_var", false),
 
         puWeight(TreeDescription<T>::reader, "puWeight"),
         puWeightUp(TreeDescription<T>::reader, "puWeightUp"),

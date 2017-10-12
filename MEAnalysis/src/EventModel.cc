@@ -8,7 +8,36 @@ template <typename T> int sgn(T val) {
 }
 
 bool Systematic::is_jec(Systematic::SystId syst_id) {
-    return syst_id.first == CMS_scale_j;
+    bool ret = false;
+    ret = (syst_id.first == CMS_scale_j) | ret;
+    ret = (syst_id.first == CMS_scalePileUpPtHF_j) | ret;
+    ret = (syst_id.first == CMS_scalePileUpPtEC2_j) | ret;
+    ret = (syst_id.first == CMS_scalePileUpPtEC1_j) | ret;
+    ret = (syst_id.first == CMS_scalePileUpPtBB_j) | ret;
+    ret = (syst_id.first == CMS_scalePileUpPtRef_j ) | ret;
+    ret = (syst_id.first == CMS_scalePileUpDataMC_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativeStatHF_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativeStatEC_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativeStatFSR_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativeFSR_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativePtHF_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativePtEC2_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativePtEC1_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativePtBB_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativeJERHF_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativeJEREC2_j) | ret;
+    ret = (syst_id.first == CMS_scaleRelativeJEREC1_j) | ret;
+    ret = (syst_id.first == CMS_scaleTimePtEta_j) | ret;
+    ret = (syst_id.first == CMS_scaleFlavorQCD_j) | ret;
+    ret = (syst_id.first == CMS_scaleSinglePionHCAL_j) | ret;
+    ret = (syst_id.first == CMS_scaleSinglePionECAL_j) | ret;
+    ret = (syst_id.first == CMS_scaleFragmentation_j) | ret;
+    ret = (syst_id.first == CMS_scaleAbsoluteMPFBias_j) | ret;
+    ret = (syst_id.first == CMS_scaleAbsoluteFlavMap_j) | ret;
+    ret = (syst_id.first == CMS_scaleAbsoluteScale_j) | ret;
+    ret = (syst_id.first == CMS_scaleAbsoluteStat_j) | ret;
+    ret = (syst_id.first == CMS_scaleSubTotalPileUp_j) | ret;
+    return ret;
 }
 
 bool Systematic::is_jer(Systematic::SystId syst_id) {
@@ -30,6 +59,13 @@ EventDescription TreeDescriptionMCSystematic<T>::create_event(Systematic::SystId
     event.genTopHad_pt = *genTopHad_pt;
     event.genTopLep_pt = *genTopLep_pt;
     return event;
+}
+
+float recomputeMem(float p0, float p1, float sf=0.1) {
+    if (p0 == 0 && p1 == 0) {
+        return 0.0;
+    }
+    return p0/(p0+sf*p1);
 }
 
 template <typename T>
@@ -72,8 +108,25 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
         event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Down)] = (*btagWeightCSV_CSVlfstats2Down);
 
         event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Down)] = (*puWeightDown);
+    }
 
+    if (Systematic::is_jec(syst_id) || Systematic::is_jer(syst_id)) {
 
+        const auto p0_DL_0w2h2t = this->mem_tth_DL_0w2h2t_var.GetValue(syst_id);
+        const auto p1_DL_0w2h2t = this->mem_ttbb_DL_0w2h2t_var.GetValue(syst_id);
+        event.mem_DL_0w2h2t_p = recomputeMem(p0_DL_0w2h2t, p1_DL_0w2h2t);
+
+        const auto p0_SL_0w2h2t = this->mem_tth_SL_0w2h2t_var.GetValue(syst_id);
+        const auto p1_SL_0w2h2t = this->mem_ttbb_SL_0w2h2t_var.GetValue(syst_id);
+        event.mem_SL_0w2h2t_p = recomputeMem(p0_SL_0w2h2t, p1_SL_0w2h2t);
+
+        const auto p0_SL_1w2h2t = this->mem_tth_SL_1w2h2t_var.GetValue(syst_id);
+        const auto p1_SL_1w2h2t = this->mem_ttbb_SL_1w2h2t_var.GetValue(syst_id);
+        event.mem_SL_1w2h2t_p = recomputeMem(p0_SL_1w2h2t, p1_SL_1w2h2t);
+
+        const auto p0_SL_2w2h2t = this->mem_tth_SL_2w2h2t_var.GetValue(syst_id);
+        const auto p1_SL_2w2h2t = this->mem_ttbb_SL_2w2h2t_var.GetValue(syst_id);
+        event.mem_SL_2w2h2t_p = recomputeMem(p0_SL_2w2h2t, p1_SL_2w2h2t);
     }
     
     event.genTopHad_pt = *genTopHad_pt;

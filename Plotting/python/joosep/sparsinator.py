@@ -188,7 +188,7 @@ def calc_lepton_SF(ev, syst="nominal"):
             w = hist_mu_id.GetBinContent(b)
             LOG_MODULE_NAME.debug("mu ID sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
             if w == 0:
-                LOG_MODULE_NAME.error("mu ID sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+                LOG_MODULE_NAME.debug("mu ID sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
                 w = 1
             if syst == "CMS_effID_mUp":
                 w = w + hist_mu_id.GetBinError(b)
@@ -200,7 +200,7 @@ def calc_lepton_SF(ev, syst="nominal"):
             w = getGraphValue(hist_mu_track, aeta)
             LOG_MODULE_NAME.debug("mu track sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
             if w == 0:
-                LOG_MODULE_NAME.error("mu track sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+                LOG_MODULE_NAME.debug("mu track sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
                 w = 1
             if syst == "CMS_effTracking_mUp":
                 w = getGraphValue(hist_mu_track, aeta, "up")
@@ -212,7 +212,7 @@ def calc_lepton_SF(ev, syst="nominal"):
             w = hist_mu_iso.GetBinContent(b)
             LOG_MODULE_NAME.debug("mu iso sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
             if w == 0:
-                LOG_MODULE_NAME.error("mu iso sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
+                LOG_MODULE_NAME.debug("mu iso sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
                 w = 1
             if syst == "CMS_effIso_mUp":
                 w = w + hist_mu_iso.GetBinError(b)
@@ -228,7 +228,7 @@ def calc_lepton_SF(ev, syst="nominal"):
             b = hist_ele_id.FindBin(abs(ev.leps_superclustereta.at(ilep)), pt)
             w = hist_ele_id.GetBinContent(b)
             if w == 0:
-                LOG_MODULE_NAME.error("ele ID sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
+                LOG_MODULE_NAME.debug("ele ID sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
                 w = 1
             if syst == "CMS_effID_eUp":
                 w = w + hist_ele_id.GetBinError(b)
@@ -240,7 +240,7 @@ def calc_lepton_SF(ev, syst="nominal"):
             b = hist_ele_reco.FindBin(abs(ev.leps_superclustereta.at(ilep)), pt)
             w = hist_ele_reco.GetBinContent(b)
             if w == 0:
-                LOG_MODULE_NAME.error("ele reco sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
+                LOG_MODULE_NAME.debug("ele reco sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
                 w = 1
             if syst == "CMS_effReco_eUp":
                 w = w + hist_ele_reco.GetBinError(b)
@@ -300,6 +300,7 @@ def fillBase(matched_processes, event, syst, schema):
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
                     LOG_MODULE_NAME.error("weight_nominal<=0")
+
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -700,13 +701,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         LOG_MODULE_NAME.info("looping over {0} events".format(events.reader.GetEntries(True)))
        
         iEv = 0
-
+        
         #Loop over events
         while events.reader.Next():
 
             nevents += 1
             iEv += 1
-
+            print(iEv)
             if skip_events > 0 and nevents < skip_events:
                 continue
             if max_events > 0:
@@ -796,14 +797,14 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        sample = "SingleMuon"
+        #sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = 1000000
+        max_events = 10000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]

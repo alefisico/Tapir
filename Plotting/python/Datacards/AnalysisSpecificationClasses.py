@@ -152,7 +152,6 @@ class HistogramOutput:
         if val < self.hist.GetBinLowEdge(1):
             val = self.hist.GetBinLowEdge(1)
         if val >= self.hist.GetBinLowEdge(self.hist.GetNbinsX()+1):
-            print "oveflow", val, self.hist.GetBinLowEdge(self.hist.GetNbinsX())
             val = self.hist.GetBinLowEdge(self.hist.GetNbinsX())
         
         if weight == 1.0:
