@@ -33,7 +33,8 @@ procs = [x[0] for x in procs_names]
 
 syst_pairs = [
     ("__CMS_puUp", "__CMS_puDown"),
-    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
+#    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
+    ("__CMS_scaleFlavorQCD_jUp", "__CMS_scaleFlavorQCD_jDown"),
     ("__CMS_res_jUp", "__CMS_res_jDown"),
     ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
     ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),

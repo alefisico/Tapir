@@ -112,21 +112,10 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
 
     if (Systematic::is_jec(syst_id) || Systematic::is_jer(syst_id)) {
 
-        const auto p0_DL_0w2h2t = this->mem_tth_DL_0w2h2t_var.GetValue(syst_id);
-        const auto p1_DL_0w2h2t = this->mem_ttbb_DL_0w2h2t_var.GetValue(syst_id);
-        event.mem_DL_0w2h2t_p = recomputeMem(p0_DL_0w2h2t, p1_DL_0w2h2t);
-
-        const auto p0_SL_0w2h2t = this->mem_tth_SL_0w2h2t_var.GetValue(syst_id);
-        const auto p1_SL_0w2h2t = this->mem_ttbb_SL_0w2h2t_var.GetValue(syst_id);
-        event.mem_SL_0w2h2t_p = recomputeMem(p0_SL_0w2h2t, p1_SL_0w2h2t);
-
-        const auto p0_SL_1w2h2t = this->mem_tth_SL_1w2h2t_var.GetValue(syst_id);
-        const auto p1_SL_1w2h2t = this->mem_ttbb_SL_1w2h2t_var.GetValue(syst_id);
-        event.mem_SL_1w2h2t_p = recomputeMem(p0_SL_1w2h2t, p1_SL_1w2h2t);
-
-        const auto p0_SL_2w2h2t = this->mem_tth_SL_2w2h2t_var.GetValue(syst_id);
-        const auto p1_SL_2w2h2t = this->mem_ttbb_SL_2w2h2t_var.GetValue(syst_id);
-        event.mem_SL_2w2h2t_p = recomputeMem(p0_SL_2w2h2t, p1_SL_2w2h2t);
+        event.mem_DL_0w2h2t_p = this->mem_DL_0w2h2t_p.GetValue(syst_id);
+        event.mem_SL_0w2h2t_p = this->mem_SL_0w2h2t_p.GetValue(syst_id);
+        event.mem_SL_1w2h2t_p = this->mem_SL_1w2h2t_p.GetValue(syst_id);
+        event.mem_SL_2w2h2t_p = this->mem_SL_2w2h2t_p.GetValue(syst_id);
     }
     
     event.genTopHad_pt = *genTopHad_pt;
@@ -172,6 +161,7 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.mem_SL_1w2h2t_p = *(this->mem_SL_1w2h2t_p);
     event.mem_SL_2w2h2t_p = *(this->mem_SL_2w2h2t_p);
     event.Wmass = *(this->Wmass);
+    event.met_pt = *(this->met_pt);
 
     event.weights[Systematic::syst_id_nominal] = 1.0;
     return event;

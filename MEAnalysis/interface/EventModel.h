@@ -139,66 +139,68 @@ void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& va
     if (add_nominal) {
         values[std::make_pair(Systematic::Nominal, Systematic::None)] = new T(reader, branch_name);
     }
-    std::cout << "making syst for " << branch_name << std::endl;
-    values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_TotalUp")).c_str());
-    values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_JERUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SubTotalPileUpUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteStat_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteStatUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteScale_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteScaleUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteFlavMap_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteFlavMapUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteMPFBias_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteMPFBiasUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleFragmentation_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_FragmentationUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleSinglePionECAL_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionECALUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleSinglePionHCAL_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionHCALUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleFlavorQCD_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_FlavorQCDUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleTimePtEta_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_TimePtEtaUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC1_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC1Up")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC2_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC2Up")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeJERHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJERHFUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtBB_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtBBUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtEC1_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC1Up")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtEC2_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC2Up")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtHFUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeFSR_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeFSRUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeStatFSR_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatFSRUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeStatEC_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatECUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeStatHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatHFUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpDataMC_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpDataMCUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtRef_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtRefUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtBB_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtBBUp")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtEC1_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC1Up")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtEC2_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC2Up")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtHF_j, Systematic::Up)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtHFUp")).c_str());
 
-    values[std::make_pair(Systematic::CMS_scale_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_TotalDown")).c_str());
-    values[std::make_pair(Systematic::CMS_res_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_JERDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_SubTotalPileUpDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteStat_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteStatDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteScale_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteScaleDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteFlavMap_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteFlavMapDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleAbsoluteMPFBias_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_AbsoluteMPFBiasDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleFragmentation_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_FragmentationDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleSinglePionECAL_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionECALDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleSinglePionHCAL_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_SinglePionHCALDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleFlavorQCD_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_FlavorQCDDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleTimePtEta_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_TimePtEtaDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC1_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC1Down")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC2_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJEREC2Down")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeJERHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeJERHFDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtBB_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtBBDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtEC1_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC1Down")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtEC2_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtEC2Down")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativePtHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativePtHFDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeFSR_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeFSRDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeStatFSR_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatFSRDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeStatEC_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatECDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scaleRelativeStatHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_RelativeStatHFDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpDataMC_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpDataMCDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtRef_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtRefDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtBB_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtBBDown")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtEC1_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC1Down")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtEC2_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtEC2Down")).c_str());
-    values[std::make_pair(Systematic::CMS_scalePileUpPtHF_j, Systematic::Down)] = new T(reader, (std::string(branch_name) + std::string("_PileUpPtHFDown")).c_str());
+    const std::string brname(branch_name);
+
+    //values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (brname + std::string("_TotalUp")).c_str());
+    values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (brname + std::string("_JERUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Up)] = new T(reader, (brname + std::string("_SubTotalPileUpUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteStat_j, Systematic::Up)] = new T(reader, (brname + std::string("_AbsoluteStatUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteScale_j, Systematic::Up)] = new T(reader, (brname + std::string("_AbsoluteScaleUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteFlavMap_j, Systematic::Up)] = new T(reader, (brname + std::string("_AbsoluteFlavMapUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteMPFBias_j, Systematic::Up)] = new T(reader, (brname + std::string("_AbsoluteMPFBiasUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleFragmentation_j, Systematic::Up)] = new T(reader, (brname + std::string("_FragmentationUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleSinglePionECAL_j, Systematic::Up)] = new T(reader, (brname + std::string("_SinglePionECALUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleSinglePionHCAL_j, Systematic::Up)] = new T(reader, (brname + std::string("_SinglePionHCALUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleFlavorQCD_j, Systematic::Up)] = new T(reader, (brname + std::string("_FlavorQCDUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleTimePtEta_j, Systematic::Up)] = new T(reader, (brname + std::string("_TimePtEtaUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC1_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativeJEREC1Up")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC2_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativeJEREC2Up")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeJERHF_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativeJERHFUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtBB_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativePtBBUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtEC1_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativePtEC1Up")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtEC2_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativePtEC2Up")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtHF_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativePtHFUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeFSR_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativeFSRUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeStatFSR_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativeStatFSRUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeStatEC_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativeStatECUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeStatHF_j, Systematic::Up)] = new T(reader, (brname + std::string("_RelativeStatHFUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpDataMC_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpDataMCUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtRef_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpPtRefUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtBB_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpPtBBUp")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtEC1_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpPtEC1Up")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtEC2_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpPtEC2Up")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtHF_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpPtHFUp")).c_str());
+
+    //values[std::make_pair(Systematic::CMS_scale_j, Systematic::Down)] = new T(reader, (brname + std::string("_TotalDown")).c_str());
+    values[std::make_pair(Systematic::CMS_res_j, Systematic::Down)] = new T(reader, (brname + std::string("_JERDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Down)] = new T(reader, (brname + std::string("_SubTotalPileUpDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteStat_j, Systematic::Down)] = new T(reader, (brname + std::string("_AbsoluteStatDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteScale_j, Systematic::Down)] = new T(reader, (brname + std::string("_AbsoluteScaleDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteFlavMap_j, Systematic::Down)] = new T(reader, (brname + std::string("_AbsoluteFlavMapDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleAbsoluteMPFBias_j, Systematic::Down)] = new T(reader, (brname + std::string("_AbsoluteMPFBiasDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleFragmentation_j, Systematic::Down)] = new T(reader, (brname + std::string("_FragmentationDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleSinglePionECAL_j, Systematic::Down)] = new T(reader, (brname + std::string("_SinglePionECALDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleSinglePionHCAL_j, Systematic::Down)] = new T(reader, (brname + std::string("_SinglePionHCALDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleFlavorQCD_j, Systematic::Down)] = new T(reader, (brname + std::string("_FlavorQCDDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleTimePtEta_j, Systematic::Down)] = new T(reader, (brname + std::string("_TimePtEtaDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC1_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativeJEREC1Down")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeJEREC2_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativeJEREC2Down")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeJERHF_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativeJERHFDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtBB_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativePtBBDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtEC1_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativePtEC1Down")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtEC2_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativePtEC2Down")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativePtHF_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativePtHFDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeFSR_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativeFSRDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeStatFSR_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativeStatFSRDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeStatEC_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativeStatECDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scaleRelativeStatHF_j, Systematic::Down)] = new T(reader, (brname + std::string("_RelativeStatHFDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpDataMC_j, Systematic::Down)] = new T(reader, (brname + std::string("_PileUpDataMCDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtRef_j, Systematic::Down)] = new T(reader, (brname + std::string("_PileUpPtRefDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtBB_j, Systematic::Down)] = new T(reader, (brname + std::string("_PileUpPtBBDown")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtEC1_j, Systematic::Down)] = new T(reader, (brname + std::string("_PileUpPtEC1Down")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtEC2_j, Systematic::Down)] = new T(reader, (brname + std::string("_PileUpPtEC2Down")).c_str());
+    values[std::make_pair(Systematic::CMS_scalePileUpPtHF_j, Systematic::Down)] = new T(reader, (brname + std::string("_PileUpPtHFDown")).c_str());
 }
 
 template <typename T>
@@ -270,6 +272,7 @@ public:
     double mem_SL_1w2h2t_p;
     double mem_SL_2w2h2t_p;
     double Wmass;
+    double met_pt;
 
     Systematic::SystId syst_id;
     std::map<Systematic::SystId, double> weights;
@@ -321,6 +324,7 @@ public:
     TTreeReaderValue<T> mem_SL_1w2h2t_p;
     TTreeReaderValue<T> mem_SL_2w2h2t_p;
     TTreeReaderValue<T> Wmass;
+    TTreeReaderValue<T> met_pt;
 
     std::map<Systematic::SystId, TTreeReaderArray<T>*> correction_branches;
 
@@ -369,6 +373,7 @@ public:
         mem_SL_1w2h2t_p(reader, "mem_SL_1w2h2t_p"),
         mem_SL_2w2h2t_p(reader, "mem_SL_2w2h2t_p"),
         Wmass(reader, "Wmass"),
+        met_pt(reader, "met_pt"),
         sample(sample) {
     }
     virtual ~TreeDescription() {}
@@ -415,17 +420,10 @@ public:
     TTreeReaderArray<T> jets_corr_JEC;
     TTreeReaderArray<T> jets_corr_JER;
 
-    TTreeReaderValueSystematic<T> mem_tth_DL_0w2h2t_var;
-    TTreeReaderValueSystematic<T> mem_ttbb_DL_0w2h2t_var;
-
-    TTreeReaderValueSystematic<T> mem_tth_SL_0w2h2t_var;
-    TTreeReaderValueSystematic<T> mem_ttbb_SL_0w2h2t_var;
-
-    TTreeReaderValueSystematic<T> mem_tth_SL_1w2h2t_var;
-    TTreeReaderValueSystematic<T> mem_ttbb_SL_1w2h2t_var;
-
-    TTreeReaderValueSystematic<T> mem_tth_SL_2w2h2t_var;
-    TTreeReaderValueSystematic<T> mem_ttbb_SL_2w2h2t_var;
+    TTreeReaderValueSystematic<T> mem_DL_0w2h2t_p;
+    TTreeReaderValueSystematic<T> mem_SL_0w2h2t_p;
+    TTreeReaderValueSystematic<T> mem_SL_1w2h2t_p;
+    TTreeReaderValueSystematic<T> mem_SL_2w2h2t_p;
 
     TTreeReaderValue<T> puWeight;
     TTreeReaderValue<T> puWeightUp;
@@ -466,17 +464,10 @@ public:
         jets_corr_JEC(TreeDescription<T>::reader, "jets_corr_JEC"),
         jets_corr_JER(TreeDescription<T>::reader, "jets_corr_JER"),
 
-        mem_tth_DL_0w2h2t_var(TreeDescription<T>::reader, "mem_tth_DL_0w2h2t_var", false),
-        mem_ttbb_DL_0w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_DL_0w2h2t_var", false),
-
-        mem_tth_SL_0w2h2t_var(TreeDescription<T>::reader, "mem_tth_SL_0w2h2t_var", false),
-        mem_ttbb_SL_0w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_SL_0w2h2t_var", false),
-
-        mem_tth_SL_1w2h2t_var(TreeDescription<T>::reader, "mem_tth_SL_1w2h2t_var", false),
-        mem_ttbb_SL_1w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_SL_1w2h2t_var", false),
-
-        mem_tth_SL_2w2h2t_var(TreeDescription<T>::reader, "mem_tth_SL_2w2h2t_var", false),
-        mem_ttbb_SL_2w2h2t_var(TreeDescription<T>::reader, "mem_ttbb_SL_2w2h2t_var", false),
+        mem_DL_0w2h2t_p(TreeDescription<T>::reader, "mem_DL_0w2h2t_p"),
+        mem_SL_0w2h2t_p(TreeDescription<T>::reader, "mem_SL_0w2h2t_p"),
+        mem_SL_1w2h2t_p(TreeDescription<T>::reader, "mem_SL_1w2h2t_p"),
+        mem_SL_2w2h2t_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_p"),
 
         puWeight(TreeDescription<T>::reader, "puWeight"),
         puWeightUp(TreeDescription<T>::reader, "puWeightUp"),

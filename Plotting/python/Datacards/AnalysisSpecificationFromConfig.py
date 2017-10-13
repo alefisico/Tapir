@@ -215,7 +215,6 @@ def analysisFromConfig(config_file_path):
 
             #Add any additional category-dependent scale uncertainties
             if config.has_option(category_name, "additional_scale_uncertainties"):
-                print config.get(category_name, "additional_scale_uncertainties").strip().split("\n")
                 for line in config.get(category_name, "additional_scale_uncertainties").strip().split("\n"):
                     name, process_pattern, uncert = line.split()
                     matching_procs = [proc for proc in unique_output_processes if fnmatch.fnmatch(proc, process_pattern)]

@@ -39,7 +39,7 @@ syst_pairs = OrderedDict([
         getattr(ROOT.TTH_MEAnalysis.Systematic, d if d != "" else "None")
     ))
     for x in [
-        "CMS_scale_j",
+        #"CMS_scale_j",
         "CMS_res_j",
         "CMS_scaleSubTotalPileUp_j",
         "CMS_scaleAbsoluteStat_j",
@@ -707,7 +707,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
             nevents += 1
             iEv += 1
-            print(iEv)
             if skip_events > 0 and nevents < skip_events:
                 continue
             if max_events > 0:
@@ -721,9 +720,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if nevents % 100 == 0:
                 LOG_MODULE_NAME.info("processed {0} events".format(nevents))
 
-            # #apply some basic preselection that does not depend on jet systematics
-            # if not (event.is_sl or event.is_dl):
-            #     continue
+            #apply some basic preselection that does not depend on jet systematics
+            if not (events.is_sl or events.is_dl):
+                continue
 
             #Loop over systematics that transform the event
             for iSyst, syst in enumerate(systematics_event):
@@ -739,6 +738,17 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #make sure data event is in golden JSON
                 if schema == "data" and not event.json:
                     continue
+           
+                #dilepton specific cuts
+                if event.is_dl:
+                    mll = (event.leptons.at(0).lv + event.leptons.at(1).lv).M()
+                    #drell-yan
+                    if mll < 20:
+                        continue
+                    #same flavour
+                    if abs(event.leptons.at(0).pdgId) == abs(event.leptons.at(1).pdgId):
+                        if event.met_pt <= 40 or abs(mll - 91) < 15:
+                            continue
 
                 fillBase(matched_processes, event, syst, schema)
                 #Fill the base histogram
@@ -797,11 +807,11 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        #sample = "SingleMuon"
+        sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
         max_events = 10000
