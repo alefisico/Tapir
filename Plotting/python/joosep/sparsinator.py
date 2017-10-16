@@ -738,9 +738,13 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #make sure data event is in golden JSON
                 if schema == "data" and not event.json:
                     continue
-           
+                 
+                #SL specific MET cut
+                if event.is_sl:
+                    if event.met_pt <= 20:
+                        continue
                 #dilepton specific cuts
-                if event.is_dl:
+                elif event.is_dl:
                     mll = (event.leptons.at(0).lv + event.leptons.at(1).lv).M()
                     #drell-yan
                     if mll < 20:

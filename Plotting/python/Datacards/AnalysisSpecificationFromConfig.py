@@ -211,7 +211,7 @@ def analysisFromConfig(config_file_path):
             for process, name_uncert in config.items(scale_name):
                 scale_uncertainties[process] = {}
                 for name, uncert in pairwise(name_uncert.split()):
-                    scale_uncertainties[process][name] = float(uncert)
+                    scale_uncertainties[process][name] = uncert
 
             #Add any additional category-dependent scale uncertainties
             if config.has_option(category_name, "additional_scale_uncertainties"):

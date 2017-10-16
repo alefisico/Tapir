@@ -84,7 +84,7 @@ def make_datacard(analysis, categories, outdir, hdict):
             tf.Close()
             
             #add the statistical uncertainties to the datacard specification
-            for proc in cat.out_processes:
+            for proc in cat.out_processes_mc:
                 for syst in stathist_names[cat.full_name][proc]:
                     cat.shape_uncertainties[proc][syst] = 1.0
     

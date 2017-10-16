@@ -73,7 +73,7 @@ class MEMConfig:
     def configure_minimize(self, orig_mem):
         self.cfg.do_minimize = 1
 
-    def configure_sudakov(self, orig_mem):
+    def configure_sudakov(self, orig_mem=None):
         self.cfg.int_code |= MEM.IntegrandType.Sudakov
         njets = 6
         if "dl" in orig_mem.mem_assumptions:

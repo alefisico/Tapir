@@ -672,7 +672,7 @@ class TaskLimits(Task):
                         self.analysis,
                         group
                     ],
-                    timeout = 5*60*60,
+                    timeout = 10*60*60,
                     ttl = -1,
                     result_ttl = -1,
                     meta = {"retries": 0, "args": ""})]
@@ -727,7 +727,12 @@ class TaskTables(Task):
                         #Find the uncertainties from simple normalization variations
                     if proc in cat.scale_uncertainties.keys():
                         for syst in cat.scale_uncertainties[proc].keys():
-                            syst_yield_diff[syst] = (cat.scale_uncertainties[proc][syst] - 1.0) * ih 
+                            sc = cat.scale_uncertainties[proc][syst]
+
+                            #if uncertainty is a simple number, instead of a up/down variation
+                            if isinstance(sc, float):
+                                syst_yield_diff[syst] = (cat.scale_uncertainties[proc][syst] - 1.0) * ih
+
                     logging.getLogger('launcher').debug("syst {0}".format(syst_yield_diff))
                     tot_yield_diff = math.sqrt(sum([x**2 for x in syst_yield_diff.values()]))
                     of.write(";".join([

@@ -109,31 +109,28 @@ def makeStatVariations(tf, of, categories):
     bin-by-bin variations for the given categories.
     """
     ret = {}
+    tf.cd()
     for cat in categories:
-        ret[cat.name] = {}
+        ret[cat.full_name] = {}
         for proc in cat.out_processes_mc:
-            ret[cat.name][proc] = []
-            hn = "{0}/{1}/{2}".format(proc, cat.name, cat.discriminator)
+            ret[cat.full_name][proc] = []
+            hn = "{0}__{1}__{2}".format(proc, cat.name, cat.discriminator.name)
             h = tf.Get(hn)
             h = h.Clone()
-            outdir = "{0}/{1}".format(proc, cat.name)
-            if of.Get(outdir) == None:
-                of.mkdir(outdir)
-            outdir = of.Get(outdir)
             for ibin in range(1, h.GetNbinsX() + 1):
-                systname = "{0}_{1}_Bin{2}".format(proc, cat.name, ibin)
-                ret[cat.name][proc] += [systname]
+                systname = "CMS_ttH_{0}_{1}_Bin{2}".format(proc, cat.full_name, ibin)
+                ret[cat.full_name][proc] += [systname]
                 for sigma, sdir in [(+1, "Up"), (-1, "Down")]:
-                    outdir.cd()
-                    systname_sdir = h.GetName() + "_" + systname + sdir
+                    systname_sdir = proc + "__" + cat.full_name + "__" + systname + sdir
                     hvar = h.Clone(systname_sdir)
                     delta = hvar.GetBinError(ibin)
                     c = hvar.GetBinContent(ibin) + sigma*delta
                     if c <= 10**-5 and h.Integral() > 0:
                         c = 10**-5
                     hvar.SetBinContent(ibin, c)
-                    outdir.Add(hvar)
+                    #tf.Add(hvar)
                     hvar.Write("", ROOT.TObject.kOverwrite)
+    #tf.Write()
     return ret
 #end of makeStatVariations
 
