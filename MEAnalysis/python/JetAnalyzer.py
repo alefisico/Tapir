@@ -132,13 +132,13 @@ class JetAnalyzer(FilterAnalyzer):
             eta_cut = "eta_dl"
         
         #define lepton-channel specific selection function
-        jetsel = lambda x, self=self: (
+        jetsel = lambda x, self=self, pt_cut=pt_cut, eta_cut=eta_cut: (
             x.pt > self.conf.jets[pt_cut]
             and abs(x.eta) < self.conf.jets[eta_cut]
             and self.conf.jets["selection"](x)
         )
         
-        jetsel_loose_pt = lambda x, self=self: (
+        jetsel_loose_pt = lambda x, self=self, pt_cut=pt_cut, eta_cut=eta_cut: (
             x.pt > 20
             and abs(x.eta) < self.conf.jets[eta_cut]
             and self.conf.jets["selection"](x)
@@ -146,7 +146,7 @@ class JetAnalyzer(FilterAnalyzer):
 
         #Identify loose jets by (pt, eta)
         loose_jets = sorted(filter(
-            jetsel_loose_pt, event.injets 
+            jetsel_loose_pt, event.injets
             ), key=lambda x: x.pt, reverse=True
         )
 

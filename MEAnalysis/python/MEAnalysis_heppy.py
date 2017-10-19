@@ -352,6 +352,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf,
         counter_name = "_final",
     )
+    import TTH.MEAnalysis.metree
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
 

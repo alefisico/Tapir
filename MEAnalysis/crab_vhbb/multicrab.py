@@ -25,7 +25,9 @@ workflows = [
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
     "testing_hadronic_withme", #single-lumi jobs, a few samples
-    "memcheck" #specific MEM jobs that contain lots of hypotheses for validation
+    "memcheck", #specific MEM jobs that contain lots of hypotheses for validation, many interpretations
+    "memcheck2", #specific MEM jobs that contain lots of hypotheses for validation, JES variations
+    #"memcheck3", #Sudakov/Recoil
 ]
 
 import argparse
@@ -43,7 +45,8 @@ me_cfgs = {
     "nome": "cfg_noME.py",
     "leptonic": "cfg_leptonic.py",
     "hadronic": "cfg_FH.py",
-    "memcheck": "cfg_memcheck.py"
+    "memcheck": "cfg_memcheck.py",
+    "memcheck2": "cfg_memcheck2.py"
 }
 
 sets_data = [
@@ -629,29 +632,29 @@ for k in [
         #"TTbar_fsr_up1",
         #"TTbar_fsr_up2",
         #"TTbar_fsr_down",
-        "TTbar_tune_up1",
-        "TTbar_tune_up2",
-        "TTbar_tune_down1",
-        "TTbar_tune_down2",
-        "TTbar_hdamp_up1",
-        "TTbar_hdamp_up2",
-        "TTbar_hdamp_down1",
-        "TTbar_hdamp_down2",
+        #"TTbar_tune_up1",
+        #"TTbar_tune_up2",
+        #"TTbar_tune_down1",
+        #"TTbar_tune_down2",
+        #"TTbar_hdamp_up1",
+        #"TTbar_hdamp_up2",
+        #"TTbar_hdamp_down1",
+        #"TTbar_hdamp_down2",
         #"TTbar_sl",
         #"TTbar_dl",
-        #"ww1", "ww2",
-        #"wz1", "wz2",
-        #"zz1", "zz2",
-        #"st_t", "stbar_t",
-        #"st_tw", "stbar_tw",
-        #"st_s",
-        #"ttw_wlnu1",
-        #"ttw_wlnu2",
-        #"ttz_zllnunu1",
-        #"ttz_zllnunu2",
-        #"ttw_wqq",
-        #"ttz_zqq",
-        #"wjets", "dy_50_inf1", "dy_50_inf2", "dy_10_50"
+        "ww1", "ww2",
+        "wz1", "wz2",
+        "zz1", "zz2",
+        "st_t", "stbar_t",
+        "st_tw", "stbar_tw",
+        "st_s",
+        "ttw_wlnu1",
+        "ttw_wlnu2",
+        "ttz_zllnunu1",
+        "ttz_zllnunu2",
+        "ttw_wqq",
+        "ttz_zqq",
+        "wjets", "dy_50_inf1", "dy_50_inf2", "dy_10_50"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -670,6 +673,14 @@ for k in [
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_memcheck.py"
     workflow_datasets["memcheck"][k] = D
+
+workflow_datasets["memcheck2"] = {}
+for k in [
+        "ttHTobb",
+    ]:
+    D = deepcopy(datasets[k])
+    D["mem_cfg"] = "cfg_memcheck2.py"
+    workflow_datasets["memcheck2"][k] = D
 
 workflow_datasets["signal"] = {}
 for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
@@ -949,7 +960,7 @@ env
     config.Data.allowNonValidInputDataset = True
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-    #config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin", "T2_US_Vanderbilt"]
+    config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
 
     config.Site.storageSite = "T3_CH_PSI"
 

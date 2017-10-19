@@ -21,10 +21,22 @@ def fillCoreVariables(self, tr, event, isMC):
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
 from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
-from VHbbAnalysis.Heppy.btagSF import systematicsCSV, systematicsCMVAV2
+#from VHbbAnalysis.Heppy.btagSF import systematicsCSV, systematicsCMVAV2
+systematicsCSV = [
+    "central",
+    "up_jes", "down_jes",
+    "up_lf", "down_lf",
+    "up_hf", "down_hf",
+    "up_hfstats1", "down_hfstats1",
+    "up_hfstats2", "down_hfstats2",
+    "up_lfstats1", "down_lfstats1",
+    "up_lfstats2", "down_lfstats2",
+    "up_cferr1", "down_cferr1",
+    "up_cferr2", "down_cferr2"
+]
 #recompute b-tag weights
 btag_weights = {}
-for algo, systematics in [("CSV", systematicsCSV), ("CMVAV2", systematicsCMVAV2)]:
+for algo, systematics in [("CSV", systematicsCSV), ]:
     for syst in systematics:
         syst_name = "" if syst=="central" else ("_"+syst) 
         btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
@@ -66,6 +78,11 @@ p4type = NTupleObjectType("p4Type", variables = [
     NTupleVariable("eta", lambda x : x.Eta()),
     NTupleVariable("phi", lambda x : x.Phi()),
     NTupleVariable("mass", lambda x : x.M()),
+])
+
+LHE_weights_type = NTupleObjectType("LHE_type", variables = [
+    NTupleVariable("id", lambda x : x.id),
+    NTupleVariable("wgt", lambda x : x.wgt),
 ])
 
 #Specifies what to save for leptons
@@ -130,7 +147,6 @@ quarkType = NTupleObjectType("quarkType", variables = [
     NTupleVariable("id", lambda x : x.pdgId),
 ])
 
-
 def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
     name = vtype[0]
     typ = vtype[1]
@@ -151,182 +167,6 @@ def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
     return NTupleVariable(
         name + syst_suffix, func, the_type=typ, help=hlp, mcOnly=mcOnly
     )
-
-topCandidateType = NTupleObjectType("topCandidateType", variables = [
-    NTupleVariable("fRec", lambda x: x.fRec ),
-    NTupleVariable("Ropt", lambda x: x.Ropt ),
-    NTupleVariable("RoptCalc", lambda x: x.RoptCalc ),
-    NTupleVariable("ptForRoptCalc", lambda x: x.ptForRoptCalc ),
-    NTupleVariable("pt", lambda x: x.pt ),
-    NTupleVariable("ptcal", lambda x: x.ptcal ),
-    NTupleVariable("eta", lambda x: x.eta ),
-    NTupleVariable("etacal", lambda x: x.etacal ),
-    NTupleVariable("phi", lambda x: x.phi ),
-    NTupleVariable("phical", lambda x: x.phical ),
-    NTupleVariable("mass", lambda x: x.mass ),
-    NTupleVariable("masscal", lambda x: x.masscal ),
-    NTupleVariable("sjW1pt", lambda x: x.sjW1pt ),
-    NTupleVariable("sjW1ptcal", lambda x: x.sjW1ptcal ),
-    NTupleVariable("sjW1eta", lambda x: x.sjW1eta ),
-    NTupleVariable("sjW1phi", lambda x: x.sjW1phi ),
-    NTupleVariable("sjW1mass", lambda x: x.sjW1mass ),
-    NTupleVariable("sjW1masscal", lambda x: x.sjW1masscal ),
-    NTupleVariable("sjW1btag", lambda x: x.sjW1btag ),
-    NTupleVariable("sjW2pt", lambda x: x.sjW2pt ),
-    NTupleVariable("sjW2ptcal", lambda x: x.sjW2ptcal ),
-    NTupleVariable("sjW2eta", lambda x: x.sjW2eta ),
-    NTupleVariable("sjW2phi", lambda x: x.sjW2phi ),
-    NTupleVariable("sjW2mass", lambda x: x.sjW2mass ),
-    NTupleVariable("sjW2masscal", lambda x: x.sjW2masscal ),
-    NTupleVariable("sjW2btag", lambda x: x.sjW2btag ),
-    NTupleVariable("sjNonWpt", lambda x: x.sjNonWpt ),
-    NTupleVariable("sjNonWptcal", lambda x: x.sjNonWptcal ),
-    NTupleVariable("sjNonWeta", lambda x: x.sjNonWeta ),
-    NTupleVariable("sjNonWphi", lambda x: x.sjNonWphi ),
-    NTupleVariable("sjNonWmass", lambda x: x.sjNonWmass ),
-    NTupleVariable("sjNonWmasscal", lambda x: x.sjNonWmasscal ),
-    NTupleVariable("sjNonWbtag", lambda x: x.sjNonWbtag ),
-    NTupleVariable("tau1", lambda x: x.tau1 ),   # Copied from matched fat jet
-    NTupleVariable("tau2", lambda x: x.tau2 ),   # Copied from matched fat jet
-    NTupleVariable("tau3", lambda x: x.tau3 ),   # Copied from matched fat jet
-    NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
-    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ), # Calculated
-    NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
-    NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
-    NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
-    #NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), the_type=int, help="Index of the matched genTopHad" ),
-])
-
-higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
-    NTupleVariable("pt", lambda x: x.pt ),
-    NTupleVariable("eta", lambda x: x.eta ),
-    NTupleVariable("phi", lambda x: x.phi ),
-    NTupleVariable("mass", lambda x: x.mass ),
-    NTupleVariable("tau1", lambda x: x.tau1 ),
-    NTupleVariable("tau2", lambda x: x.tau2 ),
-    NTupleVariable("tau3", lambda x: x.tau3 ),
-    NTupleVariable("bbtag", lambda x: x.bbtag ),
-
-    NTupleVariable("nallsubjets_softdrop", lambda x: x.nallsubjets_softdrop ),
-    NTupleVariable("nallsubjets_softdropz2b1", lambda x: x.nallsubjets_softdropz2b1 ),
-    NTupleVariable("nallsubjets_softdropfilt", lambda x: x.nallsubjets_softdropfilt ),
-    NTupleVariable("nallsubjets_softdropz2b1filt", lambda x: x.nallsubjets_softdropz2b1filt ),
-    NTupleVariable("nallsubjets_pruned", lambda x: x.nallsubjets_pruned ),
-    NTupleVariable("nallsubjets_subjetfiltered", lambda x: x.nallsubjets_subjetfiltered ),
-
-    NTupleVariable("sj1pt_softdrop",   lambda x: x.sj1pt_softdrop ),
-    NTupleVariable("sj1eta_softdrop",  lambda x: x.sj1eta_softdrop ),
-    NTupleVariable("sj1phi_softdrop",  lambda x: x.sj1phi_softdrop ),
-    NTupleVariable("sj1mass_softdrop", lambda x: x.sj1mass_softdrop ),
-    NTupleVariable("sj1btag_softdrop", lambda x: x.sj1btag_softdrop ),
-    NTupleVariable("sj2pt_softdrop",   lambda x: x.sj2pt_softdrop ),
-    NTupleVariable("sj2eta_softdrop",  lambda x: x.sj2eta_softdrop ),
-    NTupleVariable("sj2phi_softdrop",  lambda x: x.sj2phi_softdrop ),
-    NTupleVariable("sj2mass_softdrop", lambda x: x.sj2mass_softdrop ),
-    NTupleVariable("sj2btag_softdrop", lambda x: x.sj2btag_softdrop ),
-
-    NTupleVariable("sj1pt_softdropz2b1",   lambda x: x.sj1pt_softdropz2b1 ),
-    NTupleVariable("sj1eta_softdropz2b1",  lambda x: x.sj1eta_softdropz2b1 ),
-    NTupleVariable("sj1phi_softdropz2b1",  lambda x: x.sj1phi_softdropz2b1 ),
-    NTupleVariable("sj1mass_softdropz2b1", lambda x: x.sj1mass_softdropz2b1 ),
-    NTupleVariable("sj1btag_softdropz2b1", lambda x: x.sj1btag_softdropz2b1 ),
-    NTupleVariable("sj2pt_softdropz2b1",   lambda x: x.sj2pt_softdropz2b1 ),
-    NTupleVariable("sj2eta_softdropz2b1",  lambda x: x.sj2eta_softdropz2b1 ),
-    NTupleVariable("sj2phi_softdropz2b1",  lambda x: x.sj2phi_softdropz2b1 ),
-    NTupleVariable("sj2mass_softdropz2b1", lambda x: x.sj2mass_softdropz2b1 ),
-    NTupleVariable("sj2btag_softdropz2b1", lambda x: x.sj2btag_softdropz2b1 ),
-
-    NTupleVariable("sj1pt_softdropfilt",   lambda x: x.sj1pt_softdropfilt ),
-    NTupleVariable("sj1eta_softdropfilt",  lambda x: x.sj1eta_softdropfilt ),
-    NTupleVariable("sj1phi_softdropfilt",  lambda x: x.sj1phi_softdropfilt ),
-    NTupleVariable("sj1mass_softdropfilt", lambda x: x.sj1mass_softdropfilt ),
-    NTupleVariable("sj1btag_softdropfilt", lambda x: x.sj1btag_softdropfilt ),
-    NTupleVariable("sj2pt_softdropfilt",   lambda x: x.sj2pt_softdropfilt ),
-    NTupleVariable("sj2eta_softdropfilt",  lambda x: x.sj2eta_softdropfilt ),
-    NTupleVariable("sj2phi_softdropfilt",  lambda x: x.sj2phi_softdropfilt ),
-    NTupleVariable("sj2mass_softdropfilt", lambda x: x.sj2mass_softdropfilt ),
-    NTupleVariable("sj2btag_softdropfilt", lambda x: x.sj2btag_softdropfilt ),
-
-    NTupleVariable("sj1pt_softdropz2b1filt",   lambda x: x.sj1pt_softdropz2b1filt ),
-    NTupleVariable("sj1eta_softdropz2b1filt",  lambda x: x.sj1eta_softdropz2b1filt ),
-    NTupleVariable("sj1phi_softdropz2b1filt",  lambda x: x.sj1phi_softdropz2b1filt ),
-    NTupleVariable("sj1mass_softdropz2b1filt", lambda x: x.sj1mass_softdropz2b1filt ),
-    NTupleVariable("sj1btag_softdropz2b1filt", lambda x: x.sj1btag_softdropz2b1filt ),
-    NTupleVariable("sj2pt_softdropz2b1filt",   lambda x: x.sj2pt_softdropz2b1filt ),
-    NTupleVariable("sj2eta_softdropz2b1filt",  lambda x: x.sj2eta_softdropz2b1filt ),
-    NTupleVariable("sj2phi_softdropz2b1filt",  lambda x: x.sj2phi_softdropz2b1filt ),
-    NTupleVariable("sj2mass_softdropz2b1filt", lambda x: x.sj2mass_softdropz2b1filt ),
-    NTupleVariable("sj2btag_softdropz2b1filt", lambda x: x.sj2btag_softdropz2b1filt ),
-
-    NTupleVariable("sj1pt_pruned",   lambda x: x.sj1pt_pruned ),
-    NTupleVariable("sj1eta_pruned",  lambda x: x.sj1eta_pruned ),
-    NTupleVariable("sj1phi_pruned",  lambda x: x.sj1phi_pruned ),
-    NTupleVariable("sj1mass_pruned", lambda x: x.sj1mass_pruned ),
-    NTupleVariable("sj1btag_pruned", lambda x: x.sj1btag_pruned ),
-    NTupleVariable("sj2pt_pruned",   lambda x: x.sj2pt_pruned ),
-    NTupleVariable("sj2eta_pruned",  lambda x: x.sj2eta_pruned ),
-    NTupleVariable("sj2phi_pruned",  lambda x: x.sj2phi_pruned ),
-    NTupleVariable("sj2mass_pruned", lambda x: x.sj2mass_pruned ),
-    NTupleVariable("sj2btag_pruned", lambda x: x.sj2btag_pruned ),
-
-    NTupleVariable("sj1pt_subjetfiltered",   lambda x: x.sj1pt_subjetfiltered ),
-    NTupleVariable("sj1eta_subjetfiltered",  lambda x: x.sj1eta_subjetfiltered ),
-    NTupleVariable("sj1phi_subjetfiltered",  lambda x: x.sj1phi_subjetfiltered ),
-    NTupleVariable("sj1mass_subjetfiltered", lambda x: x.sj1mass_subjetfiltered ),
-    NTupleVariable("sj1btag_subjetfiltered", lambda x: x.sj1btag_subjetfiltered ),
-    NTupleVariable("sj2pt_subjetfiltered",   lambda x: x.sj2pt_subjetfiltered ),
-    NTupleVariable("sj2eta_subjetfiltered",  lambda x: x.sj2eta_subjetfiltered ),
-    NTupleVariable("sj2phi_subjetfiltered",  lambda x: x.sj2phi_subjetfiltered ),
-    NTupleVariable("sj2mass_subjetfiltered", lambda x: x.sj2mass_subjetfiltered ),
-    NTupleVariable("sj2btag_subjetfiltered", lambda x: x.sj2btag_subjetfiltered ),
-    NTupleVariable("sj12masspt_subjetfiltered", lambda x: x.sj12masspt_subjetfiltered ), # take leading two pt subjets for mass
-    NTupleVariable("sj12massb_subjetfiltered", lambda x: x.sj12massb_subjetfiltered ), # take leading two bjet from leading three pt subjets
-    NTupleVariable("sj123masspt_subjetfiltered", lambda x: x.sj123masspt_subjetfiltered ), # take leading three pt subjets for mass
-    NTupleVariable("secondbtag_subjetfiltered", lambda x: x.secondbtag_subjetfiltered ), 
-
-    NTupleVariable("sj3pt_subjetfiltered",   lambda x: x.sj3pt_subjetfiltered ),
-    NTupleVariable("sj3eta_subjetfiltered",  lambda x: x.sj3eta_subjetfiltered ),
-    NTupleVariable("sj3phi_subjetfiltered",  lambda x: x.sj3phi_subjetfiltered ),
-    NTupleVariable("sj3mass_subjetfiltered", lambda x: x.sj3mass_subjetfiltered ),
-    NTupleVariable("sj3btag_subjetfiltered", lambda x: x.sj3btag_subjetfiltered ),
-
-    NTupleVariable("mass_softdrop", lambda x: x.mass_softdrop, help="mass of the matched softdrop jet" ),
-    NTupleVariable("mass_softdropz2b1", lambda x: x.mass_softdropz2b1, help="mass of the matched softdropz2b1 jet" ),
-
-    NTupleVariable("mass_softdropfilt", lambda x: x.mass_softdropfilt, help="mass of the matched softdropfilt jet" ),
-    NTupleVariable("mass_softdropz2b1filt", lambda x: x.mass_softdropz2b1filt, help="mass of the matched softdropz2b1filt jet" ),
-    NTupleVariable("mass_pruned", lambda x: x.mass_pruned, help="mass of the matched pruned jet" ),
-    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
-    NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
-    NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
-    NTupleVariable("dr_genTop", lambda x: getattr(x, "dr_genTop", -1), help="deltaR to closest gen top"),
-])
-
-FatjetCA15ungroomedType = NTupleObjectType("FatjetCA15ungroomedType", variables = [
-    NTupleVariable("pt", lambda x: x.pt ),
-    NTupleVariable("eta", lambda x: x.eta ),
-    NTupleVariable("phi", lambda x: x.phi ),
-    NTupleVariable("mass", lambda x: x.mass ),
-    NTupleVariable("tau1", lambda x: x.tau1 ),
-    NTupleVariable("tau2", lambda x: x.tau2 ),
-    NTupleVariable("tau3", lambda x: x.tau3 ),
-    NTupleVariable("bbtag", lambda x: x.bbtag ),
-])
-
-FatjetCA15prunedType = NTupleObjectType("FatjetCA15prunedType", variables = [
-    NTupleVariable("pt", lambda x: x.pt ),
-    NTupleVariable("eta", lambda x: x.eta ),
-    NTupleVariable("phi", lambda x: x.phi ),
-    NTupleVariable("mass", lambda x: x.mass ),
-])
-
-SubjetCA15prunedType = NTupleObjectType("SubjetCA15prunedType", variables = [
-    NTupleVariable("pt", lambda x: x.pt ),
-    NTupleVariable("eta", lambda x: x.eta ),
-    NTupleVariable("phi", lambda x: x.phi ),
-    NTupleVariable("mass", lambda x: x.mass ),
-    NTupleVariable("btag", lambda x: x.btag ),
-])
 
 def getTreeProducer(conf):
     factorized_dw_vars = [
@@ -399,6 +239,7 @@ def getTreeProducer(conf):
         NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
         NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        NTupleVariable("puId", lambda x : x.puId),
     ] + corrs)
 
     #Create the output TTree writer
@@ -521,6 +362,8 @@ def getTreeProducer(conf):
             "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson", mcOnly=True),
             "genTopLep" : NTupleCollection("genTopLep", genTopType, 2, help="Generated top quark (leptonic)", mcOnly=True),
             "genTopHad" : NTupleCollection("genTopHad", genTopType, 2, help="Generated top quark (hadronic)", mcOnly=True),
+            "LHE_weights_scale" : NTupleCollection("LHE_weights_scale", LHE_weights_type, 6, help="LHE weights scale", mcOnly=True),
+            "LHE_weights_pdf" : NTupleCollection("LHE_weights_pdf", LHE_weights_type, 102, help="LHE weights pdf", mcOnly=True),
 
             #"FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 16, help="Selected resolved jets, pt ordered"),

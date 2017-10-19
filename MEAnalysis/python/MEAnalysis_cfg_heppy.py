@@ -9,7 +9,9 @@ import VHbbAnalysis.Heppy.TriggerTable as trig
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID
     #Look in Heppy autophobj.py and Jet.py
-    return (jet.id >= 1)
+    return (
+        jet.id >= 1 and jet.puId >= 4
+    )
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
@@ -347,7 +349,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
         "n_integration_points_mult": 1.0,
         "factorized_sources": factorizedJetCorrections,
         #compute MEM variations for these sources in the nominal case
