@@ -324,6 +324,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
+
+    gentth_pre = cfg.Analyzer(
+        MECoreAnalyzers.GenTTHAnalyzerPre,
+        'gentth_pre',
+        _conf = python_conf
+    )
+
     gentth = cfg.Analyzer(
         MECoreAnalyzers.GenTTHAnalyzer,
         'gentth',
@@ -364,6 +371,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         evtid_filter,
         prefilter,
         evs,
+        gentth_pre,
         pvana,
         trigger,
         counter_trg,

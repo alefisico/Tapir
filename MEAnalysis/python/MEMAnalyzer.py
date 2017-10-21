@@ -75,23 +75,23 @@ class MECategoryAnalyzer(FilterAnalyzer):
             len(event.selected_btagged_jets_high) >= 4
         )
         
-        if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh and event.systematic == "nominal": #DS
-            print "event considered:",
-            if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
-                print "4b_SR",
-            if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and 
-                event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
-                print "3b_SR",
-            if (event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_excl"] and 
-                event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and 
-                event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
-                print "4b_CR",
-            if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and 
-                event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
-                print "3b_CR",
-            if (len(event.selected_btagged_jets_high)<3):
-                print "2b_event",
-            print
+        # printouts by DS
+        # if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh and event.systematic == "nominal": #DS
+        #     if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
+        #         print "4b_SR",
+        #     if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and 
+        #         event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
+        #         print "3b_SR",
+        #     if (event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_excl"] and 
+        #         event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and 
+        #         event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+        #         print "4b_CR",
+        #     if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and 
+        #         event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+        #         print "3b_CR",
+        #     if (len(event.selected_btagged_jets_high)<3):
+        #         print "2b_event",
+        #     print
 
         #Here we define if an event was of high-btag multiplicity
         cat_btag = "NOCAT"

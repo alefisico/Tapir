@@ -51,6 +51,13 @@ def make_datacard(analysis, categories, outdir, hdict):
                 ))
                 hdict_cat[cat.full_name][syst_key] = hdict[syst_key]
 
+        #Remove processes that don't have any prediction
+        good_procs = []
+        for proc in cat.out_processes_mc:
+            if event_counts[cat.full_name][proc] > 0.0:
+                good_procs += [proc]
+        cat.out_processes_mc = good_procs
+
     #catname -> file name
     category_files = {}
 
@@ -72,6 +79,15 @@ def make_datacard(analysis, categories, outdir, hdict):
             tf = ROOT.TFile(hfile, "UPDATE")
             fakeData(tf, tf, [cat])
             tf.Close()
+    else:
+        for cat in categories:
+            tf = ROOT.TFile(category_files[cat.full_name], "UPDATE")
+            h = tf.Get("data__" + cat.full_name)
+            print h
+            h2 = h.Clone("data_obs__" + cat.full_name)
+            tf.Write()
+            tf.Close()
+
 
     #add the stat variations
     if analysis.do_stat_variations:
@@ -137,8 +153,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     analysis = analysisFromConfig(args.config)
     
+    import pdb
+    pdb.set_trace()
+    
     categories = [
-        c for c in analysis.categories if fnmatch.fnmatch(c.full_name, args.category)
+        c for c in analysis.groups if fnmatch.fnmatch(c.full_name, args.category)
     ]
     if len(categories) == 0:
         print "no categories matched out of:"

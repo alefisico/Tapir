@@ -15,6 +15,7 @@ import ROOT
 import numpy as np
 import logging
 import multiprocessing
+import json
 
 LOG_MODULE_NAME = logging.getLogger(__name__)
 from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
@@ -51,7 +52,10 @@ def get_limits_mlfit(fn, treename="limit"):
     f = ROOT.TFile(fn)
     tt = f.Get(treename)
     tt.GetEntry(0)
-    return tt.limit, 0.0
+    lim = tt.limit
+    tt.GetEntry(3)
+    err = tt.limitErr
+    return lim, err
 
 class LimitGetter(object):
     
@@ -296,22 +300,80 @@ def likelihoodScan(datacard, poi):
     )
     output, stderr = process.communicate()
     print output
-    
+
 def likelihoodScanTuple(tup):
     datacard, poi = tup
     return likelihoodScan(datacard, poi)
+
+def mlfit(datacard, freeze_groups=[]):
+    datacard_path, datacard_name = os.path.split(datacard)
+    process_name = os.path.splitext(datacard_name)[0] + "_freeze_{0}".format("_".join(freeze_groups))
+    
+    combine_cmd = [
+        "combine", datacard_name,
+        "-n", process_name,
+        "-M", "MaxLikelihoodFit",
+        "--minimizerStrategy=0",
+        "--minimizerTolerance=0.00001",
+        "--minos", "all",
+        "--saveShapes",
+        "--saveWithUncertainties",
+    ]
+
+    if len(freeze_groups)>0:
+        combine_cmd += ["--freezeNuisanceGroups", ",".join(freeze_groups)]
+
+    process = subprocess.Popen(combine_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=datacard_path,
+        env=dict(os.environ,
+                CMSSW_BASE=CMSSW_BASE,
+                PATH=PATH,
+                LD_LIBRARY_PATH = LD_LIBRARY_PATH,
+                PYTHONPATH=PYTHONPATH,
+                ROOT_INCLUDE_PATH = ROOT_INCLUDE_PATH,
+                ROOTSYS = ROOTSYS,
+                GENREFLEX = GENREFLEX
+        ),
+    )
+    output, stderr = process.communicate()
+    print output
+    print stderr
+
+    lim, err = get_limits_mlfit("higgsCombine{0}.MaxLikelihoodFit.mH120.root".format(process_name))
+    return lim, err
+
+def freezeLimits(datacard):
+
+    ret = {}
+    lim, err = mlfit(datacard)
+
+    print "total", lim, err
+    ret["total"] = (lim, err)
+
+    for group in ["exp", "theory", "mcstat", "jec", "btag"]:
+        lim, err = mlfit(datacard, [group])
+        print "freeze", group, lim, err
+        ret[group] = (lim, err)
+
+    lim, err = mlfit(datacard, ["exp", "theory"])
+    ret["stat"] = (lim, err)
+    return ret
 
 if __name__ == "__main__":
     datacard = sys.argv[1]
     workdir = os.path.dirname(datacard)
     
-    #lg = LimitGetter(workdir)
-    #lg(datacard)
-    #lg.runSignalInjection(datacard)
+    ret = {}
+    #run limits
+    lg = LimitGetter(workdir)
+    ret["limits"] = lg(datacard)
+    ret["siginject"] = lg.runSignalInjection(datacard)
 
-    #cg = ConstraintGetter(workdir)
-    #constraints = cg(datacard, 1.0)
-    #print constraints
+    #run constrraints
+    cg = ConstraintGetter(workdir)
+    constraints = cg(datacard, 1.0)
 
     pois = [
         "CMS_effID_e",
@@ -364,6 +426,15 @@ if __name__ == "__main__":
         "lumi",
         "pdf_gg",
         ]
+
+    #run log likelihood scan
     pool = multiprocessing.Pool(10)
     pool.map(likelihoodScanTuple, [(datacard, poi) for poi in pois])
     pool.close()
+
+    #run
+    ret["limits_syst"] = freezeLimits(datacard)
+    of = open("output.json", "w")
+    json.dump(ret, of, indent=2)
+    of.write()
+    of.close()

@@ -9,7 +9,7 @@ from TTH.MEAnalysis.SubjetAnalyzer import SubjetAnalyzer
 #from TTH.MEAnalysis.MulticlassAnalyzer import MulticlassAnalyzer
 from TTH.MEAnalysis.WTagAnalyzer import WTagAnalyzer
 from TTH.MEAnalysis.GenRadiationModeAnalyzer import GenRadiationModeAnalyzer
-from TTH.MEAnalysis.GenTTHAnalyzer import GenTTHAnalyzer
+from TTH.MEAnalysis.GenTTHAnalyzer import GenTTHAnalyzer, GenTTHAnalyzerPre
 from TTH.MEAnalysis.MEMAnalyzer import MEAnalyzer, MECategoryAnalyzer
 from TTH.MEAnalysis.LeptonAnalyzer import LeptonAnalyzer
 from TTH.MEAnalysis.JetAnalyzer import JetAnalyzer

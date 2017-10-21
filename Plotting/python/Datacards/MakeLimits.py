@@ -21,7 +21,9 @@ def main(
         workdir,
         analysis,
         group = None,
-        runToys = False
+        runToys = False,
+        runSignalInjection = False,
+        runPulls = False
 ):
     
     limits = {}
@@ -81,25 +83,25 @@ def main(
         # And run limit setting on it
         limits[group_name] = lg(group_dcard_filename)[0][2]
         
-        limits[group_name + "_lims"] = lg(group_dcard_filename)[0]
+        if runSignalInjection:
+            limits[group_name + "_lims"] = lg(group_dcard_filename)[0]
+            limits[group_name + "_siginject"] = lg.runSignalInjection(group_dcard_filename)
         
-        
-        limits[group_name + "_siginject"] = lg.runSignalInjection(group_dcard_filename)
-
-        #write constraints
-        for sig in [1, 0]:
-            #Run Asimov constraints
-            constraints = constraint_getter(group_dcard_filename, sig)
-            of = open(workdir + "/constraints_{0}_sig{1}_asimov.txt".format(group_name, sig), "w")
-            of.write(constraints)
-            of.close()
-          
-            if runToys:
-                #Run constraints with toys
-                constraints = constraint_getter(group_dcard_filename, sig, False)
-                of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
+        if runPulls:
+            #write constraints
+            for sig in [1, 0]:
+                #Run Asimov constraints
+                constraints = constraint_getter(group_dcard_filename, sig)
+                of = open(workdir + "/constraints_{0}_sig{1}_asimov.txt".format(group_name, sig), "w")
                 of.write(constraints)
                 of.close()
+              
+                if runToys:
+                    #Run constraints with toys
+                    constraints = constraint_getter(group_dcard_filename, sig, False)
+                    of = open(workdir + "/constraints_{0}_sig{1}.txt".format(group_name, sig), "w")
+                    of.write(constraints)
+                    of.close()
 
     # End loop over groups
 
@@ -114,7 +116,7 @@ if __name__ == "__main__":
         description='Runs the workflow'
     )
     parser.add_argument(
-        '--analysis',
+        '--config',
         action = "store",
         help = "Path to analysis pickle file",
         type = str,
@@ -136,7 +138,7 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG
     )
-    analysis = Analysis.deserialize(args.analysis)
+    analysis = Analysis.deserialize(args.config)
     workdir = os.path.dirname(args.analysis) + "/limits"
 
     if not args.category:

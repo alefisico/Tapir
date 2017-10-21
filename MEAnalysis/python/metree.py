@@ -35,15 +35,24 @@ systematicsCSV = [
     "up_cferr2", "down_cferr2"
 ]
 #recompute b-tag weights
+btag_weights_recomputed = {}
+for algo, systematics in [("CSV", systematicsCSV), ]:
+    for syst in systematics:
+        syst_name = "" if syst=="central" else ("_"+syst) 
+        btag_weights_recomputed["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
+            lambda ev, get_event_SF=get_event_SF, syst=syst, algo=algo, btagSFhandle=btagSFhandle : get_event_SF(map(JetWrapper, ev.good_jets_nominal), syst, algo, btagSFhandle)
+            , float, mcOnly=True, help="b-tag "+algo+"continuous  weight, variating "+syst
+        )
+
+#original b-tag weights
 btag_weights = {}
 for algo, systematics in [("CSV", systematicsCSV), ]:
     for syst in systematics:
         syst_name = "" if syst=="central" else ("_"+syst) 
         btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
-            lambda ev, get_event_SF=get_event_SF, syst=syst, algo=algo, btagSFhandle=btagSFhandle : get_event_SF(map(JetWrapper, ev.good_jets_nominal), syst, algo, btagSFhandle)
+            lambda ev,n="btagWeight"+algo+syst_name: getattr(ev, n)
             , float, mcOnly=True, help="b-tag "+algo+"continuous  weight, variating "+syst
         )
-
 
 lepton_sf_kind = [
     "SF_HLT_RunD4p2",
@@ -63,6 +72,7 @@ lepton_sf_kind_err = [x.replace("SF", "SFerr") for x in lepton_sf_kind]
 leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
     NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("etaSc", lambda x : x.etaSc),
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("pdgId", lambda x : x.pdgId),
@@ -354,11 +364,11 @@ def getTreeProducer(conf):
         collections = {
         #standard dumping of objects
         #These are collections which are not variated
-            # "b_quarks_gen_nominal" : NTupleCollection("b_quarks_gen", quarkType, 5, help="generated b quarks", mcOnly=True),
-            # "l_quarks_gen_nominal" : NTupleCollection("l_quarks_gen", quarkType, 3, help="generated light quarks", mcOnly=True),
-            # "b_quarks_t_nominal" : NTupleCollection("GenBFromTop", quarkType, 3, help="generated b quarks from top", mcOnly=True),
-            # "b_quarks_h_nominal" : NTupleCollection("GenBFromHiggs", quarkType, 3, help="generated b quarks from higgs", mcOnly=True),
-            # "l_quarks_w_nominal" : NTupleCollection("GenQFromW", quarkType, 5, help="generated light quarks from W", mcOnly=True),
+            #"b_quarks_gen_nominal" : NTupleCollection("b_quarks_gen", quarkType, 5, help="generated b quarks", mcOnly=True),
+            #"l_quarks_gen_nominal" : NTupleCollection("l_quarks_gen", quarkType, 3, help="generated light quarks", mcOnly=True),
+            "b_quarks_t_nominal" : NTupleCollection("GenBFromTop", quarkType, 3, help="generated b quarks from top", mcOnly=True),
+            "b_quarks_h_nominal" : NTupleCollection("GenBFromHiggs", quarkType, 3, help="generated b quarks from higgs", mcOnly=True),
+            "l_quarks_w_nominal" : NTupleCollection("GenQFromW", quarkType, 5, help="generated light quarks from W", mcOnly=True),
             "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson", mcOnly=True),
             "genTopLep" : NTupleCollection("genTopLep", genTopType, 2, help="Generated top quark (leptonic)", mcOnly=True),
             "genTopHad" : NTupleCollection("genTopHad", genTopType, 2, help="Generated top quark (hadronic)", mcOnly=True),
@@ -424,6 +434,7 @@ def getTreeProducer(conf):
         #scalar variables that have systematic variations
         for vtype in [
             ("Wmass",               float,      "Best reconstructed W candidate mass"),
+            ("mbb_closest",          float,      "Mass of geometrically closest bb pair"),
             ("cat",                 int,        "ME category", "catn"),
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
             ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),

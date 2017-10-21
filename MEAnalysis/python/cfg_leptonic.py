@@ -9,5 +9,6 @@ Conf.mem["methodsToRun"] = [
 ]
 Conf.mem["enabled_systematics"] = ["nominal"]
 Conf.mem["selection"] = lambda event: (
-        ((event.is_sl or event.is_dl) and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 4)
+        ((event.is_sl and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM >= 3) or
+        (event.is_dl and event.nominal_event.numJets>=4 and event.nominal_event.nBCSVM>=3))
 )
