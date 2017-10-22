@@ -266,7 +266,7 @@ def fill_overflow(hist):
     hist.SetBinError(nb+1, 0)
 
 
-def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=lambda x: x):
+def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=lambda x: x, postprocess_hist=lambda x: x):
     """Summary
     
     Args:
@@ -299,12 +299,24 @@ def getHistograms(tf, samples, hname, pattern="{sample}/{hname}", rename_func=la
                 h.SetBinContent(ibin, 0.0)
                 h.SetBinError(ibin, 0.0)
             h.SetEntries(0.0)
+        h = postprocess_hist(h)
         #create or add to output
         if not hs.has_key(rename_func(sample)):
             hs[rename_func(sample)] = rootpy.asrootpy(h)
         else:
             hs[rename_func(sample)] += rootpy.asrootpy(h)
     return hs
+
+
+def graph_to_hist(d):
+    h = rootpy.plotting.Hist(d.GetN(), 0, d.GetN())
+    for i in range(1, d.GetN()+1):
+        x = ROOT.Double()
+        y = ROOT.Double()
+        d.GetPoint(i-1, x, y)
+        h.SetBinContent(i, y)
+        h.SetBinError(i, d.GetErrorY(i))
+    return h
 
 def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     """
@@ -330,6 +342,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     rebin = kwargs.get("rebin", 1)
 
     rename_func = kwargs.get("rename_func", lambda x: x)
+    postprocess_hist = kwargs.get("postprocess_hist", lambda x: x)
 
     #legend properties
     do_legend = kwargs.get("do_legend", True)
@@ -359,7 +372,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
 
     title_extended = kwargs.get("title_extended", "")
 
-    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern, rename_func=rename_func)
+    histograms_nominal = getHistograms(tf, processes, hname, pattern=pattern, rename_func=rename_func, postprocess_hist=postprocess_hist)
 
     if len(histograms_nominal) == 0:
         raise KeyError(
@@ -448,7 +461,13 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         except rootpy.io.file.DoesNotExist as e:
             print e
             data = tf.get(pattern.format(sample="data_obs", hname=hname))
-        data.rebin(rebin)
+        
+        if "Graph" in data.__class__.__name__:
+            data = graph_to_hist(data)
+
+        data = postprocess_hist(data)
+        if rebin > 1:
+            data.rebin(rebin)
         if blindFunc:
             data = blindFunc(data)
         if show_overflow:
@@ -458,10 +477,11 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         data.markersize = 2
         data.linecolor = "black"
 
-        #set data error to 0 in case no data (FIXME) 
-        for ibin in range(data.GetNbinsX()):
-            if data.GetBinContent(ibin) == 0:
-                data.SetBinError(ibin, 1)
+        if isinstance(data, rootpy.plotting.Hist):
+            #set data error to 0 in case no data (FIXME) 
+            for ibin in range(data.GetNbinsX()):
+                if data.GetBinContent(ibin) == 0:
+                    data.SetBinError(ibin, 1)
         errorbar(data)
 
     if do_legend:
