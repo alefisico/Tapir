@@ -13,6 +13,7 @@ ROOT.gROOT.SetBatch(True)
 import uuid
 
 import matplotlib
+matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -407,15 +408,16 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
     
     if do_tex:
-        fig.suptitle("$\\textbf{CMS}$ private work $\\sqrt{s} = 13$ TeV, $\int \mathcal{L} = 36$ fb$^{-1}$"+title_extended,
+        fig.suptitle(r"\textbf{CMS} private work ",
            y=1.02, x=0.02,
            horizontalalignment="left", verticalalignment="bottom", fontsize=16
         )
     else:
-        fig.suptitle("CMS private work "+title_extended,
+        fig.suptitle(r"$\mathbf{CMS}$ private work ",
            y=1.02, x=0.02,
            horizontalalignment="left", verticalalignment="bottom", fontsize=16
         )
+        fig.text(0.98, 1.02, title_extended, ha="right", va="bottom", fontsize=16) 
 
     stacked_hists = mc_stack(
         histograms_nominal.values(),
@@ -502,7 +504,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
                 patches += [patch]
 
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="//////")]
-        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch=r"\\\\")]
+        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+shape", hatch=r"\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
         
     #create an automatic bin width label on the y axis
@@ -515,12 +517,12 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         ticks = a1.get_xticks()
         a1.get_xaxis().set_visible(False)
     
-    a1.set_ylim(bottom=0, top=1.1*a1.get_ylim()[1])
+    a1.set_ylim(bottom=0, top=2*a1.get_ylim()[1])
     a1.grid(zorder=100000)
 
     if do_log:
         a1.set_yscale("log")
-        a1.set_ylim(bottom=0.1, top=2*a1.get_ylim()[1])
+        a1.set_ylim(bottom=1, top=100*a1.get_ylim()[1])
 
     a2 = a1
     

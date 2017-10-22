@@ -1,28 +1,35 @@
+print "starting"
 import math
 import json
 
+print "ROOT"
 import ROOT
 import logging
 
+print "mpl"
 import matplotlib
 from matplotlib import rc
 if __name__== "__main__":
     matplotlib.use('PS')
 import matplotlib.pyplot as plt
 
+print "sys"
 import sys, os, copy
 import os.path
 from collections import OrderedDict
-import heplot, plotlib
+import plotlib
 
+print "plotlib"
 from plotlib import escape_string, zero_error
 
+print "rootpy"
 import rootpy
 from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
 import sklearn
 import sklearn.metrics
 
+print "done importing"
 DO_PARALLEL = False
 
 procs_names = [
@@ -45,7 +52,8 @@ procs = [x[0] for x in procs_names]
 syst_pairs = []
 syst_pairs.extend([
     ("__CMS_puUp", "__CMS_puDown"),
-    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
+#    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
+    ("__CMS_scaleFlavorQCD_jUp", "__CMS_scaleFlavorQCD_jDown"),
     ("__CMS_res_jUp", "__CMS_res_jDown"),
     ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
     ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
@@ -226,17 +234,17 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "outname": "/".join(["out", outpath, analysis, category, variable]),
         "category": category,
         "procs": procs_names,
-        "signal_procs": ["ttH_hbb"],
+        "signal_procs": ["ttH_hbb", "ttH_nonhbb"],
         "dataname": "data",#"data", #data_obs for fake data
         "rebin": 1,
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add me to Varnames", 
         "xunit": plotlib.varunits[variable] if variable in plotlib.varunits.keys() else "" ,
         "legend_fontsize": 12,
-        "legend_loc": (1.01, 0.01),
+        "legend_loc": "best",
         "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
-        "title_extended": "",
+        "title_extended": r"      35.9 $\mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,
         "do_syst": False,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
@@ -251,24 +259,37 @@ if __name__ == "__main__":
     # Plot for all SL categories
     simple_vars = [
         "numJets",
+        "nBCSVM",
         "jetsByPt_0_btagCSV",
-        "jetsByPt_0_pt"
+        "btag_LR_4b_2b_btagCSV_logit",
+        "jetsByPt_0_pt",
+        "leps_0_pt"
     ]
 
     cats = [
-        "sl_jge4_tge2",
-        "dl_jge4_tge2",
+        ("sl_jge4_tge2", simple_vars),
+        ("dl_jge4_tge2", simple_vars),
+        ("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        ("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        ("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
+        ("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
     ]
 
     args = []
 
+    pairs = []
+    for cat, variables in cats:
+        for var in variables:
+            pairs += [(cat, var)]
+    
     args += [get_base_plot(
-        "q",
-        "test", "categories", cat, var) for cat in cats for var in simple_vars 
+        sys.argv[1].replace(".root", ""),
+        "test", "categories", cat, var) for (cat, var) in pairs
     ]
 
     for arg in args:
-        arg["do_syst"] = True
+        arg["do_syst"] = False
+        arg["do_tex"] = False
         if "numJets" in arg["histname"]:
             arg["do_log"] = True
         print json.dumps(arg, indent=2)

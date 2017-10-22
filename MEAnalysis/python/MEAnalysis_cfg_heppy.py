@@ -709,7 +709,6 @@ Conf.mem_configs["SL_0w2h2t_sj"] = c
 bLR = False
 if Conf.jets["untaggedSelection"] == "btagLR":
     bLR = True
-print "the bLR from the config is",bLR #DS temp
 
 # btag LR cuts for FH MEM categories
 FH_bLR_3b_SR = Conf.mem["FH_bLR_3b_SR"]

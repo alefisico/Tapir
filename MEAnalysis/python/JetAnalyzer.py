@@ -62,9 +62,31 @@ class JetAnalyzer(FilterAnalyzer):
             newjets[i].mass *= cf
         return newjets
 
+    def calculate_mbb_closest(self, bjet_candidates):
+
+        if len(bjet_candidates)<2:
+            return 0
+
+        #find closest pair in deltaR
+        pairs = set([])
+        ordered = {}
+        for j1 in bjet_candidates:
+            for j2 in bjet_candidates:
+                if j1 == j2:
+                    continue
+                if (j1, j2) in pairs or (j2, j1) in pairs:
+                    continue
+                pairs.update([(j1, j2)])
+                lv1 = lvec(j1)
+                lv2 = lvec(j2)
+                dr = lv1.DeltaR(lv2)
+                ordered[dr] = (lv1, lv2)
+        dr0 = sorted(ordered.keys())[0]
+        mbb_closest = (ordered[dr0][0] + ordered[dr0][1]).M()
+        return mbb_closest
+
     def process(self, event):
         event.MET = MET(pt=event.met.pt, phi=event.met.phi)
-        event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
        
         evdict = OrderedDict()
@@ -224,6 +246,9 @@ class JetAnalyzer(FilterAnalyzer):
         event.buntagged_jets_bdisc = event.buntagged_jets_bdisc[self.conf.jets["btagWP"]]
         event.btagged_jets_bdisc = event.btagged_jets_bdisc[self.conf.jets["btagWP"]]
 
+        #calculate mass of closest mbb pair
+        event.mbb_closest = self.calculate_mbb_closest(event.btagged_jets_bdisc)
+        
         #Find how many of these tagged jets are actually true b jets
         if self.cfg_comp.isMC:
             event.n_tagwp_tagged_true_bjets = 0

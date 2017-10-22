@@ -53,7 +53,6 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
                 i_sample = -i_sample
             processes_1.append(str(i_sample))
             rates.append(str(event_counts[cat.full_name][sample]))
-
     dcof.write("bin\t"+"\t".join(bins)+"\n")
     dcof.write("process\t"+"\t".join(processes_0)+"\n")
     dcof.write("process\t"+"\t".join(processes_1)+"\n")
@@ -95,12 +94,36 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
+
+    #create nuisance groups for easy manipulation
+    nuisance_groups = {
+        "jec": [k for k in all_shape_uncerts if k.startswith("CMS_scale")] + ["CMS_res_j"],
+        "theory": [
+            "bgnorm_ttbarPlus2B", "bgnorm_ttbarPlusB", "bgnorm_ttbarPlusBBbar", "bgnorm_ttbarPlusCCbar",
+            "QCDscale_ttH", "QCDscale_ttbar", "QCDscale_t",
+            "pdf_Higgs_ttH", "pdf_gg", "pdf_qg"
+        ],
+        "btag": [k for k in all_shape_uncerts if k.startswith("CMS_ttH_CSV")],
+        "misc": ["CMS_pu", "CMS_effID_e", "CMS_effID_m", "CMS_effIso_m", "CMS_effReco_e", "CMS_effTracking_m"],
+        "mcstat": [k for k in all_shape_uncerts if "_Bin" in k]
+    }
+    nuisance_groups["exp"] = nuisance_groups["jec"] + nuisance_groups["btag"] + nuisance_groups["misc"] + nuisance_groups["mcstat"]
+
+    for nuisance_group, nuisances in nuisance_groups.items():
+        good_nuisances = []
+        for nui in nuisances:
+            if not (nui in all_scale_uncerts or nui in all_shape_uncerts):
+                logging.error("unknown nuisance {0}".format(nui))
+            else:
+                good_nuisances += [nui]
+        dcof.write("{0} group = {1}\n".format(nuisance_group, " ".join(good_nuisances)))
+    
     #dcof.write("* autoMCStats 20\n")
     #
-    # shapename = os.path.basename(datacard.output_datacardname)
-    # shapename_base = shapename.split(".")[0]
-    # dcof.write("# Execute with:\n")
-    # dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
+    #shapename = os.path.basename(datacard.output_datacardname)
+    #shapename_base = shapename.split(".")[0]
+    #dcof.write("# Execute with:\n")
+    #dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
 
 
 def makeStatVariations(tf, of, categories):

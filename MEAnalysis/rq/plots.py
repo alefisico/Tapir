@@ -45,10 +45,10 @@ syst_pairs = [
     ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
     ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
     ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down"),
-    ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
-    ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
-    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
-    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
+#    ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
+#    ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
+#    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
+#    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
 ]
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
@@ -69,7 +69,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "legend_loc": "best",
         "legend_fontsize": 6,
         "show_overflow": True,
-        "title_extended": "\n" + category + r", $\sqrt{s} = 13$ TeV, $\mathcal{L} = 36\ \mathrm{fb}^{-1}$",
+        "title_extended": "\n" + category + r", $35.9\ \mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,
         "do_syst": True,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",

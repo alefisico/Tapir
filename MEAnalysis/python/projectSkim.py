@@ -20,6 +20,7 @@ if datatype in ["memcheck", "kinematics"]:
     tt.SetBranchStatus("mem_*", True)
     tt.SetBranchStatus("nMatch*", True)
     tt.SetBranchStatus("nGen*", True)
+    tt.SetBranchStatus("gen*", True)
     tt.SetBranchStatus("is_*", True)
     tt.SetBranchStatus("numJets*", True)
     tt.SetBranchStatus("nB*", True)
@@ -29,6 +30,7 @@ if datatype in ["memcheck", "kinematics"]:
     tt.SetBranchStatus("met_*", True)
     tt.SetBranchStatus("btagWeight*", True)
     tt.SetBranchStatus("puWeight*", True)
+    tt.SetBranchStatus("changes_jet_category*", True)
 
 if datatype in ["kinematics"]:
     tt.SetBranchStatus("jets_pt*", True)

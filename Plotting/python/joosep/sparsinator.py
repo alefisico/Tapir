@@ -18,6 +18,7 @@ from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProces
 from TTH.CommonClassifier.db import ClassifierDB
 
 from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF, initBTagSF
+from TTH.MEAnalysis.leptonSF import calc_lepton_SF
 
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
@@ -122,136 +123,6 @@ def lv_p4s(pt, eta, phi, m, btagCSV=-100):
     ret.btagCSV = btagCSV
     return ret
 
-
-tfile_ele_id = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/el_id_bcdef.root")
-hist_ele_id = tfile_ele_id.Get("EGamma_SF2D")
-
-tfile_ele_reco = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/el_reco.root")
-hist_ele_reco = tfile_ele_reco.Get("EGamma_SF2D")
-
-#https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults#Results_on_the_full_2016_data
-tfile_mu_id = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/mu_id_bcdef.root")
-hist_mu_id = tfile_mu_id.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio")
-
-tfile_mu_iso = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/mu_iso_bcdef.root")
-hist_mu_iso = tfile_mu_iso.Get("TightISO_TightID_pt_eta/pt_abseta_ratio")
-
-tfile_mu_track = ROOT.TFile(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/sf/mu_tracking_bcdef.root")
-hist_mu_track = tfile_mu_track.Get("ratio_eff_aeta_dr030e030_corr")
-
-# helper function to find the first occurance of a point whose x-error bars cover a certain value
-def findGraphPoint(tgraph, x):
-    x_, y_ = ROOT.Double(), ROOT.Double()
-    for i in range(0, tgraph.GetN()):
-        tgraph.GetPoint(i, x_, y_)
-        # use same edge treatment as root histograms use, so inclusive at the left edge
-        # and exclusive at the right edge
-        l, r = x_ - tgraph.GetErrorXlow(i), x_ + tgraph.GetErrorXhigh(i)
-        if float(l) <= x < float(r):
-            return i
-    return -1
-
-# helper function to get the y-value of a point defined by it's x-value with optional error handling
-def getGraphValue(tgraph, x, err="nominal"):
-    assert(err in ("nominal", "up", "down"))
-
-    i = findGraphPoint(tgraph, x)
-    if i < 0:
-        raise Exception("x-value %f cannot be assigned to a valid point" % x)
-
-    x_, y_ = ROOT.Double(), ROOT.Double()
-    tgraph.GetPoint(i, x_, y_)
-    y = float(y_)
-
-    if err == "up":
-        return y + tgraph.GetErrorYhigh(i)
-    elif err == "down":
-        return y - tgraph.GetErrorYlow(i)
-    else:
-        return y
-
-
-def calc_lepton_SF(ev, syst="nominal"):
-    
-    weight = 1.
-
-    # Leading muon
-    for ilep in range(ev.leptons.size()):
-        pt = ev.leptons.at(ilep).lv.Pt()
-        aeta = abs(ev.leptons.at(ilep).lv.Eta())
-        
-        if abs(ev.leps_pdgId[ilep]) == 13:
-            #ID
-            if pt > 120:
-                pt = 119
-            b = hist_mu_id.FindBin(pt, aeta)
-            w = hist_mu_id.GetBinContent(b)
-            LOG_MODULE_NAME.debug("mu ID sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
-            if w == 0:
-                LOG_MODULE_NAME.debug("mu ID sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
-                w = 1
-            if syst == "CMS_effID_mUp":
-                w = w + hist_mu_id.GetBinError(b)
-            elif syst == "CMS_effID_mDown":
-                w = w - hist_mu_id.GetBinError(b)
-            weight *= w 
-           
-            #Tracking
-            w = getGraphValue(hist_mu_track, aeta)
-            LOG_MODULE_NAME.debug("mu track sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
-            if w == 0:
-                LOG_MODULE_NAME.debug("mu track sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
-                w = 1
-            if syst == "CMS_effTracking_mUp":
-                w = getGraphValue(hist_mu_track, aeta, "up")
-            elif syst == "CMS_effTracking_mDown":
-                w = getGraphValue(hist_mu_track, aeta, "down")
-            
-            #iso
-            b = hist_mu_iso.FindBin(pt, aeta)
-            w = hist_mu_iso.GetBinContent(b)
-            LOG_MODULE_NAME.debug("mu iso sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
-            if w == 0:
-                LOG_MODULE_NAME.debug("mu iso sf 0, pt={0}, eta={1} bin={2}".format(pt, aeta, b))
-                w = 1
-            if syst == "CMS_effIso_mUp":
-                w = w + hist_mu_iso.GetBinError(b)
-            elif syst == "CMS_effIso_mDown":
-                w = w - hist_mu_iso.GetBinError(b)
-
-            weight *= w
-        elif abs(ev.leps_pdgId[ilep]) == 11:
-
-            if pt > 150:
-                pt = 149 
-            #ID
-            b = hist_ele_id.FindBin(abs(ev.leps_superclustereta.at(ilep)), pt)
-            w = hist_ele_id.GetBinContent(b)
-            if w == 0:
-                LOG_MODULE_NAME.debug("ele ID sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
-                w = 1
-            if syst == "CMS_effID_eUp":
-                w = w + hist_ele_id.GetBinError(b)
-            elif syst == "CMS_effID_eDown":
-                w = w - hist_ele_id.GetBinError(b)
-            weight *= w
-            
-            #Reco
-            b = hist_ele_reco.FindBin(abs(ev.leps_superclustereta.at(ilep)), pt)
-            w = hist_ele_reco.GetBinContent(b)
-            if w == 0:
-                LOG_MODULE_NAME.debug("ele reco sf 0, pt={0}, eta={1}".format(pt, abs(ev.leps_superclustereta.at(ilep))))
-                w = 1
-            if syst == "CMS_effReco_eUp":
-                w = w + hist_ele_reco.GetBinError(b)
-            elif syst == "CMS_effReco_eDown":
-                w = w - hist_ele_reco.GetBinError(b)
-            weight *= w
-
-    return weight
-
-
-
 def pass_HLT_sl_mu(event):
     pass_hlt = event.HLT_ttH_SL_mu
     return event.is_sl and pass_hlt and len(event.leps_pdgId)>=1 and int(abs(event.leps_pdgId[0])) == 13
@@ -261,17 +132,19 @@ def pass_HLT_sl_el(event):
     return event.is_sl and pass_hlt and len(event.leps_pdgId)>=1 and int(abs(event.leps_pdgId[0])) == 11
 
 def pass_HLT_dl_mumu(event):
-    pass_hlt = event.HLT_ttH_DL_mumu
+    pass_hlt = (event.HLT_ttH_DL_mumu) or (not event.HLT_ttH_DL_mumu and event.HLT_ttH_SL_mu)
     st = sum(map(abs, event.leps_pdgId))
     return event.is_dl and pass_hlt and st == 26
 
 def pass_HLT_dl_elmu(event):
     pass_hlt = event.HLT_ttH_DL_elmu
+    pass_hlt = pass_hlt or (not event.HLT_ttH_DL_elmu and (event.HLT_ttH_SL_el and not event.HLT_ttH_SL_mu))
+    pass_hlt = pass_hlt or (not event.HLT_ttH_DL_elmu and (event.HLT_ttH_SL_mu and not event.HLT_ttH_SL_el))
     st = sum(map(abs, event.leps_pdgId))
     return event.is_dl and pass_hlt and st == 24
 
 def pass_HLT_dl_elel(event):
-    pass_hlt = event.HLT_ttH_DL_elel
+    pass_hlt = event.HLT_ttH_DL_elel or (not event.HLT_ttH_DL_elel and event.HLT_ttH_SL_el)
     st = sum(map(abs, event.leps_pdgId))
     return event.is_dl and pass_hlt and st == 22
 
@@ -449,6 +322,11 @@ def createEvent(
                 "CMS_effID_mUp", "CMS_effID_mDown",
                 "CMS_effIso_mUp", "CMS_effIso_mDown",
                 "CMS_effTracking_mUp", "CMS_effTracking_mDown",
+                "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
+                "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
+                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
+                "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
+                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
             ]}
         event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
    
@@ -571,14 +449,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
-                ("unweighted", lambda ev: 1.0)
+                ("unweighted", lambda ev: 1.0),
+                ("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight),
+                ("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
+                ("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.lepton_weight)
         ]
 
         for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
                 "CMS_effReco_eUp", "CMS_effReco_eDown",
                 "CMS_effID_mUp", "CMS_effID_mDown",
                 "CMS_effIso_mUp", "CMS_effIso_mDown",
-                "CMS_effTracking_mUp", "CMS_effTracking_mDown"]:
+                "CMS_effTracking_mUp", "CMS_effTracking_mDown",
+                "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
+                "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
+                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
+                "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
+                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
+        ]:
             systematic_weights += [
                 (lep_syst, lambda ev, syst_pairs=syst_pairs, lep_syst=lep_syst: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weights_syst[lep_syst])
             ]
@@ -749,6 +636,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     #drell-yan
                     if mll < 20:
                         continue
+                    #same sign
+                    if math.copysign(1, event.leptons.at(0).pdgId * event.leptons.at(1).pdgId) == 1:
+                        continue
                     #same flavour
                     if abs(event.leptons.at(0).pdgId) == abs(event.leptons.at(1).pdgId):
                         if event.met_pt <= 40 or abs(mll - 91) < 15:
@@ -813,13 +703,14 @@ if __name__ == "__main__":
     else:
         #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        sample = "SingleMuon"
+        #sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = 10000
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        max_events = -1
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/small.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 
