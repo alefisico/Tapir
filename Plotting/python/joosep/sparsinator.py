@@ -132,17 +132,19 @@ def pass_HLT_sl_el(event):
     return event.is_sl and pass_hlt and len(event.leps_pdgId)>=1 and int(abs(event.leps_pdgId[0])) == 11
 
 def pass_HLT_dl_mumu(event):
-    pass_hlt = event.HLT_ttH_DL_mumu
+    pass_hlt = (event.HLT_ttH_DL_mumu) or (not event.HLT_ttH_DL_mumu and event.HLT_ttH_SL_mu)
     st = sum(map(abs, event.leps_pdgId))
     return event.is_dl and pass_hlt and st == 26
 
 def pass_HLT_dl_elmu(event):
     pass_hlt = event.HLT_ttH_DL_elmu
+    pass_hlt = pass_hlt or (not event.HLT_ttH_DL_elmu and (event.HLT_ttH_SL_el and not event.HLT_ttH_SL_mu))
+    pass_hlt = pass_hlt or (not event.HLT_ttH_DL_elmu and (event.HLT_ttH_SL_mu and not event.HLT_ttH_SL_el))
     st = sum(map(abs, event.leps_pdgId))
     return event.is_dl and pass_hlt and st == 24
 
 def pass_HLT_dl_elel(event):
-    pass_hlt = event.HLT_ttH_DL_elel
+    pass_hlt = event.HLT_ttH_DL_elel or (not event.HLT_ttH_DL_elel and event.HLT_ttH_SL_el)
     st = sum(map(abs, event.leps_pdgId))
     return event.is_dl and pass_hlt and st == 22
 
@@ -320,11 +322,11 @@ def createEvent(
                 "CMS_effID_mUp", "CMS_effID_mDown",
                 "CMS_effIso_mUp", "CMS_effIso_mDown",
                 "CMS_effTracking_mUp", "CMS_effTracking_mDown",
-                "CMS_effTrigger_eUp", "CMS_effTrigger_eUp",
-                "CMS_effTrigger_mUp", "CMS_effTrigger_mUp",
-                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeUp",
-                "CMS_effTrigger_emUp", "CMS_effTrigger_emUp",
-                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmUp",
+                "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
+                "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
+                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
+                "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
+                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
             ]}
         event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
    
@@ -458,11 +460,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 "CMS_effID_mUp", "CMS_effID_mDown",
                 "CMS_effIso_mUp", "CMS_effIso_mDown",
                 "CMS_effTracking_mUp", "CMS_effTracking_mDown",
-                "CMS_effTrigger_eUp", "CMS_effTrigger_eUp",
-                "CMS_effTrigger_mUp", "CMS_effTrigger_mUp",
-                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeUp",
-                "CMS_effTrigger_emUp", "CMS_effTrigger_emUp",
-                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmUp",
+                "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
+                "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
+                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
+                "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
+                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         ]:
             systematic_weights += [
                 (lep_syst, lambda ev, syst_pairs=syst_pairs, lep_syst=lep_syst: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weights_syst[lep_syst])
@@ -707,8 +709,8 @@ if __name__ == "__main__":
         #sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = 10000
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        max_events = -1
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/small.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 

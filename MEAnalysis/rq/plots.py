@@ -69,7 +69,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "legend_loc": "best",
         "legend_fontsize": 6,
         "show_overflow": True,
-        "title_extended": "\n" + category + r", $\sqrt{s} = 13$ TeV, $\mathcal{L} = 36\ \mathrm{fb}^{-1}$",
+        "title_extended": "\n" + category + r", $35.9\ \mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,
         "do_syst": True,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",

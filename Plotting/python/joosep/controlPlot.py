@@ -1,28 +1,35 @@
+print "starting"
 import math
 import json
 
+print "ROOT"
 import ROOT
 import logging
 
+print "mpl"
 import matplotlib
 from matplotlib import rc
 if __name__== "__main__":
     matplotlib.use('PS')
 import matplotlib.pyplot as plt
 
+print "sys"
 import sys, os, copy
 import os.path
 from collections import OrderedDict
-import heplot, plotlib
+import plotlib
 
+print "plotlib"
 from plotlib import escape_string, zero_error
 
+print "rootpy"
 import rootpy
 from rootpy.plotting import Hist
 from rootpy.plotting import root2matplotlib as rplt
 import sklearn
 import sklearn.metrics
 
+print "done importing"
 DO_PARALLEL = False
 
 procs_names = [

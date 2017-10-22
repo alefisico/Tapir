@@ -13,6 +13,7 @@ ROOT.gROOT.SetBatch(True)
 import uuid
 
 import matplotlib
+matplotlib.use('PS') #needed on T3
 import matplotlib.pyplot as plt
 
 import numpy as np

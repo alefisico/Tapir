@@ -152,12 +152,9 @@ if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     args = parser.parse_args()
     analysis = analysisFromConfig(args.config)
-    
-    import pdb
-    pdb.set_trace()
-    
+  
     categories = [
-        c for c in analysis.groups if fnmatch.fnmatch(c.full_name, args.category)
+        c for c in analysis.categories if fnmatch.fnmatch(c.full_name, args.category)
     ]
     if len(categories) == 0:
         print "no categories matched out of:"
