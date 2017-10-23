@@ -135,6 +135,7 @@ class Sample(object):
             classifier_db_path = config.get(sample_name, "classifier_db_path", None),
             vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),
+            tags = config.get(sample_name, "tags")
         )
         return sample
 
