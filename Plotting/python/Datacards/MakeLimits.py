@@ -254,16 +254,19 @@ if __name__ == "__main__":
     if not args.category:
         print "choose a category:", sorted(analysis.groups.keys())
     else:
+        if args.category == "all":
+            categories = analysis.groups.keys()
+        categories = args.category.split(",")
         if args.jobtype == "main":
             main(workdir, analysis, args.category, args.runSignalInjection, args.runPulls)
         elif args.jobtype == "limit":
-            if args.category == "all":
-                run_parallel(run_limit_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in analysis.groups.keys()])
+            if len(categories)>1:
+                run_parallel(run_limit_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in categories])
             else:
                 run_limit(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir)
         elif args.jobtype == "pulls":
-            if args.category == "all":
-                run_parallel(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir, not args.noAsimov) for g in analysis.groups.keys()])
+            if len(categories)>1:
+                run_parallel(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir, not args.noAsimov) for g in categories])
             else:
                 run_pulls(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir, not args.noAsimov)
         elif args.jobtype == "syst":

@@ -225,20 +225,23 @@ def analysisFromConfig(config_file_path):
                 rebin = int(config.get(category_name,"rebin"))
             else:
                 rebin = 1
-            category = Category(
-                name = category_name,
-                cuts = [cut],
-                processes = mc_processes,
-                data_processes = data_processes,
-                signal_processes = signal_processes, 
-                common_shape_uncertainties = common_shape_uncertainties, 
-                common_scale_uncertainties = common_scale_uncertainties, 
-                scale_uncertainties = scale_uncertainties, 
-                discriminator = Histogram.from_string(config.get(category_name, "discriminator")),
-                rebin = rebin,
-                do_limit = True
-            )
-            cats.append(category)
+            
+            disc_name = config.get(category_name, "discriminator").strip()
+            if len(disc_name) > 0:
+                category = Category(
+                    name = category_name,
+                    cuts = [cut],
+                    processes = mc_processes,
+                    data_processes = data_processes,
+                    signal_processes = signal_processes, 
+                    common_shape_uncertainties = common_shape_uncertainties, 
+                    common_scale_uncertainties = common_scale_uncertainties, 
+                    scale_uncertainties = scale_uncertainties, 
+                    discriminator = Histogram.from_string(disc_name),
+                    rebin = rebin,
+                    do_limit = True
+                )
+                cats.append(category)
 
             #a group consisting of only this category
             analysis_groups[category.full_name] = [category] 
