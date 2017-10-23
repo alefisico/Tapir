@@ -16,6 +16,7 @@ import numpy as np
 import logging
 import multiprocessing
 import json
+import copy
 
 LOG_MODULE_NAME = logging.getLogger(__name__)
 from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH, GENREFLEX, ROOTSYS, ROOT_INCLUDE_PATH, CMSSW_BASE
@@ -63,7 +64,8 @@ def limit(
     name_extended="",
     opts=["-M", "Asymptotic"],
     output_format="higgsCombine{process_name}.Asymptotic.mH120.root",
-    get_limits=get_limits_asymptotic
+    get_limits=get_limits_asymptotic,
+    asimov=True
     ):
 
     datacard_path, datacard_name = os.path.split(datacard)
@@ -72,12 +74,16 @@ def limit(
         os.path.splitext(datacard_name)[0]
     ) + name_extended
 
+    opts_local = copy.deepcopy(opts) 
+    if asimov:
+        process_name += "_asimov"
+        opts_local += ["-t", "-1"]
+
     # Run combine
     combine_command = ["combine", 
                        "-n", process_name,
-                       "-t", "-1"
-    ] + opts + [datacard_name]
-    
+    ] + opts_local + [datacard_name]
+ 
     LOG_MODULE_NAME.info("running combine: {0}".format(" ".join(combine_command)))
     
     process = subprocess.Popen(combine_command,
@@ -291,7 +297,7 @@ def mlfit(datacard, freeze_groups=[]):
         "-n", process_name,
         "-M", "MaxLikelihoodFit",
         "--minimizerStrategy=0",
-        "--minimizerTolerance=0.00001",
+        "--minimizerTolerance=0.0000001",
         "--minos", "all",
         "--saveShapes",
         "--saveWithUncertainties",
@@ -337,6 +343,22 @@ def freeze_limits(datacard):
     lim, err = mlfit(datacard, ["exp", "theory"])
     ret["stat"] = (lim, err)
     return ret
+
+def significance(datacard, asimov=True):
+    datacard_path, datacard_name = os.path.split(datacard)
+
+    process_name = os.path.splitext(datacard_name)[0]
+    process_name += "_significance_{0}".format("_".join(freeze_groups))
+    if asimov:
+        process_name += "_asimov"
+ 
+    combine_cmd = [
+        "combine", datacard_name,
+        "-n", process_name,
+        "-M", "ProfileLikelihood",
+    ]
+    if asimov:
+        combined_cmd += ["-t", "-1", "--expectSignal=1"]
 
 if __name__ == "__main__":
     datacard = sys.argv[1]

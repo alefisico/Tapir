@@ -63,7 +63,11 @@ syst_pairs.extend([
     ("__CMS_ttH_CSVjesUp", "__CMS_ttH_CSVjesDown"),
     ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
     ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
-    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down")
+    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down"),
+    ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
+    ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
+    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
+    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown")
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -263,6 +267,10 @@ if __name__ == "__main__":
         "jetsByPt_0_btagCSV",
         "btag_LR_4b_2b_btagCSV_logit",
         "jetsByPt_0_pt",
+        #"jetsByPt_1_pt",
+        #"jetsByPt_2_pt",
+        #"jetsByPt_3_pt",
+        #"jetsByPt_4_pt",
         "leps_0_pt"
     ]
 
