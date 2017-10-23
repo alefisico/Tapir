@@ -93,6 +93,7 @@ class Sample(object):
         self.files_load_step1 = kwargs.get("files_load_step1", None)
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
+        self.tags = kwargs.get("tags", "").split()
 
         #Load the filenames for step2 (VHBB + tthbb13)
         try:

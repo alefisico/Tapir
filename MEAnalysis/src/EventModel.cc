@@ -120,6 +120,9 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
     
     event.genTopHad_pt = *genTopHad_pt;
     event.genTopLep_pt = *genTopLep_pt;
+
+    event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Up)] = LHE_weights_scale_wgt[4];
+    event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Down)] = LHE_weights_scale_wgt[5];
     return event;
 }
 
