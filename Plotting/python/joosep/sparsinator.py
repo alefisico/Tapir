@@ -175,7 +175,8 @@ def fillBase(matched_processes, event, syst, schema):
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
                     LOG_MODULE_NAME.error("weight_nominal<=0")
-
+            if k == "ttbarOther__sl_jge4_tge2__numJets" and "triggerPath_mm" in proc.full_name:
+                print("fill", k, syst, weight)
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -191,6 +192,8 @@ def fillSystematic(matched_processes, event, systematic_weights, schema):
         for proc in matched_processes:
             for (k, histo_out) in proc.outdict_syst[syst_weight].items():
                 weight = _weight * proc.xs_weight
+                if k.startswith("ttbarOther__sl_jge4_tge2__numJets__CMS_ttH_scaleME") and "triggerPath_mm" in proc.full_name:
+                    print("fill", k, syst_weight, weight)
                 if histo_out.cut(event):
                     histo_out.fill(event, weight)
 
@@ -322,9 +325,14 @@ def createEvent(
     else:
         #weight correction factors introduced here so that the scaleME weight would be normalized
         #to 1 in the inclusive phase space.
-        #Extracted from the mean of the weight distribution in (is_sl || is_dl) && (numJets>=4 && nBCSVM>=2)
+        #Extracted from the mean of the weight distribution in (is_sl || is_dl) && (numJets>=3 && nBCSVM>=0)
         event.weights[syst_pairs["CMS_ttH_scaleMEDown"]] = event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]/1.14
         event.weights[syst_pairs["CMS_ttH_scaleMEUp"]] = event.weights[syst_pairs["CMS_ttH_scaleMEUp"]]/0.87
+        print("scaleWeight",
+            event.evt, event.numJets, event.nBCSVM,
+            event.weights[syst_pairs["CMS_ttH_scaleMEUp"]],
+            event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]
+        )
 
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
@@ -737,7 +745,7 @@ if __name__ == "__main__":
         #sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = 10000
+        max_events = 50000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
