@@ -113,6 +113,8 @@ namespace Systematic {
         CMS_ttH_CSVlf,
         CMS_ttH_CSVlfstats1,
         CMS_ttH_CSVlfstats2,
+        
+        CMS_ttH_scaleME,
 
         CMS_pu,
     };
@@ -450,6 +452,8 @@ public:
     TTreeReaderValue<T> btagWeightCSV_CSVlfstats1Down;
     TTreeReaderValue<T> btagWeightCSV_CSVlfstats2Down;
     
+    TTreeReaderArray<T> LHE_weights_scale_wgt;
+    
     TreeDescriptionMC(TFile* file, SampleDescription sample) :
         TreeDescription<T>(file, sample),
         ttCls(TreeDescription<T>::reader, "ttCls"),
@@ -493,8 +497,9 @@ public:
         btagWeightCSV_CSVjesDown(TreeDescription<T>::reader, "btagWeightCSV_down_jes"),
         btagWeightCSV_CSVlfDown(TreeDescription<T>::reader, "btagWeightCSV_down_lf"),
         btagWeightCSV_CSVlfstats1Down(TreeDescription<T>::reader, "btagWeightCSV_down_lfstats1"),
-        btagWeightCSV_CSVlfstats2Down(TreeDescription<T>::reader, "btagWeightCSV_down_lfstats2")
-
+        btagWeightCSV_CSVlfstats2Down(TreeDescription<T>::reader, "btagWeightCSV_down_lfstats2"),
+        
+        LHE_weights_scale_wgt(TreeDescription<T>::reader, "LHE_weights_scale_wgt")
     {}
     
     ~TreeDescriptionMC() {}

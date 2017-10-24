@@ -90,6 +90,8 @@ syst_pairs = OrderedDict([
         "CMS_ttH_CSVlf",
         "CMS_ttH_CSVlfstats1",
         "CMS_ttH_CSVlfstats2",
+        
+        "CMS_ttH_scaleME",
 
         "CMS_pu"
     ]
@@ -173,7 +175,8 @@ def fillBase(matched_processes, event, syst, schema):
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
                     LOG_MODULE_NAME.error("weight_nominal<=0")
-
+            if k == "ttbarOther__sl_jge4_tge2__numJets" and "triggerPath_mm" in proc.full_name:
+                print("fill", k, syst, weight)
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -189,6 +192,8 @@ def fillSystematic(matched_processes, event, systematic_weights, schema):
         for proc in matched_processes:
             for (k, histo_out) in proc.outdict_syst[syst_weight].items():
                 weight = _weight * proc.xs_weight
+                if k.startswith("ttbarOther__sl_jge4_tge2__numJets__CMS_ttH_scaleME") and "triggerPath_mm" in proc.full_name:
+                    print("fill", k, syst_weight, weight)
                 if histo_out.cut(event):
                     histo_out.fill(event, weight)
 
@@ -284,7 +289,8 @@ def createEvent(
     events, syst, schema,
     matched_processes,
     cls_bdt_sl, cls_bdt_dl,
-    calculate_bdt, do_recompute_btag_weights
+    calculate_bdt, do_recompute_btag_weights,
+    sample
     ):
 
     event = events.create_event(syst_pairs[syst])
@@ -311,7 +317,23 @@ def createEvent(
 
     if do_recompute_btag_weights and syst == "nominal" and schema == "mc":
         recompute_btag_weights(event)
-       
+   
+    #scaleME should be used only for some samples
+    if not "scaleME" in sample.tags:
+        event.weights[syst_pairs["CMS_ttH_scaleMEDown"]] = 1.0
+        event.weights[syst_pairs["CMS_ttH_scaleMEUp"]] = 1.0
+    else:
+        #weight correction factors introduced here so that the scaleME weight would be normalized
+        #to 1 in the inclusive phase space.
+        #Extracted from the mean of the weight distribution in (is_sl || is_dl) && (numJets>=3 && nBCSVM>=0)
+        event.weights[syst_pairs["CMS_ttH_scaleMEDown"]] = event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]/1.14
+        event.weights[syst_pairs["CMS_ttH_scaleMEUp"]] = event.weights[syst_pairs["CMS_ttH_scaleMEUp"]]/0.87
+        print("scaleWeight",
+            event.evt, event.numJets, event.nBCSVM,
+            event.weights[syst_pairs["CMS_ttH_scaleMEUp"]],
+            event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]
+        )
+
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
         event.lepton_weight = calc_lepton_SF(event)
@@ -445,6 +467,19 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                btag_weights += [bweight]
 
         systematic_weights += [
+
+                ("CMS_ttH_scaleMEUp", lambda ev, syst_pairs=syst_pairs:
+                    (ev.weights.at(syst_pairs["CMS_pu"]) *
+                    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
+                    ev.lepton_weight *
+                    ev.weights.at(syst_pairs["CMS_ttH_scaleMEUp"]))),
+                ("CMS_ttH_scaleMEDown", lambda ev, syst_pairs=syst_pairs:
+                    (ev.weights.at(syst_pairs["CMS_pu"]) *
+                    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
+                    ev.lepton_weight *
+                    ev.weights.at(syst_pairs["CMS_ttH_scaleMEDown"]))
+                ),
+                ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("CMS_puUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
@@ -617,7 +652,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     events, syst, schema,
                     matched_processes,
                     cls_bdt_sl, cls_bdt_dl,
-                    calculate_bdt, do_recompute_btag_weights
+                    calculate_bdt, do_recompute_btag_weights,
+                    sample
                 )
                 if event is None:
                     continue
@@ -702,15 +738,15 @@ if __name__ == "__main__":
 
     else:
         #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
         #sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = -1
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/small.cfg")
+        max_events = 50000
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 

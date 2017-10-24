@@ -28,9 +28,13 @@ FUNCTION_TABLE = {
     "btag_LR_4b_2b_btagCSV_logit": lambda ev: ev.btag_LR_4b_2b_btagCSV_logit,
     "common_bdt": lambda ev: ev.common_bdt,
     "jetsByPt_0_eta": lambda ev: ev.jets[0].lv.Eta(),
-    "jetsByPt_0_pt": lambda ev: ev.jets[0].lv.Pt(),
+    "jetsByPt_0_pt": lambda ev: ev.jets[0].lv.Pt() if len(ev.jets)>=1 else 0.0,
+    "jetsByPt_1_pt": lambda ev: ev.jets[1].lv.Pt() if len(ev.jets)>=2 else 0.0,
+    "jetsByPt_2_pt": lambda ev: ev.jets[2].lv.Pt() if len(ev.jets)>=3 else 0.0,
+    "jetsByPt_3_pt": lambda ev: ev.jets[3].lv.Pt() if len(ev.jets)>=4 else 0.0,
     "jetsByPt_0_btagCSV": lambda ev: ev.jets[0].btag,
     "leps_0_pt": lambda ev: ev.leptons[0].lv.Pt(),
+    "leps_1_pt": lambda ev: ev.leptons[1].lv.Pt(),
     "mem_DL_0w2h2t_p": lambda ev: ev.mem_DL_0w2h2t_p,
     "mem_SL_0w2h2t_p": lambda ev: ev.mem_SL_0w2h2t_p,
     "mem_SL_1w2h2t_p": lambda ev: ev.mem_SL_1w2h2t_p,
@@ -89,6 +93,7 @@ class Sample(object):
         self.files_load_step1 = kwargs.get("files_load_step1", None)
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
+        self.tags = kwargs.get("tags", "").split()
 
         #Load the filenames for step2 (VHBB + tthbb13)
         try:
@@ -130,6 +135,7 @@ class Sample(object):
             classifier_db_path = config.get(sample_name, "classifier_db_path", None),
             vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),
+            tags = config.get(sample_name, "tags")
         )
         return sample
 

@@ -45,10 +45,10 @@ syst_pairs = [
     ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
     ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
     ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down"),
-#    ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
-#    ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
-#    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
-#    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
+    ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
+    ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
+    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
+    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
 ]
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
@@ -67,7 +67,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "colors": plotlib.colors,
         "do_legend": True,
         "legend_loc": "best",
-        "legend_fontsize": 6,
+        "legend_fontsize": 10,
         "show_overflow": True,
         "title_extended": "\n" + category + r", $35.9\ \mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,

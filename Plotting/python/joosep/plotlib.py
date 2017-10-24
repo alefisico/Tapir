@@ -408,12 +408,12 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
     
     if do_tex:
-        fig.suptitle(r"\textbf{CMS} private work ",
-           y=1.02, x=0.02,
-           horizontalalignment="left", verticalalignment="bottom", fontsize=16
+        fig.suptitle(r"\textbf{CMS} private work",
+           y=0.98, x=0.02,
+           horizontalalignment="left", verticalalignment="top", fontsize=16
         )
     else:
-        fig.suptitle(r"$\mathbf{CMS}$ private work ",
+        fig.suptitle(r"$\mathbf{CMS}$ private work",
            y=1.02, x=0.02,
            horizontalalignment="left", verticalalignment="bottom", fontsize=16
         )
