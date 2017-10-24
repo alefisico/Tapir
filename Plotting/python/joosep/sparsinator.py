@@ -323,8 +323,8 @@ def createEvent(
         #weight correction factors introduced here so that the scaleME weight would be normalized
         #to 1 in the inclusive phase space.
         #Extracted from the mean of the weight distribution in (is_sl || is_dl) && (numJets>=4 && nBCSVM>=2)
-        event.weights[syst_pairs["CMS_ttH_scaleMEDown"]] = event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]/1.14
-        event.weights[syst_pairs["CMS_ttH_scaleMEUp"]] = event.weights[syst_pairs["CMS_ttH_scaleMEUp"]]/0.87
+        event.weights[syst_pairs["CMS_ttH_scaleMEDown"]] = event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]/1.13
+        event.weights[syst_pairs["CMS_ttH_scaleMEUp"]] = event.weights[syst_pairs["CMS_ttH_scaleMEUp"]]/0.88
 
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":

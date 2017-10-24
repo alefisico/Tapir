@@ -143,7 +143,7 @@ def signal_injection(datacard, output_path):
         limits += [res]
     return limits
 
-def pulls(datacard, signal_coef, output_path, asimov=True):
+def pulls(datacard, output_path, signal_coef=1, asimov=True):
 
     datacard_path, datacard_name = os.path.split(datacard)
     process_name = os.path.splitext(datacard_name)[0] + "_sig_{0:.2f}".format(signal_coef).replace(".", "_")
@@ -161,8 +161,8 @@ def pulls(datacard, signal_coef, output_path, asimov=True):
         #"--setCrossingTolerance=0.00001",
         "--minimizerStrategy=0",
         "--minimizerTolerance=0.00001",
-        "--robustFit", "1",
-        #"--minos", "all",
+        #"--robustFit", "1", #slower
+        "--minos", "all", #faster, but sometimes weird results
         "--saveShapes",
         "--saveWithUncertainties",
         "--rMin", "-10",

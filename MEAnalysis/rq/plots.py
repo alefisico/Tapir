@@ -72,7 +72,8 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "title_extended": "\n" + category + r", $35.9\ \mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,
         "do_syst": True,
-        "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
+        #"blindFunc": "blind_mem" if "mem" in variable else "no_blind",
+        "blindFunc": "no_blind",
         "do_tex": False 
     }
     if variable in ["numJets", "nBCSVM"]:

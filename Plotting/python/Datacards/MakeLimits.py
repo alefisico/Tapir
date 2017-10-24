@@ -101,22 +101,23 @@ def combine_cards(group_name, group, workdir):
     LOG_MODULE_NAME.info("Written to file {0}, running limit setting".format(group_dcard_filename))
     return group_dcard_filename
 
-def run_pulls(group_name, dcard_filename, workdir, asimov=True):
+def run_pulls(group_name, dcard_filename, workdir):
     #write constraints
-    suf = ""
-    if asimov:
-        suf += "_asimov"
 
-    for sig in [1, 0]:
-        #Run Asimov constraints
-        constraints, pulls_file = pulls(dcard_filename, sig, workdir, asimov)
+    for sig, asimov in [(1, True), (0, True), (1, False)]:
+        suf = ""
+        title = "to data"
+        if asimov:
+            suf = "_asimov"
+            title = "to Asimov"
+        constraints, pulls_file = pulls(dcard_filename, workdir, sig, asimov)
         of = open(workdir + "/constraints_{0}_sig{1}{2}.txt".format(group_name, sig, suf), "w")
         of.write(constraints)
         of.close()
 
         for ranges in [(0,20), (20, 40), (40, 60)]:
             plot_pulls(os.path.join(workdir, pulls_file), ranges[0], ranges[1])
-            plt.title("{0}\nmu={1} Asimov".format(group_name, sig))
+            plt.title("{0}\nmu={1} {2}".format(group_name, sig, title))
             plotlib.svfg(os.path.join(workdir, "pulls_{0}_sig{1}_r{2}_{3}{4}.pdf".format(group_name, sig, ranges[0], ranges[1], suf)))
 
 def run_pulls_tup(tup):
@@ -131,13 +132,14 @@ def main(
 ):
     
     limits = {}
-
+        
     # Decide what to run on
     if group:
         groups = [group]
     #Run on all groups
     else:
         groups = analysis.groups.keys()
+    
 
     # Prepare the limit getter
 
@@ -145,6 +147,9 @@ def main(
     for group_name in groups:
 
         group = [x for x in analysis.groups[group_name] if x.do_limit]
+        
+        if len(group) == 0:
+            continue
 
         group_dcard_filename = combine_cards(group_name, group, workdir)
 
@@ -226,6 +231,7 @@ if __name__ == "__main__":
         action = "store",
         help = "Type of job",
         type = str,
+        default = "main",
         choices = ["main", "pulls", "syst", "limit"]
     )
     parser.add_argument(
@@ -237,11 +243,6 @@ if __name__ == "__main__":
         '--runPulls',
         action = "store_true",
         help = "Run constraints",
-    )
-    parser.add_argument(
-        '--noAsimov',
-        action = "store_true",
-        help = "Ron only on asimov dataset",
     )
     args = parser.parse_args()
     
@@ -266,8 +267,8 @@ if __name__ == "__main__":
                 run_limit(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir)
         elif args.jobtype == "pulls":
             if len(categories)>1:
-                run_parallel(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir, not args.noAsimov) for g in categories])
+                run_parallel(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in categories])
             else:
-                run_pulls(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir, not args.noAsimov)
+                run_pulls(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir)
         elif args.jobtype == "syst":
             run_freeze(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir)

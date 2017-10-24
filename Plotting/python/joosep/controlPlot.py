@@ -67,7 +67,8 @@ syst_pairs.extend([
     ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
     ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
     ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
-    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown")
+    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
+    ("__CMS_ttH_scaleMEUp", "__CMS_ttH_scaleMEDown")
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -277,10 +278,10 @@ if __name__ == "__main__":
     cats = [
         ("sl_jge4_tge2", simple_vars),
         ("dl_jge4_tge2", simple_vars),
-        ("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
-        ("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
-        ("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
-        ("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
+        #("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        #("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        #("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
+        #("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
     ]
 
     args = []
@@ -296,7 +297,7 @@ if __name__ == "__main__":
     ]
 
     for arg in args:
-        arg["do_syst"] = False
+        arg["do_syst"] = True
         arg["do_tex"] = False
         if "numJets" in arg["histname"]:
             arg["do_log"] = True
