@@ -45,10 +45,16 @@ syst_pairs = [
     ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
     ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
     ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down"),
+    ("__CMS_effTrigger_eUp", "__CMS_effTrigger_eDown"),
+    ("__CMS_effTrigger_mUp", "__CMS_effTrigger_mDown"),
+    ("__CMS_effTrigger_eeUp", "__CMS_effTrigger_emDown"),
+    ("__CMS_effTrigger_mmUp", "__CMS_effTrigger_mmDown"),
+    ("__CMS_effTrigger_emUp", "__CMS_effTrigger_emDown"),
     ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
     ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
     ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
     ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
+    ("__CMS_ttH_scaleMEUp", "__CMS_ttH_scaleMEDown"),
 ]
 
 def get_base_plot(basepath, outpath, analysis, category, variable):
@@ -72,11 +78,11 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "title_extended": "\n" + category + r", $35.9\ \mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,
         "do_syst": True,
-        #"blindFunc": "blind_mem" if "mem" in variable else "no_blind",
-        "blindFunc": "no_blind",
+        "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
+        #"blindFunc": "no_blind",
         "do_tex": False 
     }
-    if variable in ["numJets", "nBCSVM"]:
+    if variable in ["numJets", "nBCSVM"] or variable.endswith("_pt"):
         ret["do_log"] = True
     return ret
 

@@ -670,7 +670,7 @@ class TaskLimits(Task):
                     args = [
                         "{0}/limits".format(self.workdir),
                         self.analysis,
-                        group
+                        [group]
                     ],
                     timeout = 10*60*60,
                     ttl = -1,

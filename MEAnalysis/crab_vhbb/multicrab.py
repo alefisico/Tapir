@@ -906,6 +906,10 @@ env
     submitname = args.tag
     config.General.workArea = 'crab_projects/' + submitname
     config.General.transferLogs = True
+   
+    #Disable overflow to prevent buggy site T2_US_UCSD
+    config.section_("Debug")
+    config.Debug.extraJDL = ['+CMS_ALLOW_OVERFLOW=False']
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'

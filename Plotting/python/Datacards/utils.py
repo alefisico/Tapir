@@ -98,20 +98,17 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     #create nuisance groups for easy manipulation
     nuisance_groups = {
         "jec": [k for k in all_shape_uncerts if k.startswith("CMS_scale")] + ["CMS_res_j"],
-        "theory": [
-            "bgnorm_ttbarPlus2B", "bgnorm_ttbarPlusB", "bgnorm_ttbarPlusBBbar", "bgnorm_ttbarPlusCCbar",
-            "QCDscale_ttH", "QCDscale_ttbar", "QCDscale_t",
-            "pdf_Higgs_ttH", "pdf_gg", "pdf_qg",
-            "CMS_ttjetsfsr",
-            "CMS_ttjetsisr",
-            "CMS_ttjetstune",
-            "CMS_ttjetshdamp",
-        ],
+        "bgnorm": ["bgnorm_ttbarPlus2B", "bgnorm_ttbarPlusB", "bgnorm_ttbarPlusBBbar", "bgnorm_ttbarPlusCCbar"],
+        "pdf": ["pdf_Higgs_ttH", "pdf_gg", "pdf_qg", "pdf_qqbar"],
+        "QCDscale": ["QCDscale_ttH", "QCDscale_ttbar", "QCDscale_t", "CMS_ttH_scaleME"],
+        "isrfsr": ["CMS_ttjetsfsr", "CMS_ttjetsisr"],
+        "tunehdamp": ["CMS_ttjetstune", "CMS_ttjetshdamp"],
         "btag": [k for k in all_shape_uncerts if k.startswith("CMS_ttH_CSV")],
         "misc": ["CMS_pu", "CMS_effID_e", "CMS_effID_m", "CMS_effIso_m", "CMS_effReco_e", "CMS_effTracking_m", "CMS_effTrigger_e", "CMS_effTrigger_m", "CMS_effTrigger_ee", "CMS_effTrigger_em", "CMS_effTrigger_mm", "lumi"],
         "mcstat": [k for k in all_shape_uncerts if "_Bin" in k]
     }
     nuisance_groups["exp"] = nuisance_groups["jec"] + nuisance_groups["btag"] + nuisance_groups["misc"] + nuisance_groups["mcstat"]
+    nuisance_groups["theory"] = nuisance_groups["bgnorm"] + nuisance_groups["pdf"] + nuisance_groups["QCDscale"] + nuisance_groups["isrfsr"] + nuisance_groups["tunehdamp"]
 
     for nuisance_group, nuisances in nuisance_groups.items():
         good_nuisances = []

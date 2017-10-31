@@ -394,11 +394,16 @@ public:
     TTreeReaderValue<T> genTopHad_pt;
     TTreeReaderValue<T> genTopLep_pt;
     
+    TTreeReaderValue<T> puWeight;
+    TTreeReaderValue<T> btagWeightCSV;
+    
     TreeDescriptionMCSystematic(TFile* file, SampleDescription sample) :
         TreeDescription<T>(file, sample),
         ttCls(TreeDescription<T>::reader, "ttCls"),
         genTopHad_pt(TreeDescription<T>::reader, "genTopHad_pt"),
-        genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt")
+        genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt"),
+        puWeight(TreeDescription<T>::reader, "puWeight"),
+        btagWeightCSV(TreeDescription<T>::reader, "btagWeightCSV")
     {}
     
     ~TreeDescriptionMCSystematic() {}

@@ -68,7 +68,12 @@ syst_pairs.extend([
     ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
     ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
     ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
-    ("__CMS_ttH_scaleMEUp", "__CMS_ttH_scaleMEDown")
+    ("__CMS_ttH_scaleMEUp", "__CMS_ttH_scaleMEDown"),
+    ("__CMS_effTrigger_eUp", "__CMS_effTrigger_eDown"),
+    ("__CMS_effTrigger_mUp", "__CMS_effTrigger_mDown"),
+    ("__CMS_effTrigger_eeUp", "__CMS_effTrigger_emDown"),
+    ("__CMS_effTrigger_mmUp", "__CMS_effTrigger_mmDown"),
+    ("__CMS_effTrigger_emUp", "__CMS_effTrigger_emDown"),
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -119,7 +124,7 @@ def blind_mem(h):
     print "blinding MEM"
     h = h.Clone()
     for ibin in range(0, h.GetNbinsX()+1):
-        if ibin >= h.GetNbinsX()/2:
+        if ibin > h.GetNbinsX()/2:
             h.SetBinContent(ibin, 0)
             h.SetBinError(ibin, 0)
     return h
@@ -265,13 +270,19 @@ if __name__ == "__main__":
     simple_vars = [
         "numJets",
         "nBCSVM",
-        "jetsByPt_0_btagCSV",
         "btag_LR_4b_2b_btagCSV_logit",
+        "jetsByPt_0_btagCSV",
+        "jetsByPt_1_btagCSV",
+        "jetsByPt_2_btagCSV",
+        "jetsByPt_3_btagCSV",
         "jetsByPt_0_pt",
-        #"jetsByPt_1_pt",
-        #"jetsByPt_2_pt",
-        #"jetsByPt_3_pt",
-        #"jetsByPt_4_pt",
+        "jetsByPt_1_pt",
+        "jetsByPt_2_pt",
+        "jetsByPt_3_pt",
+        "jetsByPt_0_eta",
+        "jetsByPt_1_eta",
+        "jetsByPt_2_eta",
+        "jetsByPt_3_eta",
         "leps_0_pt"
     ]
 

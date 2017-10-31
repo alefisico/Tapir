@@ -72,12 +72,17 @@ varnames = {
     "jetsByPt_0_pt": r"leading jet $p_T$ [GeV]",
     "jetsByPt_1_pt": r"subleading jet $p_T$ [GeV]",
     "jetsByPt_2_pt": r"third jet $p_T$ [GeV]",
+    "jetsByPt_3_pt": r"fourth jet $p_T$ [GeV]",
     
     "jetsByPt_0_btagCSV": r"leading jet CSV",
-
-    "jet0_eta": r"leading jet $\eta$",
-    "jet1_eta": r"subleading jet $\eta$",
-    "jet2_eta": r"third jet $\eta$",
+    "jetsByPt_1_btagCSV": r"subleading jet CSV",
+    "jetsByPt_2_btagCSV": r"third jet CSV",
+    "jetsByPt_3_btagCSV": r"fourth jet CSV",
+    
+    "jetsByPt_0_eta": r"leading jet $\eta$",
+    "jetsByPt_1_eta": r"subleading jet $\eta$",
+    "jetsByPt_2_eta": r"third jet $\eta$",
+    "jetsByPt_3_eta": r"fourth jet $\eta$",
     
     "leps_0_pt": r"leading lepton $p_T$ [GeV]",
     "numJets": r"$N_{\mathrm{jets}}$",

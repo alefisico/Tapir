@@ -10,6 +10,7 @@ Run the combine limit setting tool
 import os, sys
 import shutil
 import datetime
+import time
 import subprocess
 import ROOT
 import numpy as np
@@ -58,6 +59,18 @@ def get_limits_mlfit(fn, treename="limit"):
     err = tt.limitErr
     return lim, err
 
+def get_bestfit_mlfit_shapes(fn, treename="tree_fit_sb"):
+    f = ROOT.TFile(fn)
+    tt = f.Get(treename)
+    if not tt:
+        raise Exception("Could not find file {0}".format(fn))
+    tt.GetEntry(0)
+    mu = tt.mu
+    err = tt.muErr
+    errLow = tt.muLoErr
+    errHigh = tt.muHiErr
+    return mu, err, errLow, errHigh
+
 def limit(
     datacard,
     output_path,
@@ -101,7 +114,7 @@ def limit(
     
     output, stderr = process.communicate()
     if process.returncode != 0:
-        LOG_MODULE_NAME.error("error running combine: {0}".format(stderr))
+        raise Exception("error running combine: {0}".format(stderr))
     LOG_MODULE_NAME.info(output)
 
     # Put the output file in the correct place..
@@ -191,7 +204,7 @@ def pulls(datacard, output_path, signal_coef=1, asimov=True):
     
     output, stderr = process.communicate()
     if process.returncode != 0:
-        LOG_MODULE_NAME.error("error running combine: {0}".format(stderr))
+        raise Exception("error running combine: {0}".format(stderr))
     LOG_MODULE_NAME.info(output)
 
     diff_cmd = [
@@ -222,6 +235,8 @@ def pulls(datacard, output_path, signal_coef=1, asimov=True):
     )
     
     output, stderr = process.communicate()
+    if process.returncode != 0:
+        raise Exception("error running combine: {0}".format(stderr))
     return output, "plots{0}.root".format(process_name)
 
 def likelihoodScan(datacard, poi):
@@ -257,7 +272,8 @@ def likelihoodScan(datacard, poi):
         ),
     )
     output, stderr = process.communicate()
-    print output
+    if process.returncode != 0:
+        raise Exception("error running combine: {0}".format(stderr))
    
     scan_cmd = [
         CMSSW_BASE + "/src/CombineHarvester/CombineTools/scripts/plot1DScan.py",
@@ -281,13 +297,15 @@ def likelihoodScan(datacard, poi):
         ),
     )
     output, stderr = process.communicate()
+    if process.returncode != 0:
+        raise Exception("error running combine: {0}".format(stderr))
     print output
 
 def likelihoodScanTuple(tup):
     datacard, poi = tup
     return likelihoodScan(datacard, poi)
 
-def mlfit(datacard, freeze_groups=[]):
+def mlfit(datacard, freeze_groups=[], saveShapes=False):
     datacard_path, datacard_name = os.path.split(datacard)
 
     process_name = os.path.splitext(datacard_name)[0]
@@ -299,18 +317,22 @@ def mlfit(datacard, freeze_groups=[]):
         "-n", process_name,
         "-M", "MaxLikelihoodFit",
         "--minimizerStrategy=0",
-        "--minimizerTolerance=0.0000001",
-        "--robustFit", "1",
-        #"--minos", "all",
-        "--saveShapes",
-        "--saveWithUncertainties",
-        "--rMin", "-10",
-        "--rMax", "10",
+        "--minimizerTolerance=0.000001",
+        #"--robustFit", "1",
+        "--minos", "all",
+        "--rMin", "-3",
+        "--rMax", "3",
     ]
-
+    if saveShapes:
+        combine_cmd += [
+            "--saveShapes",
+            "--saveWithUncertainties",
+        ]
     if len(freeze_groups)>0:
         combine_cmd += ["--freezeNuisanceGroups", ",".join(freeze_groups)]
 
+    LOG_MODULE_NAME.info("combine command: {0}".format(" ".join(combine_cmd)))
+    
     process = subprocess.Popen(combine_cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -326,9 +348,11 @@ def mlfit(datacard, freeze_groups=[]):
         ),
     )
     output, stderr = process.communicate()
-
-    lim, err = get_limits_mlfit(os.path.join(datacard_path, "higgsCombine{0}.MaxLikelihoodFit.mH120.root".format(process_name)))
-    return lim, err
+    if process.returncode != 0:
+        raise Exception("error running combine: {0}".format(stderr))
+    time.sleep(10)
+    mu, err, errLo, errHi = get_bestfit_mlfit_shapes(os.path.join(datacard_path, "mlfit{0}.root".format(process_name)))
+    return mu, err, errLo, errHi
 
 def freeze_limits(datacard):
 
