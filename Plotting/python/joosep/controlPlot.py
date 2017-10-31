@@ -67,7 +67,13 @@ syst_pairs.extend([
     ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
     ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
     ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
-    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown")
+    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
+    ("__CMS_ttH_scaleMEUp", "__CMS_ttH_scaleMEDown"),
+    ("__CMS_effTrigger_eUp", "__CMS_effTrigger_eDown"),
+    ("__CMS_effTrigger_mUp", "__CMS_effTrigger_mDown"),
+    ("__CMS_effTrigger_eeUp", "__CMS_effTrigger_emDown"),
+    ("__CMS_effTrigger_mmUp", "__CMS_effTrigger_mmDown"),
+    ("__CMS_effTrigger_emUp", "__CMS_effTrigger_emDown"),
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -118,7 +124,7 @@ def blind_mem(h):
     print "blinding MEM"
     h = h.Clone()
     for ibin in range(0, h.GetNbinsX()+1):
-        if ibin >= h.GetNbinsX()/2:
+        if ibin > h.GetNbinsX()/2:
             h.SetBinContent(ibin, 0)
             h.SetBinError(ibin, 0)
     return h
@@ -264,23 +270,29 @@ if __name__ == "__main__":
     simple_vars = [
         "numJets",
         "nBCSVM",
-        "jetsByPt_0_btagCSV",
         "btag_LR_4b_2b_btagCSV_logit",
+        "jetsByPt_0_btagCSV",
+        "jetsByPt_1_btagCSV",
+        "jetsByPt_2_btagCSV",
+        "jetsByPt_3_btagCSV",
         "jetsByPt_0_pt",
-        #"jetsByPt_1_pt",
-        #"jetsByPt_2_pt",
-        #"jetsByPt_3_pt",
-        #"jetsByPt_4_pt",
+        "jetsByPt_1_pt",
+        "jetsByPt_2_pt",
+        "jetsByPt_3_pt",
+        "jetsByPt_0_eta",
+        "jetsByPt_1_eta",
+        "jetsByPt_2_eta",
+        "jetsByPt_3_eta",
         "leps_0_pt"
     ]
 
     cats = [
         ("sl_jge4_tge2", simple_vars),
         ("dl_jge4_tge2", simple_vars),
-        ("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
-        ("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
-        ("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
-        ("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
+        #("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        #("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        #("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
+        #("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
     ]
 
     args = []
@@ -296,7 +308,7 @@ if __name__ == "__main__":
     ]
 
     for arg in args:
-        arg["do_syst"] = False
+        arg["do_syst"] = True
         arg["do_tex"] = False
         if "numJets" in arg["histname"]:
             arg["do_log"] = True

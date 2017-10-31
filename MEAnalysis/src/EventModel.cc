@@ -58,6 +58,8 @@ EventDescription TreeDescriptionMCSystematic<T>::create_event(Systematic::SystId
     event.ttCls = *ttCls;
     event.genTopHad_pt = *genTopHad_pt;
     event.genTopLep_pt = *genTopLep_pt;
+    event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = (*btagWeightCSV);
+    event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = (*puWeight);
     return event;
 }
 

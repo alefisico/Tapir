@@ -294,3 +294,11 @@ tthbb13=cba59d2
 CommonClassifier=a10a9df
 MEIntegratorStandalone=3587b02
 CMSSW=050bb6b
+
+
+Oct27_data
+-------------
+tthbb13=a2fa0b8
+CommonClassifier=a10a9df
+MEIntegratorStandalone=3587b02
+CMSSW=050bb6b

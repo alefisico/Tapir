@@ -5,7 +5,7 @@
 import imp, os, sys, time
 import subprocess
 
-from CombineHelper import limit, pulls, signal_injection, freeze_limits
+from CombineHelper import limit, pulls, signal_injection, freeze_limits, mlfit
 from EnvForCombine import PATH, LD_LIBRARY_PATH, PYTHONPATH
 
 import logging
@@ -101,22 +101,23 @@ def combine_cards(group_name, group, workdir):
     LOG_MODULE_NAME.info("Written to file {0}, running limit setting".format(group_dcard_filename))
     return group_dcard_filename
 
-def run_pulls(group_name, dcard_filename, workdir, asimov=True):
+def run_pulls(group_name, dcard_filename, workdir):
     #write constraints
-    suf = ""
-    if asimov:
-        suf += "_asimov"
 
-    for sig in [1, 0]:
-        #Run Asimov constraints
-        constraints, pulls_file = pulls(dcard_filename, sig, workdir, asimov)
+    for sig, asimov in [(1, True), (0, True), (1, False)]:
+        suf = ""
+        title = "to data"
+        if asimov:
+            suf = "_asimov"
+            title = "to Asimov"
+        constraints, pulls_file = pulls(dcard_filename, workdir, sig, asimov)
         of = open(workdir + "/constraints_{0}_sig{1}{2}.txt".format(group_name, sig, suf), "w")
         of.write(constraints)
         of.close()
 
         for ranges in [(0,20), (20, 40), (40, 60)]:
             plot_pulls(os.path.join(workdir, pulls_file), ranges[0], ranges[1])
-            plt.title("{0}\nmu={1} Asimov".format(group_name, sig))
+            plt.title("{0}\nmu={1} {2}".format(group_name, sig, title))
             plotlib.svfg(os.path.join(workdir, "pulls_{0}_sig{1}_r{2}_{3}{4}.pdf".format(group_name, sig, ranges[0], ranges[1], suf)))
 
 def run_pulls_tup(tup):
@@ -125,19 +126,12 @@ def run_pulls_tup(tup):
 def main(
         workdir,
         analysis,
-        group = None,
+        groups,
         runSignalInjection = False,
         runPulls = False
 ):
     
     limits = {}
-
-    # Decide what to run on
-    if group:
-        groups = [group]
-    #Run on all groups
-    else:
-        groups = analysis.groups.keys()
 
     # Prepare the limit getter
 
@@ -145,12 +139,15 @@ def main(
     for group_name in groups:
 
         group = [x for x in analysis.groups[group_name] if x.do_limit]
+        
+        if len(group) == 0:
+            continue
 
         group_dcard_filename = combine_cards(group_name, group, workdir)
 
         # Asymptotic limits from observed
         lims = limit(group_dcard_filename, workdir, asimov=False)
-        limits[group_name] = lims[0][2]
+        limits[group_name] = lims[0]
         # Expected limits from Asimov
         lims = limit(group_dcard_filename, workdir, asimov=True)
         limits[group_name + "_asimov"] = lims[0]
@@ -159,7 +156,12 @@ def main(
             limits[group_name + "_siginject"] = signal_injection(group_dcard_filename, workdir)
         
         if runPulls:
-            run_pulls(group_name, group_dcard_filename, workdir) 
+            run_pulls(group_name, group_dcard_filename, workdir)
+        
+        mu, err, errLo, errHi = mlfit(group_dcard_filename, saveShapes=True)
+        mu_stat, err_stat, err_statLo, err_statHi = mlfit(group_dcard_filename, ["exp", "theory"])
+        limits[group_name + "_bestfit"] = [mu, err, errLo, errHi] 
+        limits[group_name + "_bestfit_statonly"] = [mu_stat, err_stat, err_statLo, err_statHi]
 
     # End loop over groups
 
@@ -216,9 +218,9 @@ if __name__ == "__main__":
         required = True
     )
     parser.add_argument(
-        '--category',
+        '--group',
         action = "store",
-        help = "Fit category",
+        help = "Fit group",
         type = str,
     )
     parser.add_argument(
@@ -226,6 +228,7 @@ if __name__ == "__main__":
         action = "store",
         help = "Type of job",
         type = str,
+        default = "main",
         choices = ["main", "pulls", "syst", "limit"]
     )
     parser.add_argument(
@@ -238,11 +241,6 @@ if __name__ == "__main__":
         action = "store_true",
         help = "Run constraints",
     )
-    parser.add_argument(
-        '--noAsimov',
-        action = "store_true",
-        help = "Ron only on asimov dataset",
-    )
     args = parser.parse_args()
     
     logging.basicConfig(
@@ -251,23 +249,41 @@ if __name__ == "__main__":
     analysis = Analysis.deserialize(args.config)
     workdir = os.path.dirname(args.config) + "/limits"
 
-    if not args.category:
-        print "choose a category:", sorted(analysis.groups.keys())
+    if not args.group:
+        print "choose a group:", sorted(analysis.group.keys())
     else:
-        if args.category == "all":
-            categories = analysis.groups.keys()
-        categories = args.category.split(",")
-        if args.jobtype == "main":
-            main(workdir, analysis, args.category, args.runSignalInjection, args.runPulls)
-        elif args.jobtype == "limit":
-            if len(categories)>1:
-                run_parallel(run_limit_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in categories])
-            else:
-                run_limit(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir)
-        elif args.jobtype == "pulls":
-            if len(categories)>1:
-                run_parallel(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir, not args.noAsimov) for g in categories])
-            else:
-                run_pulls(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir, not args.noAsimov)
-        elif args.jobtype == "syst":
-            run_freeze(args.category, os.path.join(workdir, "shapes_group_{0}.txt".format(args.category)), workdir)
+        if args.group == "all":
+            groups = analysis.groups.keys()
+        else:
+            groups = args.group.split(",")
+            
+        groups_to_run = []
+        for group_name in groups:
+            group = analysis.groups[group_name]
+            do_limit = False 
+            for cat in group:
+                print cat.full_name, cat.do_limit
+                do_limit = do_limit or cat.do_limit
+            if do_limit:
+                groups_to_run += [group_name]
+        
+        if len(groups_to_run) == 0:
+            print("Could not find any categories or groups to run limits on")
+        else:
+            if args.jobtype == "main":
+                limits = main(workdir, analysis, groups_to_run, args.runSignalInjection, args.runPulls)
+                of = open(os.path.join(workdir, "../limits.json"), "w")
+                json.dump(limits, of, indent=2)
+                of.close()
+            elif args.jobtype == "limit":
+                if len(groups_to_run)>1:
+                    run_parallel(run_limit_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in groups_to_run])
+                else:
+                    run_limit(args.group, os.path.join(workdir, "shapes_group_{0}.txt".format(args.group)), workdir)
+            elif args.jobtype == "pulls":
+                if len(groups_to_run)>1:
+                    run_serial(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in groups_to_run])
+                else:
+                    run_pulls(groups_to_run[0], os.path.join(workdir, "shapes_group_{0}.txt".format(args.group)), workdir)
+            elif args.jobtype == "syst":
+                run_freeze(args.group, os.path.join(workdir, "shapes_group_{0}.txt".format(args.group)), workdir)

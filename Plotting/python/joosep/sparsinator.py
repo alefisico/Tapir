@@ -175,8 +175,6 @@ def fillBase(matched_processes, event, syst, schema):
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
                     LOG_MODULE_NAME.error("weight_nominal<=0")
-            if k == "ttbarOther__sl_jge4_tge2__numJets" and "triggerPath_mm" in proc.full_name:
-                print("fill", k, syst, weight)
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -192,8 +190,6 @@ def fillSystematic(matched_processes, event, systematic_weights, schema):
         for proc in matched_processes:
             for (k, histo_out) in proc.outdict_syst[syst_weight].items():
                 weight = _weight * proc.xs_weight
-                if k.startswith("ttbarOther__sl_jge4_tge2__numJets__CMS_ttH_scaleME") and "triggerPath_mm" in proc.full_name:
-                    print("fill", k, syst_weight, weight)
                 if histo_out.cut(event):
                     histo_out.fill(event, weight)
 
@@ -328,11 +324,6 @@ def createEvent(
         #Extracted from the mean of the weight distribution in (is_sl || is_dl) && (numJets>=3 && nBCSVM>=0)
         event.weights[syst_pairs["CMS_ttH_scaleMEDown"]] = event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]/1.14
         event.weights[syst_pairs["CMS_ttH_scaleMEUp"]] = event.weights[syst_pairs["CMS_ttH_scaleMEUp"]]/0.87
-        print("scaleWeight",
-            event.evt, event.numJets, event.nBCSVM,
-            event.weights[syst_pairs["CMS_ttH_scaleMEUp"]],
-            event.weights[syst_pairs["CMS_ttH_scaleMEDown"]]
-        )
 
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
@@ -481,7 +472,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 ),
                 ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("CMS_puUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
-                ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("unweighted", lambda ev: 1.0),

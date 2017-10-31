@@ -1,11 +1,21 @@
 #!/bin/bash
+set +e
+set -v
 
-combine -M MultiDimFit --saveWorkspace -n _step1 --minimizerStrategy 0 --minimizerTolerance 0.00001 --rMin -10 --rMax 10 shapes_group_group_sldl.txt
-CMD="combine higgsCombine_step1.MultiDimFit.mH120.root -w w --snapshotName "MultiDimFit"  -M MaxLikelihoodFit --minimizerStrategy 0 --minimizerTolerance 0.00001 --rMin -10 --rMax 10 --minos all"
-$CMD > freeze_none.log
-$CMD --freezeNuisanceGroups exp,theory > freeze_all.log
-$CMD --freezeNuisanceGroups exp > freeze_exp.log
-$CMD --freezeNuisanceGroups theory > freeze_theory.log
-$CMD --freezeNuisanceGroups jec > freeze_jec.log
-$CMD --freezeNuisanceGroups btag > freeze_btag.log
-$CMD --freezeNuisanceGroups mcstat > freeze_mcstat.log
+datacard=$1
+combine -M MultiDimFit --saveWorkspace -n _step1 --minimizerStrategy 0 --minimizerTolerance 0.00001 --rMin -10 --rMax 10 $datacard
+CMD="combine higgsCombine_step1.MultiDimFit.mH120.root -w w --snapshotName MultiDimFit --robustFit 1 -M MaxLikelihoodFit --minimizerStrategy 0 --minimizerTolerance 0.00001 --rMin -10 --rMax 10"
+$CMD > freeze_none.log &
+$CMD -n freeze_all --freezeNuisanceGroups exp,theory > freeze_all.log &
+$CMD -n freeze_exp --freezeNuisanceGroups exp > freeze_exp.log &
+$CMD -n freeze_theory --freezeNuisanceGroups theory > freeze_theory.log &
+$CMD -n freeze_jec --freezeNuisanceGroups jec > freeze_jec.log &
+$CMD -n freeze_btag --freezeNuisanceGroups btag > freeze_btag.log &
+$CMD -n freeze_mcstat --freezeNuisanceGroups mcstat > freeze_mcstat.log &
+$CMD -n freeze_misc --freezeNuisanceGroups misc > freeze_misc.log &
+$CMD -n freeze_QCDscale --freezeNuisanceGroups QCDscale > freeze_QCDscale &
+$CMD -n freeze_isrfsr --freezeNuisanceGroups isrfsr > freeze_isrfsr &
+$CMD -n freeze_bgnorm --freezeNuisanceGroups bgnorm > freeze_bgnorm &
+$CMD -n freeze_pdf --freezeNuisanceGroups pdf > freeze_pdf &
+$CMD -n freeze_tunehdamp --freezeNuisanceGroups tunehdamp > freeze_tunehdamp &
+wait
