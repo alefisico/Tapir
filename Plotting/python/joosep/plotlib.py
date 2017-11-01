@@ -9,7 +9,6 @@ if os.environ.has_key("CMSSW_BASE"):
 import ROOT
 ROOT.gROOT.SetBatch(True)
 
-
 import uuid
 
 import matplotlib
@@ -28,13 +27,14 @@ import math
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 
+from matplotlib.ticker import AutoMinorLocator
 
 #Configure fonts for CMS style
 matplotlib.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 matplotlib.rc("axes", labelsize=24)
 matplotlib.rc("axes", titlesize=16)
 #needs to be enabled to use latex in plot titles
-plt.rc('text', usetex=True)
+#plt.rc('text', usetex=True)
 
 #All the colors of the various processes
 #extracted using the apple color picker tool
@@ -413,7 +413,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     a1 = plt.axes([0.0, 0.22, 1.0, 0.8])
     
     if do_tex:
-        fig.suptitle(r"\textbf{CMS} private work",
+        fig.suptitle(r"$\mathrm{CMS}$ private work",
            y=0.98, x=0.02,
            horizontalalignment="left", verticalalignment="top", fontsize=16
         )
@@ -509,7 +509,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
                 patches += [patch]
 
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="//////")]
-        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+shape", hatch=r"\\\\")]
+        patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch=r"\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
         
     #create an automatic bin width label on the y axis
@@ -549,8 +549,10 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         data_ratio.Divide(histogram_total_mc)
 
         #In case MC was empty, set data/mc ratio to 0
-        for ibin in range(data_ratio.GetNbinsX()):
+        for ibin in range(data_ratio.GetNbinsX()+1):
             bc = histogram_total_mc.GetBinContent(ibin)
+            if bc > 0:
+                data_ratio.SetBinError(ibin, data.GetBinError(ibin)/bc)
             if bc==0:
                 data_ratio.SetBinContent(ibin, 0)
         
@@ -747,69 +749,104 @@ def get_cut_at_eff(h, eff):
     idx = np.searchsorted(bins, eff)
     return idx
 
-def brazilplot(limits, categories, category_names, axes=None):
+def brazilplot(limits, categories, axes=None, doObserved=False):
     """Draws the a set of limits on a brazil plot
-    
+
     Args:
         limits (dict of string->(lim, error): the actual limit data, as from CombineHelper:get_limits
         categories (list of string): the categories (dict keys) to draw
         category_names (list of string): The beautified names of the categories, in the same order as categories
         axes (None, optional): the pyplot axes to use
-    
+
     Returns:
         TYPE: nothing
     """
     if not axes:
         axes = plt.axes()
-    
+
     central_limits = []
+    observed_limits = []
     errs = np.zeros((len(categories), 4))
 
     #fill in the data
     i = 0
-    for k in categories:
-        
+    for catname, cattitle in categories:
+
         #central value
-        central_limits += [limits[k][0][2]]
-      
+        central_limits += [limits[catname][2]]
+        observed_limits += [limits[catname][5]]
+
         #error band
-        errs[i,0] = limits[k][0][1]
-        errs[i,1] = limits[k][0][3]
-        errs[i,2] = limits[k][0][0]
-        errs[i,3] = limits[k][0][4]
-        
+        errs[i,0] = limits[catname][1]
+        errs[i,1] = limits[catname][3]
+        errs[i,2] = limits[catname][0]
+        errs[i,3] = limits[catname][4]
+
         i += 1
-    
+
     #y coordinates
     ys = np.array(range(len(categories)))
 
+    table_data = []
     #draw points
-    for y, l, e1, e2, e3, e4 in zip(ys, central_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
-        
+    i = 0
+    for y, l, o, e1, e2, e3, e4 in zip(ys, central_limits, observed_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
+
         #black line
-        axes.add_line(plt.Line2D([l, l], [y, y+1.0], lw=2, color="black", ls="-"))
+        axes.add_line(plt.Line2D([l, l], [y-0.45, y+0.45], lw=2, color="black", ls="--"))
+
+        leg_args = {}
+        #axes.add_line(plt.Line2D([o, o], [y-0.4, y+0.4], lw=2, color="black", ls="-"))
+        if i == 0:
+            leg_args["label"] = "observed"
+        if doObserved:
+            axes.errorbar([o], [y], [0.4], marker="s", color="black", **leg_args)
         
         #value
-        plt.text(l*1.05, y+0.5, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
-        
+        plt.text(l+0.5, y, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
+
+        leg_args1 = {}
+        leg_args2 = {}
+        if i == 0:
+            leg_args1["label"] = "95% expected"
+            leg_args2["label"] = "68% expected"
         #error bars
-        axes.barh(y+0.1, (e4-e3), left=e3, color=np.array([254, 247, 2])/255.0, lw=0)
-        axes.barh(y+0.1, (e2-e1), left=e1, color=np.array([51, 247, 2])/255.0 , lw=0)
-        
+        axes.barh(y, (e4-e3), height=0.8, left=e3, color=np.array([254, 247, 2])/255.0, lw=0, align="center", **leg_args1)
+        axes.barh(y, (e2-e1), height=0.8, left=e1, color=np.array([51, 247, 2])/255.0 , lw=0, align="center", **leg_args2)
+        table_data += [(categories[i][1], e3, l, e4)]
+        i += 1
     #set ranges
+
     plt.xlim(0, 1.2*max(central_limits))
-    plt.ylim(ys[0], ys[-1]+1)
-    
+    plt.ylim(ys[0]-0.5, ys[-1]*1.2)
+
     #set category names
-    plt.yticks(ys+0.5, category_names, verticalalignment="center", fontsize=18, ha="right")
-    plt.xlabel("$\mu$")
+    plt.yticks(ys, [k[1] for k in categories], verticalalignment="center", fontsize=22, ha="right")
+    plt.xlabel("95% CL on $\mu$")
     yax = axes.get_yaxis()
+    
+    
+    minorLocator = AutoMinorLocator()
+    axes.xaxis.set_minor_locator(minorLocator)
+
+    axes.tick_params(axis = 'both', which = 'major', labelsize=16)
+    axes.tick_params(axis = 'both', which = 'minor')
+
+    plt.legend(loc=1, fontsize=12, numpoints = 1, frameon=False)
+    plt.title(
+        r"$\mathbf{CMS}$ private work (blinded)",
+        fontsize=16, x=0.05, ha="left", y=0.95, va="top", fontname="Helvetica"
+    )
+    plt.text(0.99, 1.00,
+        "$35.9\ \mathrm{fb}^{-1}\ \mathrm{(13\ TeV)}$",
+        fontsize=16, ha="right", va="bottom", transform=axes.transAxes, fontname="Helvetica"
+    )
+
     # find the maximum width of the label on the major ticks
     #pad = 150
     #yax.set_tick_params(pad=pad)
-
+    return table_data
     #plt.grid()
-
 
 def make_df_hist(bins, x, w=1.0):
     h = rootpy.plotting.Hist(*bins)

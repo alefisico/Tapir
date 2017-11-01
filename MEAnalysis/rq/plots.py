@@ -65,7 +65,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "category": category,
         "outname": os.path.abspath("/".join([outpath, category, variable])),
         "procs": procs_names,
-        "signal_procs": ["ttH_hbb"],
+        "signal_procs": ["ttH_hbb", "ttH_nonhbb"],
         "dataname": "data",
         "rebin": 1,
         "xlabel": plotlib.varnames[variable] if variable in plotlib.varnames.keys() else "PLZ add {0} to Varnames in plotlib.py".format(variable),

@@ -289,10 +289,10 @@ if __name__ == "__main__":
     cats = [
         ("sl_jge4_tge2", simple_vars),
         ("dl_jge4_tge2", simple_vars),
-        #("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
-        #("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
-        #("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
-        #("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
+        ("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        ("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
+        ("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
+        ("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
     ]
 
     args = []

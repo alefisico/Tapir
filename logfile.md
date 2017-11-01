@@ -302,3 +302,11 @@ tthbb13=a2fa0b8
 CommonClassifier=a10a9df
 MEIntegratorStandalone=3587b02
 CMSSW=050bb6b
+
+
+Nov1_mc
+-------------
+tthbb13=38d1bda
+CommonClassifier=a10a9df
+MEIntegratorStandalone=3587b02
+CMSSW=050bb6b
