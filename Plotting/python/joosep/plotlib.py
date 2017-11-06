@@ -85,6 +85,10 @@ varnames = {
     "jetsByPt_3_eta": r"fourth jet $\eta$",
     
     "leps_0_pt": r"leading lepton $p_T$ [GeV]",
+    "leps_1_pt": r"subleading lepton $p_T$ [GeV]",
+    "leps_0_eta": r"leading lepton $\eta$",
+    "leps_1_eta": r"subleading lepton $\eta$",
+
     "numJets": r"$N_{\mathrm{jets}}$",
     "nBCSVM": r"$N_{\mathrm{CSVM}}$",
 

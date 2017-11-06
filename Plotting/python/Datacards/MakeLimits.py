@@ -62,7 +62,7 @@ def plot_pulls(fn, first=0, maxn=20):
     plt.grid()
     plt.yticks(ys[first:maxn], [labels1[o] for o in order[first:maxn]]);
     plt.xlim(-1.5, 1.5)
-    
+    plt.xlabel(r"$\Delta \theta / \theta_0$") 
     f.Close()
 
 def combine_cards(group_name, group, workdir):
@@ -250,7 +250,7 @@ if __name__ == "__main__":
     workdir = os.path.dirname(args.config) + "/limits"
 
     if not args.group:
-        print "choose a group:", sorted(analysis.group.keys())
+        print "choose a group:", sorted(analysis.groups.keys())
     else:
         if args.group == "all":
             groups = analysis.groups.keys()

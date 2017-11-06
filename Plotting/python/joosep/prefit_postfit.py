@@ -3,6 +3,7 @@ rc('text', usetex=False)
 from TTH.Plotting.joosep import plotlib
 import rootpy
 import rootpy.io
+import sys
 
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
@@ -18,8 +19,6 @@ procs_names = [
     ("wjets", "w+jets"),
     ("dy", "dy")
 ]
-
-tf = rootpy.io.File("results/2017-10-30T20-03-26-609041_dde7d311-e1ca-4842-a91a-b960119b7e3d/limits/mlfitshapes_group_group_sldl.root")
 
 channel_titles = dict([
     ("sl_j4_t3", "SL 4j3t"),
@@ -52,7 +51,7 @@ def postprocess_hist(h, template):
         h2.SetBinError(ibin, h.GetBinError(ibin))
     return h2
 
-def draw_channel_prefit_postfit(ch, chname, template, xlabel):
+def draw_channel_prefit_postfit(ch, chname, template, xlabel, path):
 
     available_hists = [k.GetName() for k in tf.Get("shapes_prefit").Get(ch).GetListOfKeys()]
     
@@ -79,7 +78,7 @@ def draw_channel_prefit_postfit(ch, chname, template, xlabel):
     ymax = 2.0*sum([h.GetMaximum() for h in ret["nominal"].values()])
     ret["axes"][0].set_ylim(0, ymax)
     ret["axes"][1].set_ylim(0.5, 1.5)
-    plotlib.svfg("./out/{0}_prefit.pdf".format(chname))
+    plotlib.svfg(path + "/{0}_prefit.pdf".format(chname))
 
     ret = plotlib.draw_data_mc(tf, "",
         procs,
@@ -100,18 +99,22 @@ def draw_channel_prefit_postfit(ch, chname, template, xlabel):
     )
     ret["axes"][0].set_ylim(0, ymax)
     ret["axes"][1].set_ylim(0.5, 1.5)
-    plotlib.svfg("./out/{0}_postfit.pdf".format(chname))
+    plotlib.svfg(path + "/{0}_postfit.pdf".format(chname))
     return ret
 
-for ch, chname, template, xlabel in [
-    ("ch1", "sl_j4_t3", rootpy.plotting.Hist(6,-1,4), "btag LR"),
-    ("ch2", "sl_j4_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
-    ("ch3", "sl_j5_t3", rootpy.plotting.Hist(6,0,5), "btag LR"),
-    ("ch4", "sl_j5_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
-    ("ch5", "sl_jge6_t3", rootpy.plotting.Hist(6,1,6), "btag LR"),
-    ("ch6", "sl_jge6_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
-    ("ch8", "dl_jge4_t3", rootpy.plotting.Hist(6,-1,6), "btag LR"),
-    ("ch7", "dl_jge4_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
-    ]:
-    
-    ret = draw_channel_prefit_postfit(ch, chname, template, xlabel)
+if __name__ == "__main__":
+    path = sys.argv[1]
+    tf = rootpy.io.File(path + "/limits/mlfitshapes_group_group_sldl.root")
+
+    for ch, chname, template, xlabel in [
+        ("ch1", "sl_j4_t3", rootpy.plotting.Hist(6,-1,4), "btag LR"),
+        ("ch2", "sl_j4_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
+        ("ch3", "sl_j5_t3", rootpy.plotting.Hist(6,0,5), "btag LR"),
+        ("ch4", "sl_j5_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
+        ("ch5", "sl_jge6_t3", rootpy.plotting.Hist(6,1,6), "btag LR"),
+        ("ch6", "sl_jge6_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
+        ("ch8", "dl_jge4_t3", rootpy.plotting.Hist(6,-1,6), "btag LR"),
+        ("ch7", "dl_jge4_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
+        ]:
+        
+        ret = draw_channel_prefit_postfit(ch, chname, template, xlabel, path)

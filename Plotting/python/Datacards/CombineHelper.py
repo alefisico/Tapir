@@ -169,11 +169,10 @@ def pulls(datacard, output_path, signal_coef=1, asimov=True):
                        "--expectSignal", str(signal_coef),
                        datacard_name]
     combine_command += [
-        #"--robustFit", "1",
         #"--setRobustFitTolerance=0.00001",
         #"--setCrossingTolerance=0.00001",
         "--minimizerStrategy=0",
-        "--minimizerTolerance=0.00001",
+        "--minimizerTolerance=0.0000001",
         #"--robustFit", "1", #slower
         "--minos", "all", #faster, but sometimes weird results
         "--saveShapes",
@@ -239,9 +238,9 @@ def pulls(datacard, output_path, signal_coef=1, asimov=True):
         raise Exception("error running combine: {0}".format(stderr))
     return output, "plots{0}.root".format(process_name)
 
-def likelihoodScan(datacard, poi):
+def likelihoodScan(datacard, poi, sig=1):
     datacard_path, datacard_name = os.path.split(datacard)
-    process_name = os.path.splitext(datacard_name)[0] + "_poi_{0}".format(poi)
+    process_name = os.path.splitext(datacard_name)[0] + "_poi_{0}".format(poi) + "_sig_{0}".format(sig)
     
     combine_cmd = [
         "combine", datacard_name,
@@ -250,13 +249,16 @@ def likelihoodScan(datacard, poi):
         "-t", "-1",
         "-P", poi,
         "--point", "100",
-        "--algo", "grid"
-        #"--robustFit", "1",
+        "--algo", "grid",
+        "--robustFit", "1",
+        "--expectSignal", str(sig)
         #"--setRobustFitTolerance=0.00001",
         #"--setCrossingTolerance=0.00001",
         #"--minimizerStrategy=0",
         #"--minimizerTolerance=0.00001",
     ]
+    LOG_MODULE_NAME.info("combine command: {0}".format(" ".join(combine_cmd)))
+    
     process = subprocess.Popen(combine_cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -388,80 +390,68 @@ def significance(datacard, asimov=True):
         combined_cmd += ["-t", "-1", "--expectSignal=1"]
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.DEBUG
+    )
     datacard = sys.argv[1]
     workdir = os.path.dirname(datacard)
-    do_ll_scans = False
-
-    ret = {}
-    #run limits
-    lg = LimitGetter(workdir)
-    ret["limits"] = lg(datacard)
-    ret["siginject"] = lg.runSignalInjection(datacard)
-
-    #run constrraints
-    cg = ConstraintGetter(workdir)
-    constraints = cg(datacard, 1.0)
-    
+    do_ll_scans = True
+   
+    #pulls(datacard, workdir)
     if do_ll_scans:
         pois = [
-            "CMS_effID_e",
-            "CMS_effID_m",
-            "CMS_effIso_m",
-            "CMS_effReco_e",
-            "CMS_effTracking_m",
-            "CMS_pu",
-            "CMS_res_j",
-            "CMS_scaleAbsoluteFlavMap_j",
-            "CMS_scaleAbsoluteMPFBias_j",
-            "CMS_scaleAbsoluteScale_j",
-            "CMS_scaleAbsoluteStat_j",
+           # "CMS_effID_e",
+           # "CMS_effID_m",
+           # "CMS_effIso_m",
+           # "CMS_effReco_e",
+           # "CMS_effTracking_m",
+           "CMS_pu",
+           # "CMS_res_j",
+           # "CMS_scaleAbsoluteFlavMap_j",
+           # "CMS_scaleAbsoluteMPFBias_j",
+           # "CMS_scaleAbsoluteScale_j",
+           # "CMS_scaleAbsoluteStat_j",
             "CMS_scaleFlavorQCD_j",
-            "CMS_scaleFragmentation_j",
-            "CMS_scalePileUpDataMC_j",
-            "CMS_scalePileUpPtBB_j",
-            "CMS_scalePileUpPtEC1_j",
-            "CMS_scalePileUpPtEC2_j",
-            "CMS_scalePileUpPtHF_j",
-            "CMS_scalePileUpPtRef_j",
-            "CMS_scaleRelativeFSR_j",
-            "CMS_scaleRelativeJEREC1_j",
-            "CMS_scaleRelativeJEREC2_j",
-            "CMS_scaleRelativeJERHF_j",
-            "CMS_scaleRelativePtBB_j",
-            "CMS_scaleRelativePtEC1_j",
-            "CMS_scaleRelativePtEC2_j",
-            "CMS_scaleRelativePtHF_j",
-            "CMS_scaleRelativeStatEC_j",
-            "CMS_scaleRelativeStatFSR_j",
-            "CMS_scaleRelativeStatHF_j",
-            "CMS_scaleSinglePionECAL_j",
-            "CMS_scaleSinglePionHCAL_j",
-            "CMS_scaleTimePtEta_j",
-            "CMS_ttH_CSVcferr1",
-            "CMS_ttH_CSVcferr2",
-            "CMS_ttH_CSVhf",
-            "CMS_ttH_CSVhfstats1",
-            "CMS_ttH_CSVhfstats2",
-            "CMS_ttH_CSVjes",
-            "CMS_ttH_CSVlf",
-            "CMS_ttH_CSVlfstats1",
-            "CMS_ttH_CSVlfstats2",
-            "QCDscale_ttbar",
-            "bgnorm_ttbarPlus2B",
-            "bgnorm_ttbarPlusB",
-            "bgnorm_ttbarPlusBBbar",
-            "bgnorm_ttbarPlusCCbar",
-            "lumi",
-            "pdf_gg",
-            ]
+           # "CMS_scaleFragmentation_j",
+           # "CMS_scalePileUpDataMC_j",
+           # "CMS_scalePileUpPtBB_j",
+           # "CMS_scalePileUpPtEC1_j",
+           # "CMS_scalePileUpPtEC2_j",
+           # "CMS_scalePileUpPtHF_j",
+           # "CMS_scalePileUpPtRef_j",
+           # "CMS_scaleRelativeFSR_j",
+           # "CMS_scaleRelativeJEREC1_j",
+           # "CMS_scaleRelativeJEREC2_j",
+           # "CMS_scaleRelativeJERHF_j",
+           # "CMS_scaleRelativePtBB_j",
+           # "CMS_scaleRelativePtEC1_j",
+           # "CMS_scaleRelativePtEC2_j",
+           # "CMS_scaleRelativePtHF_j",
+           # "CMS_scaleRelativeStatEC_j",
+           # "CMS_scaleRelativeStatFSR_j",
+           # "CMS_scaleRelativeStatHF_j",
+           # "CMS_scaleSinglePionECAL_j",
+           # "CMS_scaleSinglePionHCAL_j",
+           # "CMS_scaleTimePtEta_j",
+           "CMS_ttH_CSVcferr1",
+           "CMS_ttH_CSVcferr2",
+           "CMS_ttH_CSVhf",
+           "CMS_ttH_CSVhfstats1",
+           "CMS_ttH_CSVhfstats2",
+           "CMS_ttH_CSVjes",
+           "CMS_ttH_CSVlf",
+           "CMS_ttH_CSVlfstats1",
+           "CMS_ttH_CSVlfstats2",
+           "QCDscale_ttbar",
+           "bgnorm_ttbarPlus2B",
+           "bgnorm_ttbarPlusB",
+           "bgnorm_ttbarPlusBBbar",
+           "bgnorm_ttbarPlusCCbar",
+           "lumi",
+           "pdf_gg",
+        ]
 
         #run log likelihood scan
-        pool = multiprocessing.Pool(10)
-        pool.map(likelihoodScanTuple, [(datacard, poi) for poi in pois])
-        pool.close()
-
-    #run
-    ret["limits_syst"] = freeze_limits(datacard)
-    of = open("output.json", "w")
-    json.dump(ret, of, indent=2)
-    of.close()
+        #pool = multiprocessing.Pool(10)
+        map(likelihoodScanTuple, [(datacard, poi) for poi in pois])
+        #pool.close()
