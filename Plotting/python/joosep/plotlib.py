@@ -540,6 +540,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
     #do ratio panel
     if data:
         a2 = plt.axes([0.0,0.0, 1.0, 0.18], sharex=a1)
+        minorLocator = AutoMinorLocator()
+        a2.yaxis.set_minor_locator(minorLocator)
 
         plt.xlabel(xlabel)
         a2.grid()
@@ -608,7 +610,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         )
         plt.ylabel(r"$\frac{\mathrm{data}}{\mathrm{pred.}}$", fontsize=16)
         plt.axhline(1.0, color="black")
-        a2.set_ylim(0, 2)
+        a2.set_ylim(0.5, 1.5)
         #hide last tick on ratio y axes
         #a2.set_yticks(a2.get_yticks()[:-1])
         a2.set_xticks(ticks)

@@ -308,7 +308,7 @@ if __name__ == "__main__":
     ]
 
     for arg in args:
-        arg["do_syst"] = True
+        arg["do_syst"] = False
         arg["do_tex"] = False
         if "numJets" in arg["histname"]:
             arg["do_log"] = True
