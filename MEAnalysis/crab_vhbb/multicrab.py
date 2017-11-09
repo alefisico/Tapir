@@ -125,7 +125,7 @@ for sd in sets_data:
         "maxlumis": -1,
         "perjob": 30,
         "runtime": 20, #hours
-        "mem_cfg": me_cfgs["nome"],
+        "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script_data.sh'
     }
 datasets.update({

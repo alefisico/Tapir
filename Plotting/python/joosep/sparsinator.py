@@ -125,6 +125,17 @@ def lv_p4s(pt, eta, phi, m, btagCSV=-100):
     ret.btagCSV = btagCSV
     return ret
 
+def pass_METfilter(event, schema):
+    ret = True
+    ret = ret and event.Flag_goodVertices
+    ret = ret and event.Flag_GlobalTightHalo2016Filter
+    ret = ret and event.Flag_HBHENoiseFilter
+    ret = ret and event.Flag_HBHENoiseIsoFilter
+    ret = ret and event.Flag_EcalDeadCellTriggerPrimitiveFilter
+    if schema == "data":
+        ret = ret and event.Flag_eeBadScFilter
+    return ret
+
 def pass_HLT_sl_mu(event):
     pass_hlt = event.HLT_ttH_SL_mu
     return event.is_sl and pass_hlt and len(event.leps_pdgId)>=1 and int(abs(event.leps_pdgId[0])) == 13
@@ -651,7 +662,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #make sure data event is in golden JSON
                 if schema == "data" and not event.json:
                     continue
-                 
+                
+                if not pass_METfilter(event, schema):
+                    print("Event {0}:{1}:{2} failed MET filter".format(event.run, event.lumi, event.evt))
+                    continue
+
                 #SL specific MET cut
                 if event.is_sl:
                     if event.met_pt <= 20:
@@ -728,14 +743,14 @@ if __name__ == "__main__":
 
     else:
         #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        #sample = "SingleMuon"
+        sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = 50000
+        max_events = 100000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]

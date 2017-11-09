@@ -267,6 +267,13 @@ public:
     int HLT_ttH_DL_elmu;
     int HLT_ttH_DL_elel;
     int HLT_ttH_FH;
+    
+    int Flag_goodVertices;
+    int Flag_GlobalTightHalo2016Filter;
+    int Flag_HBHENoiseFilter;
+    int Flag_HBHENoiseIsoFilter;
+    int Flag_EcalDeadCellTriggerPrimitiveFilter;
+    int Flag_eeBadScFilter;
 
     double btag_LR_4b_2b_btagCSV;
     double mem_DL_0w2h2t_p;
@@ -301,6 +308,13 @@ public:
     TTreeReaderValue<int> HLT_ttH_DL_elel;
     TTreeReaderValue<int> HLT_ttH_DL_mumu;
     TTreeReaderValue<int> HLT_ttH_FH;
+    
+    TTreeReaderValue<int> Flag_goodVertices;
+    TTreeReaderValue<int> Flag_GlobalTightHalo2016Filter;
+    TTreeReaderValue<int> Flag_HBHENoiseFilter;
+    TTreeReaderValue<int> Flag_HBHENoiseIsoFilter;
+    TTreeReaderValue<int> Flag_EcalDeadCellTriggerPrimitiveFilter;
+    TTreeReaderValue<int> Flag_eeBadScFilter;
 
     TTreeReaderValue<int> numJets;
     TTreeReaderValue<int> nBCSVM;
@@ -349,6 +363,13 @@ public:
         HLT_ttH_DL_elel(reader, "HLT_ttH_DL_elel"),
         HLT_ttH_DL_mumu(reader, "HLT_ttH_DL_mumu"),
         HLT_ttH_FH(reader, "HLT_ttH_FH"),
+        
+        Flag_goodVertices(reader, "Flag_goodVertices"),
+        Flag_GlobalTightHalo2016Filter(reader, "Flag_GlobalTightHalo2016Filter"),
+        Flag_HBHENoiseFilter(reader, "Flag_HBHENoiseFilter"),
+        Flag_HBHENoiseIsoFilter(reader, "Flag_HBHENoiseIsoFilter"),
+        Flag_EcalDeadCellTriggerPrimitiveFilter(reader, "Flag_EcalDeadCellTriggerPrimitiveFilter"),
+        Flag_eeBadScFilter(reader, "Flag_eeBadScFilter"),
         
         numJets(reader, "numJets"),
         nBCSVM(reader, "nBCSVM"),

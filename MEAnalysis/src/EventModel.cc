@@ -150,6 +150,13 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.HLT_ttH_DL_elel = *(this->HLT_ttH_DL_elel);
     event.HLT_ttH_FH = *(this->HLT_ttH_FH);
     
+    event.Flag_goodVertices = *(this->Flag_goodVertices);
+    event.Flag_GlobalTightHalo2016Filter = *(this->Flag_GlobalTightHalo2016Filter);
+    event.Flag_HBHENoiseFilter = *(this->Flag_HBHENoiseFilter);
+    event.Flag_HBHENoiseIsoFilter = *(this->Flag_HBHENoiseIsoFilter);
+    event.Flag_EcalDeadCellTriggerPrimitiveFilter = *(this->Flag_EcalDeadCellTriggerPrimitiveFilter);
+    event.Flag_eeBadScFilter = *(this->Flag_eeBadScFilter);
+    
     event.numJets = *(this->numJets);
     event.nBCSVM = *(this->nBCSVM);
     event.jets = jets;
