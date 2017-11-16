@@ -48,6 +48,7 @@ FUNCTION_TABLE = {
     "Wmass": lambda ev: ev.Wmass,
     "numJets": lambda ev: ev.numJets,
     "nBCSVM": lambda ev: ev.nBCSVM,
+    "nPVs": lambda ev: ev.nPVs,
     "counting": 1.0
 }
 
@@ -137,7 +138,7 @@ class Sample(object):
             treemodel = config.get(sample_name, "treemodel"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
-            ngen = config.getfloat(sample_name, "ngen"),
+            ngen = config.getfloat(sample_name, "ngen_weight"),
             classifier_db_path = config.get(sample_name, "classifier_db_path", None),
             vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),

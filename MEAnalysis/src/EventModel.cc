@@ -60,6 +60,7 @@ EventDescription TreeDescriptionMCSystematic<T>::create_event(Systematic::SystId
     event.genTopLep_pt = *genTopLep_pt;
     event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = (*btagWeightCSV);
     event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = (*puWeight);
+    event.weights[std::make_pair(Systematic::gen, Systematic::None)] = (*genWeight);
     return event;
 }
 
@@ -82,6 +83,7 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
     event.numJets = numJets.GetValue(syst_id);
     event.nBCSVM = nBCSVM.GetValue(syst_id);
 
+    event.weights[std::make_pair(Systematic::gen, Systematic::None)] = (*genWeight);
     event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = (*btagWeightCSV);
     event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = (*puWeight);
 
@@ -162,6 +164,8 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.jets = jets;
     event.syst_id = syst_id;
     event.leptons = build_leptons(syst_id);
+    
+    event.nPVs = *(this->nPVs);
     
     for (int ilep=0; ilep < *(this->nleps); ilep++) {
         event.leps_superclustereta.push_back(this->leps_scEta[ilep]);

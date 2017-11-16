@@ -93,7 +93,8 @@ syst_pairs = OrderedDict([
         
         "CMS_ttH_scaleME",
 
-        "CMS_pu"
+        "CMS_pu",
+        "gen"
     ]
     for d in ["Up", "Down", ""]
 ])
@@ -352,7 +353,7 @@ def createEvent(
                 "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
                 "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
             ]}
-        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
+        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
    
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
@@ -464,7 +465,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                bweight = "CMS_ttH_CSV{0}{1}".format(syst, sdir)
                systematic_weights += [
                    (bweight, lambda ev, bweight=bweight, syst_pairs=syst_pairs:
-                       ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs[bweight]) * ev.lepton_weight)
+                       ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs[bweight]) * ev.lepton_weight)
                ]
                btag_weights += [bweight]
 
@@ -474,21 +475,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     (ev.weights.at(syst_pairs["CMS_pu"]) *
                     ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
                     ev.lepton_weight *
+                    ev.weights.at(syst_pairs["gen"]) *
                     ev.weights.at(syst_pairs["CMS_ttH_scaleMEUp"]))),
                 ("CMS_ttH_scaleMEDown", lambda ev, syst_pairs=syst_pairs:
                     (ev.weights.at(syst_pairs["CMS_pu"]) *
                     ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
                     ev.lepton_weight *
+                    ev.weights.at(syst_pairs["gen"]) *
                     ev.weights.at(syst_pairs["CMS_ttH_scaleMEDown"]))
                 ),
-                ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
-                ("CMS_puUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
-                #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
-                #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                ("CMS_puUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("unweighted", lambda ev: 1.0),
-                ("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight),
-                ("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
-                ("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.lepton_weight)
+                ("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
+                ("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
+                ("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
         ]
 
         for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
@@ -503,7 +506,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         ]:
             systematic_weights += [
-                (lep_syst, lambda ev, syst_pairs=syst_pairs, lep_syst=lep_syst: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weights_syst[lep_syst])
+                (lep_syst, lambda ev, syst_pairs=syst_pairs, lep_syst=lep_syst: (
+                    ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_pu"]) *
+                    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weights_syst[lep_syst]
+                ))
             ]
 
     if len(file_names) == 0:
@@ -744,14 +750,14 @@ if __name__ == "__main__":
     else:
         #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        #sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        sample = "SingleMuon"
+        #sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
-        max_events = 100000
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        max_events = 10000
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/crosscheck.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 

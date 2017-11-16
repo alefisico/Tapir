@@ -26,7 +26,9 @@ def is_ttbar(s):
     return s in [
         "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8",
         "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8",
-        "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
+        "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8",
+        "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8",
+        "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
     ]
 
 def get_hists(dataset, chain, variable, bins, cut, mc_weight, name=""):
@@ -87,9 +89,9 @@ if __name__ == "__main__":
     hists = get_hists(
         dataset, chain,
         "numJets",
-        (10, 4, 14),
+        (6, 4, 10),
         "((HLT_ttH_SL_mu==1 && abs(leps_pdgId[0]==13))) && is_sl==1 && numJets>=4 && nBCSVM>=2",
-        "btagWeightCSV * puWeight",
+        "genWeight * btagWeightCSV * puWeight",
         "__numJets"
     )
     if hc:

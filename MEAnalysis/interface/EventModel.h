@@ -117,6 +117,7 @@ namespace Systematic {
         CMS_ttH_scaleME,
 
         CMS_pu,
+        gen,
     };
 
     enum Direction {
@@ -260,6 +261,7 @@ public:
     int is_fh;
     int numJets;
     int nBCSVM;
+    int nPVs;
 
     int HLT_ttH_SL_mu;
     int HLT_ttH_SL_el;
@@ -318,6 +320,7 @@ public:
 
     TTreeReaderValue<int> numJets;
     TTreeReaderValue<int> nBCSVM;
+    TTreeReaderValue<T> nPVs;
     
     TTreeReaderValue<int> nleps;
     TTreeReaderArray<T> leps_pdgId;
@@ -373,6 +376,7 @@ public:
         
         numJets(reader, "numJets"),
         nBCSVM(reader, "nBCSVM"),
+        nPVs(reader, "nPVs"),
         
         nleps(reader, "nleps"),
         leps_pdgId(reader, "leps_pdgId"),
@@ -415,6 +419,7 @@ public:
     TTreeReaderValue<T> genTopHad_pt;
     TTreeReaderValue<T> genTopLep_pt;
     
+    TTreeReaderValue<T> genWeight;
     TTreeReaderValue<T> puWeight;
     TTreeReaderValue<T> btagWeightCSV;
     
@@ -423,6 +428,7 @@ public:
         ttCls(TreeDescription<T>::reader, "ttCls"),
         genTopHad_pt(TreeDescription<T>::reader, "genTopHad_pt"),
         genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt"),
+        genWeight(TreeDescription<T>::reader, "genWeight"),
         puWeight(TreeDescription<T>::reader, "puWeight"),
         btagWeightCSV(TreeDescription<T>::reader, "btagWeightCSV")
     {}
@@ -453,6 +459,8 @@ public:
     TTreeReaderValueSystematic<T> mem_SL_1w2h2t_p;
     TTreeReaderValueSystematic<T> mem_SL_2w2h2t_p;
 
+    TTreeReaderValue<T> genWeight;
+    
     TTreeReaderValue<T> puWeight;
     TTreeReaderValue<T> puWeightUp;
     TTreeReaderValue<T> puWeightDown;
@@ -499,6 +507,8 @@ public:
         mem_SL_1w2h2t_p(TreeDescription<T>::reader, "mem_SL_1w2h2t_p"),
         mem_SL_2w2h2t_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_p"),
 
+        genWeight(TreeDescription<T>::reader, "genWeight"),
+        
         puWeight(TreeDescription<T>::reader, "puWeight"),
         puWeightUp(TreeDescription<T>::reader, "puWeightUp"),
         puWeightDown(TreeDescription<T>::reader, "puWeightDown"),

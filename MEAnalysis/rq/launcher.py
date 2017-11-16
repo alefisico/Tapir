@@ -569,38 +569,23 @@ class TaskCategories(Task):
 
     def run(self, inputs, redis_conn, qmain, qfail):
         self.load_state(self.workdir)
-
-        hdict = {}
-
-        logging.getLogger('launcher').info("Opening {0}".format(inputs))
-        tf = ROOT.TFile(inputs)
-        ROOT.gROOT.cd()
-        for k in tf.GetListOfKeys():
-
-            #check if this is a valid histogram according to its name
-            if len(k.GetName().split("__")) >= 3:
-                hdict[k.GetName()] = k.ReadObj().Clone()
-        
+       
+        jobs = []
         #make all the datacards for all the categories
         for cat in self.analysis.categories:
-            print cat.full_name
-            for proc in cat.out_processes:
-                print proc
-                if proc == "data":
-                    continue
-                for syst in cat.common_shape_uncertainties.keys():
-                    for sdir in ["Up", "Down"]:
-                        pat = "__".join([proc, cat.full_name, syst+sdir])
-                        if not hdict.has_key(pat):
-                            logging.getLogger('launcher').info("Could not find {0}, cloning nominal".format(pat))
-                            hdict[pat] = hdict["__".join([proc, cat.full_name])].Clone()
-            category_dir = "{0}/categories/{1}/{2}".format(
-                workdir, cat.name, cat.discriminator.name
+            print "enqueueing {0}".format(cat.full_name)
+            job = enqueue_memoize(
+                qmain,
+                func = makecategory,
+                args = (workdir, analysis, cat, inputs),
+                timeout = 20*60,
+                ttl = -1,
+                result_ttl = -1,
+                meta = {"retries": 2, "args": (cat.full_name)}
             )
-            logging.getLogger('launcher').info("creating category to {0}".format(category_dir))
-            if not os.path.exists(category_dir):
-                os.makedirs(category_dir)
-            make_datacard(self.analysis, [cat], category_dir, hdict)
+            jobs += [job]
+        print "waiting on {0} jobs".format(len(jobs))
+        waitJobs(jobs, redis_conn, qmain, qfail, callback=basic_job_status)
 
         # hadd Results
         cat_names = list(set([cat.name for cat in self.analysis.categories]))

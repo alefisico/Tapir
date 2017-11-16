@@ -2,7 +2,8 @@ import ROOT
 import sys, os
 from TTH.MEAnalysis.samples_base import getSitePrefix
 
-datatype = sys.argv[2]
+datatypes = sys.argv[2:]
+print datatypes
 
 ofname = sys.argv[1]
 tt = ROOT.TChain("tree")
@@ -16,12 +17,13 @@ for fi in os.environ["FILE_NAMES"].split():
     tt.AddFile(fn)
 
 tt.SetBranchStatus("*", False)
-if datatype in ["memcheck", "kinematics"]:
+tt.SetBranchStatus("is_*", True)
+if "mem" in datatypes:
     tt.SetBranchStatus("mem_*", True)
     tt.SetBranchStatus("nMatch*", True)
     tt.SetBranchStatus("nGen*", True)
     tt.SetBranchStatus("gen*", True)
-    tt.SetBranchStatus("is_*", True)
+    tt.SetBranchStatus("Gen*", True)
     tt.SetBranchStatus("numJets*", True)
     tt.SetBranchStatus("nB*", True)
     tt.SetBranchStatus("btag_LR_4b_2b*", True)
@@ -32,7 +34,7 @@ if datatype in ["memcheck", "kinematics"]:
     tt.SetBranchStatus("puWeight*", True)
     tt.SetBranchStatus("changes_jet_category*", True)
 
-if datatype in ["kinematics"]:
+if "kinematics" in datatypes:
     tt.SetBranchStatus("jets_pt*", True)
     tt.SetBranchStatus("jets_eta*", True)
     tt.SetBranchStatus("jets_btagCSV*", True)
