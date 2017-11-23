@@ -18,7 +18,7 @@ before_script:
   - cd ..
   - cd $CI_HOME
   - echo "${KRB_PASSWORD}" | kinit -f ${KRB_USERNAME}@CERN.CH
-  - scp ${KRB_USERNAME}@lxplus.cern.ch:~/x509 ~/x509
+  - scp -o StrictHostKeyChecking=no ${KRB_USERNAME}@lxplus.cern.ch:~/x509 ~/x509
   - export X509_USER_PROXY=~/x509
   - voms-proxy-info --all
 
