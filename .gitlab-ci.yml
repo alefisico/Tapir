@@ -17,6 +17,7 @@ before_script:
   - source /cvmfs/grid.cern.ch/emi-ui-3.15.3-1_sl6v1/etc/profile.d/setup-ui-example.sh
   - cd ..
   - cd $CI_HOME
+  - mkdir -p ~/.ssh
   - echo -e "Host *\n\tGSSAPIDelegateCredentials yes\n\tGSSAPITrustDNS yes\n\n" > ~/.ssh/config
   - echo "${KRB_PASSWORD}" | kinit -f ${KRB_USERNAME}@CERN.CH
   - klist
