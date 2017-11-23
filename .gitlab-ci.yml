@@ -17,6 +17,8 @@ before_script:
   - source /cvmfs/grid.cern.ch/emi-ui-3.15.3-1_sl6v1/etc/profile.d/setup-ui-example.sh
   - cd ..
   - cd $CI_HOME
+  - echo "${KRB_PASSWORD}" | kinit -f ${KRB_USERNAME}@CERN.CH
+  - scp ${KRB_USERNAME}@lxplus.cern.ch:~/x509 ~/x509
   - export X509_USER_PROXY=~/x509
   - voms-proxy-info --all
 
