@@ -51,7 +51,7 @@ compile_vhbb:
 test_vhbb:
   stage: test_vhbb
   dependencies:
-    - compile-vhbb
+    - compile_vhbb
   script:
     - cd $CI_HOME
     - tar xfz cmssw.tgz
@@ -68,7 +68,7 @@ test_vhbb:
 test_MEAnalysis_ttH:
   stage: test
   dependencies:
-    - compile-vhbb
+    - compile_vhbb
   script:
     - cd $CI_HOME
     - tar xfz cmssw.tgz
@@ -84,7 +84,7 @@ test_MEAnalysis_ttH:
 test_MEAnalysis_ttjets:
   stage: test
   dependencies:
-    - compile-vhbb
+    - compile_vhbb
   script:
     - cd $CI_HOME
     - tar xfz cmssw.tgz
@@ -100,7 +100,7 @@ test_MEAnalysis_ttjets:
 test_MEAnalysis_DoubleMuon:
   stage: test
   dependencies:
-    - compile-vhbb
+    - compile_vhbb
   script:
     - cd $CI_HOME
     - tar xfz cmssw.tgz
@@ -116,7 +116,7 @@ test_MEAnalysis_DoubleMuon:
 test_sparsinator:
   stage: test
   dependencies:
-    - compile-vhbb
+    - compile_vhbb
   script:
     - cd $CI_HOME
     - tar xfz cmssw.tgz
@@ -132,7 +132,7 @@ test_sparsinator:
 test_MEAnalysis_ttH_FH:
   stage: test
   dependencies:
-    - compile-vhbb
+    - compile_vhbb
   script:
     - cd $CI_HOME
     - tar xfz cmssw.tgz
@@ -148,7 +148,7 @@ test_MEAnalysis_ttH_FH:
 test_MEAnalysis_TTbar_FH:
   stage: test
   dependencies:
-    - compile-vhbb
+    - compile_vhbb
   script:
     - cd $CI_HOME
     - tar xfz cmssw.tgz
