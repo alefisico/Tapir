@@ -43,12 +43,11 @@ compile_vhbb:
     - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
     - scram b -j4
     - cd $CMSSW_BASE
-
+    - pwd
 test_vhbb:
   stage: test_vhbb
   script:
-    - ls -al
-    - ls $CI_HOME
+    - pwd
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
