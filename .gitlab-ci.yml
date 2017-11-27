@@ -28,8 +28,6 @@ before_script:
 
 compile_vhbb:
   stage: compile_vhbb
-  only:
-    - meanalysis-80x-V25
   script:
     - cd $CI_HOME/..
     - rm -Rf $CMSSW_VERSION
@@ -48,8 +46,6 @@ compile_vhbb:
 
 test_vhbb:
   stage: test_vhbb
-  only:
-    - meanalysis-80x-V25
   script:
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
