@@ -45,7 +45,7 @@ compile_vhbb:
     - tar -cvzf cmssw.tgz $CMSSW_BASE
   artifacts:
     paths:
-      - vhbb.txt
+      - cmssw.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_vhbb:
@@ -147,7 +147,6 @@ test_MEAnalysis_TTbar_FH:
     - tar xfz cmssw.tgz
     - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
     - cd $CI_HOME
     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_TTbar_FH.txt
   artifacts:
