@@ -21,7 +21,7 @@ before_script:
   - echo -e "Host *\n\tGSSAPIDelegateCredentials yes\n\tGSSAPITrustDNS yes\n\n" > ~/.ssh/config
   - echo "${KRB_PASSWORD}" | kinit -f ${KRB_USERNAME}@CERN.CH
   - klist
-  - scp -vvv -o StrictHostKeyChecking=no ${KRB_USERNAME}@lxplus.cern.ch:~/x509 ~/x509
+  - scp -o StrictHostKeyChecking=no ${KRB_USERNAME}@lxplus.cern.ch:~/x509 ~/x509
   - export X509_USER_PROXY=~/x509
   - voms-proxy-info --all
 
