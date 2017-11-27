@@ -47,6 +47,8 @@ compile_vhbb:
 test_vhbb:
   stage: test_vhbb
   script:
+    - ls -al
+    - ls $CI_HOME
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
