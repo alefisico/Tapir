@@ -1,7 +1,6 @@
 stages:
   - compile_vhbb
   - test_vhbb
-  - compile_tthbb13
   - test
 
 before_script:
@@ -42,13 +41,20 @@ compile_vhbb:
     - source $CI_HOME/setenv_sklearn_cmssw.sh
     - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
     - scram b -j4
-    - cd $CMSSW_BASE
-    - pwd
+    - cd $CMSSW_BASE/..
+    - tar -cvzf cmssw.tgz $CMSSW_BASE
+  artifacts:
+    paths:
+      - vhbb.txt
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
 test_vhbb:
   stage: test_vhbb
+  dependencies: compile-vhbb
   script:
-    - pwd
-    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - cd $CI_HOME
+    - tar xfz cmssw.tgz
+    - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
@@ -58,23 +64,13 @@ test_vhbb:
       - vhbb.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
-compile_tthbb13:
-  stage: compile_tthbb13
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - rm -Rf TTH
-    - cp -r $CI_HOME TTH
-    - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
-    - source $CI_HOME/setenv_sklearn_cmssw.sh
-    - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
-    - scram b -j4
-    - cd $CMSSW_BASE
-
 test_MEAnalysis_ttH:
   stage: test
+  dependencies: compile-vhbb
   script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - cd $CI_HOME
+    - tar xfz cmssw.tgz
+    - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb*" | tee -i MEAnalysis_ttH.txt
@@ -85,8 +81,11 @@ test_MEAnalysis_ttH:
 
 test_MEAnalysis_ttjets:
   stage: test
+  dependencies: compile-vhbb
   script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - cd $CI_HOME
+    - tar xfz cmssw.tgz
+    - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
@@ -97,8 +96,11 @@ test_MEAnalysis_ttjets:
 
 test_MEAnalysis_DoubleMuon:
   stage: test
+  dependencies: compile-vhbb
   script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - cd $CI_HOME
+    - tar xfz cmssw.tgz
+    - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "DoubleMuon" | tee -i MEAnalysis_DoubleMuon.txt
@@ -109,8 +111,11 @@ test_MEAnalysis_DoubleMuon:
 
 test_sparsinator:
   stage: test
+  dependencies: compile-vhbb
   script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - cd $CI_HOME
+    - tar xfz cmssw.tgz
+    - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - python $CMSSW_BASE/src/TTH/Plotting/python/joosep/sparsinator.py | tee -i sparsinator.txt
@@ -121,8 +126,11 @@ test_sparsinator:
 
 test_MEAnalysis_ttH_FH:
   stage: test
+  dependencies: compile-vhbb
   script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - cd $CI_HOME
+    - tar xfz cmssw.tgz
+    - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_ttH_FH.txt
@@ -133,8 +141,11 @@ test_MEAnalysis_ttH_FH:
 
 test_MEAnalysis_TTbar_FH:
   stage: test
+  dependencies: compile-vhbb
   script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - cd $CI_HOME
+    - tar xfz cmssw.tgz
+    - cd $CI_HOME/$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CI_HOME
