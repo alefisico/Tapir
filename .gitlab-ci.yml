@@ -41,7 +41,7 @@ compile_vhbb:
     - source $CI_HOME/setenv_sklearn_cmssw.sh
     - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
     - scram b -j4
-    - cd $CI_HOME
+    - cd $CI_HOME/..
     - tar -czf cmssw.tgz $CMSSW_VERSION
     - du -csh cmssw.tgz
   artifacts:
