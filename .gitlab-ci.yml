@@ -24,6 +24,7 @@ before_script:
   - scp -o StrictHostKeyChecking=no ${KRB_USERNAME}@lxplus.cern.ch:~/x509 ~/x509
   - export X509_USER_PROXY=~/x509
   - voms-proxy-info --all
+  - ls -al
 
 compile_vhbb:
   stage: compile_vhbb
@@ -33,6 +34,7 @@ compile_vhbb:
     - cd $CI_HOME/..
     - rm -Rf $CMSSW_VERSION
     - scramv1 project CMSSW $CMSSW_VERSION
+    - ls -al
     - cd $CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - git cms-init
