@@ -56,7 +56,7 @@ test_vhbb:
     - compile_vhbb
   script:
     - cd $CI_HOME/..
-    - tar xfz cmssw.tgz
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
@@ -73,7 +73,7 @@ test_MEAnalysis_ttH:
     - compile_vhbb
   script:
     - cd $CI_HOME/..
-    - tar xfz cmssw.tgz
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
@@ -89,7 +89,7 @@ test_MEAnalysis_ttjets:
     - compile_vhbb
   script:
     - cd $CI_HOME/..
-    - tar xfz cmssw.tgz
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
@@ -105,7 +105,7 @@ test_MEAnalysis_DoubleMuon:
     - compile_vhbb
   script:
     - cd $CI_HOME/..
-    - tar xfz cmssw.tgz
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
@@ -121,7 +121,7 @@ test_sparsinator:
     - compile_vhbb
   script:
     - cd $CI_HOME/..
-    - tar xfz cmssw.tgz
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
@@ -137,7 +137,7 @@ test_MEAnalysis_ttH_FH:
     - compile_vhbb
   script:
     - cd $CI_HOME/..
-    - tar xfz cmssw.tgz
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
@@ -153,7 +153,7 @@ test_MEAnalysis_TTbar_FH:
     - compile_vhbb
   script:
     - cd $CI_HOME/..
-    - tar xfz cmssw.tgz
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
