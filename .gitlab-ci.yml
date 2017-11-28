@@ -62,7 +62,8 @@ test_vhbb:
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
     - python vhbb_combined.py | tee -i vhbb.txt
-    - cp Loop/cmsRun.log cmsRun.txt
+    - cp vhbb.txt $CI_HOME/vhbb.txt
+    - cp Loop/cmsRun.log $CI_HOME/cmsRun.txt
   artifacts:
     paths:
       - vhbb.txt
