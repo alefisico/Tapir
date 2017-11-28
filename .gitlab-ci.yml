@@ -62,9 +62,11 @@ test_vhbb:
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
     - python vhbb_combined.py | tee -i vhbb.txt
+    - cp Loop/cmsRun.log cmsRun.txt
   artifacts:
     paths:
       - vhbb.txt
+      - cmsRun.txt
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_MEAnalysis_ttH:
@@ -77,7 +79,7 @@ test_MEAnalysis_ttH:
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb*" | tee -i MEAnalysis_ttH.txt
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttH.txt
   artifacts:
     paths:
       - MEAnalysis_ttH.txt
@@ -93,7 +95,7 @@ test_MEAnalysis_ttjets:
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
+    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
   artifacts:
     paths:
       - MEAnalysis_ttjets.txt
