@@ -772,6 +772,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
 
     central_limits = []
     observed_limits = []
+    injected_limits = []
     errs = np.zeros((len(categories), 4))
 
     #fill in the data
@@ -781,6 +782,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
         #central value
         central_limits += [limits[catname][2]]
         observed_limits += [limits[catname][5]]
+        injected_limits += [limits[catname][6]]
 
         #error band
         errs[i,0] = limits[catname][1]
@@ -796,11 +798,21 @@ def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
     table_data = []
     #draw points
     i = 0
-    for y, l, o, e1, e2, e3, e4 in zip(ys, central_limits, observed_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
+    for y, l, o, inj, e1, e2, e3, e4 in zip(ys, central_limits, observed_limits, injected_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
 
+        leg_args = {}
+        if i == 0:
+            leg_args["label"] = "median"
         #black line
-        axes.add_line(plt.Line2D([l, l], [y-0.45, y+0.45], lw=2, color="black", ls="--"))
+        axes.add_line(plt.Line2D([l, l], [y-0.45, y+0.45], lw=2, color="black", ls="--", **leg_args))
 
+        leg_args = {}
+        if i == 0:
+            leg_args["label"] = "$\mu=1$ injected"
+        #black line
+        axes.add_line(plt.Line2D([inj, inj], [y-0.45, y+0.45], lw=2, color="red", ls="--", **leg_args))
+
+        
         leg_args = {}
         #axes.add_line(plt.Line2D([o, o], [y-0.4, y+0.4], lw=2, color="black", ls="-"))
         if i == 0:
@@ -809,7 +821,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
             axes.errorbar([o], [y], [0.4], marker="s", color="black", **leg_args)
         
         #value
-        plt.text(l+0.5, y, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
+        #plt.text(l+0.5, y, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
 
         leg_args1 = {}
         leg_args2 = {}
@@ -838,9 +850,9 @@ def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
     axes.tick_params(axis = 'both', which = 'major', labelsize=16)
     axes.tick_params(axis = 'both', which = 'minor')
 
-    plt.legend(loc=legend_loc, fontsize=12, numpoints = 1, frameon=False)
+    plt.legend(loc=legend_loc, fontsize=12, numpoints = 1, frameon=False, ncol=2)
     plt.title(
-        r"$\mathbf{CMS}$ private work (blinded)",
+        r"$\mathbf{CMS}$ private work",
         fontsize=16, x=0.05, ha="left", y=0.95, va="top", fontname="Helvetica"
     )
     plt.text(0.99, 1.00,
