@@ -459,7 +459,6 @@ strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t"] = c
 
-
 ###
 ### SL_2w2h2t Sudakov
 ###

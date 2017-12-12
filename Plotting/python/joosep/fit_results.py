@@ -10,7 +10,7 @@ from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 import sys
 
-def plot_bestfit(fit_data):
+def plot_bestfit_comb(fit_data):
     bestfit = {
         "sl": [fit_data["group_sl_bestfit"][0],
             [fit_data["group_sl_bestfit_statonly"][2],
@@ -110,6 +110,7 @@ if __name__ == "__main__":
     lims_data = json.load(open(path + "/limits.json"))
 
     suf = "_asimov"
+    #suf = ""
     plt.figure(figsize=(5,4))
     tab = brazilplot(
         {
@@ -118,18 +119,65 @@ if __name__ == "__main__":
             "sldl": lims_data["group_sldl" + suf],
         },
         [
-            ("sldl", "SL+DL"),
+            ("sldl", "comb."),
             ("dl", r"DL"),
             ("sl", r"SL"),
         ],
+        legend_loc=(0.5, 0.65),
+        doObserved=True
     )
     #plt.ylim(-1,3)
     plt.xlim(0,5)
-    plt.ylim(-0.5, 3.5)
+    plt.ylim(-0.5, 4.5)
     plotlib.svfg(path + "/limits_comb.pdf")
+
+    plt.figure(figsize=(10, 10))
+    tab = brazilplot(
+        {
+            #"sl_4tag": lims_data["group_sl_4tag_lims"],
+            "sl_j4_t3": lims_data["sl_j4_t3__btag_LR_4b_2b_btagCSV_logit" + suf],
+            "sl_j4_tge4": lims_data["sl_j4_tge4__mem_SL_0w2h2t_p" + suf],
+            "sl_j5_tge4": lims_data["sl_j5_tge4__mem_SL_1w2h2t_p" + suf],
+            "sl_j5_t3": lims_data["sl_j5_t3__btag_LR_4b_2b_btagCSV_logit" + suf],
+            "sl_jge6_tge4": lims_data["sl_jge6_tge4__mem_SL_2w2h2t_p" + suf],
+            "sl_jge6_t3": lims_data["sl_jge6_t3__btag_LR_4b_2b_btagCSV_logit" + suf],
+            #"dl_4tag": lims_data["group_dl_4tag_lims"],
+            "dl": lims_data["group_dl" + suf],
+            "sl": lims_data["group_sl" + suf],
+            "dl_jge4_t3": lims_data["dl_jge4_t3__btag_LR_4b_2b_btagCSV_logit" + suf],
+            "dl_jge4_tge4": lims_data["dl_jge4_tge4__mem_DL_0w2h2t_p" + suf],
+            #"sldl_4tag": lims_data["group_sldl_4tag_lims"],
+            "sldl": lims_data["group_sldl" + suf],
+        },
+        [
+            ("sldl", "comb."),
+            ("sl", "SL"),
+            ("sl_jge6_tge4", r"SL $\geq$6j $\geq$4t"),
+            ("sl_jge6_t3", r"SL $\geq$6j $3$t"),
+            ("sl_j5_tge4", r"SL 5j $\geq$ 4t"),
+            ("sl_j5_t3", r"SL 5j3t"),
+            ("sl_j4_tge4", r"SL 4j4t"),
+            ("sl_j4_t3", r"SL 4j3t"),
+            ("dl", r"DL"),
+            ("dl_jge4_tge4", r"DL $\geq$4j $\geq$4t"),
+            ("dl_jge4_t3", r"DL $\geq$4j 3t"),
+        ],
+        legend_loc=1,
+        doObserved=True
+    )
+    plt.axhline(0.5, ls="--", lw=0.5)
+    plt.axhline(7.5, ls="--", lw=0.5)
+    
+    #plt.ylim(-1,4)
+    plt.xlim(0,40)
+    plotlib.svfg(path + "/limits.pdf")
+    
+    of = open(path + "/lims.tex", "w")
+    of.write(tabulate.tabulate(tab[::-1], headers=["category", "low", "median", "high"], tablefmt="latex_raw", floatfmt=".2f"))
+    of.close()
     
     of = open(path + "/lims_comb.tex", "w")
     of.write(tabulate.tabulate(tab[::-1], headers=["category", "low", "median", "high"], tablefmt="latex_raw", floatfmt=".2f"))
     of.close()
 
-    plot_bestfit(lims_data)
+    plot_bestfit_comb(lims_data)

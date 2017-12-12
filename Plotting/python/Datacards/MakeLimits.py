@@ -57,7 +57,7 @@ def plot_pulls(fn, first=0, maxn=20):
     
     plt.errorbar(bins1[order[first:maxn]], ys[first:maxn] - 0.15, xerr=errors1[order[first:maxn]], marker="o", lw=0, elinewidth=2, color="red", label="s+b")
     plt.errorbar(bins2[order[first:maxn]], ys[first:maxn] + 0.15, xerr=errors2[order[first:maxn]], marker="o", lw=0, elinewidth=2, color="blue", label="b")
-    
+    plt.axvline(0.0, color="black", ls="--")
     plt.legend(loc="best")
     plt.grid()
     plt.yticks(ys[first:maxn], [labels1[o] for o in order[first:maxn]]);
@@ -104,7 +104,12 @@ def combine_cards(group_name, group, workdir):
 def run_pulls(group_name, dcard_filename, workdir):
     #write constraints
 
-    for sig, asimov in [(1, True), (0, True), (1, False)]:
+    for sig, asimov in [
+        (1, True),
+        (0, True),
+        (1, False),
+        (0, False)
+        ]:
         suf = ""
         title = "to data"
         if asimov:
@@ -148,9 +153,14 @@ def main(
         # Asymptotic limits from observed
         lims = limit(group_dcard_filename, workdir, asimov=False)
         limits[group_name] = lims[0]
+        
         # Expected limits from Asimov
         lims = limit(group_dcard_filename, workdir, asimov=True)
         limits[group_name + "_asimov"] = lims[0]
+        
+        # Expected limits with signal injected
+        lims = limit(group_dcard_filename, workdir, asimov=True, expectSignal=1)
+        limits[group_name + "_asimov_sig1"] = lims[0]
         
         if runSignalInjection:
             limits[group_name + "_siginject"] = signal_injection(group_dcard_filename, workdir)

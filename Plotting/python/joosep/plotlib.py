@@ -448,8 +448,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         histogram_signal.Scale(0.0)
         
     if histogram_signal.Integral()>0:
-        histogram_signal.Scale(0.2 * histogram_total_mc.Integral() / histogram_signal.Integral())
-    histogram_signal.title = processes[0][1] + " norm"
+        histogram_signal.Scale(50.0)
+    histogram_signal.title = processes[0][1] + " x50"
     histogram_signal.linewidth=2
     histogram_signal.fillstyle = None
     #draw the signal shape
@@ -511,7 +511,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             for (line1, line2), h in zip(stacked_hists["hists"], histograms_nominal.values()):
                 patch = mpatches.Patch(color=line1.get_color(), label=h.title)
                 patches += [patch]
-
+        patches += [mlines.Line2D([], [], color=histogram_signal.color[0], label=histogram_signal.title, linewidth=2)]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="//////")]
         patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch=r"\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
@@ -755,7 +755,7 @@ def get_cut_at_eff(h, eff):
     idx = np.searchsorted(bins, eff)
     return idx
 
-def brazilplot(limits, categories, axes=None, doObserved=False):
+def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
     """Draws the a set of limits on a brazil plot
 
     Args:
@@ -838,7 +838,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False):
     axes.tick_params(axis = 'both', which = 'major', labelsize=16)
     axes.tick_params(axis = 'both', which = 'minor')
 
-    plt.legend(loc=1, fontsize=12, numpoints = 1, frameon=False)
+    plt.legend(loc=legend_loc, fontsize=12, numpoints = 1, frameon=False)
     plt.title(
         r"$\mathbf{CMS}$ private work (blinded)",
         fontsize=16, x=0.05, ha="left", y=0.95, va="top", fontname="Helvetica"

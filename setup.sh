@@ -8,7 +8,7 @@ git cms-init
 git cms-merge-topic -u jpata:vhbbHeppy80X_july31
 
 #get the TTH code
-git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch meanalysis-80x-V25
+git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch oct
 cd $CMSSW_BASE/src/TTH
 
 git submodule update --init --recursive

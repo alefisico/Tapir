@@ -19,6 +19,7 @@ import tempfile
 from collections import OrderedDict
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
 import subprocess
+import logging
 
 import rootpy
 from rootpy.plotting import Hist

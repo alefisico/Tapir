@@ -3,7 +3,10 @@ rc('text', usetex=False)
 from TTH.Plotting.joosep import plotlib
 import rootpy
 import rootpy.io
-import sys
+import sys, math
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
 
 procs_names = [
     ("ttH_hbb", "tt+H(bb)"),
@@ -43,10 +46,11 @@ channel_map = dict([
 ])
 
 def postprocess_hist(h, template):
-    if h.GetNbinsX() != template.GetNbinsX():
-        raise Exception("Expected {0} bins but got {1}".format(h.GetNbinsX(), template.GetNbinsX()))
+    #Combine messes up histogram bins, so just assume template is correct
+    #if h.GetNbinsX() != template.GetNbinsX():
+    #    raise Exception("Expected {0} bins but got {1} for {2}".format(h.GetNbinsX(), template.GetNbinsX(), h.GetName()))
     h2 = template.Clone(h.GetName())
-    for ibin in range(h.GetNbinsX()+2):
+    for ibin in range(template.GetNbinsX()+2):
         h2.SetBinContent(ibin, h.GetBinContent(ibin))
         h2.SetBinError(ibin, h.GetBinError(ibin))
     return h2
@@ -54,11 +58,12 @@ def postprocess_hist(h, template):
 def draw_channel_prefit_postfit(ch, chname, template, xlabel, path):
 
     available_hists = [k.GetName() for k in tf.Get("shapes_prefit").Get(ch).GetListOfKeys()]
-    
+
     procs = []
     for proc in procs_names:
         if proc[0] in available_hists:
             procs += [proc]
+    print tf.Get("shapes_prefit/{0}/ttH_hbb".format(ch)).GetNbinsX()
     ret = plotlib.draw_data_mc(tf, "",
         procs,
         ["ttH_hbb", "ttH_nonhbb"],
@@ -102,6 +107,17 @@ def draw_channel_prefit_postfit(ch, chname, template, xlabel, path):
     plotlib.svfg(path + "/{0}_postfit.pdf".format(chname))
     return ret
 
+def barchart(vals, colors, axes=None):
+    if not axes:
+        axes = plt.geaxes()
+    ret = axes.bar(range(len(vals)), vals, color=colors, width=1.0)
+    axes.spines['top'].set_visible(False)
+    axes.spines['right'].set_visible(False)
+    ax.set_xticks([])
+    #ax.spines['bottom'].set_visible(False)
+    #ax.spines['left'].set_visible(False)
+    return ret
+
 if __name__ == "__main__":
     path = sys.argv[1]
     tf = rootpy.io.File(path + "/limits/mlfitshapes_group_group_sldl.root")
@@ -116,5 +132,47 @@ if __name__ == "__main__":
         ("ch8", "dl_jge4_t3", rootpy.plotting.Hist(6,-1,6), "btag LR"),
         ("ch7", "dl_jge4_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
         ]:
-        
+        print ch, chname 
         ret = draw_channel_prefit_postfit(ch, chname, template, xlabel, path)
+
+    #draw bar plots with yields
+    plt.figure(figsize=(5,5))
+    ich = 1
+    nch = len(tf.Get("shapes_prefit").GetListOfKeys())
+    process_histograms = {
+        p: rootpy.plotting.Hist(nch, 0, nch) for p in [x[0] for x in procs_names]
+    }
+    channel_yields = {}
+    for ch in tf.Get("shapes_prefit").GetListOfKeys():
+        ax = plt.subplot(3,3,ich)
+        chname = ch.GetName()
+        kl = [k.GetName() for k in ch.ReadObj().GetListOfKeys()]
+        yields = []
+        yields_proc = {}
+        colors = []
+        #print kl
+        for proc in procs_names:
+            if proc[0] in kl:
+                yields += [ch.ReadObj().Get(proc[0]).Integral()]
+                colors += [plotlib.colors[proc[0]]]
+                yields_proc[proc[0]] = ch.ReadObj().Get(proc[0]).Integral()
+            else:
+                yields_proc[proc[0]] = 0
+        for proc, y in yields_proc.items():
+            process_histograms[proc].SetBinContent(ich, y/sum(yields_proc.values()))
+        s = ch.ReadObj().Get("total_signal").Integral()
+        b = ch.ReadObj().Get("total_background").Integral()
+        sob = s/math.sqrt(b)
+        leg = barchart([yields_proc[p[0]] for p in procs_names], [plotlib.colors[p[0]] for p in procs_names], axes=ax)
+        ich += 1
+        plt.title(channel_titles[channel_map[chname]], y=0.98)
+        ax.set_ylim(0, max(yields)*1.5)
+        plt.text(0.5, 0.8, r"$S/\sqrt{{B}}={0:.2f}$".format(sob), transform=ax.transAxes, ha="center", fontsize=8)
+        channel_yields[chname] = np.array(yields)
+        
+        minorLocator1 = AutoMinorLocator()
+        ax.yaxis.set_minor_locator(minorLocator1)
+        
+    plt.legend(leg, [p[1] for p in procs_names], loc=(1.2, 0.25), frameon=False, ncol=2, fontsize=10)
+    plt.tight_layout()
+    plotlib.svfg(path + "/pies.pdf")

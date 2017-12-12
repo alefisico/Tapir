@@ -91,7 +91,7 @@ if __name__ == "__main__":
         "numJets",
         (6, 4, 10),
         "((HLT_ttH_SL_mu==1 && abs(leps_pdgId[0]==13))) && is_sl==1 && numJets>=4 && nBCSVM>=2",
-        "genWeight * btagWeightCSV * puWeight",
+        "(genWeight * btagWeightCSV * puWeight)",
         "__numJets"
     )
     if hc:

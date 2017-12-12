@@ -78,7 +78,8 @@ def limit(
     opts=["-M", "Asymptotic"],
     output_format="higgsCombine{process_name}.Asymptotic.mH120.root",
     get_limits=get_limits_asymptotic,
-    asimov=True
+    asimov=True,
+    expectSignal=None
     ):
 
     datacard_path, datacard_name = os.path.split(datacard)
@@ -91,6 +92,8 @@ def limit(
     if asimov:
         process_name += "_asimov"
         opts_local += ["-t", "-1"]
+    if expectSignal:
+        opts_local += ["--expectSignal", str(expectSignal)]
 
     # Run combine
     combine_command = ["combine", 
@@ -172,9 +175,9 @@ def pulls(datacard, output_path, signal_coef=1, asimov=True):
         #"--setRobustFitTolerance=0.00001",
         #"--setCrossingTolerance=0.00001",
         "--minimizerStrategy=0",
-        "--minimizerTolerance=0.0000001",
-        #"--robustFit", "1", #slower
-        "--minos", "all", #faster, but sometimes weird results
+        "--minimizerTolerance=0.00000001",
+        "--robustFit", "1", #slower
+        #"--minos", "all", #faster, but sometimes weird results
         "--saveShapes",
         "--saveWithUncertainties",
         "--rMin", "-10",

@@ -581,7 +581,7 @@ class TaskCategories(Task):
                 timeout = 20*60,
                 ttl = -1,
                 result_ttl = -1,
-                meta = {"retries": 2, "args": (cat.full_name)}
+                meta = {"retries": 2, "args": ("categories", workdir, cat.full_name)}
             )
             jobs += [job]
         print "waiting on {0} jobs".format(len(jobs))

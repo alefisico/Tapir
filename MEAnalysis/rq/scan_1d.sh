@@ -33,27 +33,27 @@ combine $DCARD.txt \
     --freezeNuisances "rgx{.*}" \
     --setPhysicsModelParameterRanges r=-2,2
 
-#combine $DCARD.txt \
-#    -n scan_r_sig1 \
-#    -M MultiDimFit \
-#    -t -1 \
-#    -P r \
-#    --point 100 \
-#    --algo grid \
-#    --robustFit 1 \
-#    --expectSignal 1 \
-#    --saveSpecifiedNuis bgnorm_ttbarPlusBBbar,CMS_ttH_CSVhf,CMS_scaleFlavorQCD_j,CMS_ttjetsisr \
-#    --saveInactivePOI 1 \
-#    --setPhysicsModelParameterRanges r=-1,3
-#
-#combine $DCARD.txt \
-#    -n scan_r_sig1_freeze \
-#    -M MultiDimFit \
-#    -t -1 \
-#    -P r \
-#    --point 100 \
-#    --algo grid \
-#    --robustFit 1 \
-#    --expectSignal 1 \
-#    --freezeNuisances "rgx{.*}" \
-#    --setPhysicsModelParameterRanges r=-1,3
+combine $DCARD.txt \
+    -n scan_r_sig1 \
+    -M MultiDimFit \
+    -t -1 \
+    -P r \
+    --point 100 \
+    --algo grid \
+    --robustFit 1 \
+    --expectSignal 1 \
+    --saveSpecifiedNuis bgnorm_ttbarPlusBBbar,CMS_ttH_CSVhf,CMS_scaleFlavorQCD_j,CMS_ttjetsisr \
+    --saveInactivePOI 1 \
+    --setPhysicsModelParameterRanges r=-1,3
+
+combine $DCARD.txt \
+    -n scan_r_sig1_freeze \
+    -M MultiDimFit \
+    -t -1 \
+    -P r \
+    --point 100 \
+    --algo grid \
+    --robustFit 1 \
+    --expectSignal 1 \
+    --freezeNuisances "rgx{.*}" \
+    --setPhysicsModelParameterRanges r=-1,3

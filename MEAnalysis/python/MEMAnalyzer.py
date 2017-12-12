@@ -224,7 +224,7 @@ class MEAnalyzer(FilterAnalyzer):
     def beginLoop(self, setup):
         super(MEAnalyzer, self).beginLoop(setup)
 
-    def getRightCorrection(self,jet,corr):
+    def getRightCorrection(self, jet, corr):
         corrfactor = 1
         if corr == "JERUp" or corr == "JERDown":
             corrfactor = jet.corr_JER

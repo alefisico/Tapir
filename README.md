@@ -269,3 +269,11 @@ CVMFS_HTTP_PROXY='http://ca-proxy-meyrin.cern.ch:3128;http://ca-proxy.cern.ch:31
 configure runner as in
 https://docs.gitlab.com/runner/install/linux-manually.html
 
+
+# OpenLOOPS
+
+Compile the signal and background amplitudes, which will be placed in `OpenLoops/proclib`.
+~~~
+./openloops libinstall pphtt compile_extra=1
+./openloops libinstall ppttjj compile_extra=1
+~~~
