@@ -392,7 +392,7 @@ class MEAnalyzer(FilterAnalyzer):
                     if self.conf.mem["calcME"]:
                         autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6} 3blr={7}".format(
                             hypo, confname,
-                            event.input.run, event.input.lumi, event.input.evt,
+                            event.input.run, event.lumi, event.evt,
                             event.category_string, event.btag_LR_4b_2b, event.btag_LR_3b_2b
                         ))
                         autolog("Integrator conf: b={0} l={1} syst={2}".format(

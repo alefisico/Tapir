@@ -174,9 +174,9 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #Event contents are defined here
     #This is work in progress
     if schema == "mc":
-        from TTH.MEAnalysis.VHbbTree import EventAnalyzer
+        from TTH.MEAnalysis.nanoTree  import EventAnalyzer
     else:
-        from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer
+        from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer #TODO convert to nanoAOD
 
 
     from TTH.MEAnalysis.nanoAODWrapper import FormatVariables
@@ -416,7 +416,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         files = files,
         tree_name = vhbb_tree_name, #DS requires change to ../../PhysicsTools/HeppyCore/python/framework/config.py
     )
-
     #from PhysicsTools.HeppyCore.framework.chain import Chain
     heppy_config = cfg.Config(
         #Run across these inputs
@@ -452,13 +451,14 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #execute the code
     looper.loop()
     print "Looper done"
-
-    tf = looper.setup.services["PhysicsTools.HeppyCore.framework.services.tfile.TFileService_outputfile"].file
+    
+    tf = looper.setup.services["outputfile"].file
     #tf.cd()
     #ts = ROOT.TNamed("config", conf_to_str(python_conf))
     #ts.Write("", ROOT.TObject.kOverwrite)
 
     #write the output
+    print "write the output"
     looper.write()
     return python_conf
 

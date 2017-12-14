@@ -69,7 +69,7 @@ class BTagRandomizerAnalyzer(FilterAnalyzer):
                 p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
                 obs_dict={
                     MEM.Observable.BTAG: getattr(jet, self.algo) > self.btagWP,
-                    MEM.Observable.PDGID: jet.mcFlavour,
+                    MEM.Observable.PDGID: jet.partonFlavour,
                     MEM.Observable.CSV: getattr(jet, self.algo)
                 }
             )

@@ -54,7 +54,7 @@ class LeptonAnalyzer(FilterAnalyzer):
             for lep_flavour in ["mu", "el"]:
                 lepcuts = self.conf.leptons[lep_flavour][id_type]
                 incoll = getattr(event, lep_flavour)
-               
+                
                 #The isolation type and cut value to be used
                 isotype = self.conf.leptons[lep_flavour]["isotype"]
                 isocut = lepcuts.get("iso", None)
@@ -114,7 +114,6 @@ class LeptonAnalyzer(FilterAnalyzer):
             setattr(event, "lep_{0}".format(id_type), sumleps)
             setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
         #end of id_type loop
-
         event.lep_SL = sorted(event.lep_SL, key=lambda x: x.pt, reverse=True)
         event.lep_DL = sorted(event.lep_DL, key=lambda x: x.pt, reverse=True)
         event.lep_veto = sorted(event.lep_veto, key=lambda x: x.pt, reverse=True)

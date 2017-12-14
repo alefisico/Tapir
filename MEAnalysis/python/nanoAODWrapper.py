@@ -376,15 +376,20 @@ class GenGluonFromB:
 
 
 def Jet_addmc(Jet,GenJet):
-	#event.injets = event.Jet
-	for ij, j in enumerate(Jet):
-		j.mcPt = GenJet[Jet[ij].genJetIdx].pt;
-		j.mcEta = GenJet[Jet[ij].genJetIdx].eta;
-		j.mcPhi = GenJet[Jet[ij].genJetIdx].phi;
-		j.mcM = GenJet[Jet[ij].genJetIdx].mass;
-
-
-
+    #event.injets = event.Jet
+    for ij, j in enumerate(Jet):
+        #Catch unmatched jets (-1) and IndexError
+        if Jet[ij].genJetIdx != -1 and Jet[ij].genJetIdx < len(GenJet):
+	    j.mcPt = GenJet[Jet[ij].genJetIdx].pt
+	    j.mcEta = GenJet[Jet[ij].genJetIdx].eta
+	    j.mcPhi = GenJet[Jet[ij].genJetIdx].phi
+	    j.mcM = GenJet[Jet[ij].genJetIdx].mass
+        else:
+	    j.mcPt = -99
+	    j.mcEta = -99
+	    j.mcPhi = -99
+	    j.mcM = -99
+        j.mcMatchIdx = Jet[ij].genJetIdx
 
 
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
@@ -400,7 +405,7 @@ class FormatVariables(Analyzer):
     	event.GenTaus = GenTaus.make_array(event.GenParticle)
     	event.GenLep = GenLep.make_array(event.GenParticle)
     	event.GenWZQuark = GenWZQuark.make_array(event.GenParticle)
-    	event.GenBQuarkFromHiggs = GenBQuarkFromHiggs.make_array(event.GenParticle)
+    	event.GenBQuarkFromH = GenBQuarkFromHiggs.make_array(event.GenParticle)
     	event.GenNuFromTop = GenNuFromTop.make_array(event.GenParticle)
     	event.GenNu = GenNu.make_array(event.GenParticle)
     	event.GenNuFromTau = GenNuFromTau.make_array(event.GenParticle)

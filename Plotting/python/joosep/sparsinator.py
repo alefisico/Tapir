@@ -17,7 +17,7 @@ from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProcess, CategoryCut
 from TTH.CommonClassifier.db import ClassifierDB
 
-from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
+#from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
 
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")

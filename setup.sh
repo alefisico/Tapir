@@ -1,11 +1,12 @@
 export SCRAM_ARCH=slc6_amd64_gcc630
 
-scram project -n CMSSW CMSSW CMSSW_9_4_0_pre1
+scram project -n CMSSW CMSSW CMSSW_9_4_1
 cd CMSSW/src/
 eval `scramv1 runtime -sh`
 
 git cms-init
-git cms-merge-topic -u cms-nanoAOD:nano_94X
+git cms-merge-topic cms-nanoAOD:master
+git checkout -b nanoAOD cms-nanoAOD/master
 
 #get the TTH code
 git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch SwitchNanoAOD

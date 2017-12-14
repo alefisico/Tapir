@@ -26,17 +26,17 @@ def fillCoreVariables(self, tr, event, isMC):
 
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
-from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
-from VHbbAnalysis.Heppy.btagSF import systematicsCSV, systematicsCMVAV2
+#from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
+#from VHbbAnalysis.Heppy.btagSF import systematicsCSV, systematicsCMVAV2
 #recompute b-tag weights
 btag_weights = {}
-for algo, systematics in [("CMVAV2", systematicsCMVAV2)]:
-    for syst in systematics:
-        syst_name = "" if syst=="central" else ("_"+syst) 
-        btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
-            lambda ev, get_event_SF=get_event_SF, syst=syst, algo=algo, btagSFhandle=btagSFhandle : get_event_SF(map(JetWrapper, ev.good_jets_nominal), syst, algo, btagSFhandle)
-            , float, mcOnly=True, help="b-tag "+algo+"continuous  weight, variating "+syst
-        )
+#for algo, systematics in [("CMVAV2", systematicsCMVAV2)]:
+#    for syst in systematics:
+#        syst_name = "" if syst=="central" else ("_"+syst) 
+#        btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
+#            lambda ev, get_event_SF=get_event_SF, syst=syst, algo=algo, btagSFhandle=btagSFhandle : get_event_SF(map(JetWrapper, ev.good_jets_nominal), syst, algo, btagSFhandle)
+#            , float, mcOnly=True, help="b-tag "+algo+"continuous  weight, variating "+syst
+#        )
 
 
 lepton_sf_kind = [
@@ -114,7 +114,7 @@ perm_vars = [
     for i in range(MEMPermutation.MAXOBJECTS)
 ]
 memPermType = NTupleObjectType("memPermType", variables = [
-    NTupleVariable("idx", lambda x : x.idx, the_type=int),
+    NTupleVariable("idx", lambda x : x.idx, type=int),
     NTupleVariable("p_mean", lambda x : x.p_mean),
     NTupleVariable("p_std", lambda x : x.p_std),
     NTupleVariable("p_tf_mean", lambda x : x.p_tf_mean),
@@ -155,7 +155,7 @@ def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
     if systematic == "nominal":
         syst_suffix = ""
     return NTupleVariable(
-        name + syst_suffix, func, the_type=typ, help=hlp, mcOnly=mcOnly
+        name + syst_suffix, func, type=typ, help=hlp, mcOnly=mcOnly
     )
 
 topCandidateType = NTupleObjectType("topCandidateType", variables = [
@@ -200,7 +200,7 @@ topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
     NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
-    #NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), the_type=int, help="Index of the matched genTopHad" ),
+    #NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
 ])
 
 higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
@@ -336,12 +336,12 @@ SubjetCA15prunedType = NTupleObjectType("SubjetCA15prunedType", variables = [
 
 def getTreeProducer(conf):
     factorized_dw_vars = [
-        NTupleVariable("dw_" + fc, lambda x,fc=fc : getattr(x, "dw", {}).get(fc, 0.0), the_type=float)
+        NTupleVariable("dw_" + fc, lambda x,fc=fc : getattr(x, "dw", {}).get(fc, 0.0), type=float)
         for fc in conf.mem["jet_corrections"]
     ]
     
     variated_vars = [
-        NTupleVariable("var_" + fc, lambda x,i=i : x.variated.at(i) if x.variated.size()>i else 0.0, the_type=float)
+        NTupleVariable("var_" + fc, lambda x,i=i : x.variated.at(i) if x.variated.size()>i else 0.0, type=float)
         for (i, fc) in enumerate(conf.mem["jet_corrections"])
     ]
     
@@ -350,9 +350,9 @@ def getTreeProducer(conf):
         NTupleVariable("p_err", lambda x : x.p_err),
         #NTupleVariable("chi2", lambda x : x.chi2),
         NTupleVariable("time", lambda x : x.time),
-        #NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
+        #NTupleVariable("error_code", lambda x : x.error_code, type=int),
         #NTupleVariable("efficiency", lambda x : x.efficiency),
-        NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
+        NTupleVariable("nperm", lambda x : x.num_perm, type=int),
     ] + factorized_dw_vars + variated_vars)
     
     memType_syst = NTupleObjectType("memType", variables = [
@@ -360,9 +360,9 @@ def getTreeProducer(conf):
         NTupleVariable("p_err", lambda x : x.p_err),
         #NTupleVariable("chi2", lambda x : x.chi2),
         #NTupleVariable("time", lambda x : x.time),
-        #NTupleVariable("error_code", lambda x : x.error_code, the_type=int),
+        #NTupleVariable("error_code", lambda x : x.error_code, type=int),
         #NTupleVariable("efficiency", lambda x : x.efficiency),
-        #NTupleVariable("nperm", lambda x : x.num_perm, the_type=int),
+        #NTupleVariable("nperm", lambda x : x.num_perm, type=int),
     ])
    
     #create jet up/down variations
@@ -375,28 +375,29 @@ def getTreeProducer(conf):
         NTupleVariable("mass", lambda x : x.mass),
         NTupleVariable("id", lambda x : x.jetId),  
         NTupleVariable("qgl", lambda x : x.qgl),
-        #NTupleVariable("btagCSV", lambda x : x.btagCSV),
+        NTupleVariable("btagCSV", lambda x : x.btagCSV),
+        NTupleVariable("btagDeepCSV", lambda x : x.btagDeepCSV),
         NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
         #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
         NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
-        NTupleVariable("qg_sf", lambda x : getattr(x,"qg_sf",1.), the_type=float, mcOnly=True),
-        #NTupleVariable("mcFlavour", lambda x : x.mcFlavour, the_type=int, mcOnly=True),
-        #NTupleVariable("mcMatchId", lambda x : x.mcMatchId, the_type=int, mcOnly=True),
-        NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, the_type=int, mcOnly=True),
+        NTupleVariable("qg_sf", lambda x : getattr(x,"qg_sf",1.), type=float, mcOnly=True),
+        NTupleVariable("partonFlavour", lambda x : x.partonFlavour, type=int, mcOnly=True),
+        NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int, mcOnly=True),
         NTupleVariable("matchFlag",
             lambda x : getattr(x, "tth_match_label_numeric", -1),
-            the_type=int,
+            type=int,
             mcOnly=True,
             help="0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs"
         ),
-        NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), the_type=int, mcOnly=True),
+        NTupleVariable("matchBfromHadT", lambda x : getattr(x, "tth_match_label_bfromhadt", -1), type=int, mcOnly=True),
         NTupleVariable("mcPt", lambda x : x.mcPt, mcOnly=True),
         NTupleVariable("mcEta", lambda x : x.mcEta, mcOnly=True),
         NTupleVariable("mcPhi", lambda x : x.mcPhi, mcOnly=True),
         NTupleVariable("mcM", lambda x : x.mcM, mcOnly=True),
+        NTupleVariable("mcMatchIdx", lambda x : x.mcMatchIdx, mcOnly=True),
         #NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-        #NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
+        NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
         #NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
     ] + corrs)
 
@@ -448,56 +449,56 @@ def getTreeProducer(conf):
 
             NTupleVariable(
                "nGenBHiggs", lambda ev: len(getattr(ev, "b_quarks_h_nominal", [])),
-               the_type=int,
+               type=int,
                help="Number of generated b from higgs", mcOnly=True
             ),
 
             NTupleVariable(
                "nGenBTop", lambda ev: len(getattr(ev, "b_quarks_t_nominal", [])),
-               the_type=int,
+               type=int,
                help="Number of generated b from top", mcOnly=True
             ),
 
             NTupleVariable(
                "nGenQW", lambda ev: len(getattr(ev, "l_quarks_w_nominal", [])),
-               the_type=int,
+               type=int,
                help="Number of generated quarks from W", mcOnly=True
             ),
             
             NTupleVariable(
                "passPV", lambda ev: getattr(ev, "passPV", -1),
-               the_type=int,
+               type=int,
                help="First PV passes selection"
             ),
 
             NTupleVariable(
                "triggerDecision", lambda ev: getattr(ev, "triggerDecision", -1),
-               the_type=int,
+               type=int,
                help="Trigger selection"
             ),
             NTupleVariable(
                "triggerBitmask", lambda ev: getattr(ev, "triggerBitmask", -1),
-               the_type=int,
+               type=int,
                help="Bitmask of trigger decisions"
             ),
             NTupleVariable(
                "is_sl", lambda ev: ev.is_sl,
-               the_type=int,
+               type=int,
                help="is single-leptonic"
             ),
             NTupleVariable(
                "is_dl", lambda ev: ev.is_dl,
-               the_type=int,
+               type=int,
                help="is di-leptonic"
             ),
             NTupleVariable(
                "is_fh", lambda ev: ev.is_fh,
-               the_type=int,
+               type=int,
                help="is fully hadronic"
             ),
-            #NTupleVariable("ht40", lambda ev: getattr(ev, "ht40", -9999), the_type=float, help="ht considering only jets with pT>40"),
-            NTupleVariable("csv1", lambda ev: getattr(ev, "csv1", -9999), the_type=float, help="highest jet csv value"),
-            NTupleVariable("csv2", lambda ev: getattr(ev, "csv2", -9999), the_type=float, help="2nd highest jet csv value"),
+            #NTupleVariable("ht40", lambda ev: getattr(ev, "ht40", -9999), type=float, help="ht considering only jets with pT>40"),
+            NTupleVariable("csv1", lambda ev: getattr(ev, "csv1", -9999), type=float, help="highest jet csv value"),
+            NTupleVariable("csv2", lambda ev: getattr(ev, "csv2", -9999), type=float, help="2nd highest jet csv value"),
 
         ],
         globalObjects = {
@@ -540,7 +541,7 @@ def getTreeProducer(conf):
     trignames = []
     print "im there"
     for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-        print pathname, trigs
+        #print pathname, trigs
         for pref in ["HLT"]:
             #add trigger path (combination of trigger)
             _pathname = "_".join([pref, pathname])
@@ -554,7 +555,8 @@ def getTreeProducer(conf):
                 tn = pref + "_BIT_" + tn[:-1]
                 if not tn in trignames:
                     trignames += [tn]
-
+    print trignames
+                    
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
@@ -573,7 +575,7 @@ def getTreeProducer(conf):
     ]
     """for trig in trignames + metfilter_flags:
                     treeProducer.globalVariables += [NTupleVariable(
-                        trig, lambda ev, name=trig: getattr(ev.input, name, -1), the_type=int, mcOnly=False
+                        trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False
                     )]"""
        
     #Add systematically variated quantities
@@ -619,8 +621,9 @@ def getTreeProducer(conf):
             #("qg_LR_3b_flavour_5q_4q", float,      ""),
 
             ("nBCSVM",              int,      "Number of good jets that pass the CSV Medium WP"),
-            #("nBCSVT",              int,      ""),
-            #("nBCSVL",              int,      ""),
+            ("nBCSVT",              int,      "Number of good jets that pass the DeepCSV Tight WP"),
+            ("nBCSVL",              int,      "Number of good jets that pass the DeepCSV Loose WP"),
+            ("nBDeepCSVM",          int,      "Number of good jets that pass the DeepCSV Medium WP"),
             #("nCSVv2IVFM",              int,      ""),                
             ("nBCMVAM",             int,      "Number of good jets that pass cMVAv2 Medium WP"),
             ("numJets",             int,        "Total number of good jets that pass jet ID"),
@@ -691,7 +694,7 @@ def getTreeProducer(conf):
         ("qgWeight",                float,  ""),
         ("nPU0",                    float,  ""),
         ("nTrueInt",                int,  ""),
-        ("triggerEmulationWeight",  float,  ""),
+        ("trigtrigTablegerEmulationWeight",  float,  ""),
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
    

@@ -3,8 +3,10 @@ from collections import OrderedDict
 from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
-import VHbbAnalysis.Heppy.TriggerTableData as trigData
-import VHbbAnalysis.Heppy.TriggerTable as trig
+#import VHbbAnalysis.Heppy.TriggerTableData as trigData
+#import VHbbAnalysis.Heppy.TriggerTable as trig
+import TriggerTable as trig
+trigData = trig
 
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID
@@ -13,10 +15,10 @@ def jet_baseline(jet):
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
-# https://github.com/vhbb/cmssw/blob/vhbbHeppy722patch2/PhysicsTools/Heppy/python/physicsobjects/Muon.py
+# nanoAOD is using CMSSW definiton: https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc#L837
 def mu_baseline_tight(mu):
     return (
-        mu.tightId == 1
+        mu.tightId == 1 
     )
 
 def print_mu(mu):
@@ -25,71 +27,33 @@ def print_mu(mu):
 factorizedJetCorrections = []
 
 def el_baseline_medium(el):
-
-    #ele MVA ID preselection
     sca = abs(el.etaSc)
-    ret = ((sca < 1.4442 and
-        el.eleSieie < 0.012 and
-        el.eleHoE < 0.09 and
-        el.eleEcalClusterIso/ el.pt < 0.37 and
-        el.eleHcalClusterIso / el.pt < 0.25 and
-        abs(el.eleDEta) < 0.0095 and
-        abs(el.eleDPhi) < 0.065 and
-        el.dr03TkSumPt/el.pt < 0.18) or
-        (sca > 1.5660 and
-        el.eleSieie < 0.033 and
-        el.eleHoE < 0.09 and
-        el.eleEcalClusterIso / el.pt < 0.45 and
-        el.eleHcalClusterIso / el.pt < 0.28 and
-        el.dr03TkSumPt/el.pt < 0.18)
+    ret = ( el.eleCutId == 3 and
+            not ( sca >= 1.4442 and
+                  sca < 1.5669 )
     )
-
-    #medium ID (cut-based)
-    #ret = ret and el.eleCutIdSpring15_25ns_v1 >= 3
-
-    #EGamma POG MVA ID for triggering electrons (0=none, 1=WP90, 2=WP80, Spring15 training); 1 for muons
-    # We want 80% (tight id)
-    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TTbarHbbRun2ReferenceAnalysis_76XTransition#Electrons
-    ret = ret and el.eleMVAIdSpring15Trig == 2
 
     return ret
 
 def el_baseline_tight(el):
-
-    # Taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2?rev=42
-    sca = abs(el.etaSc)
-    ret = ((sca < 1.4442 and
-        el.sieie < 0.00998 and
-        el.hoe < 0.0414 and
-        abs(el.DEta) < 0.00308 and
-        abs(el.DPhi) < 0.0816 and
-        el.ooEmooP < 0.0129) or
-        #el.ooEmooP < 0.0129 and
-        #el.ExpMissingInnerHits <= 1 and
-        #el.combIsoAreaCorr < 0.0588 and
-        #el.convVetoFull == True) or
-        (sca >1.5669 and
-        el.sieie < 0.0292 and
-        el.hoe < 0.0641 and
-        abs(el.DEta) < 0.00605 and
-        abs(el.DPhi) < 0.0394 and
-        el.ooEmooP < 0.0129)
-        #el.ooEmooP < 0.0129 and
-        #el.ExpMissingInnerHits <= 1 and
-        #el.combIsoAreaCorr < 0.0571 and
-        #el.convVetoFull == True)
-
     
+    # Taken from https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#22-electron
+    #  --> Usage of VID tools. Should also contain isolation cut
+    sca = abs(el.etaSc)
+    ret = ( el.eleCutId == 4 and
+            not ( sca >= 1.4442 and
+                  sca < 1.5669 )
     )
-
+            
     return ret
 
 def print_el(el):
-    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, nhits=%s, eOp=%s)" % (
+    print "Electron: (pt=%s, eta=%s, convVeto=%s, etaSc=%s, dEta=%s, dPhi=%s, sieie=%s, HoE=%s, dxy=%s, dz=%s, nhits=%s, eOp=%s VIDID=%s)" % (
         el.pt, el.eta, el.convVeto, abs(el.etaSc), abs(el.DEta),
         abs(el.DPhi), el.sieie, el.hoe, abs(el.dxy),
         abs(el.dz), getattr(el, "eleExpMissingInnerHits", 0),
-        getattr(el, "eleooEmooP", 0)
+        getattr(el, "eleooEmooP", 0),
+        getattr(el, "eleCutId",0)
     )
 
 class Conf:
@@ -134,7 +98,7 @@ class Conf:
                 "idcut": lambda el: el_baseline_tight(el),
             },
             #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff is not defined
-            "isotype": "ooEmooP",
+            "isotype": "relIso03", #KS: changed for nanoAOD. Seems to not do anything anyways.
             "debug" : print_el
         },
         "DL": {
@@ -167,18 +131,22 @@ class Conf:
         "minjets_fh": 6,
 
         #The default b-tagging algorithm (branch name)
-        "btagAlgo": "btagCMVA",
+        "btagAlgo": "btagCSV",
 
         #The default b-tagging WP
-        "btagWP": "CMVAM",
+        "btagWP": "CSVM",
 
         #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
         #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
         "btagWPs": {
-            #"CSVL": ("btagCSV", 0.5426),
-            #"CSVM": ("btagCSV", 0.8484),
-            #"CSVT": ("btagCSV", 0.9535),
+            "CSVL": ("btagCSV", 0.5426),
+            "CSVM": ("btagCSV", 0.8484),
+            "CSVT": ("btagCSV", 0.9535),
 
+            "DeepCSVL": ("btagDeepCSV", 0.2219),
+            "DeepCSVM": ("btagDeepCSV", 0.6324),
+            "DeepCSVT": ("btagDeepCSV", 0.8958),
+            
             "CMVAL": ("btagCMVA", -0.5884),
             "CMVAM": ("btagCMVA", 0.4432),
             "CMVAT": ("btagCMVA", 0.9432)
