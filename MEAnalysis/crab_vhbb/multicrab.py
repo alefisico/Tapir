@@ -690,8 +690,8 @@ for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
 
 workflow_datasets["leptonic_nome"] = {}
 for k in [
-        "ttHTobb",
-        "ttHToNonbb",
+        #"ttHTobb",
+        #"ttHToNonbb",
         "TTbar_inc",
         "TTbar_sl",
         "TTbar_dl",
@@ -788,7 +788,7 @@ workflow_datasets["testing"] = {}
 
 for k in [
     "ttHTobb",
-    #"TTbar_inc",
+    "TTbar_inc",
     #"SingleMuon-Run2016H-03Feb2017_ver3-v1"
     ]:
     D = deepcopy(datasets[k])
