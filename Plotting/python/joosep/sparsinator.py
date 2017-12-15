@@ -673,6 +673,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     print("Event {0}:{1}:{2} failed MET filter".format(event.run, event.lumi, event.evt))
                     continue
 
+                event.mll = 0.0
+
                 #SL specific MET cut
                 if event.is_sl:
                     if event.met_pt <= 20:
@@ -680,6 +682,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #dilepton specific cuts
                 elif event.is_dl:
                     mll = (event.leptons.at(0).lv + event.leptons.at(1).lv).M()
+                    event.mll = mll
                     #drell-yan
                     if mll < 20:
                         continue
@@ -757,7 +760,7 @@ if __name__ == "__main__":
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
         max_events = 10000
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/crosscheck.cfg")
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
         #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
 

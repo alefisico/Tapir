@@ -89,15 +89,19 @@ varnames = {
     "leps_0_eta": r"leading lepton $\eta$",
     "leps_1_eta": r"subleading lepton $\eta$",
 
-    "numJets": r"$N_{\mathrm{jets}}$",
-    "nBCSVM": r"$N_{\mathrm{CSVM}}$",
+    "numJets": r"jet multiplicity, $N_{\mathrm{jets}}$",
+    "nBCSVM": r"b tag multiplicity, $N_{\mathrm{CSVM}}$",
 
-    "btag_LR_4b_2b_btagCSV_logit" : "BLR (CSV)",
-    "mem_SL_0w2h2t_p": "MEM SL 0w2h2t",
-    "mem_SL_1w2h2t_p": "MEM SL 1w2h2t",
-    "mem_SL_2w2h2t_p": "MEM SL 2w2h2t",
-    "mem_DL_0w2h2t_p": "MEM DL 0w2h2t",
-    "Wmass": "$m_{qq}$"
+    "btag_LR_4b_2b_btagCSV_logit" : r"b tagging likelihood ratio, $\mathcal{BLR}$",
+    "mem_SL_0w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "mem_SL_1w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "mem_SL_2w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "mem_DL_0w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "Wmass": "W boson candidate mass, $m_{qq}$",
+    "met_pt": "MET [GeV]",
+    "ht": "scalar sum of jet momenta, $H_T$ [GeV]",
+    "mll": "dilepton invariant mass, $m_{\ell\ell}$ [GeV]",
+    "nPVs": "number of primary vertices, $N_{PV}$",
 }
 
 #the units for variables
@@ -448,8 +452,8 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
         histogram_signal.Scale(0.0)
         
     if histogram_signal.Integral()>0:
-        histogram_signal.Scale(0.2 * histogram_total_mc.Integral() / histogram_signal.Integral())
-    histogram_signal.title = processes[0][1] + " norm"
+        histogram_signal.Scale(50.0)
+    histogram_signal.title = processes[0][1] + " x50"
     histogram_signal.linewidth=2
     histogram_signal.fillstyle = None
     #draw the signal shape
@@ -511,7 +515,7 @@ def draw_data_mc(tf, hname, processes, signal_processes, **kwargs):
             for (line1, line2), h in zip(stacked_hists["hists"], histograms_nominal.values()):
                 patch = mpatches.Patch(color=line1.get_color(), label=h.title)
                 patches += [patch]
-
+        patches += [mlines.Line2D([], [], color=histogram_signal.color[0], label=histogram_signal.title, linewidth=2)]
         patches += [mpatches.Patch(facecolor="none", edgecolor="black", label="stat", hatch="//////")]
         patches += [mpatches.Patch(facecolor="none", edgecolor="gray", label="stat+syst", hatch=r"\\\\")]
         plt.legend(handles=patches, loc=legend_loc, numpoints=1, prop={'size':legend_fontsize}, ncol=2, frameon=False)
@@ -755,7 +759,7 @@ def get_cut_at_eff(h, eff):
     idx = np.searchsorted(bins, eff)
     return idx
 
-def brazilplot(limits, categories, axes=None, doObserved=False):
+def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
     """Draws the a set of limits on a brazil plot
 
     Args:
@@ -772,6 +776,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False):
 
     central_limits = []
     observed_limits = []
+    injected_limits = []
     errs = np.zeros((len(categories), 4))
 
     #fill in the data
@@ -781,6 +786,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False):
         #central value
         central_limits += [limits[catname][2]]
         observed_limits += [limits[catname][5]]
+        injected_limits += [limits[catname][6]]
 
         #error band
         errs[i,0] = limits[catname][1]
@@ -796,11 +802,21 @@ def brazilplot(limits, categories, axes=None, doObserved=False):
     table_data = []
     #draw points
     i = 0
-    for y, l, o, e1, e2, e3, e4 in zip(ys, central_limits, observed_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
+    for y, l, o, inj, e1, e2, e3, e4 in zip(ys, central_limits, observed_limits, injected_limits, errs[:, 0], errs[:, 1], errs[:, 2], errs[:, 3]):
 
+        leg_args = {}
+        if i == 0:
+            leg_args["label"] = "median"
         #black line
-        axes.add_line(plt.Line2D([l, l], [y-0.45, y+0.45], lw=2, color="black", ls="--"))
+        axes.add_line(plt.Line2D([l, l], [y-0.45, y+0.45], lw=2, color="black", ls="--", **leg_args))
 
+        leg_args = {}
+        if i == 0:
+            leg_args["label"] = "$\mu=1$ injected"
+        #black line
+        axes.add_line(plt.Line2D([inj, inj], [y-0.45, y+0.45], lw=2, color="red", ls="--", **leg_args))
+
+        
         leg_args = {}
         #axes.add_line(plt.Line2D([o, o], [y-0.4, y+0.4], lw=2, color="black", ls="-"))
         if i == 0:
@@ -809,7 +825,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False):
             axes.errorbar([o], [y], [0.4], marker="s", color="black", **leg_args)
         
         #value
-        plt.text(l+0.5, y, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
+        #plt.text(l+0.5, y, "{0:.2f}".format(l), horizontalalignment="left", verticalalignment="center")
 
         leg_args1 = {}
         leg_args2 = {}
@@ -819,7 +835,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False):
         #error bars
         axes.barh(y, (e4-e3), height=0.8, left=e3, color=np.array([254, 247, 2])/255.0, lw=0, align="center", **leg_args1)
         axes.barh(y, (e2-e1), height=0.8, left=e1, color=np.array([51, 247, 2])/255.0 , lw=0, align="center", **leg_args2)
-        table_data += [(categories[i][1], e3, l, e4)]
+        table_data += [(categories[i][1], e3, l, e4, o, inj)]
         i += 1
     #set ranges
 
@@ -838,9 +854,9 @@ def brazilplot(limits, categories, axes=None, doObserved=False):
     axes.tick_params(axis = 'both', which = 'major', labelsize=16)
     axes.tick_params(axis = 'both', which = 'minor')
 
-    plt.legend(loc=1, fontsize=12, numpoints = 1, frameon=False)
+    plt.legend(loc=legend_loc, fontsize=12, numpoints = 1, frameon=False, ncol=2)
     plt.title(
-        r"$\mathbf{CMS}$ private work (blinded)",
+        r"$\mathbf{CMS}$ private work",
         fontsize=16, x=0.05, ha="left", y=0.95, va="top", fontname="Helvetica"
     )
     plt.text(0.99, 1.00,

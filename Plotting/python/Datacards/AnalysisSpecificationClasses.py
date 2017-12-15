@@ -41,6 +41,8 @@ FUNCTION_TABLE = {
     "jetsByPt_3_btagCSV": lambda ev: ev.jets[3].btag if len(ev.jets)>=4 else 0.0,
     "leps_0_pt": lambda ev: ev.leptons[0].lv.Pt(),
     "leps_1_pt": lambda ev: ev.leptons[1].lv.Pt(),
+    "leps_0_eta": lambda ev: ev.leptons[0].lv.Eta(),
+    "leps_1_eta": lambda ev: ev.leptons[1].lv.Eta(),
     "mem_DL_0w2h2t_p": lambda ev: ev.mem_DL_0w2h2t_p,
     "mem_SL_0w2h2t_p": lambda ev: ev.mem_SL_0w2h2t_p,
     "mem_SL_1w2h2t_p": lambda ev: ev.mem_SL_1w2h2t_p,
@@ -49,7 +51,10 @@ FUNCTION_TABLE = {
     "numJets": lambda ev: ev.numJets,
     "nBCSVM": lambda ev: ev.nBCSVM,
     "nPVs": lambda ev: ev.nPVs,
-    "counting": 1.0
+    "counting": 1.0,
+    "mll": lambda ev: ev.mll,
+    "met_pt": lambda ev: ev.met_pt,
+    "ht": lambda ev: sum([jet.lv.Pt() for jet in ev.jets])
 }
 
 class Cut(object):
