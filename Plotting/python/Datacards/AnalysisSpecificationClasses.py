@@ -51,7 +51,10 @@ FUNCTION_TABLE = {
     "numJets": lambda ev: ev.numJets,
     "nBCSVM": lambda ev: ev.nBCSVM,
     "nPVs": lambda ev: ev.nPVs,
-    "counting": 1.0
+    "counting": 1.0,
+    "mll": lambda ev: ev.mll,
+    "met_pt": lambda ev: ev.met_pt,
+    "ht": lambda ev: sum([jet.lv.Pt() for jet in ev.jets])
 }
 
 class Cut(object):

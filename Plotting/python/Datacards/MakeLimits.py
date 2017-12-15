@@ -107,8 +107,7 @@ def run_pulls(group_name, dcard_filename, workdir):
     for sig, asimov in [
         (1, True),
         (0, True),
-        (1, False),
-        (0, False)
+        (None, False),
         ]:
         suf = ""
         title = "to data"
@@ -116,14 +115,23 @@ def run_pulls(group_name, dcard_filename, workdir):
             suf = "_asimov"
             title = "to Asimov"
         constraints, pulls_file = pulls(dcard_filename, workdir, sig, asimov)
-        of = open(workdir + "/constraints_{0}_sig{1}{2}.txt".format(group_name, sig, suf), "w")
+        if sig is None:
+            of = open(workdir + "/constraints_{0}{1}.txt".format(group_name, suf), "w")
+        else:
+            of = open(workdir + "/constraints_{0}_sig{1}{2}.txt".format(group_name, sig, suf), "w")
         of.write(constraints)
         of.close()
 
         for ranges in [(0,20), (20, 40), (40, 60)]:
             plot_pulls(os.path.join(workdir, pulls_file), ranges[0], ranges[1])
-            plt.title("{0}\nmu={1} {2}".format(group_name, sig, title))
-            plotlib.svfg(os.path.join(workdir, "pulls_{0}_sig{1}_r{2}_{3}{4}.pdf".format(group_name, sig, ranges[0], ranges[1], suf)))
+            if sig is None:
+                plt.title("{0}\n{1}".format(group_name, title))
+            else:
+                plt.title("{0}\nmu={1} {2}".format(group_name, sig, title))
+            if sig is None:
+                plotlib.svfg(os.path.join(workdir, "pulls_{0}_r{1}_{2}{3}.pdf".format(group_name, ranges[0], ranges[1], suf)))
+            else:
+                plotlib.svfg(os.path.join(workdir, "pulls_{0}_sig{1}_r{2}_{3}{4}.pdf".format(group_name, sig, ranges[0], ranges[1], suf)))
 
 def run_pulls_tup(tup):
     return run_pulls(*tup)
@@ -282,7 +290,7 @@ if __name__ == "__main__":
         else:
             if args.jobtype == "main":
                 limits = main(workdir, analysis, groups_to_run, args.runSignalInjection, args.runPulls)
-                of = open(os.path.join(workdir, "../limits.json"), "w")
+                of = open(os.path.join(workdir, "../limits_rerun.json"), "w")
                 json.dump(limits, of, indent=2)
                 of.close()
             elif args.jobtype == "limit":
@@ -292,7 +300,7 @@ if __name__ == "__main__":
                     run_limit(args.group, os.path.join(workdir, "shapes_group_{0}.txt".format(args.group)), workdir)
             elif args.jobtype == "pulls":
                 if len(groups_to_run)>1:
-                    run_serial(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in groups_to_run])
+                    run_parallel(run_pulls_tup, [(g, os.path.join(workdir, "shapes_group_{0}.txt".format(g)), workdir) for g in groups_to_run])
                 else:
                     run_pulls(groups_to_run[0], os.path.join(workdir, "shapes_group_{0}.txt".format(args.group)), workdir)
             elif args.jobtype == "syst":

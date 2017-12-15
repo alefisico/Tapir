@@ -82,7 +82,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         #"blindFunc": "no_blind",
         "do_tex": False 
     }
-    if variable in ["numJets", "nBCSVM"] or variable.endswith("_pt"):
+    if variable in ["numJets", "nBCSVM", "ht", "met_pt"] or variable.endswith("_pt"):
         ret["do_log"] = True
     return ret
 

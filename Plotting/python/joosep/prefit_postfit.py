@@ -72,7 +72,7 @@ def draw_channel_prefit_postfit(ch, chname, template, xlabel, path):
         colors = plotlib.colors,
         pattern="shapes_prefit/" + ch + "/{sample}",
         legend_loc="best",
-        title_extended = channel_titles[chname] + " prefit",
+        title_extended = channel_titles[chname] + r" $35.9\ \mathrm{fb}^{-1}$ (13 TeV)",
         legend_fontsize=12,
         xlabel = xlabel,
         ylabel = "events / bin",
@@ -80,9 +80,16 @@ def draw_channel_prefit_postfit(ch, chname, template, xlabel, path):
         postprocess_hist = lambda x, template=template: postprocess_hist(x, template),
         do_tex = False
     )
-    ymax = 2.0*sum([h.GetMaximum() for h in ret["nominal"].values()])
+    ymax = 3.0*sum([h.GetMaximum() for h in ret["nominal"].values()])
+    h = ret["nominal"].values()[0]
+    xticks = [h.GetBinLowEdge(i) for i in range(1, h.GetNbinsX()+1)]
+    ret["axes"][0].text(0.05, 0.95, "prefit", ha="left", va="top", transform=ret["axes"][0].transAxes, fontsize=16)
     ret["axes"][0].set_ylim(0, ymax)
     ret["axes"][1].set_ylim(0.5, 1.5)
+    #ret["axes"][0].set_xticks(xticks)
+    #ret["axes"][1].set_xticks(xticks)
+    minorLocator = AutoMinorLocator()
+    ret["axes"][1].xaxis.set_minor_locator(minorLocator)
     plotlib.svfg(path + "/{0}_prefit.pdf".format(chname))
 
     ret = plotlib.draw_data_mc(tf, "",
@@ -93,7 +100,7 @@ def draw_channel_prefit_postfit(ch, chname, template, xlabel, path):
         colors = plotlib.colors,
         pattern="shapes_fit_s/" + ch + "/{sample}",
         legend_loc="best",
-        title_extended = channel_titles[chname] + " postfit",
+        title_extended = channel_titles[chname] + r" $35.9\ \mathrm{fb}^{-1}$ (13 TeV)",
         legend_fontsize=12,
         xlabel = xlabel,
         ylabel = "events / bin",
@@ -102,8 +109,14 @@ def draw_channel_prefit_postfit(ch, chname, template, xlabel, path):
         do_tex = False
 
     )
+    ymax = 3.0*sum([h.GetMaximum() for h in ret["nominal"].values()])
     ret["axes"][0].set_ylim(0, ymax)
     ret["axes"][1].set_ylim(0.5, 1.5)
+    ret["axes"][0].text(0.05, 0.95, "postfit", ha="left", va="top", transform=ret["axes"][0].transAxes, fontsize=16)
+    #ret["axes"][0].set_xticks(xticks)
+    #ret["axes"][1].set_xticks(xticks)
+    minorLocator = AutoMinorLocator()
+    ret["axes"][1].xaxis.set_minor_locator(minorLocator)
     plotlib.svfg(path + "/{0}_postfit.pdf".format(chname))
     return ret
 
@@ -123,14 +136,14 @@ if __name__ == "__main__":
     tf = rootpy.io.File(path + "/limits/mlfitshapes_group_group_sldl.root")
 
     for ch, chname, template, xlabel in [
-        ("ch1", "sl_j4_t3", rootpy.plotting.Hist(6,-1,4), "btag LR"),
-        ("ch2", "sl_j4_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
-        ("ch3", "sl_j5_t3", rootpy.plotting.Hist(6,0,5), "btag LR"),
-        ("ch4", "sl_j5_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
-        ("ch5", "sl_jge6_t3", rootpy.plotting.Hist(6,1,6), "btag LR"),
-        ("ch6", "sl_jge6_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
-        ("ch8", "dl_jge4_t3", rootpy.plotting.Hist(6,-1,6), "btag LR"),
-        ("ch7", "dl_jge4_tge4", rootpy.plotting.Hist(6,0,1), "MEM"),
+        ("ch1", "sl_j4_t3", rootpy.plotting.Hist(6,-1,4), r"b tagging likelihood ratio, $\mathcal{BLR}$"),
+        ("ch2", "sl_j4_tge4", rootpy.plotting.Hist(6,0,1), r"MEM discriminant, $P_{\mathrm{s/b}}$"),
+        ("ch3", "sl_j5_t3", rootpy.plotting.Hist(6,0,5), r"b tagging likelihood ratio, $\mathcal{BLR}$"),
+        ("ch4", "sl_j5_tge4", rootpy.plotting.Hist(6,0,1), r"MEM discriminant, $P_{\mathrm{s/b}}$"),
+        ("ch5", "sl_jge6_t3", rootpy.plotting.Hist(6,1,6), r"b tagging likelihood ratio, $\mathcal{BLR}$"),
+        ("ch6", "sl_jge6_tge4", rootpy.plotting.Hist(6,0,1), r"MEM discriminant, $P_{\mathrm{s/b}}$"),
+        ("ch8", "dl_jge4_t3", rootpy.plotting.Hist(6,-1,6), r"b tagging likelihood ratio, $\mathcal{BLR}$"),
+        ("ch7", "dl_jge4_tge4", rootpy.plotting.Hist(6,0,1), r"MEM discriminant, $P_{\mathrm{s/b}}$"),
         ]:
         print ch, chname 
         ret = draw_channel_prefit_postfit(ch, chname, template, xlabel, path)
@@ -173,6 +186,6 @@ if __name__ == "__main__":
         minorLocator1 = AutoMinorLocator()
         ax.yaxis.set_minor_locator(minorLocator1)
         
-    plt.legend(leg, [p[1] for p in procs_names], loc=(1.2, 0.25), frameon=False, ncol=2, fontsize=10)
+    plt.legend(leg, [p[1] for p in procs_names], loc=(1.2, 0.05), frameon=False, ncol=2, fontsize=10)
     plt.tight_layout()
     plotlib.svfg(path + "/pies.pdf")

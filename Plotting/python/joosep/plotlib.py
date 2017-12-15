@@ -89,15 +89,19 @@ varnames = {
     "leps_0_eta": r"leading lepton $\eta$",
     "leps_1_eta": r"subleading lepton $\eta$",
 
-    "numJets": r"$N_{\mathrm{jets}}$",
-    "nBCSVM": r"$N_{\mathrm{CSVM}}$",
+    "numJets": r"jet multiplicity, $N_{\mathrm{jets}}$",
+    "nBCSVM": r"b tag multiplicity, $N_{\mathrm{CSVM}}$",
 
-    "btag_LR_4b_2b_btagCSV_logit" : "BLR (CSV)",
-    "mem_SL_0w2h2t_p": "MEM SL 0w2h2t",
-    "mem_SL_1w2h2t_p": "MEM SL 1w2h2t",
-    "mem_SL_2w2h2t_p": "MEM SL 2w2h2t",
-    "mem_DL_0w2h2t_p": "MEM DL 0w2h2t",
-    "Wmass": "$m_{qq}$"
+    "btag_LR_4b_2b_btagCSV_logit" : r"b tagging likelihood ratio, $\mathcal{BLR}$",
+    "mem_SL_0w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "mem_SL_1w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "mem_SL_2w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "mem_DL_0w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",
+    "Wmass": "W boson candidate mass, $m_{qq}$",
+    "met_pt": "MET [GeV]",
+    "ht": "scalar sum of jet momenta, $H_T$ [GeV]",
+    "mll": "dilepton invariant mass, $m_{\ell\ell}$ [GeV]",
+    "nPVs": "number of primary vertices, $N_{PV}$",
 }
 
 #the units for variables
@@ -831,7 +835,7 @@ def brazilplot(limits, categories, axes=None, doObserved=False, legend_loc=1):
         #error bars
         axes.barh(y, (e4-e3), height=0.8, left=e3, color=np.array([254, 247, 2])/255.0, lw=0, align="center", **leg_args1)
         axes.barh(y, (e2-e1), height=0.8, left=e1, color=np.array([51, 247, 2])/255.0 , lw=0, align="center", **leg_args2)
-        table_data += [(categories[i][1], e3, l, e4)]
+        table_data += [(categories[i][1], e3, l, e4, o, inj)]
         i += 1
     #set ranges
 

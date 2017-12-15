@@ -144,11 +144,12 @@ def signal_injection(datacard, output_path):
         LOG_MODULE_NAME.info("signal injection s={0}".format(sig))
         res = limit(
             datacard,
+            output_path,
             name_extended="_sig_{0:.2f}".format(sig).replace(".", "_"),
             opts=["-M", "MaxLikelihoodFit",
             "--expectSignal", str(sig),
-            "--rMin", "-10",
-            "--rMax", "10",
+            "--rMin", "-20",
+            "--rMax", "20",
             "--robustFit", "1",
             #"--robustFit", "1",
             ],
@@ -162,31 +163,37 @@ def signal_injection(datacard, output_path):
 def pulls(datacard, output_path, signal_coef=1, asimov=True):
 
     datacard_path, datacard_name = os.path.split(datacard)
-    process_name = os.path.splitext(datacard_name)[0] + "_sig_{0:.2f}".format(signal_coef).replace(".", "_")
+    if signal_coef is None:
+        process_name = os.path.splitext(datacard_name)[0]
+    else: 
+        process_name = os.path.splitext(datacard_name)[0] + "_sig_{0:.2f}".format(signal_coef).replace(".", "_")
+
     if asimov:
         process_name += "_asimov"
     # Run combine
     combine_command = ["combine", 
                        "-n", process_name,
                        "-M", "MaxLikelihoodFit",
-                       "--expectSignal", str(signal_coef),
                        datacard_name]
     combine_command += [
         #"--setRobustFitTolerance=0.00001",
         #"--setCrossingTolerance=0.00001",
-        "--minimizerStrategy=0",
-        "--minimizerTolerance=0.00000001",
+        "--minimizerStrategy=0", #don't use derivatives in fit
+        "--minimizerTolerance=0.0001",
         "--robustFit", "1", #slower
         #"--minos", "all", #faster, but sometimes weird results
         "--saveShapes",
         "--saveWithUncertainties",
-        "--rMin", "-10",
-        "--rMax", "10",
+        "--rMin", "-20",
+        "--rMax", "20",
+        "--stepSize", "0.05"
     ]
     if asimov:
         combine_command += [
             "-t", "-1",
         ]
+    if not (signal_coef is None):
+        combine_command += ["--expectSignal", str(signal_coef)]
 
     
     LOG_MODULE_NAME.info("running combine: {0}".format(" ".join(combine_command)))
@@ -325,8 +332,8 @@ def mlfit(datacard, freeze_groups=[], saveShapes=False):
         "--minimizerTolerance=0.000001",
         #"--robustFit", "1",
         "--minos", "all",
-        "--rMin", "-3",
-        "--rMax", "3",
+        "--rMin", "-20",
+        "--rMax", "20",
     ]
     if saveShapes:
         combine_cmd += [
