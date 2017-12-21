@@ -4,7 +4,7 @@ set -v
 
 datacard=$1
 combine -M MultiDimFit --saveWorkspace -n _step1 --minimizerStrategy 1 --minimizerTolerance 0.0000001 --rMin -10 --rMax 10 $datacard
-CMD="combine higgsCombine_step1.MultiDimFit.mH120.root -w w --snapshotName MultiDimFit --robustFit 1 -M MaxLikelihoodFit --minimizerStrategy 0 --minimizerTolerance 0.000001 --rMin -10 --rMax 10"
+CMD="combine higgsCombine_step1.MultiDimFit.mH120.root -w w --snapshotName MultiDimFit --robustFit 0 -M MaxLikelihoodFit --minimizerStrategy 0 --minimizerTolerance 0.000001 --minos all --rMin -20 --rMax 20"
 $CMD > freeze_none.log &
 $CMD -n freeze_all --freezeNuisanceGroups exp,theory > freeze_all.log &
 $CMD -n freeze_exp --freezeNuisanceGroups exp > freeze_exp.log &

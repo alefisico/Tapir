@@ -13,29 +13,29 @@ import sys
 def plot_bestfit_comb(fit_data):
     bestfit = {
         "sl": [fit_data["group_sl_bestfit"][0],
-            [fit_data["group_sl_bestfit_statonly"][2],
-             fit_data["group_sl_bestfit_statonly"][3]
+            [fit_data["group_sl_bestfit_statonly"][3],
+             fit_data["group_sl_bestfit_statonly"][2]
             ],
-            [fit_data["group_sl_bestfit"][2], fit_data["group_sl_bestfit"][3]],
-            [math.sqrt(fit_data["group_sl_bestfit"][2]**2 - fit_data["group_sl_bestfit_statonly"][2]**2),
-             math.sqrt(fit_data["group_sl_bestfit"][3]**2 - fit_data["group_sl_bestfit_statonly"][3]**2)
+            [fit_data["group_sl_bestfit"][3], fit_data["group_sl_bestfit"][2]],
+            [math.sqrt(fit_data["group_sl_bestfit"][3]**2 - fit_data["group_sl_bestfit_statonly"][3]**2),
+             math.sqrt(fit_data["group_sl_bestfit"][2]**2 - fit_data["group_sl_bestfit_statonly"][2]**2)
             ]],
         "dl": [fit_data["group_dl_bestfit"][0],
-            [fit_data["group_dl_bestfit_statonly"][2],
-             fit_data["group_dl_bestfit_statonly"][3]
+            [fit_data["group_dl_bestfit_statonly"][3],
+             fit_data["group_dl_bestfit_statonly"][2]
             ],
-            [fit_data["group_dl_bestfit"][2], fit_data["group_dl_bestfit"][3]],
-            [math.sqrt(fit_data["group_dl_bestfit"][2]**2 - fit_data["group_dl_bestfit_statonly"][2]**2),
-             math.sqrt(fit_data["group_dl_bestfit"][3]**2 - fit_data["group_dl_bestfit_statonly"][3]**2)
+            [fit_data["group_dl_bestfit"][3], fit_data["group_dl_bestfit"][2]],
+            [math.sqrt(fit_data["group_dl_bestfit"][3]**2 - fit_data["group_dl_bestfit_statonly"][3]**2),
+             math.sqrt(fit_data["group_dl_bestfit"][2]**2 - fit_data["group_dl_bestfit_statonly"][2]**2)
             ]],
         "comb": [
             fit_data["group_sldl_bestfit"][0],
-            [fit_data["group_sldl_bestfit_statonly"][2],
-             fit_data["group_sldl_bestfit_statonly"][3]
+            [fit_data["group_sldl_bestfit_statonly"][3],
+             fit_data["group_sldl_bestfit_statonly"][2]
             ],
-            [fit_data["group_sldl_bestfit"][2], fit_data["group_sldl_bestfit"][3]],
-            [math.sqrt(fit_data["group_sldl_bestfit"][2]**2 - fit_data["group_sldl_bestfit_statonly"][2]**2),
-             math.sqrt(fit_data["group_sldl_bestfit"][3]**2 - fit_data["group_sldl_bestfit_statonly"][3]**2)
+            [fit_data["group_sldl_bestfit"][3], fit_data["group_sldl_bestfit"][2]],
+            [math.sqrt(fit_data["group_sldl_bestfit"][3]**2 - fit_data["group_sldl_bestfit_statonly"][3]**2),
+             math.sqrt(fit_data["group_sldl_bestfit"][2]**2 - fit_data["group_sldl_bestfit_statonly"][2]**2)
             ]
         ],
     }
