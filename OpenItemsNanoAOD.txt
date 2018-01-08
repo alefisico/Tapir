@@ -1,0 +1,7 @@
+TODO for NanoAOD framework:
+
+- Add boosted objects (HTT subjet btags, CA15 fat + subjets)
+- Cross-cleaning of objects (eg. leptons/jets)
+- JES corrections for jets
+- Variables for vertex selection (rho, isFake) are missing in nanoAOD. Do we need them?
+- Adapt workflow (switch to CMSSW 9_4_2?)
