@@ -4,13 +4,11 @@ class Particles:
     def __init__(self, tree, n):
         self.pdgId = tree.GenLepFromTop_pdgId[n];
 
-#Not really true, takes only average values... Might need to change?
+#Only masses of particles > 10 GeV are stored in nanoAOD. Use pdg values for the others
 genemass = 0.000511
 genmumass = 0.1057
 gentaumass = 1.777
-gentopmass = 172.4
 genbmass = 4.75
-genHiggsmass = 125
 
 def sign(number):
 	return cmp(number,0)
@@ -133,7 +131,7 @@ class GenHiggsBoson:
 		self.phi = GenParticle[n].phi;
 		self.status = GenParticle[n].status;
 		self.charge = -sign(GenParticle[n].pdgId);
-		self.mass = genHiggsmass
+		self.mass = GenParticle[n].mass;
         #What about isPromptHard? Is it needed?
 		pass
 
@@ -153,7 +151,7 @@ class GenTop:
 		self.phi = GenParticle[n].phi;
 		self.status = GenParticle[n].status;
 		self.charge = -sign(GenParticle[n].pdgId);
-		self.mass = gentopmass
+		self.mass = GenParticle[n].mass;
         #What about isPromptHard? Is it needed?
 		pass
 
@@ -219,8 +217,7 @@ class GenWZQuark:
 		self.phi = GenParticle[n].phi;
 		self.status = GenParticle[n].status;
 		self.charge = -sign(GenParticle[n].pdgId);
-		##TODO:::: MASS IS WRONG!
-		self.mass = 0
+		self.mass = GenParticle[n].mass;
         #What about isPromptHard? Is it needed?
 		pass
 
@@ -240,7 +237,7 @@ class GenBQuarkFromHiggs:
 		self.phi = GenParticle[n].phi;
 		self.status = GenParticle[n].status;
 		self.charge = -sign(GenParticle[n].pdgId);
-		self.mass = genHiggsmass
+		self.mass = genbmass
         #What about isPromptHard? Is it needed?
 		pass
 
