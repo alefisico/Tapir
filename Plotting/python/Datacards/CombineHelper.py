@@ -330,7 +330,7 @@ def mlfit(datacard, freeze_groups=[], saveShapes=False):
         "-M", "MaxLikelihoodFit",
         "--minimizerStrategy=0",
         "--minimizerTolerance=0.000001",
-        #"--robustFit", "1",
+        "--robustFit", "0",
         "--minos", "all",
         "--rMin", "-20",
         "--rMax", "20",

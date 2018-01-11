@@ -62,7 +62,7 @@ def plot_pulls(fn, first=0, maxn=20):
     plt.grid()
     plt.yticks(ys[first:maxn], [labels1[o] for o in order[first:maxn]]);
     plt.xlim(-1.5, 1.5)
-    plt.xlabel(r"$\Delta \theta / \theta_0$") 
+    plt.xlabel(r"$(\hat{\theta} - \theta_0) / \Delta \theta$") 
     f.Close()
 
 def combine_cards(group_name, group, workdir):
@@ -103,6 +103,12 @@ def combine_cards(group_name, group, workdir):
 
 def run_pulls(group_name, dcard_filename, workdir):
     #write constraints
+    
+    group_names = {
+        "group_sldl": "combined SL+DL",
+        "group_sl": "combined SL",
+        "group_dl": "combined DL",
+    }
 
     for sig, asimov in [
         (1, True),
@@ -125,9 +131,9 @@ def run_pulls(group_name, dcard_filename, workdir):
         for ranges in [(0,20), (20, 40), (40, 60)]:
             plot_pulls(os.path.join(workdir, pulls_file), ranges[0], ranges[1])
             if sig is None:
-                plt.title("{0}\n{1}".format(group_name, title))
+                plt.title("{0}\n{1}".format(group_names.get(group_name, group_name), title))
             else:
-                plt.title("{0}\nmu={1} {2}".format(group_name, sig, title))
+                plt.title("{0}\nmu={1} {2}".format(group_names.get(group_name, group_name), sig, title))
             if sig is None:
                 plotlib.svfg(os.path.join(workdir, "pulls_{0}_r{1}_{2}{3}.pdf".format(group_name, ranges[0], ranges[1], suf)))
             else:
