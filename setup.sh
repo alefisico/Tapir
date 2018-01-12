@@ -6,6 +6,7 @@ eval `scramv1 runtime -sh`
 
 git cms-init
 git cms-merge-topic cms-nanoAOD:master
+git cms-merge-topic kschweiger:HeppyttHbb_Jan12
 git checkout -b nanoAOD cms-nanoAOD/master
 
 #get the TTH code

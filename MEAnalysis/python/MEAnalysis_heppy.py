@@ -174,22 +174,15 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #Event contents are defined here
     #This is work in progress
     if schema == "mc":
-        from TTH.MEAnalysis.nanoTree  import EventAnalyzer
+        from TTH.MEAnalysis.nanoTree import EventAnalyzer
     else:
-        from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer #TODO convert to nanoAOD
+        from TTH.MEAnalysis.nanoTree_data import EventAnalyzer #TODO convert to nanoAOD
 
-
-    from TTH.MEAnalysis.nanoAODWrapper import FormatVariables
 
     #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
     evs = cfg.Analyzer(
         EventAnalyzer,
         'events',
-    )
-
-    nano = cfg.Analyzer(
-        FormatVariables,
-        'events2',
     )
 
     #Here we define all the main analyzers
@@ -372,7 +365,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         evtid_filter,
         prefilter,
         evs,
-        nano,
         pvana,
         trigger,
         counter_trg,
@@ -411,6 +403,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     if schema == "data":
         comp_cls = cfg.DataComponent
 
+    print files
     comp = comp_cls(
         sample_name,
         files = files,
