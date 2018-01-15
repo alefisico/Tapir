@@ -536,12 +536,11 @@ def getTreeProducer(conf):
         }
     )
     treeProducer.globalVariables += list(btag_weights.values())
-    
     #add HLT bits to final tree
     trignames = []
     print "im there"
     for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-        #print pathname, trigs
+        print "--->",pathname, trigs
         for pref in ["HLT"]:
             #add trigger path (combination of trigger)
             _pathname = "_".join([pref, pathname])
@@ -556,12 +555,18 @@ def getTreeProducer(conf):
                 if not tn in trignames:
                     trignames += [tn]
     print trignames
-                    
+
+    for trig in trignames:
+        treeProducer.globalVariables += [NTupleVariable(
+            trig, lambda ev, name=trig: getattr(ev, name, -1), type=int, mcOnly=False
+        )]
+
+    
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
         "Flag_goodVertices", 
-        "Flag_GlobalTightHalo2016Filter",
+        #"Flag_GlobalTightHalo2016Filter", #Not in nanoAOD
         "Flag_HBHENoiseFilter",
         "Flag_HBHENoiseIsoFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
@@ -573,10 +578,10 @@ def getTreeProducer(conf):
         # "badGlobalMuonTagger",
         # "cloneGlobalMuonTagger",
     ]
-    """for trig in trignames + metfilter_flags:
-                    treeProducer.globalVariables += [NTupleVariable(
-                        trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False
-                    )]"""
+    for metfilter in metfilter_flags:
+        treeProducer.globalVariables += [NTupleVariable(
+            trig, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
+        )]
        
     #Add systematically variated quantities
     for systematic in conf.general["systematics"]:

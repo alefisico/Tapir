@@ -4,7 +4,7 @@ Some path for testing from the 2017 menu. Move to config?
 
 triggerTable = {
     "ttH_SL_el" : [
-        "HLT_IsoMu24HLT_Ele27_WPTight_Gsf",
+        "HLT_Ele27_WPTight_Gsf",
     ],
     "ttH_SL_mu" : [
         "HLT_IsoMu24",

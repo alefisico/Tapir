@@ -15,7 +15,7 @@ def jet_baseline(jet):
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
-# nanoAOD is using CMSSW definiton: https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc#L837
+# nanoAOD is using CMSSW definiton: https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc#L854
 def mu_baseline_tight(mu):
     return (
         mu.tightId == 1 
@@ -97,8 +97,8 @@ class Conf:
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_tight(el),
             },
-            #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff is not defined
-            "isotype": "relIso03", #KS: changed for nanoAOD. Seems to not do anything anyways.
+            #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff
+            "isotype": "relIso03", #KS: changed for nanoAOD.
             "debug" : print_el
         },
         "DL": {
@@ -168,7 +168,7 @@ class Conf:
 
         "filter": False,
         "trigTable": trig.triggerTable,
-        "trigTableData": trigData.triggerTable,
+        "trigTableData": trig.triggerTable,
     }
 
     general = {
