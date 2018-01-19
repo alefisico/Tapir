@@ -68,5 +68,25 @@ test_tth:
   artifacts:
     paths:
       - plots.tgz
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}_test_tth"
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_ttjets:
+  stage: test
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH/MEAnalysis
+    - python python/test_MEAnalysis_heppy.py --sample TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
+    - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
+    - ls -al
+    - tar -czf plots.tgz *.pdf
+    - du -csh plots.tgz
+    - mv plots.tgz $CI_HOME/
+  artifacts:
+    paths:
+      - plots.tgz
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
