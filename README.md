@@ -28,7 +28,9 @@ We use rootpy in the plotting code, which is installed on T3_CH_PSI locally in `
 
 ## Step1: Running the nanoAOD code
 
-TODO
+NanoAOD links:
+1. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD
+2. https://github.com/cms-nanoAOD/cmssw/issues
 
 ## Step2: tthbb13 code
 Using the nanoAOD-tree, we will run the ttH(bb) and matrix element code (tthbb13). The code is configured mainly from two files:
