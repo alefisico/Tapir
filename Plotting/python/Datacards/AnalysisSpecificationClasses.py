@@ -2,11 +2,15 @@ import os
 import ConfigParser
 from itertools import izip
 import cPickle as pickle
+import fnmatch
 
 import ROOT
 
 from TTH.MEAnalysis import samples_base
 from TTH.MEAnalysis.samples_base import get_files, getSitePrefix
+
+import logging
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 # From:
 # http://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
@@ -23,16 +27,34 @@ def triplewise(iterable):
 FUNCTION_TABLE = {
     "btag_LR_4b_2b_btagCSV_logit": lambda ev: ev.btag_LR_4b_2b_btagCSV_logit,
     "common_bdt": lambda ev: ev.common_bdt,
-    "jetsByPt_0_eta": lambda ev: ev.jets[0].lv.Eta(),
-    "jetsByPt_0_pt": lambda ev: ev.jets[0].lv.Pt(),
-    "jetsByPt_0_btagCSV": lambda ev: ev.jets[0].btag,
+    "jetsByPt_0_eta": lambda ev: ev.jets[0].lv.Eta() if len(ev.jets)>=1 else 0.0,
+    "jetsByPt_1_eta": lambda ev: ev.jets[1].lv.Eta() if len(ev.jets)>=2 else 0.0,
+    "jetsByPt_2_eta": lambda ev: ev.jets[2].lv.Eta() if len(ev.jets)>=3 else 0.0,
+    "jetsByPt_3_eta": lambda ev: ev.jets[3].lv.Eta() if len(ev.jets)>=4 else 0.0,
+    "jetsByPt_0_pt": lambda ev: ev.jets[0].lv.Pt() if len(ev.jets)>=1 else 0.0,
+    "jetsByPt_1_pt": lambda ev: ev.jets[1].lv.Pt() if len(ev.jets)>=2 else 0.0,
+    "jetsByPt_2_pt": lambda ev: ev.jets[2].lv.Pt() if len(ev.jets)>=3 else 0.0,
+    "jetsByPt_3_pt": lambda ev: ev.jets[3].lv.Pt() if len(ev.jets)>=4 else 0.0,
+    "jetsByPt_0_btagCSV": lambda ev: ev.jets[0].btag if len(ev.jets)>=1 else 0.0,
+    "jetsByPt_1_btagCSV": lambda ev: ev.jets[1].btag if len(ev.jets)>=2 else 0.0,
+    "jetsByPt_2_btagCSV": lambda ev: ev.jets[2].btag if len(ev.jets)>=3 else 0.0,
+    "jetsByPt_3_btagCSV": lambda ev: ev.jets[3].btag if len(ev.jets)>=4 else 0.0,
     "leps_0_pt": lambda ev: ev.leptons[0].lv.Pt(),
+    "leps_1_pt": lambda ev: ev.leptons[1].lv.Pt(),
+    "leps_0_eta": lambda ev: ev.leptons[0].lv.Eta(),
+    "leps_1_eta": lambda ev: ev.leptons[1].lv.Eta(),
     "mem_DL_0w2h2t_p": lambda ev: ev.mem_DL_0w2h2t_p,
     "mem_SL_0w2h2t_p": lambda ev: ev.mem_SL_0w2h2t_p,
     "mem_SL_1w2h2t_p": lambda ev: ev.mem_SL_1w2h2t_p,
     "mem_SL_2w2h2t_p": lambda ev: ev.mem_SL_2w2h2t_p,
     "Wmass": lambda ev: ev.Wmass,
-    "counting": 1.0
+    "numJets": lambda ev: ev.numJets,
+    "nBCSVM": lambda ev: ev.nBCSVM,
+    "nPVs": lambda ev: ev.nPVs,
+    "counting": 1.0,
+    "mll": lambda ev: ev.mll,
+    "met_pt": lambda ev: ev.met_pt,
+    "ht": lambda ev: sum([jet.lv.Pt() for jet in ev.jets])
 }
 
 class Cut(object):
@@ -70,21 +92,26 @@ class Cut(object):
             s += ["({1} <= {0} < {2})".format(*c)]
         return "AND".join(s)
 
+    def __repr__(self):
+        return str(self)
+
 class Sample(object):
     def __init__(self, *args, **kwargs):
         self.debug = kwargs.get("debug")
         self.name = kwargs.get("name")
         self.schema = kwargs.get("schema")
+        self.treemodel = kwargs.get("treemodel")
         self.files_load = kwargs.get("files_load")
         self.files_load_step1 = kwargs.get("files_load_step1", None)
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
+        self.tags = kwargs.get("tags", "").split()
 
         #Load the filenames for step2 (VHBB + tthbb13)
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
         except Exception as e:
-            print "ERROR: could not load sample file {0}: {1}".format(self.files_load, e)
+            LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
             self.file_names = []
 
         #Load the filenames for step1 (VHBB)
@@ -94,7 +121,7 @@ class Sample(object):
             try:
                 self.file_names_step1 = [getSitePrefix(fn) for fn in get_files(self.files_load_step1)]
             except Exception as e:
-                print "ERROR: could not load sample file {0}: {1}".format(self.files_load_step1, e)
+                LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
                 self.file_names_step1 = []
 
         #Limit list of files in debug mode
@@ -103,7 +130,6 @@ class Sample(object):
         self.ngen = int(kwargs.get("ngen"))
         self.xsec = kwargs.get("xsec")
         self.classifier_db_path = kwargs.get("classifier_db_path")
-        self.skim_file = kwargs.get("skim_file")
         self.vhbb_tree_name = kwargs.get("vhbb_tree_name", "vhbb/tree")
         
     @staticmethod
@@ -114,15 +140,19 @@ class Sample(object):
             files_load = config.get(sample_name, "files_load"),
             files_load_step1 = config.get(sample_name, "files_load_step1"),
             schema = config.get(sample_name, "schema"),
+            treemodel = config.get(sample_name, "treemodel"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
-            ngen = config.getfloat(sample_name, "ngen"),
+            ngen = config.getfloat(sample_name, "ngen_weight"),
             classifier_db_path = config.get(sample_name, "classifier_db_path", None),
-            skim_file = config.get(sample_name, "skim_file", None),
             vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),
+            tags = config.get(sample_name, "tags")
         )
         return sample
+
+    def __repr__(self):
+        return "Sample(name={0})".format(self.name)
 
 class HistogramOutput:
     def __init__(self, hist, func, cut_name):
@@ -134,7 +164,18 @@ class HistogramOutput:
         return event.cuts.get(self.cut_name, False)
 
     def fill(self, event, weight = 1.0):
-        self.hist.Fill(self.func(event), weight)
+
+        #make sure underflow is filled to first visible bin and overflow to last visible
+        val = self.func(event)
+        if val < self.hist.GetBinLowEdge(1):
+            val = self.hist.GetBinLowEdge(1)
+        if val >= self.hist.GetBinLowEdge(self.hist.GetNbinsX()+1):
+            val = self.hist.GetBinLowEdge(self.hist.GetNbinsX())
+        
+        if weight == 1.0:
+            self.hist.Fill(val)
+        else:
+            self.hist.Fill(val, weight)
 
 class CategoryCut:
     def __init__(self, cuts):
@@ -167,18 +208,21 @@ class Process(object):
         self.xs_weight = kwargs.get("xs_weight", 1.0)
         self.full_name = " ".join([self.input_name, self.output_name, ",".join([c.name for c in self.cuts])])
 
+        #extra category name, in case you want to make a distinction
+        self.category_name = kwargs.get("category_name", "")
+
     def __repr__(self):
-        s = "Process(input_name={0}, output_name={1})".format(self.input_name, self.output_name)
+        s = "Process(input_name={0}, output_name={1}, cuts={2})".format(self.input_name, self.output_name, self.cuts)
         return s
 
     def output_path(self, category_name, discriminator_name, systematic_string=None):
-        to_join = [self.output_name, category_name, discriminator_name]
+        to_join = [self.output_name, category_name + self.category_name, discriminator_name]
         if systematic_string:
             to_join += [systematic_string]
         name = "__".join(to_join)
         return name
     
-    def createOutputs(self, outdir, analysis, systematics):
+    def createOutputs(self, outdir, analysis, systematics, outfilter=None):
         """Creates an output dictionary with fillable objects in TDirectories based on categories and systematics. 
         
         Args:
@@ -212,6 +256,13 @@ class Process(object):
                     if not outdict_cuts.has_key(cut_name):
                         outdict_cuts[cut_name] = category_cut
                     name = self.output_path(category.name, category.discriminator.name, syst_str)
+
+                    #optionally create only a subset of categories
+                    if outfilter:
+                        if not fnmatch.fnmatch(name, outfilter):
+                            LOG_MODULE_NAME.info("filtering {0} with {1}".format(name, outfilter))
+                            continue
+
                     if not outdict_syst[syst].has_key(name):
                         h = category.discriminator.get_TH1(name)
                         outdict_syst[syst][name] = HistogramOutput(
@@ -233,7 +284,7 @@ class SystematicProcess(Process):
             self.systematic_name
         )
     
-    def createOutputs(self, outdir, analysis, systematics):
+    def createOutputs(self, outdir, analysis, systematics, outfilter=None):
         outdict_syst = {"nominal": {}}
         outdict_cuts = {}
     
@@ -248,6 +299,13 @@ class SystematicProcess(Process):
                 if not outdict_cuts.has_key(cut_name):
                     outdict_cuts[cut_name] = category_cut
                 name = self.output_path(category.name, category.discriminator.name)
+                
+                #optionally create only a subset of categories
+                if outfilter:
+                    if not fnmatch.fnmatch(name, outfilter):
+                        LOG_MODULE_NAME.info("filtering {0} with {1}".format(name, outfilter))
+                        continue
+                
                 if not outdict_syst["nominal"].has_key(name):
                     h = category.discriminator.get_TH1(name)
                     outdict_syst["nominal"][name] = HistogramOutput(
@@ -293,6 +351,7 @@ class Histogram:
 
     def get_TH1(self, name):
         th = ROOT.TH1D(name, name, *self.get_binning())
+        th.Sumw2()
         return th
 
 class Category:
@@ -300,7 +359,6 @@ class Category:
         self.name = kwargs.get("name")
         self.discriminator = kwargs.get("discriminator")
         self.full_name = "{0}__{1}".format(self.name, self.discriminator.name)
-        self.src_histogram = kwargs.get("src_histogram")
         self.rebin = kwargs.get("rebin", 1)
         self.do_limit = kwargs.get("do_limit", True)
 
@@ -313,7 +371,9 @@ class Category:
         #self.lumi = sum([d.lumi for d in self.data_samples])
 
         self.signal_processes = kwargs.get("signal_processes", [])
-        self.out_processes = list(set([s.output_name for s in self.processes + self.data_processes]))
+        self.out_processes_mc = list(set([s.output_name for s in self.processes]))
+        self.out_processes_data = list(set([s.output_name for s in self.data_processes]))
+        self.out_processes = self.out_processes_mc + self.out_processes_data 
 
         #[process][syst]
         self.shape_uncertainties = {}
@@ -322,7 +382,7 @@ class Category:
         #[syst] -> scale factor, common for all processes
         self.common_shape_uncertainties = kwargs.get("common_shape_uncertainties", {})
         self.common_scale_uncertainties = kwargs.get("common_scale_uncertainties", {})
-        for proc in self.out_processes:
+        for proc in self.out_processes_mc:
             self.shape_uncertainties[proc] = {}
             self.scale_uncertainties[proc] = {}
             for systname, systval in self.common_shape_uncertainties.items():
@@ -337,8 +397,10 @@ class Category:
             self.shape_uncertainties[k].update(v)
 
         for k, v in self.proc_scale_uncertainties.items():
-            self.scale_uncertainties[k].update(v)
-
+            if k in self.scale_uncertainties.keys():
+                self.scale_uncertainties[k].update(v)
+            else:
+                LOG_MODULE_NAME.info("Could not find process {0} to update scale uncertainties".format(k))
     
     def __str__(self):
         s = "Category(full_name={0})".format(
