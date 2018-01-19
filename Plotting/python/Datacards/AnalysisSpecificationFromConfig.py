@@ -4,6 +4,7 @@
 
 import sys
 from copy import deepcopy
+import os
 
 from TTH.MEAnalysis.samples_base import xsec
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Histogram, Cut, Sample, Process, DataProcess, Category, Analysis, pairwise, triplewise, make_csv_categories_abstract, make_csv_groups_abstract
@@ -54,6 +55,8 @@ def analysisFromConfig(config_file_path):
     ########################################
 
     # Init config parser
+    if not os.path.isfile(config_file_path):
+        raise IOError("Could not open file {0}".format(config_file_path))
     config = Analysis.getConfigParser(config_file_path)
     
     # Get information on sparse input

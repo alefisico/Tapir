@@ -3,17 +3,17 @@
 #crash in case of error
 set -e
 #print out
-set -x
+#set -x
+
+#SRC=srm://storm-se-01.ba.infn.it:8444/srm/managerv2?SFN=/cms
+SRC=root://cms-xrd-global.cern.ch
+DST=srm://t3se01.psi.ch:8443/srm/managerv2\?SFN=/pnfs/psi.ch/cms/trivcat
 
 source common.sh
 cd $GC_SCRATCH
-COUNTER=1
 for fi in $FILE_NAMES; do
-    echo $f
-    gfal-copy -n1 gsiftp://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat$fi tmp.root || echo "could not copy $fi"
-    rootcp tmp.root:tree tree_$COUNTER.root || echo "could not copy tree"
-    rootcp tmp.root:vhbb/Count count_$COUNTER.root || echo "could not copy count"
-    rm tmp.root
-    COUNTER=$[$COUNTER +1]
+    echo $fi
+    newfi="${fi/arizzi/$USER}"
+    LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH gfal-copy -n1 --force $SRC/$fi $DST/$newfi
+    python $CMSSW_BASE/src/TTH/MEAnalysis/test/getBranches.py root://t3dcachedb03.psi.ch/pnfs/psi.ch/cms/trivcat/$newfi Events | grep " = " >> out.txt 
 done
-hadd tree.root tree_*.root count_*.root
