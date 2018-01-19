@@ -1,5 +1,4 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from TTH.MEAnalysis.VHbbTree import *
 from TTH.MEAnalysis.vhbb_utils import *
 from copy import deepcopy
 import numpy as np

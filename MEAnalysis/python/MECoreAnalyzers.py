@@ -3,7 +3,6 @@ import itertools
 from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 import copy
 import math
-from TTH.MEAnalysis.VHbbTree import *
 
 from TTH.MEAnalysis.SubjetAnalyzer import SubjetAnalyzer
 #from TTH.MEAnalysis.MulticlassAnalyzer import MulticlassAnalyzer

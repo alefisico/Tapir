@@ -2,7 +2,6 @@ from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 import resource
 import ROOT
-from TTH.MEAnalysis.VHbbTree import LHEPdfWeight
 import logging
 
 class FilterAnalyzer(Analyzer):
