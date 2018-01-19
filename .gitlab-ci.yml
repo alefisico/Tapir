@@ -93,7 +93,7 @@ test_ttjets:
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
     - python python/test_MEAnalysis_heppy.py --sample TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
-    - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
+    - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
     - ls -al
     - tar -czf plots.tgz *.pdf
     - du -csh plots.tgz
