@@ -1,141 +1,72 @@
 stages:
-  - compile_vhbb
-  - test_vhbb
-  - compile_tthbb13
-  - test
+  - compile
+  - test 
 
 before_script:
+  - source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
+  - source /cvmfs/cms.cern.ch/cmsset_default.sh
   - export CI_HOME="$( pwd )"
   - git config --global user.name 'CERN CI'
   - git config --global user.email 'joosep.pata@cern.ch'
   - git config --global user.github jpata
   - git submodule update --init --recursive
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
-  - export SCRAM_ARCH="slc6_amd64_gcc530"
-  - export CMSSW_VERSION="CMSSW_8_0_26_patch2"
-  - source /cvmfs/cms.cern.ch/cmsset_default.sh
-  - source /cvmfs/grid.cern.ch/emi-ui-3.15.3-1_sl6v1/etc/profile.d/setup-ui-example.sh
+  - export SCRAM_ARCH="slc6_amd64_gcc630"
+  - export CMSSW_VERSION="CMSSW_9_4_2"
   - cd ..
   - cd $CI_HOME
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tGSSAPIDelegateCredentials yes\n\tGSSAPITrustDNS yes\n\n" > ~/.ssh/config
+  - echo "${KRB_PASSWORD}" | kinit -f ${KRB_USERNAME}@CERN.CH
+  - klist
+  - scp -v -o StrictHostKeyChecking=no ${KRB_USERNAME}@lxplus.cern.ch:~/x509 ~/x509
   - export X509_USER_PROXY=~/x509
   - voms-proxy-info --all
+  - ls -al
 
-compile_vhbb:
-  stage: compile_vhbb
-  only:
-    - meanalysis-80x-V25
+compile:
+  stage: compile
   script:
     - cd $CI_HOME/..
     - rm -Rf $CMSSW_VERSION
     - scramv1 project CMSSW $CMSSW_VERSION
+    - ls -al
     - cd $CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - git cms-init
-    - git cms-merge-topic -u jpata:vhbbHeppy80X_july31
+    - git cms-merge-topic cms-nanoAOD:master
+    - git cms-merge-topic kschweiger:HeppyttHbb_Jan12
+    - git checkout -b nanoAOD cms-nanoAOD/master
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
-    - source $CI_HOME/setenv_sklearn_cmssw.sh
     - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
     - scram b -j4
-    - cd $CMSSW_BASE
-
-test_vhbb:
-  stage: test_vhbb
-  only:
-    - meanalysis-80x-V25
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
-    - cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test/
-    - python vhbb_combined.py | tee -i vhbb.txt
+    - cd $CMSSW_BASE/..
+    - tar -czf cmssw.tgz $CMSSW_VERSION
+    - du -csh cmssw.tgz
+    - mv $CI_HOME/../cmssw.tgz $CI_HOME 
   artifacts:
     paths:
-      - vhbb.txt
+      - cmssw.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
-compile_tthbb13:
-  stage: compile_tthbb13
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - rm -Rf TTH
-    - cp -r $CI_HOME TTH
-    - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
-    - source $CI_HOME/setenv_sklearn_cmssw.sh
-    - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
-    - scram b -j4
-    - cd $CMSSW_BASE
-
-test_MEAnalysis_ttH:
+test_tth:
   stage: test
   script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
     - cd $CI_HOME/../$CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb*" | tee -i MEAnalysis_ttH.txt
+    - cd $CMSSW_BASE/src/TTH/MEAnalysis
+    - python python/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/validationHistos.py Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
+    - ls -al
+    - tar -czf plots.tgz *.pdf
+    - du -csh plots.tgz
+    - mv plots.tgz $CI_HOME/
   artifacts:
     paths:
-      - MEAnalysis_ttH.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+      - plots.tgz
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}_test_tth"
 
-test_MEAnalysis_ttjets:
-  stage: test
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" | tee -i MEAnalysis_ttjets.txt
-  artifacts:
-    paths:
-      - MEAnalysis_ttjets.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-
-test_MEAnalysis_DoubleMuon:
-  stage: test
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "DoubleMuon" | tee -i MEAnalysis_DoubleMuon.txt
-  artifacts:
-    paths:
-      - MEAnalysis_DoubleMuon.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-
-test_sparsinator:
-  stage: test
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/Plotting/python/joosep/sparsinator.py | tee -i sparsinator.txt
-  artifacts:
-    paths:
-      - sparsinator.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-
-test_MEAnalysis_ttH_FH:
-  stage: test
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_ttH_FH.txt
-  artifacts:
-    paths:
-      - MEAnalysis_ttH_FH.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-
-test_MEAnalysis_TTbar_FH:
-  stage: test
-  script:
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
-    - cd $CI_HOME
-    - python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample_pattern "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" --analysis_cfg $CMSSW_BASE/src/TTH/MEAnalysis/data/config_FH.cfg | tee -i MEAnalysis_TTbar_FH.txt
-  artifacts:
-    paths:
-      - MEAnalysis_TTbar_FH.txt
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"

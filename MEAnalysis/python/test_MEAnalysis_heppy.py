@@ -9,20 +9,24 @@ from TTH.MEAnalysis.MEAnalysis_heppy import main
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
 def launch_test_MEAnalysis(analysis, sample, **kwargs):
-    output_name = "Loop_{0}".format(sample)
-    main(analysis, sample_name=sample, firstEvent=0, output_name = output_name, **kwargs)
+    output_name = "Loop_{0}".format(sample.name)
+    files = sample.file_names_step1[:sample.debug_max_files]
+
+    #replace local SE access with remote SE access
+    files = [fi.replace("t3dcachedb03", "t3se01") for fi in files]
+    main(analysis, sample_name=sample.name, firstEvent=0, output_name=output_name, files=files, **kwargs)
+
     return output_name
 
-def test_MEAnalysis(sample_pattern="*", analysis_cfg="", **kwargs):
-    if analysis_cfg is "":
-        print "Error: no analysis config specified!"
-        return -1
-    else:
-        analysis = analysisFromConfig(analysis_cfg)
+def test_MEAnalysis(sample_pattern, analysis_cfg, **kwargs):
+    analysis = analysisFromConfig(analysis_cfg)
+    if not sample_pattern:
+        raise KeyError("Choose sample from {0}".format([s.name for s in analysis.samples]))
+    
     for sample in analysis.samples:
-        if fnmatch.fnmatch(sample.name, sample_pattern):
+        if sample.name == sample_pattern:
             logging.info("Running on sample {0}".format(sample.name))
-            out = launch_test_MEAnalysis(analysis, sample.name, numEvents=analysis.config.getint(sample.name, "test_events"))
+            out = launch_test_MEAnalysis(analysis, sample, numEvents=analysis.config.getint(sample.name, "test_events"))
             
             tf = ROOT.TFile(out + "/tree.root")
             tt = tf.Get("tree")
@@ -37,11 +41,11 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Runs MEAnalysis tests')
     parser.add_argument(
-        '--sample_pattern',
+        '--sample',
         action="store",
-        help="Samples to process, glob pattern",
+        help="Sample to process",
         required=False,
-        default="*"
+        default=None
     )
     parser.add_argument(
         '--analysis_cfg',
@@ -51,4 +55,4 @@ if __name__ == "__main__":
         default=os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/default.cfg"
     )
     args = parser.parse_args(sys.argv[1:])
-    test_MEAnalysis(args.sample_pattern,args.analysis_cfg)
+    test_MEAnalysis(args.sample, args.analysis_cfg)
