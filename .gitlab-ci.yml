@@ -103,7 +103,7 @@ test_tth_sparsinator:
     - tar xfz $CI_HOME/plots_tth.tgz
     - ls -al
     - FILE_NAMES=Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
-    - mv out.root sparse_tth.root
+    - mv out.root $CI_HOME/sparse_tth.root
   artifacts:
     paths:
       - sparse_tth.root
@@ -121,7 +121,7 @@ test_ttjets_sparsinator:
     - tar xfz $CI_HOME/plots_tth.tgz
     - ls -al
     - FILE_NAMES=Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root DATASETPATH=TT_TuneCUETP8M2T4_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
-    - mv out.root sparse_ttjets.root
+    - mv out.root $CI_HOME/sparse_ttjets.root
   artifacts:
     paths:
       - sparse_ttjets.root
