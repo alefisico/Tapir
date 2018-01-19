@@ -83,7 +83,7 @@ test_ttjets:
     - python python/test_MEAnalysis_heppy.py --sample TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
     - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
     - ls -al
-    - tar -czf plots_ttjets.tgz *.pdf
+    - tar -czf plots_ttjets.tgz *.pdf Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
     - du -csh plots_ttjets.tgz
     - mv plots_ttjets.tgz $CI_HOME/
   artifacts:

@@ -549,7 +549,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
         tf = ROOT.TFile.Open(file_name)
         if not tf:
-            raise FileError("Could not open file {0}".format(file_name))
+            raise IOError("Could not open file {0}".format(file_name))
         treemodel = getattr(ROOT.TTH_MEAnalysis, sample.treemodel.split(".")[-1])
         LOG_MODULE_NAME.debug("treemodel {0}".format(treemodel))
 
