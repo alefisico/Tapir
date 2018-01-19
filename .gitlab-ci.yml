@@ -80,8 +80,9 @@ test_tth_sparsinator:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH
-    - tar xfz $CI_HOME/test_tth_${CI_BUILD_REF_NAME}.tgz
+    - tar xfz $CI_HOME/plots.tgz
     - ls -al
+    - FILE_NAMES=Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
 
 test_ttjets:
   stage: test
