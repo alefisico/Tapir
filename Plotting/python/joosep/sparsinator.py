@@ -17,7 +17,6 @@ from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import SystematicProcess, CategoryCut
 from TTH.CommonClassifier.db import ClassifierDB
 
-from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF, initBTagSF
 from TTH.MEAnalysis.leptonSF import calc_lepton_SF
 
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
@@ -128,13 +127,13 @@ def lv_p4s(pt, eta, phi, m, btagCSV=-100):
 
 def pass_METfilter(event, schema):
     ret = True
-    ret = ret and event.Flag_goodVertices
-    ret = ret and event.Flag_GlobalTightHalo2016Filter
-    ret = ret and event.Flag_HBHENoiseFilter
-    ret = ret and event.Flag_HBHENoiseIsoFilter
-    ret = ret and event.Flag_EcalDeadCellTriggerPrimitiveFilter
-    if schema == "data":
-        ret = ret and event.Flag_eeBadScFilter
+    #ret = ret and event.Flag_goodVertices
+    #ret = ret and event.Flag_GlobalTightHalo2016Filter
+    #ret = ret and event.Flag_HBHENoiseFilter
+    #ret = ret and event.Flag_HBHENoiseIsoFilter
+    #ret = ret and event.Flag_EcalDeadCellTriggerPrimitiveFilter
+    #if schema == "data":
+    #    ret = ret and event.Flag_eeBadScFilter
     return ret
 
 def pass_HLT_sl_mu(event):
@@ -186,7 +185,7 @@ def fillBase(matched_processes, event, syst, schema):
             if schema == "mc" or schema == "mc_syst":
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
-                    LOG_MODULE_NAME.error("weight_nominal<=0")
+                    LOG_MODULE_NAME.debug("weight_nominal<=0: gen={0}".format(event.weights.at(syst_pairs["gen"])))
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -239,65 +238,12 @@ class FakeJet:
     def btag(self, algo):
         return self._csv
 
-def recompute_btag_weights(event):
-    p4 = [j.lv for j in event.jets]
-    btag = [j.btag for j in event.jets]
-    hadronFlavour = [hf for hf in event.jets_hadronFlavour]
-    
-    wrapped_jets = []
-    for _p4, btag, hf in zip(p4, btag, hadronFlavour):
-        jet = FakeJet(
-            _p4.Pt(),
-            _p4.Eta(),
-            hf,
-            btag
-        )
-        wrapped_jets += [jet]
-
-    btag_weights = [
-        "up_cferr1",
-        "up_cferr2",
-        "up_hf",
-        "up_hfstats1",
-        "up_hfstats2",
-        "up_jes",
-        "up_jesAbsoluteMPFBias",
-        "up_jesAbsoluteScale",
-        "up_jesFlavorQCD",
-        "up_jesPileUpDataMC",
-        "up_jesPileUpPtBB",
-        "up_jesPileUpPtEC1",
-        "up_jesPileUpPtRef",
-        "up_jesRelativeFSR",
-        "up_jesSinglePionECAL",
-        "up_jesSinglePionHCAL",
-        "up_jesTimePtEta",
-        "up_lf",
-        "up_lfstats1",
-        "up_lfstats2",
-    ]
-
-    btag_weights_recomputed = {}
-    for algo in ["CSV"]:
-        for btag_syst in [
-                "central",
-            ] + btag_weights + [bw.replace("up_", "down_") for bw in btag_weights]:
-            sf = get_event_SF(wrapped_jets, btag_syst, algo, btagSFhandle)
-            btag_weights_recomputed[btag_syst] = sf
-            if btag_syst == "central":
-                LOG_MODULE_NAME.debug("replacing bweight {0} with {1}".format(event.weights[syst_pairs["CMS_ttH_CSV"]], btag_weights_recomputed[btag_syst]))
-                event.weights[syst_pairs["CMS_ttH_CSV"]] = btag_weights_recomputed[btag_syst]
-            else:
-                sdir, syst_name = btag_syst.split("_")
-                sp = syst_pairs["CMS_ttH_CSV{0}{1}".format(syst_name, sdir.capitalize())]
-                LOG_MODULE_NAME.debug("replacing bweight {0} with {1} ({2})".format(event.weights[sp], btag_weights_recomputed[btag_syst], btag_syst))
-                event.weights[sp] = btag_weights_recomputed[btag_syst]
  
 def createEvent(
     events, syst, schema,
     matched_processes,
     cls_bdt_sl, cls_bdt_dl,
-    calculate_bdt, do_recompute_btag_weights,
+    calculate_bdt,
     sample
     ):
 
@@ -322,9 +268,6 @@ def createEvent(
   
     if not any_passes:
         return None
-
-    if do_recompute_btag_weights and syst == "nominal" and schema == "mc":
-        recompute_btag_weights(event)
    
     #scaleME should be used only for some samples
     if not "scaleME" in sample.tags:
@@ -339,21 +282,22 @@ def createEvent(
 
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
-        event.lepton_weight = calc_lepton_SF(event)
-        if syst == "nominal":
-            event.lepton_weights_syst = {w: calc_lepton_SF(event, w) for w in [
-                "CMS_effID_eUp", "CMS_effID_eDown",
-                "CMS_effReco_eUp", "CMS_effReco_eDown",
-                "CMS_effID_mUp", "CMS_effID_mDown",
-                "CMS_effIso_mUp", "CMS_effIso_mDown",
-                "CMS_effTracking_mUp", "CMS_effTracking_mDown",
-                "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
-                "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
-                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
-                "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
-                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
-            ]}
-        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
+        #event.lepton_weight = calc_lepton_SF(event)
+        #if syst == "nominal":
+        #    event.lepton_weights_syst = {w: calc_lepton_SF(event, w) for w in [
+        #        "CMS_effID_eUp", "CMS_effID_eDown",
+        #        "CMS_effReco_eUp", "CMS_effReco_eDown",
+        #        "CMS_effID_mUp", "CMS_effID_mDown",
+        #        "CMS_effIso_mUp", "CMS_effIso_mDown",
+        #        "CMS_effTracking_mUp", "CMS_effTracking_mDown",
+        #        "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
+        #        "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
+        #        "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
+        #        "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
+        #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
+        #    ]}
+        #event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
+        event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
@@ -471,46 +415,46 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         systematic_weights += [
 
-                ("CMS_ttH_scaleMEUp", lambda ev, syst_pairs=syst_pairs:
-                    (ev.weights.at(syst_pairs["CMS_pu"]) *
-                    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
-                    ev.lepton_weight *
-                    ev.weights.at(syst_pairs["gen"]) *
-                    ev.weights.at(syst_pairs["CMS_ttH_scaleMEUp"]))),
-                ("CMS_ttH_scaleMEDown", lambda ev, syst_pairs=syst_pairs:
-                    (ev.weights.at(syst_pairs["CMS_pu"]) *
-                    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
-                    ev.lepton_weight *
-                    ev.weights.at(syst_pairs["gen"]) *
-                    ev.weights.at(syst_pairs["CMS_ttH_scaleMEDown"]))
-                ),
-                ("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
-                ("CMS_puUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                #("CMS_ttH_scaleMEUp", lambda ev, syst_pairs=syst_pairs:
+                #    (ev.weights.at(syst_pairs["CMS_pu"]) *
+                #    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
+                #    ev.lepton_weight *
+                #    ev.weights.at(syst_pairs["gen"]) *
+                #    ev.weights.at(syst_pairs["CMS_ttH_scaleMEUp"]))),
+                #("CMS_ttH_scaleMEDown", lambda ev, syst_pairs=syst_pairs:
+                #    (ev.weights.at(syst_pairs["CMS_pu"]) *
+                #    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) *
+                #    ev.lepton_weight *
+                #    ev.weights.at(syst_pairs["gen"]) *
+                #    ev.weights.at(syst_pairs["CMS_ttH_scaleMEDown"]))
+                #),
+                #("CMS_puDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puDown"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
+                #("CMS_puUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_puUp"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("unweighted", lambda ev: 1.0),
-                ("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
-                ("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
-                ("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
+                #("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
+                #("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
+                #("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
         ]
 
-        for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
-                "CMS_effReco_eUp", "CMS_effReco_eDown",
-                "CMS_effID_mUp", "CMS_effID_mDown",
-                "CMS_effIso_mUp", "CMS_effIso_mDown",
-                "CMS_effTracking_mUp", "CMS_effTracking_mDown",
-                "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
-                "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
-                "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
-                "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
-                "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
-        ]:
-            systematic_weights += [
-                (lep_syst, lambda ev, syst_pairs=syst_pairs, lep_syst=lep_syst: (
-                    ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_pu"]) *
-                    ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weights_syst[lep_syst]
-                ))
-            ]
+        #for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
+        #        "CMS_effReco_eUp", "CMS_effReco_eDown",
+        #        "CMS_effID_mUp", "CMS_effID_mDown",
+        #        "CMS_effIso_mUp", "CMS_effIso_mDown",
+        #        "CMS_effTracking_mUp", "CMS_effTracking_mDown",
+        #        "CMS_effTrigger_eUp", "CMS_effTrigger_eDown",
+        #        "CMS_effTrigger_mUp", "CMS_effTrigger_mDown",
+        #        "CMS_effTrigger_eeUp", "CMS_effTrigger_eeDown",
+        #        "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
+        #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
+        #]:
+        #    systematic_weights += [
+        #        (lep_syst, lambda ev, syst_pairs=syst_pairs, lep_syst=lep_syst: (
+        #            ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_pu"]) *
+        #            ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weights_syst[lep_syst]
+        #        ))
+        #    ]
 
     if len(file_names) == 0:
         raise Exception("No files specified")
@@ -566,11 +510,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     LOG_MODULE_NAME.info("matched processes: {0}".format(len(matched_processes)))
 
     do_classifier_db = analysis.config.getboolean("sparsinator", "do_classifier_db")
-    do_recompute_btag_weights = analysis.config.getboolean("sparsinator", "recompute_btag_weights")
-    
-    if do_recompute_btag_weights:
-        LOG_MODULE_NAME.info("Initializing btag weights")
-        initBTagSF()
 
     if do_classifier_db:
         cls_db = ClassifierDB(filename=sample.classifier_db_path)
@@ -659,7 +598,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     events, syst, schema,
                     matched_processes,
                     cls_bdt_sl, cls_bdt_dl,
-                    calculate_bdt, do_recompute_btag_weights,
+                    calculate_bdt,
                     sample
                 )
                 if event is None:

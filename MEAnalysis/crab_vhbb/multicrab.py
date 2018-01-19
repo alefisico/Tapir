@@ -24,7 +24,10 @@ workflows = [
     "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
-    "testing_hadronic_withme" #single-lumi jobs, a few samples   
+    "testing_hadronic_withme", #single-lumi jobs, a few samples
+    "memcheck", #specific MEM jobs that contain lots of hypotheses for validation, many interpretations
+    "memcheck2", #specific MEM jobs that contain lots of hypotheses for validation, JES variations
+    #"memcheck3", #Sudakov/Recoil
 ]
 
 import argparse
@@ -42,6 +45,8 @@ me_cfgs = {
     "nome": "cfg_noME.py",
     "leptonic": "cfg_leptonic.py",
     "hadronic": "cfg_FH.py",
+    "memcheck": "cfg_memcheck.py",
+    "memcheck2": "cfg_memcheck2.py"
 }
 
 sets_data = [
@@ -62,7 +67,7 @@ sets_data = [
     "/DoubleMuon/Run2016G-03Feb2017-v1/MINIAOD",
     "/DoubleMuon/Run2016H-03Feb2017_ver2-v1/MINIAOD",
     "/DoubleMuon/Run2016H-03Feb2017_ver3-v1/MINIAOD",
-       
+      
     "/MuonEG/Run2016B-03Feb2017_ver2-v2/MINIAOD",
     "/MuonEG/Run2016C-03Feb2017-v1/MINIAOD",
     "/MuonEG/Run2016D-03Feb2017-v1/MINIAOD",
@@ -120,7 +125,7 @@ for sd in sets_data:
         "maxlumis": -1,
         "perjob": 30,
         "runtime": 20, #hours
-        "mem_cfg": me_cfgs["nome"],
+        "mem_cfg": me_cfgs["leptonic"],
         "script": 'heppy_crab_script_data.sh'
     }
 datasets.update({
@@ -143,6 +148,15 @@ datasets.update({
 
     'TTbar_inc': {
         "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'ttbb': {
+        "ds": '/ttbb_4FS_OpenLoops_13TeV-sherpa/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 50,
         "runtime": 20,
@@ -197,6 +211,72 @@ datasets.update({
     
     'TTbar_fsr_down': {
         "ds": '/TT_TuneCUETP8M2T4_13TeV-powheg-fsrdown-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+   
+    'TTbar_tune_up1': {
+        "ds": '/TT_TuneCUETP8M2T4up_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_tune_up2': {
+        "ds": '/TT_TuneCUETP8M2T4up_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_tune_down1': {
+        "ds": '/TT_TuneCUETP8M2T4down_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_tune_down2': {
+        "ds": '/TT_TuneCUETP8M2T4down_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    
+    'TTbar_hdamp_up1': {
+        "ds": '/TT_hdampUP_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_hdamp_up2': {
+        "ds": '/TT_hdampUP_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_hdamp_down1': {
+        "ds": '/TT_hdampDOWN_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+        "maxlumis": -1,
+        "perjob": 50,
+        "runtime": 20,
+        "mem_cfg": me_cfgs["default"],
+        "script": 'heppy_crab_script.sh'
+    },
+    'TTbar_hdamp_down2': {
+        "ds": '/TT_hdampDOWN_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM',
         "maxlumis": -1,
         "perjob": 50,
         "runtime": 20,
@@ -319,6 +399,15 @@ datasets.update({
        "script": 'heppy_crab_script.sh'
    },
    
+   'wjets': {
+       "ds": '/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 20,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   
    # 'wjets_ht_100_200': {
    #     "ds": '/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
    #     "maxlumis": -1,
@@ -380,23 +469,31 @@ datasets.update({
    #     "script": 'heppy_crab_script.sh'
    # },
 
-   # 'dy_10_50': {
-   #     "ds": '/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 20,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 'dy_50_inf': {
-   #     "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/MINIAODSIM',
-   #     "maxlumis": -1,
-   #     "perjob": 40,
-   #     "runtime": 10,
-   #     "mem_cfg": me_cfgs["leptonic"],
-   #     "script": 'heppy_crab_script.sh'
-   # },
-   # 
+   'dy_10_50': {
+       "ds": '/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 80,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'dy_50_inf1': {
+       "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 80,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   'dy_50_inf2': {
+       "ds": '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM',
+       "maxlumis": -1,
+       "perjob": 80,
+       "runtime": 10,
+       "mem_cfg": me_cfgs["leptonic"],
+       "script": 'heppy_crab_script.sh'
+   },
+   
    'st_t': {
        "ds": '/ST_t-channel_top_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
        "maxlumis": -1,
@@ -525,33 +622,66 @@ datasets.update({
 workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
-        #"ttHTobb",
-        #"ttHToNonbb",
+        "ttHTobb",
+        "ttHToNonbb",
         #"TTbar_inc",
+        #"ttbb",
         "TTbar_isr_up",
         "TTbar_isr_down1",
         "TTbar_isr_down2",
-        #"TTbar_fsr_up1",
-        #"TTbar_fsr_up2",
-        #"TTbar_fsr_down",
-        #"TTbar_sl",
-        #"TTbar_dl",
-        #"ww1", "ww2",
-        #"wz1", "wz2",
-        #"zz1", "zz2",
-        #"st_t", "stbar_t",
-        #"st_tw", "stbar_tw",
-        #"st_s",
-        #"ttw_wlnu1",
-        #"ttw_wlnu2",
-        #"ttz_zllnunu1",
-        #"ttz_zllnunu2",
-        #"ttw_wqq",
-        #"ttz_zqq",
+        "TTbar_fsr_up1",
+        "TTbar_fsr_up2",
+        "TTbar_fsr_down",
+        "TTbar_tune_up1",
+        "TTbar_tune_up2",
+        "TTbar_tune_down1",
+        "TTbar_tune_down2",
+        "TTbar_hdamp_up1",
+        "TTbar_hdamp_up2",
+        "TTbar_hdamp_down1",
+        "TTbar_hdamp_down2",
+        "TTbar_sl",
+        "TTbar_dl",
+        "ww1", "ww2",
+        "wz1", "wz2",
+        "zz1", "zz2",
+        "st_t", "stbar_t",
+        "st_tw", "stbar_tw",
+        "st_s",
+        "ttw_wlnu1",
+        "ttw_wlnu2",
+        "ttz_zllnunu1",
+        "ttz_zllnunu2",
+        "ttw_wqq",
+        "ttz_zqq",
+        "wjets",
+        "dy_50_inf1", "dy_50_inf2", "dy_10_50"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
     workflow_datasets["leptonic"][k] = D
+
+#now we construct the workflows from all the base datasets
+workflow_datasets["memcheck"] = {}
+for k in [
+        "ttHTobb",
+        "ttHToNonbb",
+        "TTbar_inc",
+        "ttbb",
+        "TTbar_sl",
+        "TTbar_dl",
+    ]:
+    D = deepcopy(datasets[k])
+    D["mem_cfg"] = "cfg_memcheck.py"
+    workflow_datasets["memcheck"][k] = D
+
+workflow_datasets["memcheck2"] = {}
+for k in [
+        "ttHTobb",
+    ]:
+    D = deepcopy(datasets[k])
+    D["mem_cfg"] = "cfg_memcheck2.py"
+    workflow_datasets["memcheck2"][k] = D
 
 workflow_datasets["signal"] = {}
 for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
@@ -777,10 +907,16 @@ env
     submitname = args.tag
     config.General.workArea = 'crab_projects/' + submitname
     config.General.transferLogs = True
+   
+    #Disable overflow to prevent buggy site T2_US_UCSD
+    config.section_("Debug")
+    config.Debug.extraJDL = ['+CMS_ALLOW_OVERFLOW=False']
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
-    config.JobType.maxMemoryMB = 3000 #DS
+    config.JobType.maxMemoryMB = 2500
+    #with 3000MB, almost no jobs will run at T2_CH_CSCS, our default site.
+    #therefore, 3000MB should only be used for resubmissions
 
     import os
     os.system("tar czf python.tar.gz --directory $CMSSW_BASE python `find $CMSSW_BASE/src -name python | perl -pe s#$CMSSW_BASE/## `")
@@ -829,7 +965,7 @@ env
     config.Data.allowNonValidInputDataset = True
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-    #config.Site.blacklist = ["T2_US_Florida", "T2_US_MIT", "T2_US_Wisconsin", "T2_US_Vanderbilt"]
+    config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
 
     config.Site.storageSite = "T3_CH_PSI"
 

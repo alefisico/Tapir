@@ -15,9 +15,11 @@ from shutil import copyfile
 import glob
 
 import sys, os, copy
+import tempfile
 from collections import OrderedDict
 import TTH.Plotting.joosep.plotlib as plotlib #heplot, 
 import subprocess
+import logging
 
 import rootpy
 from rootpy.plotting import Hist
@@ -30,6 +32,7 @@ from TTH.Plotting.Datacards import MakeCategory
 from TTH.Plotting.Datacards import MakeLimits
 
 from TTH.MEAnalysis.samples_base import getSitePrefix
+from TTH.Plotting.Datacards.MakeCategory import make_datacard
 
 def copy_rsync(src, dst):
     os.system("rsync --bwlimit=20000 {0} {1}".format(src, dst))
@@ -39,6 +42,34 @@ def count(filenames):
     ret = counts.main(filenames, ofname)
     os.remove(ofname)
     return ret
+
+def makecategory(workdir, analysis, cat, infile):
+    hdict = {}
+    tf = ROOT.TFile(infile)
+    ROOT.gROOT.cd()
+    for k in tf.GetListOfKeys():
+
+        if not (cat.full_name in k.GetName()):
+            continue
+
+        #check if this is a valid histogram according to its name
+        if len(k.GetName().split("__")) >= 3:
+            hdict[k.GetName()] = k.ReadObj().Clone()
+    for proc in cat.out_processes:
+        if proc == "data":
+            continue
+        for syst in cat.common_shape_uncertainties.keys():
+            for sdir in ["Up", "Down"]:
+                pat = "__".join([proc, cat.full_name, syst+sdir])
+                if not hdict.has_key(pat):
+                    logging.getLogger('launcher').info("Could not find {0}, cloning nominal".format(pat))
+                    hdict[pat] = hdict["__".join([proc, cat.full_name])].Clone()
+    category_dir = "{0}/categories/{1}/{2}".format(
+        workdir, cat.name, cat.discriminator.name
+    )
+    if not os.path.exists(category_dir):
+        os.makedirs(category_dir)
+    make_datacard(analysis, [cat], category_dir, hdict)
 
 def sparse(config_path, filenames, sample, outfile):
     analysis = Analysis.deserialize(config_path)
@@ -65,13 +96,6 @@ def sparse(config_path, filenames, sample, outfile):
     os.remove(ofname)
     return outfile
 
-#def plot_syst_updown(nominal, up, down):
-#    plt.figure(figsize=(6,6))
-#    heplot.barhist(nominal, color="black")
-#    heplot.barhist(up, color="red")
-#    heplot.barhist(down, color="blue")
-
-
 def mergeFiles(outfile, infiles, remove_inputs=False):
     basepath = os.path.dirname(outfile)
     if not os.path.isdir(basepath):
@@ -96,13 +120,8 @@ def mergeFiles(outfile, infiles, remove_inputs=False):
                 os.remove(res)
     return outfile
 
-def makecategory(*args):
-    an_name, analysis = analysisFromConfig(args[0])
-    new_args = [analysis] + list(args)[1:]
-    new_args = tuple(new_args)
-    return MakeCategory.main(*new_args)
-
 def plot(*kwargs):
+    os.environ["MPLCONFIGDIR"] = tempfile.gettempdir()
     return controlPlot.plot_worker(*kwargs)
 
 def makelimits(*args):

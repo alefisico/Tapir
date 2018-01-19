@@ -39,6 +39,8 @@ if __name__ == "__main__":
     parser.add_argument('--limit', action="store", help="max files per dataset", default=0)
     parser.add_argument('--debug', action="store", help="debug mode", default=False)
     parser.add_argument('--name', action="store", help="search only this dataset", default="*")
+    parser.add_argument('--prefix', action="store", help="Prefix to add to filename", default="")
+    parser.add_argument('--doLumis', action="store_true", help="Get the lumi-sections")
     args = parser.parse_args()
     
     version = args.version
@@ -81,7 +83,7 @@ if __name__ == "__main__":
             ds_list += [dataset]
     else:
         datasets = filter(
-            lambda x: len(x)>0,
+            lambda x: len(x)>0 and not x.startswith("#"),
             map(lambda x: x.strip(),
                 open(args.datasetfile).readlines()
             )
@@ -119,13 +121,7 @@ if __name__ == "__main__":
             ], stdout=subprocess.PIPE, shell=True
         ).stdout.read()
         files_di = json.loads(files_json)
-        
-        files_run_lumi_json = subprocess.Popen([
-            "{0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3} --threshold=600".format(
-            das_client, ds, args.instance, args.limit)
-            ], stdout=subprocess.PIPE, shell=True
-        ).stdout.read()
-        files_run_lumi = json.loads(files_run_lumi_json)
+       
         
         try:
             print "Got {0} files".format(len(files_di['data']))
@@ -135,17 +131,25 @@ if __name__ == "__main__":
             raise e
        
         #Create dict of filename -> run -> lumis
-        lumis_dict = {}
-        for fi in files_run_lumi["data"]:
-            fn = fi["file"][0]["name"]
-           
-            if not lumis_dict.has_key(fn):
-                lumis_dict[fn] = {}
-            for run, lumis in zip(fi["run"], fi["lumi"]):
-                run_num = run["run_number"]
-                if not lumis_dict[fn].has_key(run_num):
-                    lumis_dict[fn][run_num] = []
-                lumis_dict[fn][run_num] += lumis["number"]
+        if args.doLumis:
+            files_run_lumi_json = subprocess.Popen([
+                "{0} --query='file,run,lumi dataset={1} instance={2}' --format=json --limit={3} --threshold=600".format(
+                das_client, ds, args.instance, args.limit)
+                ], stdout=subprocess.PIPE, shell=True
+            ).stdout.read()
+            files_run_lumi = json.loads(files_run_lumi_json)
+            
+            lumis_dict = {}
+            for fi in files_run_lumi["data"]:
+                fn = fi["file"][0]["name"]
+               
+                if not lumis_dict.has_key(fn):
+                    lumis_dict[fn] = {}
+                for run, lumis in zip(fi["run"], fi["lumi"]):
+                    run_num = run["run_number"]
+                    if not lumis_dict[fn].has_key(run_num):
+                        lumis_dict[fn][run_num] = []
+                    lumis_dict[fn][run_num] += lumis["number"]
 
         lumis = []
         for ifile, fi in enumerate(files_di['data']):
@@ -162,28 +166,33 @@ if __name__ == "__main__":
                 except Exception as e:
                     print "Could not parse nevents", fi["file"][0]
                     nevents = 0
-                if lumis_dict.has_key(name):
-                    tmp_lumis = LumiList(runsAndLumis = lumis_dict[name])
-                    lumis += [tmp_lumis]
-                else:
-                    raise Exception("file {0} has no associated lumis (events={1})".format(name, nevents))
-                ofile.write("{0} = {1}\n".format(name, nevents))
+                if args.doLumis:
+                    if lumis_dict.has_key(name):
+                        tmp_lumis = LumiList(runsAndLumis = lumis_dict[name])
+                        lumis += [tmp_lumis]
+                    else:
+                        if nevents > 0:
+                            raise Exception("file {0} has no associated lumis (events={1})".format(name, nevents))
+                        else:
+                            print "file {0} has no associated lumis (events={1})".format(name, nevents)
+                ofile.write("{0} = {1}\n".format(args.prefix + name, nevents))
             #merge lumi files
 
-        #merge lumi files
-        total_lumis = LumiList()
-        lumi_fn = ofile_fn.replace(".txt", ".json")
-        if sample_short in samples_processed:
-            total_lumis = LumiList(filename = lumi_fn)
-            print "opened existing lumi file", len(total_lumis)
-        for i in range(len(lumis)):
-            total_lumis = total_lumis + lumis[i]
-        total_lumis.writeJSON(fileName=lumi_fn)
-        #end loop over files
+        if args.doLumis:
+            #merge lumi files
+            total_lumis = LumiList()
+            lumi_fn = ofile_fn.replace(".txt", ".json")
+            if sample_short in samples_processed:
+                total_lumis = LumiList(filename = lumi_fn)
+                print "opened existing lumi file", len(total_lumis)
+            for i in range(len(lumis)):
+                total_lumis = total_lumis + lumis[i]
+            total_lumis.writeJSON(fileName=lumi_fn)
+            #end loop over files
 
-        #write per-file lumi dictionary 
-        with open(ofile_fn.replace(".txt", "_lumi_per_file.json"), "w") as fi:
-            fi.write(json.dumps(lumis_dict, indent=2))
+            #write per-file lumi dictionary 
+            with open(ofile_fn.replace(".txt", "_lumi_per_file.json"), "w") as fi:
+                fi.write(json.dumps(lumis_dict, indent=2))
 
         ofile.close()
         samples_processed += [sample_short]

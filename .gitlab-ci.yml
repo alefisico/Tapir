@@ -1,6 +1,7 @@
 stages:
   - compile
-  - test 
+  - test
+  - test_sparsinator
 
 before_script:
   - source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
@@ -62,13 +63,25 @@ test_tth:
     - python python/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - python test/validationHistos.py Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
-    - tar -czf plots.tgz *.pdf
+    - tar -czf plots.tgz *.pdf Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - du -csh plots.tgz
     - mv plots.tgz $CI_HOME/
   artifacts:
     paths:
       - plots.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_tth_sparsinator:
+  stage: test_sparsinator
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH
+    - tar xfz "test_tth_${CI_BUILD_REF_NAME}.tgz"
+    - ls -al
 
 test_ttjets:
   stage: test

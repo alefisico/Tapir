@@ -129,7 +129,6 @@ class Sample(object):
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
         self.xsec = kwargs.get("xsec")
-        self.classifier_db_path = kwargs.get("classifier_db_path")
         self.vhbb_tree_name = kwargs.get("vhbb_tree_name", "vhbb/tree")
         
     @staticmethod
@@ -144,7 +143,6 @@ class Sample(object):
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen_weight"),
-            classifier_db_path = config.get(sample_name, "classifier_db_path", None),
             vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),
             tags = config.get(sample_name, "tags")
@@ -400,7 +398,7 @@ class Category:
             if k in self.scale_uncertainties.keys():
                 self.scale_uncertainties[k].update(v)
             else:
-                LOG_MODULE_NAME.info("Could not find process {0} to update scale uncertainties".format(k))
+                LOG_MODULE_NAME.debug("Could not find process {0} to update scale uncertainties".format(k))
     
     def __str__(self):
         s = "Category(full_name={0})".format(
