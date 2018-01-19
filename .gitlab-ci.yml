@@ -71,19 +71,6 @@ test_tth:
       - plots_tth.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
-test_tth_sparsinator:
-  stage: test_sparsinator
-  script:
-    - cd $CI_HOME/..
-    - tar xfz $CI_HOME/cmssw.tgz
-    - cd $CI_HOME/../$CMSSW_VERSION/src
-    - eval `scramv1 runtime -sh`
-    - cd $CI_HOME
-    - cd $CMSSW_BASE/src/TTH
-    - tar xfz $CI_HOME/plots_tth.tgz
-    - ls -al
-    - FILE_NAMES=Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
-
 test_ttjets:
   stage: test
   script:
@@ -103,3 +90,40 @@ test_ttjets:
     paths:
       - plots_ttjets.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_tth_sparsinator:
+  stage: test_sparsinator
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH
+    - tar xfz $CI_HOME/plots_tth.tgz
+    - ls -al
+    - FILE_NAMES=Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
+    - mv out.root sparse_tth.root
+  artifacts:
+    paths:
+      - sparse_tth.root
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_ttjets_sparsinator:
+  stage: test_sparsinator
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH
+    - tar xfz $CI_HOME/plots_tth.tgz
+    - ls -al
+    - FILE_NAMES=Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root DATASETPATH=TT_TuneCUETP8M2T4_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
+    - mv out.root sparse_ttjets.root
+  artifacts:
+    paths:
+      - sparse_ttjets.root
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
