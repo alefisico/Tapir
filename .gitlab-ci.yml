@@ -63,12 +63,12 @@ test_tth:
     - python python/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - python test/validationHistos.py Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
-    - tar -czf plots.tgz *.pdf Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
-    - du -csh plots.tgz
-    - mv plots.tgz $CI_HOME/
+    - tar -czf plots_tth.tgz *.pdf Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
+    - du -csh plots_tth.tgz
+    - mv plots_tth.tgz $CI_HOME/
   artifacts:
     paths:
-      - plots.tgz
+      - plots_tth.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_tth_sparsinator:
@@ -80,7 +80,7 @@ test_tth_sparsinator:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH
-    - tar xfz $CI_HOME/plots.tgz
+    - tar xfz $CI_HOME/plots_tth.tgz
     - ls -al
     - FILE_NAMES=Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
 
@@ -96,11 +96,10 @@ test_ttjets:
     - python python/test_MEAnalysis_heppy.py --sample TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
     - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
     - ls -al
-    - tar -czf plots.tgz *.pdf
-    - du -csh plots.tgz
-    - mv plots.tgz $CI_HOME/
+    - tar -czf plots_ttjets.tgz *.pdf
+    - du -csh plots_ttjets.tgz
+    - mv plots_ttjets.tgz $CI_HOME/
   artifacts:
     paths:
-      - plots.tgz
+      - plots_ttjets.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-
