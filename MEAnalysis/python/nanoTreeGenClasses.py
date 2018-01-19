@@ -43,13 +43,16 @@ genbmass = 4.75
 def sign(number):
 	return cmp(number,0)
 
-def realGenMothers(GenParticle,gp):
+def realGenMothers(GenParticle,gp, idx=20):
     """Get the mothers of a particle X going through intermediate X -> X' chains.
        e.g. if Y -> X, X -> X' realGenMothers(X') = Y"""
     ret = []
+    if idx == 0:
+        print "NB: realGenMothers aborted due to deep recursion"
+        return ret
     mom = GenParticle[gp.genPartIdxMother]
     if mom.pdgId == gp.pdgId:
-        ret += realGenMothers(GenParticle,mom)
+        ret += realGenMothers(GenParticle,mom, idx-1)
     else:
         ret.append(mom)
     return ret
