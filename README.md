@@ -1,13 +1,13 @@
-# TTHBB MEM code
+# ttH(bb) MEM code for Run 2
 
-Setup on SLC6 in a clean directory (no CMSSW) on a **shared file system**
+Setup on SLC6 in a clean directory (no CMSSW) on a **shared file system (NFS)**
 ~~~
 $ mkdir -p ~/tth/sw
 $ cd ~/tth/sw
 $ wget --no-check-certificate https://gitlab.cern.ch/jpata/tthbb13/raw/SwitchNanoAOD/setup.sh
 $ source setup.sh
 ~~~
-This will download CMSSW, the tthbb code and all the dependencies.
+This will download CMSSW, the `tthbb13` code and all the dependencies.
 
 In order to compile the code, run
 ~~~
@@ -16,7 +16,7 @@ $ cmsenv
 $ scram b -j 8
 ~~~
 
-Note that if you run `scram b clean`, the matrix element library OpennLoops will be deleted from CMSSW, which will result in errors like
+Note that if you run `scram b clean`, the matrix element library OpenLoops will be deleted from CMSSW, which will result in errors like
 ~~~
 [OpenLoops] ERROR: register_process: proclib folder not found, check install_path or install libraries.
 ~~~
@@ -24,65 +24,27 @@ In order to fix this, you have to re-copy the libraries, see the end of `setup.s
 
 ## Step0: environment
 
-We use rootpy in the plotting code, which is installed on the T3 locally in `/swshare/anaconda`. In order to properly configure the environment, run the following `source setenv_psi.sh` before starting your work.
+We use rootpy in the plotting code, which is installed on T3_CH_PSI locally in `/swshare/anaconda`.
 
-## Step1: VHBB code
-This will start with MiniAOD and produce a VHBB ntuple.
+## Step1: Running the nanoAOD code
 
-In order to run a quick test of the code, use the following makefile
+TODO
+
+## Step2: tthbb13 code
+Using the nanoAOD-tree, we will run the ttH(bb) and matrix element code (tthbb13). The code is configured mainly from two files:
+
+1. A flat configuration in https://gitlab.cern.ch/jpata/tthbb13/blob/SwitchNanoAOD/MEAnalysis/data/default.cfg specifying the samples and analysis categories. This configuration should be preferred for most future options.
+2. A python configuration in https://gitlab.cern.ch/jpata/tthbb13/blob/SwitchNanoAOD/MEAnalysis/python/MEAnalysis_cfg_heppy.py used for the MEM configuration and specifying the object (jet, lepton) cuts. 
+
+In order to test the `tthbb13` code, run:
 ~~~
-$ cd $CMSSW_BASE/src/VHbbAnalysis/Heppy/test
-$ python validation/tth_sl_dl.py #run a few MC files
-$ python validation/tth_data.py #run a few data files
-~~~
-
-The structure of the VHBB-tree is encoded in `$CMSSW_BASE/src/TTH/MEAnalysis/python/VHbbTree.py` for MC and `VHbbTreeData.py` for data. These files are **automatically generated** using `make vhbb_wrapper` with the following commands:
-
-~~~
-cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper.py
-cd $(CMSSW_BASE)/src/VHbbAnalysis/Heppy/test && python genWrapper_data.py
-~~~
-
-Submitting jobs based on step1 will proceed via `crab3`, explained in Step1+2.
-
-## Step2: tthbb code
-Using the VHBB-tree, we will run the ttH(bb) and matrix element code (tthbb13)
-
-In order to test the code, run:
-~~~
-$ python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py
+$ python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
 ~~~
 
 This will call
 ~~~
 python $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_heppy.py MEAnalysis/data/default.cfg --sample SAMPLE_NAME
 ~~~
-which is currently configured by the `MEAnalysis_cfg_heppy.py` (MEM and object ID configuration) and `default.cfg` (samples and categories).
-
-## Step1+2: VHBB & tthbb13 with CRAB
-In order to reduce the amount of intermediate steps and book-keeping, we run
-step1 (VHBB) and step2 (tthbb13) together in one job, back to back. This is configured in `$CMSSW_BASE/src/TTH/MEAnalysis/crab_vhbb
-
-To submit a few test workflows with crab do:
-
-~~~
-$ cd TTH/MEAnalysis/crab_vhbb
-$ python multicrab.py --workflow testing_withme --tag my_test1
-~~~
-
-To produce all the SL/DL samples, do
-~~~
-$ cd TTH/MEAnalysis/crab_vhbb
-$ python multicrab.py --workflow leptonic --tag May13
-~~~
-where the tag `May13` is for your own book-keeping.
-
-To prepare the dataset files in `TTH/MEAnalysis/gc/datasets/{TAG}/{DATASET}`, use the DAS script
-~~~
-$ python TTH/MEAnalysis/python/MakeDatasetFiles.py --version {TAG}
-~~~
-
-This will create lists of the Step1+2 files in the Storage Element (SE), which are stored under `TTH/MEAnalysis/gc/datasets/{TAG}`.
 
 ## Step3 (optional): skim with `projectSkim`
 
@@ -132,77 +94,6 @@ $ hadd -f sparse.root /path/to/output/GC1234/
 
 The output file will contain per-category histograms.
 
-## Step5: Categories with `makecategories.sh`
-
-Configure what is necessary in `TTH/Plotting/python/Datacards/config_*.cfg`, then call
-
-~~~
-cd TTH/MEAnalysis/gc
-#generate the parameter csv files: analysis_groups.csv, analysis_specs.csv
-python $CMSSW_BASE/src/TTH/Plotting/python/Datacards/AnalysisSpecification.py
-./grid-control/go.py confs/makecategories.conf
-~~~
-
-This will create all the `combine` datacards (`{ANALYSIS}/{CATEGORY}.root` files and `shapes_*.txt` files) for all analyses and all the categories.
-
-~~~
-[jpata@t3ui17 gc]$ ls -1 ~/tth/gc/makecategory/GC41c32de9adb2/SL_7cat/
-shapes_sl_j4_t3_blrH_mem_SL_0w2h2t_p.txt
-shapes_sl_j4_t3_blrL_btag_LR_4b_2b_btagCSV_logit.txt
-shapes_sl_j4_t3_mem_SL_0w2h2t_p.txt
-shapes_sl_j4_tge4_mem_SL_0w2h2t_p.txt
-shapes_sl_j5_t3_blrH_mem_SL_1w2h2t_p.txt
-shapes_sl_j5_t3_blrL_btag_LR_4b_2b_btagCSV_logit.txt
-shapes_sl_j5_t3_mem_SL_1w2h2t_p.txt
-shapes_sl_j5_tge4_mem_SL_1w2h2t_p.txt
-shapes_sl_jge6_t2_btag_LR_4b_2b_btagCSV_logit.txt
-shapes_sl_jge6_t3_blrH_mem_SL_2w2h2t_p.txt
-shapes_sl_jge6_t3_blrL_mem_SL_2w2h2t_p.txt
-shapes_sl_jge6_t3_mem_SL_2w2h2t_p.txt
-shapes_sl_jge6_tge4_mem_SL_2w2h2t_p.txt
-sl_j4_t3_blrH.root
-sl_j4_t3_blrL.root
-sl_j4_t3.root
-sl_j4_tge4.root
-sl_j5_t3_blrH.root
-sl_j5_t3_blrL.root
-sl_j5_t3.root
-sl_j5_tge4.root
-sl_jge6_t2.root
-sl_jge6_t3_blrH.root
-sl_jge6_t3_blrL.root
-sl_jge6_t3.root
-sl_jge6_tge4.root
-
-$ python ../test/listroot.py ~/tth/gc/makecategory/GC41c32de9adb2/SL_7cat/sl_jge6_tge4.root
-ttH_hbb
--sl_jge6_tge4
---btag_LR_4b_2b_btagCSV_logit (Hist)
---jetsByPt_0_pt (Hist)
---mem_SL_2w2h2t_p (Hist)
-ttbarPlusB
--sl_jge6_tge4
---btag_LR_4b_2b_btagCSV_logit (Hist)
---jetsByPt_0_pt (Hist)
---mem_SL_2w2h2t_p (Hist)
-...
-~~~
-
-## Step6: Limits with `makelimits.sh`
-
-Configure the path to the category output in `confs/makelimits.conf` by setting `datacardbase` to the output of step 4.
-
-~~~
-cd TTH/MEAnalysis/gc
-./grid-control/go.py confs/makelimits.conf
-~~~
-
-## Step6: data/mc plots
-
-From the output of makecategory, you can make data/MC plots using code in `plotlib.py` and `controlPlot.py`. See `TTH/MEAnalysis/python/joosep/controlPlot.py` for an example. For this to work, you need to use the rootpy environment.
-
-On the T3 using 10 cores, you can make about 100 pdf plots per minute.
-
 ## Step3-6 in one go: `launcher.py`
 
 If you are running this step for the first time, you need to create an empty "logs" folder in the rq directory.
@@ -237,35 +128,7 @@ When you're done, don't forget to free up your jobs:
 qdel -u $USER
 ~~~
 
-
 # Continous integration (CI)
 
-In order to run the continuous integration on a multicore machine, we have provisioned a virtual machine on the CERN cloud infrastructure.
-This machine is configured as a CI runner in the `tthbb13` repository under [Specific Runners](https://gitlab.cern.ch/jpata/tthbb13/runners).
-
-SLC6 machine on CERN OpenStack
-https://openstack.cern.ch/project/instances/
-
-With two additional volumes formatted as ext4:
-- `cvmfs`: 25GB
-- `gitlab-runner`: 100GB
-
-With the following software
-~~~
-yum install git wget
-~~~
-
-Install cvmfs like
-https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallCvmfs
-
-~~~
-#/etc/cvmfs/default.local
-CVMFS_REPOSITORIES="cms.cern.ch,grid.cern.ch"
-CVMFS_QUOTA_LIMIT=20000
-CVMFS_CACHE_BASE="/cvmfs-cache"
-CVMFS_HTTP_PROXY='http://ca-proxy-meyrin.cern.ch:3128;http://ca-proxy.cern.ch:3128;http://ca01.cern.ch:3128|http://ca02.cern.ch:3128|http://ca03.cern.ch:3128|http://ca04.cern.ch:3128|http://ca05.cern.ch:3128|http://ca06.cern.ch:3128'
-~~~
-
-configure runner as in
-https://docs.gitlab.com/runner/install/linux-manually.html
+We test the code regularly using the gitlab CI system. Since we are accessing the samples from T3_CH_PSI, this currently requires a valid proxy at CERN. 
 
