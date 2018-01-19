@@ -80,7 +80,7 @@ test_tth_sparsinator:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH
-    - tar xfz "test_tth_${CI_BUILD_REF_NAME}.tgz"
+    - tar xfz $CI_HOME/test_tth_${CI_BUILD_REF_NAME}.tgz
     - ls -al
 
 test_ttjets:
