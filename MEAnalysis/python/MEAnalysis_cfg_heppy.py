@@ -6,7 +6,6 @@ from ROOT import MEM
 #import VHbbAnalysis.Heppy.TriggerTableData as trigData
 #import VHbbAnalysis.Heppy.TriggerTable as trig
 import TriggerTable as trig
-trigData = trig
 
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID
@@ -167,8 +166,9 @@ class Conf:
     trigger = {
 
         "filter": False,
-        "trigTable": trig.triggerTable,
-        "trigTableData": trig.triggerTable,
+        #Change to trig.triggerTable for 2017 menu (starting from 92X samples)
+        "trigTable": trig.triggerTable2016,
+        "trigTableData": trig.triggerTable2016,
     }
 
     general = {
