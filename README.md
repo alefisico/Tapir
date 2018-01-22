@@ -134,3 +134,11 @@ qdel -u $USER
 
 We test the code regularly using the gitlab CI system. Since we are accessing the samples from T3_CH_PSI, this currently requires a valid proxy at CERN. 
 
+
+# OpenLOOPS
+
+Compile the signal and background amplitudes, which will be placed in `OpenLoops/proclib`.
+~~~
+./openloops libinstall pphtt compile_extra=1
+./openloops libinstall ppttjj compile_extra=1
+~~~

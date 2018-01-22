@@ -28,9 +28,13 @@ def main(filenames, ofname):
         good_filenames += [lfn]
         vhbb_dir = tf.Get("vhbb")
         if not vhbb_dir:
+            print "could not find vhbb directory" 
             vhbb_dir = tf
+        print [k.GetName() for k in vhbb_dir.GetListOfKeys()]
+
         for k in vhbb_dir.GetListOfKeys():
             kn = k.GetName()
+            print kn
             if "Count" in kn:
                 o = k.ReadObj()
                 if not count_dict.has_key(kn):
@@ -58,4 +62,4 @@ def main(filenames, ofname):
 if __name__ == "__main__":
     filenames = sys.argv[2:]
     ofname = sys.argv[1]
-    main(filenames, ofname)
+    print main(filenames, ofname)

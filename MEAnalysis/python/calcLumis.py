@@ -101,7 +101,7 @@ if __name__ == "__main__":
                      "jpata"  : "jpata" }
 
     lxplus_username = lxplus_users[getpass.getuser()]
-    dataset_name = "Aug3_data"
+    dataset_name = "Sep20_data"
 
     processes = [
         "SingleMuon",

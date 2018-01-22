@@ -13,9 +13,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     backgrounds = []
     #FIXME: check what happens with ttH_nonhbb
     for cat in categories:
-        for proc in cat.out_processes:
-            if proc == "data":
-                continue
+        for proc in cat.out_processes_mc:
             backgrounds += [proc]
     backgrounds = set(backgrounds)
     number_of_backgrounds = len(backgrounds) - 1
@@ -48,29 +46,24 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     # Example: ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8_hbb -> ttH_hbb
 
     for cat in categories:
-        for i_sample, sample in enumerate(cat.out_processes):
-            if sample == "data":
-                continue
+        for i_sample, sample in enumerate(cat.out_processes_mc):
             bins.append(cat.full_name)
             processes_0.append(sample)
             if sample in cat.signal_processes:
                 i_sample = -i_sample
             processes_1.append(str(i_sample))
             rates.append(str(event_counts[cat.full_name][sample]))
-
     dcof.write("bin\t"+"\t".join(bins)+"\n")
     dcof.write("process\t"+"\t".join(processes_0)+"\n")
     dcof.write("process\t"+"\t".join(processes_1)+"\n")
     dcof.write("rate\t"+"\t".join(rates)+"\n")
     dcof.write("---------------\n")
 
-
-
     # Gather all shape uncerainties
     all_shape_uncerts = []
     all_scale_uncerts = []
     for cat in categories:
-        for proc in cat.out_processes:
+        for proc in cat.out_processes_mc:
             all_shape_uncerts.extend(cat.shape_uncertainties[proc].keys())
             all_scale_uncerts.extend(cat.scale_uncertainties[proc].keys())
     # Uniquify
@@ -80,7 +73,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     for syst in all_shape_uncerts:
         dcof.write(syst + "\t shape \t")
         for cat in categories:
-            for proc in cat.out_processes:
+            for proc in cat.out_processes_mc:
                 if (cat.shape_uncertainties.has_key(proc) and
                     cat.shape_uncertainties[proc].has_key(syst)):
                     dcof.write(str(cat.shape_uncertainties[proc][syst]))
@@ -93,7 +86,7 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
     for syst in all_scale_uncerts:
         dcof.write(syst + "\t lnN \t")
         for cat in categories:
-            for proc in cat.out_processes:
+            for proc in cat.out_processes_mc:
                 if (cat.scale_uncertainties.has_key(proc) and
                     cat.scale_uncertainties[proc].has_key(syst)):
                     dcof.write(str(cat.scale_uncertainties[proc][syst]))
@@ -101,11 +94,37 @@ def PrintDatacard(categories, event_counts, filenames, dcof):
                     dcof.write("-")
                 dcof.write("\t")
         dcof.write("\n")
+
+    #create nuisance groups for easy manipulation
+    nuisance_groups = {
+        "jec": [k for k in all_shape_uncerts if k.startswith("CMS_scale")] + ["CMS_res_j"],
+        "bgnorm": ["bgnorm_ttbarPlus2B", "bgnorm_ttbarPlusB", "bgnorm_ttbarPlusBBbar", "bgnorm_ttbarPlusCCbar"],
+        "pdf": ["pdf_Higgs_ttH", "pdf_gg", "pdf_qg", "pdf_qqbar"],
+        "QCDscale": ["QCDscale_ttH", "QCDscale_ttbar", "QCDscale_t", "CMS_ttH_scaleME"],
+        "isrfsr": ["CMS_ttjetsfsr", "CMS_ttjetsisr"],
+        "tunehdamp": ["CMS_ttjetstune", "CMS_ttjetshdamp"],
+        "btag": [k for k in all_shape_uncerts if k.startswith("CMS_ttH_CSV")],
+        "misc": ["CMS_pu", "CMS_effID_e", "CMS_effID_m", "CMS_effIso_m", "CMS_effReco_e", "CMS_effTracking_m", "CMS_effTrigger_e", "CMS_effTrigger_m", "CMS_effTrigger_ee", "CMS_effTrigger_em", "CMS_effTrigger_mm", "lumi"],
+        "mcstat": [k for k in all_shape_uncerts if "_Bin" in k]
+    }
+    nuisance_groups["exp"] = nuisance_groups["jec"] + nuisance_groups["btag"] + nuisance_groups["misc"] + nuisance_groups["mcstat"]
+    nuisance_groups["theory"] = nuisance_groups["bgnorm"] + nuisance_groups["pdf"] + nuisance_groups["QCDscale"] + nuisance_groups["isrfsr"] + nuisance_groups["tunehdamp"]
+
+    for nuisance_group, nuisances in nuisance_groups.items():
+        good_nuisances = []
+        for nui in nuisances:
+            if not (nui in all_scale_uncerts or nui in all_shape_uncerts):
+                logging.error("unknown nuisance {0}".format(nui))
+            else:
+                good_nuisances += [nui]
+        dcof.write("{0} group = {1}\n".format(nuisance_group, " ".join(good_nuisances)))
+    
+    #dcof.write("* autoMCStats 20\n")
     #
-    # shapename = os.path.basename(datacard.output_datacardname)
-    # shapename_base = shapename.split(".")[0]
-    # dcof.write("# Execute with:\n")
-    # dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
+    #shapename = os.path.basename(datacard.output_datacardname)
+    #shapename_base = shapename.split(".")[0]
+    #dcof.write("# Execute with:\n")
+    #dcof.write("# combine -n {0} -M Asymptotic -t -1 {1} \n".format(shapename_base, shapename))
 
 
 def makeStatVariations(tf, of, categories):
@@ -114,31 +133,28 @@ def makeStatVariations(tf, of, categories):
     bin-by-bin variations for the given categories.
     """
     ret = {}
+    tf.cd()
     for cat in categories:
-        ret[cat.name] = {}
-        for proc in cat.out_processes:
-            ret[cat.name][proc] = []
-            hn = "{0}/{1}/{2}".format(proc, cat.name, cat.discriminator)
+        ret[cat.full_name] = {}
+        for proc in cat.out_processes_mc:
+            ret[cat.full_name][proc] = []
+            hn = "{0}__{1}__{2}".format(proc, cat.name, cat.discriminator.name)
             h = tf.Get(hn)
             h = h.Clone()
-            outdir = "{0}/{1}".format(proc, cat.name)
-            if of.Get(outdir) == None:
-                of.mkdir(outdir)
-            outdir = of.Get(outdir)
             for ibin in range(1, h.GetNbinsX() + 1):
-                systname = "{0}_{1}_Bin{2}".format(proc, cat.name, ibin)
-                ret[cat.name][proc] += [systname]
+                systname = "CMS_ttH_{0}_{1}_Bin{2}".format(proc, cat.full_name, ibin)
+                ret[cat.full_name][proc] += [systname]
                 for sigma, sdir in [(+1, "Up"), (-1, "Down")]:
-                    outdir.cd()
-                    systname_sdir = h.GetName() + "_" + systname + sdir
+                    systname_sdir = proc + "__" + cat.full_name + "__" + systname + sdir
                     hvar = h.Clone(systname_sdir)
                     delta = hvar.GetBinError(ibin)
                     c = hvar.GetBinContent(ibin) + sigma*delta
                     if c <= 10**-5 and h.Integral() > 0:
                         c = 10**-5
                     hvar.SetBinContent(ibin, c)
-                    outdir.Add(hvar)
+                    #tf.Add(hvar)
                     hvar.Write("", ROOT.TObject.kOverwrite)
+    #tf.Write()
     return ret
 #end of makeStatVariations
 
@@ -146,15 +162,17 @@ def fakeData(infile, outfile, categories):
     dircache = {}
     for cat in categories:
 
-        #get first histogram
+        #get first nominal histogram
         hn = "{0}__{1}__{2}".format(
-            cat.out_processes[0], cat.name, cat.discriminator.name
+            cat.out_processes_mc[0], cat.name, cat.discriminator.name
         )
         h = infile.Get(hn)
         if not h or h.IsZombie():
             raise Exception("Could not get histo {0}".format(hn)) 
         h = h.Clone()
-        for proc in cat.out_processes[1:]:
+
+        #Get and add the rest of the nominal histograms
+        for proc in cat.out_processes_mc[1:]:
             name = "{0}__{1}__{2}".format(
                 proc, cat.name, cat.discriminator.name
             )

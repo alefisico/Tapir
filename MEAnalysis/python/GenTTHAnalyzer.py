@@ -4,35 +4,56 @@ from TTH.MEAnalysis.vhbb_utils import lvec, MET, autolog
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.JetAnalyzer import attach_jet_transfer_function
 
-class GenTTHAnalyzer(FilterAnalyzer):
+def match_jets_to_quarks(jetcoll, quarkcoll, label, label_numeric):
+    matched_pairs = {}
+    for ij, j in enumerate(jetcoll):        
+        for iq, q in enumerate(quarkcoll):
+
+            # Set to 1 for bs from hadronic top
+            # Set to 0 for bs from hadronic top
+            # Set to -1 for other stuff
+            if label == "tb":
+                if q.from_had_t == 1:
+                    numeric_b_from_had_t = 1
+                elif q.from_had_t == 0:
+                    numeric_b_from_had_t = 0
+                else:
+                    numeric_b_from_had_t = -1
+            else:
+                numeric_b_from_had_t = -1
+
+            #find DeltaR between jet and quark
+            l1 = lvec(q)
+            l2 = lvec(j)
+            dr = l1.DeltaR(l2)
+            if dr < 0.3:
+                #Jet already had a match: take the one with smaller dR
+                if not matched_pairs.has_key(ij):
+                    matched_pairs[ij] = []
+                matched_pairs[ij] += [(label, iq, dr, label_numeric, numeric_b_from_had_t)]
+    return matched_pairs
+    
+class GenTTHAnalyzerPre(FilterAnalyzer):
     """
     Analyzes the ttbar (and Higgs) system on gen level.
     Identifies leptonic and hadronic gen top quarks. 
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
-        super(GenTTHAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        super(GenTTHAnalyzerPre, self).__init__(cfg_ana, cfg_comp, looperName)
 
     def beginLoop(self, setup):
-        super(GenTTHAnalyzer, self).beginLoop(setup)
+        super(GenTTHAnalyzerPre, self).beginLoop(setup)
 
     def pass_jet_selection(self, quark):
         return quark.pt > 30 and abs(quark.eta) < 2.5
 
     def process(self, event):
-        for (syst, event_syst) in event.systResults.items():
-            if event_syst.passes_btag and syst == "nominal":
-                res = self._process(event_syst)
-                event.systResults[syst] = res
-        return True
-
-    def _process(self, event):
-
         if not self.cfg_comp.isMC:
             return event 
 
         if "debug" in self.conf.general["verbosity"]:
-            autolog("GenTTHAnalyzer started")
+            autolog("GenTTHAnalyzerPre started")
 
         #Get light quarks from W/Z
         event.l_quarks_w = event.GenWZQuark
@@ -158,6 +179,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
         event.tth_px_gen = spx
         event.tth_py_gen = spy
 
+        event.MET_gen = MET(pt=event.met.genPt, phi=event.met.genPhi)
+
         #Calculate tth recoil
         #rho = -met - tth_matched
         event.tth_rho_px_gen = -event.MET_gen.px - event.tth_px_gen
@@ -200,41 +223,35 @@ class GenTTHAnalyzer(FilterAnalyzer):
         else:
             for b in event.b_quarks_t:
                 b.from_had_t = -1
-            
 
+        return True
 
+class GenTTHAnalyzer(FilterAnalyzer):
+    """
+    Analyzes the ttbar (and Higgs) system on gen level.
+    Identifies leptonic and hadronic gen top quarks. 
+    """
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        self.conf = cfg_ana._conf
+        super(GenTTHAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
 
-        def match_jets_to_quarks(jetcoll, quarkcoll, label, label_numeric):
-            matched_pairs = {}
-            for ij, j in enumerate(jetcoll):        
-                for iq, q in enumerate(quarkcoll):
+    def beginLoop(self, setup):
+        super(GenTTHAnalyzer, self).beginLoop(setup)
 
-                    # Set to 1 for bs from hadronic top
-                    # Set to 0 for bs from hadronic top
-                    # Set to -1 for other stuff
-                    if label == "tb":
-                        if q.from_had_t == 1:
-                            numeric_b_from_had_t = 1
-                        elif q.from_had_t == 0:
-                            numeric_b_from_had_t = 0
-                        else:
-                            numeric_b_from_had_t = -1
-                    else:
-                        numeric_b_from_had_t = -1
+    def pass_jet_selection(self, quark):
+        return quark.pt > 30 and abs(quark.eta) < 2.5
 
-                    #find DeltaR between jet and quark
-                    l1 = lvec(q)
-                    l2 = lvec(j)
-                    dr = l1.DeltaR(l2)
-                    if dr < 0.3:
-                        #Jet already had a match: take the one with smaller dR
-                        if not matched_pairs.has_key(ij):
-                            matched_pairs[ij] = []
-                        matched_pairs[ij] += [(label, iq, dr, label_numeric, numeric_b_from_had_t)]
-            return matched_pairs
+    def process(self, event):
+        for (syst, event_syst) in event.systResults.items():
+            if event_syst.passes_btag and syst == "nominal":
+                res = self._process(event_syst)
+                event.systResults[syst] = res
+        return True
 
+    def _process(self, event):
+        if not self.cfg_comp.isMC:
+            return event 
         #Find the best possible match for each individual jet
-
         #Store for each jet, specified by it's index in the jet
         #vector, if it is matched to any gen-level quarks
         matched_pairs = {}

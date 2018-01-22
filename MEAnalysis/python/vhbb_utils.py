@@ -86,23 +86,6 @@ class SystematicObject(object):
     def __getattr__(self, attr):
         return getattr(self.__dict__["orig"], attr)
 
-from TTH.MEAnalysis.VHbbTree import Jet
-
-jet_keys = ["pt", "eta", "phi", "m", "btagCSV", "chMult", "nhMult"]
-
-def printJet(j):
-    s = ""
-    for k, v in sorted(j.__dict__.items(), key=lambda x: x[0]):
-        if k in jet_keys:
-            try:
-                v = float(v)
-                s += "{0}={1:2.2f} ".format(k, v)
-            except TypeError as e:
-                pass
-    return s
-
-Jet.__str__ = printJet
-
 def autolog(*args):
     import inspect, logging
     # Get the previous frame in the stack, otherwise it would
