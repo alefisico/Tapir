@@ -96,7 +96,9 @@ class BufferedChain( object ):
         self.files = input
         self.base_chain = ROOT.TChain(tree_name)
         for fi in self.files:
-            ret = self.base_chain.Add(fi)
+            ret = self.base_chain.AddFile(fi, 0)
+            if ret == 0:
+                raise IOError("Could not open file {0}".format(fi))
         self.chain = BufferedTree(self.base_chain)
 
     def __getattr__(self, attr):
@@ -174,22 +176,15 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #Event contents are defined here
     #This is work in progress
     if schema == "mc":
-        from TTH.MEAnalysis.nanoTree  import EventAnalyzer
+        from TTH.MEAnalysis.nanoTree import EventAnalyzer
     else:
-        from TTH.MEAnalysis.VHbbTree_data import EventAnalyzer #TODO convert to nanoAOD
+        from TTH.MEAnalysis.nanoTree_data import EventAnalyzer #TODO convert to nanoAOD
 
-
-    from TTH.MEAnalysis.nanoAODWrapper import FormatVariables
 
     #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
     evs = cfg.Analyzer(
         EventAnalyzer,
         'events',
-    )
-
-    nano = cfg.Analyzer(
-        FormatVariables,
-        'events2',
     )
 
     #Here we define all the main analyzers
@@ -333,6 +328,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
+
+    gentth_pre = cfg.Analyzer(
+        MECoreAnalyzers.GenTTHAnalyzerPre,
+        'gentth_pre',
+        _conf = python_conf
+    )
+
     gentth = cfg.Analyzer(
         MECoreAnalyzers.GenTTHAnalyzer,
         'gentth',
@@ -361,6 +363,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf,
         counter_name = "_final",
     )
+    import TTH.MEAnalysis.metree
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
 
@@ -372,7 +375,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         evtid_filter,
         prefilter,
         evs,
-        nano,
+        gentth_pre,
         pvana,
         trigger,
         counter_trg,
@@ -411,6 +414,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     if schema == "data":
         comp_cls = cfg.DataComponent
 
+    print files
     comp = comp_cls(
         sample_name,
         files = files,

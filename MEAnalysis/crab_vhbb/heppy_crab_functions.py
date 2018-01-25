@@ -26,8 +26,7 @@ def convertLFN(crabFiles,crabFiles_pfn):
     for i in xrange(0,len(crabFiles)) :
         if "file://" in crabFiles[i] or "root://" in crabFiles[i]:
             continue
-        if (os.getenv("GLIDECLIENT_Group","") != "overflow" and
-            os.getenv("GLIDECLIENT_Group","") != "overflow_conservative"):
+        if not ("overflow" in os.getenv("GLIDECLIENT_Group","overflow")):
             pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read()
             pfn=re.sub("\n","",pfn)
             print "replaced", crabFiles[i],"->",pfn

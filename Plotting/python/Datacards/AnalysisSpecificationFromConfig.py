@@ -4,6 +4,7 @@
 
 import sys
 from copy import deepcopy
+import fnmatch
 
 from TTH.MEAnalysis.samples_base import xsec
 from TTH.Plotting.Datacards.AnalysisSpecificationClasses import Histogram, Cut, Sample, Process, DataProcess, Category, Analysis, pairwise, triplewise, make_csv_categories_abstract, make_csv_groups_abstract
@@ -30,14 +31,33 @@ def splitByTriggerPath(processes, lumi, cuts_dict):
         "fh": lumi["BTagCSV"],
     }
 
-    for name, trigpath in TRIGGERPATH_MAP.items():
-        for proc in processes:
+    for proc in processes:
+        #Don't need to split data process
+        if type(proc) is DataProcess:
+            out += [proc]
+            continue
+        for name, trigpath in TRIGGERPATH_MAP.items():
+            
+            #Don't need to split data process
+            if type(proc) is DataProcess:
+                continue
+
+            #Process where the trigger paths are split and then merged
             newproc = Process(
                 input_name = proc.input_name,
                 output_name = proc.output_name,
                 xs_weight = _lumis[name] * proc.xs_weight,
                 cuts = [cuts_dict["triggerPath_{0}".format(name)]] + proc.cuts,
             )
+
+            # #Process where the trigger path is explicitly kept separate
+            # newproc2 = Process(
+            #     input_name = proc.input_name,
+            #     output_name = proc.output_name,
+            #     category_name = "_" + name,
+            #     xs_weight = _lumis[name] * proc.xs_weight,
+            #     cuts = [cuts_dict["triggerPath_{0}".format(name)]] + proc.cuts,
+            # )
             out += [newproc]
     return out
 
@@ -93,8 +113,6 @@ def analysisFromConfig(config_file_path):
     process_lists = {}
     process_lists_original = {}
     for process_list in config.get("general","process_lists").split():
-        print "adding process list", process_list
-
         process_lists_original[process_list] = []
         process_lists[process_list] = []
 
@@ -103,10 +121,11 @@ def analysisFromConfig(config_file_path):
 
         for process in config.get(process_list,"processes").split():
 
-            print "adding process", process
             in_name  = config.get(process,"in")
             out_name = config.get(process,"out")
-
+            
+            if not in_name in samples_dict.keys():
+                raise KeyError("process {0} needs sample {1}, but it was not defined".format(process, in_name))
             # Build cuts..
             cuts = []
             # ..Process Cut
@@ -187,32 +206,44 @@ def analysisFromConfig(config_file_path):
             common_scale_name = config.get(template, "common_scale_uncertainties")
             common_scale_uncertainties = {k:float(v) for k,v in config.items(common_scale_name)}        
 
+            unique_output_processes = list(set([p.output_name for p in mc_processes]))
+            
             scale_name = config.get(template, "scale_uncertainties")
             scale_uncertainties = {}
-            for k,v in config.items(scale_name):
-                scale_uncertainties[k] = {}
-                for name, uncert in pairwise(v.split()):
-                    scale_uncertainties[k][name] = float(uncert)
+            for process, name_uncert in config.items(scale_name):
+                scale_uncertainties[process] = {}
+                for name, uncert in pairwise(name_uncert.split()):
+                    scale_uncertainties[process][name] = uncert
+
+            #Add any additional category-dependent scale uncertainties
+            if config.has_option(category_name, "additional_scale_uncertainties"):
+                for line in config.get(category_name, "additional_scale_uncertainties").strip().split("\n"):
+                    name, process_pattern, uncert = line.split()
+                    matching_procs = [proc for proc in unique_output_processes if fnmatch.fnmatch(proc, process_pattern)]
+                    for matching_proc in matching_procs:
+                        scale_uncertainties[matching_proc][name] = uncert
 
             if config.has_option(category_name, "rebin"):
                 rebin = int(config.get(category_name,"rebin"))
             else:
                 rebin = 1
-
-            category = Category(
-                name = category_name,
-                cuts = [cut],
-                processes = mc_processes,
-                data_processes = data_processes,
-                signal_processes = signal_processes, 
-                common_shape_uncertainties = common_shape_uncertainties, 
-                common_scale_uncertainties = common_scale_uncertainties, 
-                scale_uncertainties = scale_uncertainties, 
-                discriminator = Histogram.from_string(config.get(category_name, "discriminator")),
-                rebin = rebin,
-                do_limit = True
-            )
-            cats.append(category)
+            
+            disc_name = config.get(category_name, "discriminator").strip()
+            if len(disc_name) > 0:
+                category = Category(
+                    name = category_name,
+                    cuts = [cut],
+                    processes = mc_processes,
+                    data_processes = data_processes,
+                    signal_processes = signal_processes, 
+                    common_shape_uncertainties = common_shape_uncertainties, 
+                    common_scale_uncertainties = common_scale_uncertainties, 
+                    scale_uncertainties = scale_uncertainties, 
+                    discriminator = Histogram.from_string(disc_name),
+                    rebin = rebin,
+                    do_limit = True
+                )
+                cats.append(category)
 
             #a group consisting of only this category
             analysis_groups[category.full_name] = [category] 
@@ -284,34 +315,16 @@ def analysisFromConfig(config_file_path):
 
 if __name__ == "__main__":
     an = analysisFromConfig(sys.argv[1])
-
-
-# TODO: handle
-#control_variables = [
-#    "jetsByPt_0_pt",
-#    "btag_LR_4b_2b_btagCSV_logit",
-##    "btag_LR_4b_2b_btagCMVA_logit"
-#]
-#
-# all_cats = make_control_categories(sl_categories)
-#def make_control_categories(input_categories):
-#    all_cats = copy.deepcopy(input_categories)
-#    for discr in control_variables:
-#        for cat in input_categories:
-#            #Update only the discriminator, note that this is hacky and may not
-#            #work in the future, because we assume the object is final
-#            #after the constructor
-#            newcat_d = cat.__dict__
-#            newcat_d["discriminator"] = discr
-#            newcat_d["do_limit"] = False
-#            newcat = Category(**newcat_d)
-#            all_cats += [newcat]
-#    return all_cats
-#
-# TODO: Implement
-##add single-category groups
-#for cat in sl_categories:
-#    analysis.groups[cat.full_name] = [cat]
-## for cat in sl_categories_bdt:
-##     analysis_bdt.groups[cat.full_name] = [cat]
-#
+    print an
+    
+    print "processes"
+    for proc in an.processes:
+        print "  ", proc
+   
+    print "samples"
+    for samp in an.samples:
+        print "  ", samp
+    
+    print "categories"
+    for cat in an.categories:
+        print "  ", cat

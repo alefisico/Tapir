@@ -26,19 +26,6 @@ def fillCoreVariables(self, tr, event, isMC):
 
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
-#from VHbbAnalysis.Heppy.btagSF import btagSFhandle, get_event_SF
-#from VHbbAnalysis.Heppy.btagSF import systematicsCSV, systematicsCMVAV2
-#recompute b-tag weights
-btag_weights = {}
-#for algo, systematics in [("CMVAV2", systematicsCMVAV2)]:
-#    for syst in systematics:
-#        syst_name = "" if syst=="central" else ("_"+syst) 
-#        btag_weights["btagWeight"+algo+syst_name] = NTupleVariable("btagWeight"+algo+syst_name,
-#            lambda ev, get_event_SF=get_event_SF, syst=syst, algo=algo, btagSFhandle=btagSFhandle : get_event_SF(map(JetWrapper, ev.good_jets_nominal), syst, algo, btagSFhandle)
-#            , float, mcOnly=True, help="b-tag "+algo+"continuous  weight, variating "+syst
-#        )
-
-
 lepton_sf_kind = [
     "SF_HLT_RunD4p2",
     "SF_HLT_RunD4p3",
@@ -57,6 +44,7 @@ lepton_sf_kind_err = [x.replace("SF", "SFerr") for x in lepton_sf_kind]
 leptonType = NTupleObjectType("leptonType", variables = [
     NTupleVariable("pt", lambda x : x.pt),
     NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("etaSc", lambda x : getattr(x, "etaSc", -99)),
     NTupleVariable("phi", lambda x : x.phi),
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("pdgId", lambda x : x.pdgId),
@@ -72,6 +60,11 @@ p4type = NTupleObjectType("p4Type", variables = [
     NTupleVariable("eta", lambda x : x.Eta()),
     NTupleVariable("phi", lambda x : x.Phi()),
     NTupleVariable("mass", lambda x : x.M()),
+])
+
+LHE_weights_type = NTupleObjectType("LHE_type", variables = [
+    NTupleVariable("id", lambda x : x.id),
+    NTupleVariable("wgt", lambda x : x.wgt),
 ])
 
 #Specifies what to save for leptons
@@ -135,7 +128,6 @@ quarkType = NTupleObjectType("quarkType", variables = [
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("id", lambda x : x.pdgId),
 ])
-
 
 def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
     name = vtype[0]
@@ -366,7 +358,14 @@ def getTreeProducer(conf):
     ])
    
     #create jet up/down variations
-    corrs = [NTupleVariable("corr_"+c, lambda x,c="corr_"+c : getattr(x, c), mcOnly=True) for c in conf.mem["jet_corrections"]]
+    corrs = [NTupleVariable(
+            "corr_"+c,
+            lambda x,c="corr_"+c : getattr(x, c),
+            mcOnly=True,
+            the_type=float,
+        ) for c in conf.mem["jet_corrections"]
+    ]
+
     #Specifies what to save for jets
     jetType = NTupleObjectType("jetType", variables = [
         NTupleVariable("pt", lambda x : x.pt),
@@ -399,12 +398,14 @@ def getTreeProducer(conf):
         #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
         #NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        NTupleVariable("puId", lambda x : x.puId),
     ] + corrs)
 
     #Create the output TTree writer
     #Here we define all the variables that we want to save in the output TTree
     treeProducer = cfg.Analyzer(
         class_object = AutoFillTreeProducer,
+        defaultFloatType = "F",
         verbose = False,
         vectorTree = True,
         globalVariables = [
@@ -512,14 +513,16 @@ def getTreeProducer(conf):
         collections = {
         #standard dumping of objects
         #These are collections which are not variated
-            # "b_quarks_gen_nominal" : NTupleCollection("b_quarks_gen", quarkType, 5, help="generated b quarks", mcOnly=True),
-            # "l_quarks_gen_nominal" : NTupleCollection("l_quarks_gen", quarkType, 3, help="generated light quarks", mcOnly=True),
-            # "b_quarks_t_nominal" : NTupleCollection("GenBFromTop", quarkType, 3, help="generated b quarks from top", mcOnly=True),
-            # "b_quarks_h_nominal" : NTupleCollection("GenBFromHiggs", quarkType, 3, help="generated b quarks from higgs", mcOnly=True),
-            # "l_quarks_w_nominal" : NTupleCollection("GenQFromW", quarkType, 5, help="generated light quarks from W", mcOnly=True),
+            #"b_quarks_gen_nominal" : NTupleCollection("b_quarks_gen", quarkType, 5, help="generated b quarks", mcOnly=True),
+            #"l_quarks_gen_nominal" : NTupleCollection("l_quarks_gen", quarkType, 3, help="generated light quarks", mcOnly=True),
+            "b_quarks_t_nominal" : NTupleCollection("GenBFromTop", quarkType, 3, help="generated b quarks from top", mcOnly=True),
+            "b_quarks_h_nominal" : NTupleCollection("GenBFromHiggs", quarkType, 3, help="generated b quarks from higgs", mcOnly=True),
+            "l_quarks_w_nominal" : NTupleCollection("GenQFromW", quarkType, 5, help="generated light quarks from W", mcOnly=True),
             "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson", mcOnly=True),
             "genTopLep" : NTupleCollection("genTopLep", genTopType, 2, help="Generated top quark (leptonic)", mcOnly=True),
             "genTopHad" : NTupleCollection("genTopHad", genTopType, 2, help="Generated top quark (hadronic)", mcOnly=True),
+            #"LHE_weights_scale" : NTupleCollection("LHE_weights_scale", LHE_weights_type, 6, help="LHE weights scale", mcOnly=True),
+            #"LHE_weights_pdf" : NTupleCollection("LHE_weights_pdf", LHE_weights_type, 102, help="LHE weights pdf", mcOnly=True),
 
             #"FatjetCA15ungroomed" : NTupleCollection("fatjets", FatjetCA15ungroomedType, 4, help="Ungroomed CA 1.5 fat jets"),
             "good_jets_nominal" : NTupleCollection("jets", jetType, 16, help="Selected resolved jets, pt ordered"),
@@ -535,13 +538,12 @@ def getTreeProducer(conf):
 
         }
     )
-    treeProducer.globalVariables += list(btag_weights.values())
     
     #add HLT bits to final tree
     trignames = []
     print "im there"
     for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-        #print pathname, trigs
+        print "--->",pathname, trigs
         for pref in ["HLT"]:
             #add trigger path (combination of trigger)
             _pathname = "_".join([pref, pathname])
@@ -556,12 +558,18 @@ def getTreeProducer(conf):
                 if not tn in trignames:
                     trignames += [tn]
     print trignames
-                    
+
+    for trig in trignames:
+        treeProducer.globalVariables += [NTupleVariable(
+            trig, lambda ev, name=trig: getattr(ev, name, -1), type=int, mcOnly=False
+        )]
+
+    
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
         "Flag_goodVertices", 
-        "Flag_GlobalTightHalo2016Filter",
+        #"Flag_GlobalTightHalo2016Filter", #Not in nanoAOD
         "Flag_HBHENoiseFilter",
         "Flag_HBHENoiseIsoFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
@@ -573,10 +581,10 @@ def getTreeProducer(conf):
         # "badGlobalMuonTagger",
         # "cloneGlobalMuonTagger",
     ]
-    """for trig in trignames + metfilter_flags:
-                    treeProducer.globalVariables += [NTupleVariable(
-                        trig, lambda ev, name=trig: getattr(ev.input, name, -1), type=int, mcOnly=False
-                    )]"""
+    for metfilter in metfilter_flags:
+        treeProducer.globalVariables += [NTupleVariable(
+            trig, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
+        )]
        
     #Add systematically variated quantities
     for systematic in conf.general["systematics"]:
@@ -584,6 +592,7 @@ def getTreeProducer(conf):
         #scalar variables that have systematic variations
         for vtype in [
             ("Wmass",               float,      "Best reconstructed W candidate mass"),
+            ("mbb_closest",          float,      "Mass of geometrically closest bb pair"),
             ("cat",                 int,        "ME category", "catn"),
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
             ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),
@@ -695,6 +704,10 @@ def getTreeProducer(conf):
         ("nPU0",                    float,  ""),
         ("nTrueInt",                int,  ""),
         ("trigtrigTablegerEmulationWeight",  float,  ""),
+        ("tth_rho_px_gen",  float,  ""),
+        ("tth_rho_py_gen",  float,  ""),
+        ("tth_rho_px_reco",  float,  ""),
+        ("tth_rho_py_reco",  float,  ""),
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
    

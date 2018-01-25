@@ -17,7 +17,6 @@ for ev in ch:
     jets_p4 = []
     jets_btag = []
     jets_csv = []
-    jets_cmva = []
     jets_matchFlag = []
     jets_hadronFlavour = []
     for ijet in range(ev.numJets):
@@ -30,7 +29,6 @@ for ev in ch:
         jets_p4 += [p4]
         jets_btag += [ev.jets_btagFlag[ijet]]
         jets_csv += [ev.jets_btagCSV[ijet]]
-        jets_cmva += [ev.jets_btagCMVA[ijet]]
         jets_hadronFlavour += [ev.jets_hadronFlavour[ijet]]
         jets_matchFlag += [ev.jets_matchFlag[ijet]]
     
@@ -51,7 +49,6 @@ for ev in ch:
             "selectedJetsP4": jets_p4,
             "selectedJetsBTag": jets_btag,
             "selectedJetsCSV": jets_csv,
-            "selectedJetsCMVA": jets_cmva,
             "selectedJetsMatchFlag": jets_matchFlag,
             "selectedJetsHadronFlavour": jets_hadronFlavour,
 
@@ -74,6 +71,9 @@ for ev in ch:
             "nMatch_wq_btag": ev.nMatch_wq_btag,
             "nMatch_tb_btag": ev.nMatch_tb_btag,
             "nMatch_hb_btag": ev.nMatch_hb_btag,
+
+            "mem_tth_SL_2w2h2t_p": ev.mem_tth_SL_2w2h2t_p,
+            "mem_ttbb_SL_2w2h2t_p": ev.mem_ttbb_SL_2w2h2t_p,
         }
     }
     print json.dumps(event)

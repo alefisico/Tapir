@@ -6,7 +6,6 @@ from ROOT import MEM
 #import VHbbAnalysis.Heppy.TriggerTableData as trigData
 #import VHbbAnalysis.Heppy.TriggerTable as trig
 import TriggerTable as trig
-trigData = trig
 
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID
@@ -15,7 +14,7 @@ def jet_baseline(jet):
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
-# nanoAOD is using CMSSW definiton: https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc#L837
+# nanoAOD is using CMSSW definiton: https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/src/MuonSelectors.cc#L854
 def mu_baseline_tight(mu):
     return (
         mu.tightId == 1 
@@ -97,8 +96,8 @@ class Conf:
                 "eta": 2.4,
                 "idcut": lambda el: el_baseline_tight(el),
             },
-            #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff is not defined
-            "isotype": "relIso03", #KS: changed for nanoAOD. Seems to not do anything anyways.
+            #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff
+            "isotype": "relIso03", #KS: changed for nanoAOD.
             "debug" : print_el
         },
         "DL": {
@@ -167,8 +166,9 @@ class Conf:
     trigger = {
 
         "filter": False,
-        "trigTable": trig.triggerTable,
-        "trigTableData": trigData.triggerTable,
+        #Change to trig.triggerTable for 2017 menu (starting from 92X samples)
+        "trigTable": trig.triggerTable2016,
+        "trigTableData": trig.triggerTable2016,
     }
 
     general = {
@@ -371,6 +371,74 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t"] = c
 
 ###
+### SL_2w2h2t Sudakov
+###
+c = MEMConfig(Conf)
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+c.cfg.int_code |= MEM.IntegrandType.Sudakov
+Conf.mem_configs["SL_2w2h2t_sudakov"] = c
+
+###
+### SL_2w2h2t Recoil
+###
+c = MEMConfig(Conf)
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+c.cfg.int_code |= MEM.IntegrandType.Recoil
+Conf.mem_configs["SL_2w2h2t_recoil"] = c
+
+###
+### SL_2w2h2t No Tag
+###
+c = MEMConfig(Conf)
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h2t_notag"] = c
+
+###
+### SL_2w2h2t No Sym
+###
+c = MEMConfig(Conf)
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 2
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h2t_nosym"] = c
+
+
+###
 ### SL_2w2h2t_1j
 ###
 c = MEMConfig(Conf)
@@ -551,7 +619,6 @@ Conf.mem_configs["SL_0w2h2t_sj"] = c
 bLR = False
 if Conf.jets["untaggedSelection"] == "btagLR":
     bLR = True
-print "the bLR from the config is",bLR #DS temp
 
 # btag LR cuts for FH MEM categories
 FH_bLR_3b_SR = Conf.mem["FH_bLR_3b_SR"]

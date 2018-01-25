@@ -60,7 +60,6 @@ TRIGGERPATH_MAP = {
     "mm": 3,
     "em": 4,
     "ee": 5,
-    "fh": 6,
 }
 
 #Configure the site-specific file path
@@ -82,12 +81,16 @@ def chunks(l, n):
 def get_files(fname):
     # Expect fname relative to CMSSW BASE
     fname = fname.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+    
+    lines = [fname]
+
     #Load list of file names from textfile
     if fname.endswith(".txt"):
         lines = open(fname).readlines()
         lines = map(lambda x: x.strip(), lines)
         lines = filter(lambda x: "root" in x, lines)
         lines = map(lambda x: x.split()[0], lines)
+    
     #Filename is a globstring
     elif fname.endswith("*"):
         #Files in T3_CH_PSI storage element
@@ -96,6 +99,7 @@ def get_files(fname):
         #Files are really on local filesystem
         else:
             lines = ["file://" + f for f in glob.glob(fname)]
+    
     return lines
 
 # This function is used everywher to translate LFN /store to PFN root://
