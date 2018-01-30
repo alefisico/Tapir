@@ -692,9 +692,9 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
 
     else:
-        #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        #sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
         #sample = "SingleMuon"
