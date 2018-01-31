@@ -1,5 +1,6 @@
 stages:
   - compile
+  - test_nano
   - test
   - test_sparsinator
 
@@ -49,6 +50,22 @@ compile:
   artifacts:
     paths:
       - cmssw.tgz
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_nano:
+  stage: test
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src
+    - cmsRun PhysicsTools/NanoAOD/test/nano_cfg.py
+    - mv nano.root $CI_HOME/
+  artifacts:
+    paths:
+      - nano.root
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_tth:
