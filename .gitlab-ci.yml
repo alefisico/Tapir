@@ -15,6 +15,7 @@ before_script:
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc630"
   - export CMSSW_VERSION="CMSSW_9_4_2"
+  - export CMS_PATH=/cvmfs/cms-ib.cern.ch/week0 #https://gitlab.cern.ch/cms-nanoAOD/nanoAOD-integration/blob/master/scripts/restore_cmssw.sh#L14
   - cd ..
   - cd $CI_HOME
   - mkdir -p ~/.ssh
@@ -27,6 +28,7 @@ before_script:
   - ls -al
 
 compile:
+  tags: [ cvmfs ]
   stage: compile
   script:
     - cd $CI_HOME/..
@@ -53,6 +55,7 @@ compile:
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_nano:
+  tags: [ cvmfs ]
   stage: test
   script:
     - cd $CI_HOME/..
@@ -69,6 +72,7 @@ test_nano:
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_tth:
+  tags: [ cvmfs ]
   stage: test
   script:
     - cd $CI_HOME/..
@@ -89,6 +93,7 @@ test_tth:
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_ttjets:
+  tags: [ cvmfs ]
   stage: test
   script:
     - cd $CI_HOME/..
@@ -109,6 +114,7 @@ test_ttjets:
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_tth_sparsinator:
+  tags: [ cvmfs ]
   stage: test_sparsinator
   script:
     - cd $CI_HOME/..
@@ -127,6 +133,7 @@ test_tth_sparsinator:
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_ttjets_sparsinator:
+  tags: [ cvmfs ]
   stage: test_sparsinator
   script:
     - cd $CI_HOME/..
