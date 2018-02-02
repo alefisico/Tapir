@@ -8,7 +8,10 @@ be added up from all the input files.
 import ROOT
 import sys
 from TTH.MEAnalysis.samples_base import getSitePrefix
+import logging
+import os
 
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 def main(filenames, ofname):
     """
@@ -22,12 +25,18 @@ def main(filenames, ofname):
         Output file name
     """
     filenames_pref = map(getSitePrefix, filenames)
-    of = ROOT.TFile(ofname, "RECREATE")
+    if os.path.isfile(ofname):
+        LOG_MODULE_NAME.info("opening existing file {0}".format(ofname))
+        of = ROOT.TFile(ofname, "UPDATE")
+    else:
+        LOG_MODULE_NAME.info("creating new file {0}".format(ofname))
+        of = ROOT.TFile(ofname, "RECREATE")
     tree_list = ROOT.TList()
 
     #keep tfiles open for the duration of the merge
     tfiles = []
     for infn, lfn in zip(filenames_pref, filenames):
+        LOG_MODULE_NAME.info("processing {0}".format(infn))
         tf = ROOT.TFile.Open(infn)
         tfiles += [tf]
 
@@ -36,6 +45,7 @@ def main(filenames, ofname):
 
     of.cd()
     out_tree = ROOT.TTree.MergeTrees(tree_list)
+    LOG_MODULE_NAME.info("saving output")
     out_tree.Write()
     of.Close()
     return ofname

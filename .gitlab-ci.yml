@@ -57,6 +57,7 @@ compile:
 test_nano:
   tags: [ cvmfs ]
   stage: test
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz

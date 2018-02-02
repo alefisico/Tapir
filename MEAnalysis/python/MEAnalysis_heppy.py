@@ -8,9 +8,12 @@ import imp
 import cPickle as pickle
 import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
+import logging
 
 sys.modules["TFClasses"] = TFClasses
 ROOT.gROOT.SetBatch(True)
+
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 class BufferedTree:
     """Class with buffered TTree access, so that using tree.branch does not load the entry twice
@@ -124,12 +127,13 @@ class BufferedChain( object ):
 def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None):
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
     #Create python configuration object based on path
+
     if len(mem_python_config) > 0:
-        print "Loading ME config from", mem_python_config
+        LOG_MODULE_NAME.info("Loading ME python config from {0}".format(mem_python_config))
         meconf = imp.load_source("meconf", mem_python_config)
         from meconf import Conf as python_conf
     else:
-        print "Loading ME config from TTH.MEAnalysis.MEAnalysis_cfg_heppy"
+        LOG_MODULE_NAME.info("Loading ME python config from TTH.MEAnalysis.MEAnalysis_cfg_heppy")
         from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf as python_conf
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
 
@@ -414,12 +418,12 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     if schema == "data":
         comp_cls = cfg.DataComponent
 
-    print files
     comp = comp_cls(
         sample_name,
         files = files,
         tree_name = vhbb_tree_name, #DS requires change to ../../PhysicsTools/HeppyCore/python/framework/config.py
     )
+
     #from PhysicsTools.HeppyCore.framework.chain import Chain
     heppy_config = cfg.Config(
         #Run across these inputs
@@ -451,10 +455,10 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         **kwargs
     )
 
-    print "Running looper"
+    LOG_MODULE_NAME.info("Running looper")
     #execute the code
     looper.loop()
-    print "Looper done"
+    LOG_MODULE_NAME.info("Looper done")
     
     tf = looper.setup.services["outputfile"].file
     #tf.cd()
@@ -462,12 +466,21 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #ts.Write("", ROOT.TObject.kOverwrite)
 
     #write the output
-    print "write the output"
+    LOG_MODULE_NAME.info("writing the looper output to {0}".format(looper.name))
     looper.write()
-    return python_conf
+    
+    return looper.name, files
 
 if __name__ == "__main__":
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
+    if len(sys.argv) == 1:
+        print "Call signature:"
+        print "  {0} analysis.cfg".format(sys.argv[0])
+        print "Please provide a path to an analysis configuration, e.g. in data/default.cfg"
+        print "Exiting..."
+        sys.exit(0)
     an = analysisFromConfig(sys.argv[1])
 
     import argparse
@@ -497,4 +510,7 @@ if __name__ == "__main__":
         files = args.files.split(",")
     else:
         files = []
-    main(an, sample_name=args.sample, numEvents=args.numEvents, files=files)
+    looper_dir, files = main(an, sample_name=args.sample, numEvents=args.numEvents, files=files)
+
+    import TTH.MEAnalysis.counts as counts
+    counts.main(files, "{0}/tree.root".format(looper_dir))

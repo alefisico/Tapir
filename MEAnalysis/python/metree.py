@@ -541,9 +541,7 @@ def getTreeProducer(conf):
     
     #add HLT bits to final tree
     trignames = []
-    print "im there"
     for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-        print "--->",pathname, trigs
         for pref in ["HLT"]:
             #add trigger path (combination of trigger)
             _pathname = "_".join([pref, pathname])
