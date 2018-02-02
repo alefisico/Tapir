@@ -41,6 +41,8 @@ compile:
     - git cms-merge-topic cms-nanoAOD:master
     - git cms-merge-topic kschweiger:HeppyttHbb_Jan12
     - git checkout -b nanoAOD cms-nanoAOD/master
+    - git cms-merge-topic mmeinhard:BoostedNanoAOD
+    - git cms-merge-topic jpata:heppy_fixes
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
@@ -112,6 +114,27 @@ test_ttjets:
   artifacts:
     paths:
       - plots_ttjets.tgz
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
+test_data:
+  tags: [ cvmfs ]
+  stage: test
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH/MEAnalysis
+    - python python/test_MEAnalysis_heppy.py --sample SingleMuon
+    - python test/validationHistos.py Loop_SingleMuon/tree.root
+    - ls -al
+    - tar -czf plots_singlemuon.tgz *.pdf Loop_SingleMuon/tree.root
+    - du -csh plots_singlemuon.tgz
+    - mv plots_singlemuon.tgz $CI_HOME/
+  artifacts:
+    paths:
+      - plots_singlemuon.tgz
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
 test_tth_sparsinator:
