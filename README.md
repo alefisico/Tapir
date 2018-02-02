@@ -1,5 +1,11 @@
-# ttH(bb) MEM code for Run 2
+# TOC
 
+- [Installation](#installation)
+- [Running](#running)
+- [Samples](#samples)
+- [Misc](#misc)
+
+# Installation
 Setup on SLC6 in a clean directory (no CMSSW) on a **shared file system (NFS)**
 ~~~
 $ mkdir -p ~/tth/sw
@@ -22,7 +28,7 @@ Note that if you run `scram b clean`, the matrix element library OpenLoops will 
 ~~~
 In order to fix this, you have to re-copy the libraries, see the end of `setup.sh` for the recipe.
 
-
+# Running
 ## Step0: environment
 
 Generally for running the code, `cmsenv` is sufficient. For some plotting tasks,
@@ -59,8 +65,8 @@ When some of the samples are done, you can produce smallish (<10GB) skims of the
 $ cd TTH/MEAnalysis/gc
 $ source makeEnv.sh #make an uncommited script to properly set the environment on the batch system
 v./grid-control/go.py confs/projectSkim.conf
-... #wait
-$ ./hadd.py /path/to/output/GC1234/ #call our merge script
+... #wait and make note of the task name, which is like GC123445
+$ ./hadd.py /path/to/output/GC123445/ #call our merge script
 ~~~
 
 This will produce some skimmed ntuples in
@@ -133,7 +139,14 @@ When you're done, don't forget to free up your jobs:
 qdel -u $USER
 ~~~
 
-# Assorted topics
+# Samples
+
+- NanoAOD
+  - [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas)
+- tthbb13
+  - [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26)
+
+# Misc
 
 ## Copying nanoAOD ntuples
 
