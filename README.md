@@ -141,10 +141,19 @@ qdel -u $USER
 
 # Samples
 
-- NanoAOD
-  - [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas)
-- tthbb13
-  - [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26)
+The currently used samples are listed below. Generally, they are stored at T3_CH_PSI.
+
+## NanoAOD
+
+| production name | comments |
+|-----------------|----------|
+| [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas) | no boosted or hadronic triggers |
+
+## tthbb13
+
+| production name | base NanoAOD | comments |
+|-----------------|--------------|----------|
+| [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26) | NanoCrabProdXmas | |
 
 # Misc
 
