@@ -4,10 +4,13 @@ scram project -n CMSSW CMSSW CMSSW_9_4_1
 cd CMSSW/src/
 eval `scramv1 runtime -sh`
 
+#need to add these always also to ../.gitlab-ci.yml in the compile stage
 git cms-init
 git cms-merge-topic cms-nanoAOD:master
 git cms-merge-topic kschweiger:HeppyttHbb_Jan12
 git checkout -b nanoAOD cms-nanoAOD/master
+git cms-merge-topic mmeinhard:BoostedNanoAOD
+git cms-merge-topic jpata:heppy_fixes #fix for Heppy DataComponent
 
 #get the TTH code
 git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch SwitchNanoAOD
@@ -26,3 +29,4 @@ scram setup TTH/MEIntegratorStandalone/deps/gsl.xml
 
 cd $CMSSW_BASE/src
 git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
+

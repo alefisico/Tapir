@@ -13,6 +13,29 @@ def lvec(self):
 #        raise Exception("Invalid values for TLorentzVector")
     return lv
 
+def match_deltaR(coll1, coll2, deltaR=0.3):
+    pairs = []
+    for idx1, obj1 in enumerate(coll1):
+        lv1 = lvec(obj1)
+        for idx2, obj2 in enumerate(coll2):
+            lv2 = lvec(obj2)
+            dr = lv1.DeltaR(lv2)
+            if dr < deltaR:
+                pairs += [(idx1, idx2, dr)]
+    return pairs
+
+def remove_duplicates(coll):
+    seen = set([])
+    deduped = []
+    for obj in coll:
+        key = (obj.pt, obj.eta, obj.phi) 
+        if key not in seen:
+            seen.add(key)
+            deduped += [obj]
+        else:
+            continue
+    return deduped
+
 class MET:
     def __init__(self, **kwargs):
         self.p4 = ROOT.TLorentzVector()
