@@ -9,7 +9,7 @@ EXITCODE=$?
 ./post.sh $EXITCODE
 echo Finished_vhbb $EXITCODE
 
-python mem_crab_script.py $@ >> log 2>&1
+python mem_crab_script.py $@  --isMC >> log 2>&1
 EXITCODE=$?
 echo ExitCode $EXITCODE
 ./post.sh $EXITCODE

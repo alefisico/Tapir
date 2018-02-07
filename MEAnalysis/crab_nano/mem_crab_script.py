@@ -11,6 +11,15 @@ if "--test" in sys.argv:
 elif "--local" in sys.argv:
     import PSet_local as PSet
 
+if "--isMC" in sys.argv:
+    isMC = True
+elif "--isData" in sys.argv:
+    isMC = False
+else:
+    print "No MC flag in scirpt --> falling back to isMC = True"
+    isMC = True
+
+    
 import copy
 import json
 from PhysicsTools.HeppyCore.framework.looper import Looper
@@ -43,7 +52,7 @@ if hasattr(PSet.process.source, "lumisToProcess"):
     lumidict = fn.getLumisProcessed(lumisToProcess)
 handle.close()
 """
-
+os.getcwd()
 ### tthbb13 code
 if not "--nostep2" in args:
     print "Running tth code"
@@ -63,12 +72,13 @@ if not "--nostep2" in args:
     print "I'm using ",an, " and ", an.mem_python_config
     mem_python_conf = tth_main(
         an,
-        schema="mc" if cfo.sample.isMC else "data",
+        schema="mc" if isMC else "data",
         output_name="Output_tth",
-        files="Output/tree.root"
+        #files=os.getcwd()+"/Output/nanoAOD_postprocessed.root"
+        files="Output/nanoAOD_postprocessed.root"
     )
-    dumpfile.write(conf_to_str(mem_python_conf))
-    dumpfile.write("\n")
+    #dumpfile.write(conf_to_str(mem_python_conf))
+    #dumpfile.write("\n")
     tfm = ROOT.TFile("Output_tth/tree.root") #print events
     if not tfm or tfm.IsZombie():
         raise Exception("Error occurred in processing step2")
@@ -78,16 +88,16 @@ if not "--nostep2" in args:
     print "timeto_doMEM ",(time.time()-t0)
 
 #Now we need to copy both the vhbb and tth outputs to the same file
-inf1 = ROOT.TFile("Output/tree.root")
+inf1 = ROOT.TFile("Output/nanoAOD_postprocessed.root")
 inf2 = ROOT.TFile("Output_tth/tree.root")
 tof = ROOT.TFile("tree.root", "RECREATE")
-vhbb_dir = tof.mkdir("vhbb")
+nano_dir = tof.mkdir("nanoAOD")
 
-fn.copyTo(inf1, vhbb_dir)
+fn.copyTo(inf1, nano_dir)
 fn.copyTo(inf2, tof)
 tof.Close()
 
-assert(fn.getEntries("Output/tree.root", "tree") == fn.getEntries("tree.root", "vhbb/tree"))
+assert(fn.getEntries("Output/nanoAOD_postprocessed.root", "Events") == fn.getEntries("tree.root", "nanoAOD/Events"))
 assert(fn.getEntries("Output_tth/tree.root", "tree") == fn.getEntries("tree.root", "tree"))
 
 #Now write the FWKJobReport

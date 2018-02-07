@@ -60,11 +60,13 @@ if hasattr(PSet.process.source, "lumisToProcess"):
     config.preprocessor.options["lumisToProcess"] = PSet.process.source.lumisToProcess
     lumidict = fn.getLumisProcessed(lumisToProcess)
 """
-### nanoAOD code
-name = "SomeName"
-if not "--nostep1" in args:
 
-    driverCommand = "cmsDriver.py {0}  -s NANO --filein {1} -n {2}" .format(name, crabFiles.value()[0], crabMaxEvents)
+os.system("mkdir Output")
+
+### nanoAOD code
+if not "--nostep1" in args:
+    
+    driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root  -s NANO --filein {1} -n {2}" .format("", crabFiles.value()[0], crabMaxEvents)
     if isMC:
         conditions = nanoCFG.conditionsMC
         era = nanoCFG.eraMC
@@ -80,11 +82,11 @@ if not "--nostep1" in args:
     print driverCommand
 
     #Run cmsDriver
-    os.system(driverCommand)
+    os.system(driverCommand+" &> Output/cmsRun.log")
     #This produdes file named: [name]_NANO.root                                       
 
     
-    tf = ROOT.TFile("{0}_NANO.root".format(name))
+    tf = ROOT.TFile("Output/nanoAOD.root")
     if not tf or tf.IsZombie():
         raise Exception("Error occurred in processing step1")
     tt = tf.Get("Events")
@@ -100,11 +102,11 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 
 
 
-outdir = "./"
+outdir = "Output"
 if "--nostep1" in args:
     infiles = inputfiles #Use the inputdataset as input for postprocessing -> Check if DS is really nanoAOD?
 else:
-    infiles = ["{0}_NANO.root".format(name)] #Use nanoAOD output as input for postprocessing
+    infiles = ["Output/nanoAOD.root"] #Use nanoAOD output as input for postprocessing
 cuts = nanoCFG.cuts
 branchsel = nanoCFG.branchsel
 json = nanoCFG.json
@@ -118,7 +120,7 @@ p.run()
 
 print "timeto_donanoAODpostprocessing", (time.time() - t1)
 ### run tthbb13 code separately
-tf = ROOT.TFile("{0}_NANO_postprocessed.root".format(name))
+tf = ROOT.TFile("Output/nanoAOD_postprocessed.root")
 if not tf or tf.IsZombie():
     raise Exception("Error occurred in processing step1")
 tt = tf.Get("Events")

@@ -152,7 +152,7 @@ def getFJR(lumidict, inputfiles_lfn, inputfiles_pfn, outputfile):
     
     output_entries = 0
     tf = ROOT.TFile(outputfile)
-    output_entries = tf.Get("vhbb/tree").GetEntries()
+    output_entries = tf.Get("nanoAOD/Events").GetEntries()
 
     fwkreport += """
     <File>
