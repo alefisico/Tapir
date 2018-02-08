@@ -5,7 +5,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 60,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD1000_ext1": {
         "ds": "/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM",
@@ -13,7 +14,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 60,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD1500": {
         "ds": "/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -21,7 +23,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 50,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD2000": {
         "ds": "/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -29,7 +32,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 60,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD300": {
         "ds": "/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -37,7 +41,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 200,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD300_ext1": {
         "ds": "/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM",
@@ -45,7 +50,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 200,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD500": {
         "ds": "/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -53,7 +59,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 150,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD500_ext1": {
         "ds": "/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/MINIAODSIM",
@@ -61,7 +68,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 150,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD700": {
         "ds": "/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -69,7 +77,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 150,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCD700_ext1": {
         "ds": "/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM",
@@ -77,7 +86,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 150,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT1000BGenFilter": {
         "ds": "/QCD_HT1000to1500_BGenFilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -85,7 +95,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 80,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT1000bEnriched": {
         "ds": "/QCD_bEnriched_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -93,7 +104,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 60,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT1500BGenFilter": {
         "ds": "/QCD_HT1500to2000_BGenFilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -101,7 +113,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 50,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT1500bEnriched": {
         "ds": "/QCD_bEnriched_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -109,7 +122,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 50,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT2000BGenFilter": {
         "ds": "/QCD_HT2000toInf_BGenFilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -117,7 +131,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 50,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT2000bEnriched": {
         "ds": "/QCD_bEnriched_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -125,7 +140,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 50,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT300BGenFilter": {
         "ds": "/QCD_HT300to500_BGenFilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -133,7 +149,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 200,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT300bEnriched": {
         "ds": "/QCD_bEnriched_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -141,7 +158,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 200,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT500BGenFilter": {
         "ds": "/QCD_HT500to700_BGenFilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -149,7 +167,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 200,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT500bEnriched": {
         "ds": "/QCD_bEnriched_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -157,7 +176,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 200,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT700BGenFilter": {
         "ds": "/QCD_HT700to1000_BGenFilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -165,7 +185,8 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 100,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     },
     "QCDHT700bEnriched": {
         "ds": "/QCD_bEnriched_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
@@ -173,6 +194,7 @@
         "mem_cfg": "cfg_noME.py",
         "perjob": 100,
         "runtime": 40,
-        "script": "heppy_crab_script.sh"
+        "script": "heppy_crab_script.sh",
+	"isNANOAOD" : False
     }
 }

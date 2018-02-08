@@ -1,4 +1,4 @@
-import json
+import json, yaml
 import os
 
 def getDatasets(mem_cfg, script, files = ["ttH.json","ttbar.json","otherbkg.json", "QCD.json"]):
@@ -29,7 +29,7 @@ def getDatasets(mem_cfg, script, files = ["ttH.json","ttbar.json","otherbkg.json
     for filename in files:
         data = None
         with open(filename, 'r') as f:
-            data = json.load(f)
+            data = yaml.safe_load(f) #json loads all entries as unicode (u'..')
         for ds in data:
             data[ds]["mem_cfg"] = mem_cfg
             data[ds]["script"] = script

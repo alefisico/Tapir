@@ -14,8 +14,7 @@ elif "--local" in sys.argv:
     import PSet_local as PSet
     print PSet
 
-if "--dumpPSet" in sys.argv:
-    print PSet.__dict__["process"].dumpPython()
+print PSet.__dict__["process"].dumpPython()
 
 
 
@@ -46,7 +45,16 @@ print "ARGV:",sys.argv
 #Load necessary variables from PSet:
 crabFiles=PSet.process.source.fileNames
 crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
-crabnfirst = int(PSet.process.source.skipEvents.value())
+
+#Try first if PSet has skipEvents
+try:
+    PSet.process.source.skipEvents.value()
+except AttributeError:
+    crabnfirst = 0
+else:
+    print "Reading skipEvents from PSet"
+    crabnfirst = int(PSet.process.source.skipEvents.value())
+
 crabMaxEvents = PSet.process.maxEvents.input.value()
 
 
@@ -56,24 +64,22 @@ print "-------------------------",crabFiles_pfn
 
 
 #Setting lumis in file
-#TODO!!! Figure out how to tell cmsDriver the lumi sections!
-# ---> --lumiToProcess= specify a certification json file in input to run on
-#                       certified data
 lumisToProcess = None
+VLuminosityBlockRange = None
 lumidict = {}
-"""
+
 if hasattr(PSet.process.source, "lumisToProcess"):
     lumisToProcess = PSet.process.source.lumisToProcess
-    config.preprocessor.options["lumisToProcess"] = PSet.process.source.lumisToProcess
+    VLuminosityBlockRange = PSet.process.source.lumisToProcess
     lumidict = fn.getLumisProcessed(lumisToProcess)
-"""
+
 
 os.system("mkdir Output")
 
 ### nanoAOD code
 if not "--nostep1" in args:
     #Building cmsDriver.py command
-    driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root --no_exec -s NANO --filein {1} -n {2}" .format("runConfig",crabFiles.value()[0], crabMaxEvents)
+    driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root --no_exec -s NANO --filein {1} -n {2}" .format("runConfig",crabFiles_pfn.value()[0], crabMaxEvents)
     if isMC:
         conditions = nanoCFG.conditionsMC
         era = nanoCFG.eraMC
@@ -96,7 +102,9 @@ if not "--nostep1" in args:
     print dir_
 
     cmsswConfig = imp.load_source("cmsRunProcess",os.path.expandvars("runConfig_NANO.py"))
-    cmsswConfig.process.source.fileNames = crabFiles.value()
+    cmsswConfig.process.source.fileNames = crabFiles_pfn.value()
+    if VLuminosityBlockRange is not None:
+        cmsswConfig.process.source.lumisToProcess = VLuminosityBlockRange
     
     configfile=dir_+"/mod_runConfig_NANO.py"
     f = open(configfile, 'w')
@@ -126,7 +134,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 
 outdir = "Output"
 if "--nostep1" in args:
-    infiles = crabFiles.value() #Use the inputdataset as input for postprocessing -> Check if DS is really nanoAOD?
+    infiles = crabFiles_pfn.value() #Use the inputdataset as input for postprocessing -> Check if DS is really nanoAOD?
 else:
     infiles = ["Output/nanoAOD.root"] #Use nanoAOD output as input for postprocessing
 cuts = nanoCFG.cuts

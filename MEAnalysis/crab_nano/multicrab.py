@@ -133,10 +133,7 @@ for sd in sets_data:
 
 #Add MC datasets from JSON files
 import multicrabHelper
-
-MCdatasets = multicrabHelper.getDatasets(mem_cfg = me_cfgs["default"], script = "heppy_crab_script.sh")
-
-print MCdatasets
+datasets.update(multicrabHelper.getDatasets(mem_cfg = me_cfgs["default"], script = "heppy_crab_script.sh"))
 
 #now we construct the workflows from all the base datasets
 workflow_datasets = {}
@@ -312,12 +309,12 @@ for k in [
     #"SingleMuon-Run2016H-03Feb2017_ver3-v1"
     ]:
     D = deepcopy(datasets[k])
-    D["maxlumis"] = 5
-    D["perjob"] = 1
+    D["maxlumis"] = 4
+    D["perjob"] = 2
     if "data" in D["script"]:
-        D["maxlumis"] = 5
-        D["perjob"] = 1
-    D["runtime"] = 1
+        D["maxlumis"] = 4
+        D["perjob"] = 2
+    D["runtime"] = 0.2
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
 
@@ -370,10 +367,19 @@ for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
 
+#Check if Dataset are nanoAOD
+nanoFlag = None
+for datasetKey in sel_datasets[args.workflow]:
+    isNANOAOD = workflow_datasets[args.workflow][datasetKey]["isNANOAOD"]
+    if nanoFlag is None:
+        nanoFlag = isNANOAOD
+    if not(nanoFlag and isNANOAOD):
+        exit() 
+
 if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
     from CRABClient.UserUtilities import getUsernameFromSiteDB
-
+    
     def submit(config):
         res = crabCommand('submit', config = config)
         with open(config.General.workArea + "/crab_" + config.General.requestName + "/crab_config.py", "w") as fi:
@@ -455,7 +461,6 @@ if __name__ == '__main__':
         'analyze_log.py',
         'FrameworkJobReport.xml',
         'env.sh',
-        'setenv_sklearn_cmssw.sh',
         'post.sh',
         'heppy_crab_script.py',
         'mem_crab_script.py',
@@ -463,16 +468,15 @@ if __name__ == '__main__':
 	'nano_crab_config.py',
         'python.tar.gz',
         'data.tar.gz',
-        "MEAnalysis_heppy.py",
+        'MEAnalysis_heppy.py',
         tth_data_dir + '/BDT.pickle',
-        nanoTools_dir + '/scripts/nano_postproc.py',
-        nanoTools_dir + '/python/postprocessing/modules/jme/jecUncertainties.py'
-
+        #nanoTools_dir + '/scripts/nano_postproc.py',
+        #nanoTools_dir + '/python/postprocessing/modules/jme/jecUncertainties.py'
     ]
 
     config.Data.inputDBS = 'global'
     config.Data.splitting = 'LumiBased'
-    config.Data.publication = True
+    config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
 
@@ -492,7 +496,7 @@ if __name__ == '__main__':
             dataset = sel_datasets[sample]["ds"]
             nlumis = sel_datasets[sample]["maxlumis"]
             perjob = sel_datasets[sample]["perjob"]
-            runtime_min = sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60)
+            runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
 
             config.JobType.maxJobRuntimeMin = runtime_min
             config.General.requestName = sample + "_" + submitname
@@ -506,6 +510,8 @@ if __name__ == '__main__':
                 config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
 
         config.JobType.scriptArgs = ['ME_CONF={0}'.format(mem_cfg)]
+        print  config.JobType.scriptArgs
+        
         if localtesting:
             localsubmit(config, sample, sel_datasets[sample])
         else:
