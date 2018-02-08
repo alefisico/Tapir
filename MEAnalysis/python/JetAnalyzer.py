@@ -85,11 +85,9 @@ class JetAnalyzer(FilterAnalyzer):
         return mbb_closest
 
     def process(self, event):
-        print "EVENT ", event.input.event
         event.MET = MET(metobj=event.met)
         event.MET_gen = MET(pt=event.MET.genPt, phi=event.MET.genPhi)
         event.MET_tt = MET(px=0, py=0)
-        print event.MET.pt, event.MET.px, event.MET.py, event.MET.sumEt
         evdict = OrderedDict()
         
         #We create a wrapper around the base event with nominal quantities

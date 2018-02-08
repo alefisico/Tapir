@@ -4,6 +4,8 @@ import resource
 import ROOT
 import logging
 
+LOG_MODULE_NAME = logging.getLogger(__name__)
+
 class FilterAnalyzer(Analyzer):
     """
     A generic analyzer that may filter events.
@@ -29,7 +31,7 @@ class MemoryAnalyzer(Analyzer):
                 self.hpy = hpy()
                 self.hpy.setrelheap()
             except Exception as e:
-                autolog("Could not import guppy, skipping")
+                logging.error("Could not import guppy, skipping memory logging")
 
         self.heap_prev = None
 
@@ -88,6 +90,7 @@ class CounterAnalyzer(FilterAnalyzer):
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
     """
+    Allows only events in a whitelist of (run, lumi, event) to pass.
     """
 
     def __init__(self, cfg_ana, cfg_comp, looperName):
