@@ -4,5 +4,6 @@ source common.sh
 #go to work directory
 cd $GC_SCRATCH
 
-#python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/MakeTaggingNtuple.py taggingNtuple.root $FILE_NAMES
-python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/dumpMEEvents.py > out.json
+#create file so it exists
+touch out.json
+python ${CMSSW_BASE}/src/TTH/MEAnalysis/python/dumpMEEvents.py ${CMSSW_BASE}/src/TTH/MEAnalysis/data/default.cfg > out.json
