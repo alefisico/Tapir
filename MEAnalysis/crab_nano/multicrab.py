@@ -404,16 +404,16 @@ if __name__ == '__main__':
         os.system('cp files $CMSSW_BASE/; cd $CMSSW_BASE; for f in `cat files`; do cp --parents $f {0}/; done'.format(workdir))
         runfile = open(workdir+"/run.sh", "w")
         runfile.write(
-"""
-#!/bin/bash
-source /cvmfs/cms.cern.ch/cmsset_default.sh
-scram b ProjectRename
-eval `scramv1 runtime -sh`
-scram b
-env
-./{0} 1 {1}
-""".format(config.JobType.scriptExe, " ".join(config.JobType.scriptArgs)).strip() + '\n'
-)
+            """
+            #!/bin/bash
+            source /cvmfs/cms.cern.ch/cmsset_default.sh
+            scram b ProjectRename
+            eval `scramv1 runtime -sh`
+            scram b
+            env
+            ./{0} 1 {1}
+            """.format(config.JobType.scriptExe, " ".join(config.JobType.scriptArgs)).strip() + '\n'
+        )
         runfile.close()
         os.system('chmod +x {0}/run.sh'.format(workdir))
         os.system('cd {0}/{1};eval `scram runtime -sh`;scram b;'.format(TMPDIR, CMSSW_VERSION))

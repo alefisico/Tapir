@@ -5,12 +5,19 @@ import ROOT
 import PhysicsTools.HeppyCore.framework.config as cfg
 cfg.Analyzer.nosubdir=True
 import PSet
+
+
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
 elif "--local" in sys.argv:
     import PSet_local as PSet
     print PSet
+
+if "--dumpPSet" in sys.argv:
+    print PSet.__dict__["process"].dumpPython()
+
+
 
 if "--isMC" in sys.argv:
     isMC = True
@@ -65,8 +72,8 @@ os.system("mkdir Output")
 
 ### nanoAOD code
 if not "--nostep1" in args:
-    
-    driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root  -s NANO --filein {1} -n {2}" .format("", crabFiles.value()[0], crabMaxEvents)
+    #Building cmsDriver.py command
+    driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root --no_exec -s NANO --filein {1} -n {2}" .format("runConfig",crabFiles.value()[0], crabMaxEvents)
     if isMC:
         conditions = nanoCFG.conditionsMC
         era = nanoCFG.eraMC
@@ -82,9 +89,24 @@ if not "--nostep1" in args:
     print driverCommand
 
     #Run cmsDriver
-    os.system(driverCommand+" &> Output/cmsRun.log")
-    #This produdes file named: [name]_NANO.root                                       
+    os.system(driverCommand+" &> Output/cmsDriver.log")
 
+    #Modfiy the config for multiple input files
+    dir_ = os.getcwd()
+    print dir_
+
+    cmsswConfig = imp.load_source("cmsRunProcess",os.path.expandvars("runConfig_NANO.py"))
+    cmsswConfig.process.source.fileNames = crabFiles.value()
+    
+    configfile=dir_+"/mod_runConfig_NANO.py"
+    f = open(configfile, 'w')
+    f.write(cmsswConfig.process.dumpPython())
+    f.close()
+
+    #Run cmsRun with the modified config file
+    runstring="{0} {1} >& {2}/Output/cmsRun.log".format("cmsRun",configfile,dir_)
+    print "Running cmsRun: {0}".format(runstring)
+    ret=os.system(runstring)
     
     tf = ROOT.TFile("Output/nanoAOD.root")
     if not tf or tf.IsZombie():
@@ -104,7 +126,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 
 outdir = "Output"
 if "--nostep1" in args:
-    infiles = inputfiles #Use the inputdataset as input for postprocessing -> Check if DS is really nanoAOD?
+    infiles = crabFiles.value() #Use the inputdataset as input for postprocessing -> Check if DS is really nanoAOD?
 else:
     infiles = ["Output/nanoAOD.root"] #Use nanoAOD output as input for postprocessing
 cuts = nanoCFG.cuts
