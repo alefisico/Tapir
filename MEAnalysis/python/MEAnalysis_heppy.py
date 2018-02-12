@@ -225,6 +225,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'eventid',
         _conf = python_conf
     )
+    
+    lumilist_ana = cfg.Analyzer(
+        MECoreAnalyzers.LumiListAnalyzer,
+        'lumilist',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
 
     #fills the passPV flag 
     pvana = cfg.Analyzer(
@@ -387,6 +394,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter,
         # memory_ana,
         evtid_filter,
+        lumilist_ana,
         # prefilter,
         evs,
         gentth_pre,

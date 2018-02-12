@@ -716,7 +716,8 @@ def getTreeProducer(conf):
 
     for vtype in [
         ("rho",                     float,  ""),
-        ("json",                    float,  ""),
+        ("json",                    int,  ""),
+        ("runrange",                int,  "integer index of the run range (A-F)"),
         ("nPVs",                    float,  ""),
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=False)]

@@ -3,6 +3,9 @@ from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 import resource
 import ROOT
 import logging
+import os
+
+from FWCore.PythonUtilities.LumiList import LumiList
 
 LOG_MODULE_NAME = logging.getLogger(__name__)
 
@@ -134,6 +137,37 @@ class EventWeightAnalyzer(FilterAnalyzer):
     def process(self, event):
         event.weight_xs = self.xs/float(self.n_gen) if self.n_gen > 0 else 1
        
+
+        return True
+
+class LumiListAnalyzer(FilterAnalyzer):
+    """
+    """
+
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(LumiListAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.analysis_conf = cfg_ana._analysis_conf
+        path = self.analysis_conf.config.get("general", "json")
+        path = path.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+
+        self.runranges = self.analysis_conf.config.get("general", "runs").split("\n")
+        self.runranges = [map(int, s.split()[1:]) for s in self.runranges if len(s)>0]
+         
+        ll = LumiList(path)
+        self.lls = set(ll.getLumis())
+
+    def beginLoop(self, setup):
+        super(LumiListAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+        run_lumi = (event.input.run, event.input.luminosityBlock)
+        event.json = run_lumi in self.lls
+
+        event.runrange = -1
+        for irunrange, runrange in enumerate(self.runranges):
+            if event.input.run >= runrange[0] and event.input.run <= runrange[1]:
+                event.runrange = irunrange
+                break
 
         return True
 
