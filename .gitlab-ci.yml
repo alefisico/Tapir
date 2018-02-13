@@ -43,6 +43,7 @@ compile:
     - git checkout -b nanoAOD cms-nanoAOD/master
     - git cms-merge-topic mmeinhard:BoostedNanoAOD
     - git cms-merge-topic jpata:heppy_fixes
+    - git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml

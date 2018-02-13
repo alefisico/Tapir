@@ -6,7 +6,7 @@ import logging
 import os
 
 from FWCore.PythonUtilities.LumiList import LumiList
-from PhysicsTools.NanoAODTools.postprocessing.examples.puWeightProducer import puWeightProducer
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeightProducer
 LOG_MODULE_NAME = logging.getLogger(__name__)
 
 class FilterAnalyzer(Analyzer):
