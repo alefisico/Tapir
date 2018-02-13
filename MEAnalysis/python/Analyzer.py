@@ -208,6 +208,9 @@ class NanoOutputEmulator:
         for key, val in self.data.items():
             setattr(event, key, val)
 
+    def branch(self, name, type):
+        pass
+
 class PUWeightAnalyzer(Analyzer):
     """
     Recomputes the pileup weight using the nanoAOD postprocessing module.
@@ -235,7 +238,8 @@ class PUWeightAnalyzer(Analyzer):
     def beginLoop(self, setup):
         super(PUWeightAnalyzer, self).beginLoop(setup)
         self.nano_analyzer.beginJob()
-
+        self.nano_analyzer.beginFile(None, None, None, self.out)
+        
     def process(self, event):
 
         #Only process MC
