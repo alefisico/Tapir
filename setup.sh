@@ -1,6 +1,6 @@
 export SCRAM_ARCH=slc6_amd64_gcc630
 
-scram project -n CMSSW CMSSW CMSSW_9_4_1
+scram project -n CMSSW CMSSW CMSSW_9_4_4
 cd CMSSW/src/
 eval `scramv1 runtime -sh`
 
@@ -11,6 +11,9 @@ git cms-merge-topic kschweiger:HeppyttHbb_Jan12
 git checkout -b nanoAOD cms-nanoAOD/master
 git cms-merge-topic mmeinhard:BoostedNanoAOD
 git cms-merge-topic jpata:heppy_fixes #fix for Heppy DataComponent
+
+#https://github.com/cms-nanoAOD/nanoAOD-tools#checkout-instructions-cmssw
+git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
 
 #get the TTH code
 git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch SwitchNanoAOD

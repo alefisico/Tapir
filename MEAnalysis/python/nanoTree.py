@@ -21,7 +21,8 @@ class EventAnalyzer(Analyzer):
 
         event.PV = nanoTreeClasses.PV.make_array(event.input)
         #event.pileUpVertex_z = pileUpVertex_z.make_array(event.input)        
-        #event.nPU0 = getattr(event.input, "nPU0", None)
+        event.Pileup_nPU = getattr(event.input, "Pileup_nPU", None)
+        event.Pileup_nTrueInt = getattr(event.input, "Pileup_nTrueInt", None)
         event.PV_npvs = getattr(event.input, "PV_npvs", None)
         #event.bx = getattr(event.input, "bx", None)
         #event.rho = getattr(event.input, "rho", None)
