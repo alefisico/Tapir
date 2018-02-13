@@ -225,10 +225,19 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'eventid',
         _conf = python_conf
     )
-    
+
+    #Set the json flag according to the provided data json
     lumilist_ana = cfg.Analyzer(
         MECoreAnalyzers.LumiListAnalyzer,
         'lumilist',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
+
+    #Recompute pileup weight
+    puweight_ana = cfg.Analyzer(
+        MECoreAnalyzers.PUWeightAnalyzer,
+        'puweight',
         _conf = python_conf,
         _analysis_conf = analysis_cfg,
     )
@@ -385,6 +394,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter_name = "_final",
     )
     import TTH.MEAnalysis.metree
+
+    #Make the final output tree producer
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
 
@@ -394,9 +405,12 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter,
         # memory_ana,
         evtid_filter,
-        lumilist_ana,
         # prefilter,
         evs,
+
+        #After this, the event has been created
+        lumilist_ana,
+        puweight_ana,
         gentth_pre,
         pvana,
         trigger,
@@ -418,6 +432,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         mem_analyzer,
         #mva,
         treevar,
+
+        #Write the output tree
         treeProducer,
         counter_final,
     ])
@@ -489,9 +505,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     
     return looper.name, files
 
-if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    
+if __name__ == "__main__":   
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     if len(sys.argv) == 1:
         print "Call signature:"
@@ -523,7 +537,19 @@ if __name__ == "__main__":
         default=None,
         required=False
     )
+    parser.add_argument(
+        '--loglevel',
+        action="store",
+        help="log level",
+        choices=["ERROR", "INFO", "DEBUG"],
+        default="INFO",
+        required=False
+    )
     args = parser.parse_args(sys.argv[2:])
+
+    #configure logging
+    logging.basicConfig(stream=sys.stdout, level=getattr(logging, args.loglevel))
+
     if args.files:
         files = args.files.split(",")
     else:

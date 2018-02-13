@@ -7,24 +7,54 @@ from TTH.MEAnalysis.vhbb_utils import *
 #Defines the output TTree branch structures
 from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import *
 
-#Override the default fillCoreVariables function, which
-#by default looks for FWLite variables
-#FIXME: this is a hack to run heppy on non-EDM formats. Better to propagate it to heppy
-def fillCoreVariables(self, tr, event, isMC):
-    if isMC:
-        for x in ["run", "lumi", "evt", "genWeight"]: # Removed "xsec",  "puWeight"
-            if x == "lumi" or x == "evt":
-                tr.fill(x, getattr(event, x))
-            else:
-                tr.fill(x, getattr(event.input, x))
-    else:
-        for x in ["run", "lumi", "evt"]:
-            if x == "lumi" or x == "evt":
-                tr.fill(x, getattr(event, x))
-            else:
-                tr.fill(x, getattr(event.input, x))
+import numpy as np
 
+import logging
+
+LOG_MODULE_NAME = logging.getLogger(__name__)
+
+
+#Override the default fillCoreVariables and declareCoreVariables in heppy,
+#as otherwise they would mess with some variables like puWeight etc
+def fillCoreVariables(self, tr, event, isMC):
+    pass
+
+def declareCoreVariables(self, tr, isMC):
+    pass
+
+AutoFillTreeProducer.declareCoreVariables = declareCoreVariables 
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
+
+def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
+
+    LOG_MODULE_NAME.info("Making global variable {0}, for systematic {1}".format(vtype, systematic))
+    name = vtype[0] #name of variable
+    typ = vtype[1] #type of variable
+    hlp = vtype[2] #help string
+
+    #if only 3 supplied, assume variable can be accessed from tree using name
+    if len(vtype) == 3:
+        func = lambda ev, systematic=systematic, name=name: \
+            getattr(ev.systResults[systematic], name, -9999)
+
+    #if 4 supplied, access variable using name from systematic tree
+    elif len(vtype) == 4:
+
+        #If 4th element is string, just use that as an accessor
+        if isinstance(vtype[3], str):
+            func = lambda ev, systematic=systematic, name=vtype[3]: \
+                getattr(ev.systResults[systematic], name, -9999)
+        #Otherwise it's a function
+        else:
+            func = vtype[3]
+
+    syst_suffix = "_" + systematic
+    if systematic == "nominal":
+        syst_suffix = ""
+
+    return NTupleVariable(
+        name + syst_suffix, func, type=typ, help=hlp, mcOnly=mcOnly
+    )
 
 lepton_sf_kind = [
     "SF_HLT_RunD4p2",
@@ -128,27 +158,6 @@ quarkType = NTupleObjectType("quarkType", variables = [
     NTupleVariable("mass", lambda x : x.mass),
     NTupleVariable("id", lambda x : x.pdgId),
 ])
-
-def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
-    name = vtype[0]
-    typ = vtype[1]
-    hlp = vtype[2]
-
-    if len(vtype) == 3:
-        func = lambda ev, systematic=systematic, name=name: \
-            getattr(ev.systResults[systematic], name, -9999)
-    elif len(vtype) == 4:
-        if isinstance(vtype[3], str):
-            func = lambda ev, systematic=systematic, name=vtype[3]: \
-                getattr(ev.systResults[systematic], name, -9999)
-        else:
-            func = vtype[4]
-    syst_suffix = "_" + systematic
-    if systematic == "nominal":
-        syst_suffix = ""
-    return NTupleVariable(
-        name + syst_suffix, func, type=typ, help=hlp, mcOnly=mcOnly
-    )
 
 topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("fRec", lambda x: x.fRec ),
@@ -500,6 +509,9 @@ def getTreeProducer(conf):
             #NTupleVariable("ht40", lambda ev: getattr(ev, "ht40", -9999), type=float, help="ht considering only jets with pT>40"),
             NTupleVariable("csv1", lambda ev: getattr(ev, "csv1", -9999), type=float, help="highest jet csv value"),
             NTupleVariable("csv2", lambda ev: getattr(ev, "csv2", -9999), type=float, help="2nd highest jet csv value"),
+            NTupleVariable("run", lambda ev: ev.input.run, type=int),
+            NTupleVariable("lumi", lambda ev: ev.input.luminosityBlock, type=int),
+            NTupleVariable("evt", lambda ev: ev.input.event, type=int),
 
         ],
         globalObjects = {
@@ -696,12 +708,17 @@ def getTreeProducer(conf):
         #("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
+        ("qgWeight",                float,  ""),
+
+        ("Pileup_nTrueInt",         float,  ""),
+        ("Pileup_nPU",              int,  ""),
+
+        ("puWeight",                float,  "pileup weight"),
         ("puWeightUp",              float,    ""),
         ("puWeightDown",            float,    ""),
-        ("qgWeight",                float,  ""),
-        ("nPU0",                    float,  ""),
-        ("nTrueInt",                int,  ""),
-        ("trigtrigTablegerEmulationWeight",  float,  ""),
+
+        ("genWeight",            float,    "Generator weight", lambda ev: ev.input.genWeight),
+
         ("tth_rho_px_gen",  float,  ""),
         ("tth_rho_py_gen",  float,  ""),
         ("tth_rho_px_reco",  float,  ""),
@@ -714,6 +731,7 @@ def getTreeProducer(conf):
     #        makeGlobalVariable((bweight, float, ""), "nominal", mcOnly=True)
     #    ]
 
+    #Variables in both MC and data
     for vtype in [
         ("rho",                     float,  ""),
         ("json",                    int,  ""),

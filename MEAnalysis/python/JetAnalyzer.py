@@ -112,6 +112,8 @@ class JetAnalyzer(FilterAnalyzer):
         for syst, event_syst in evdict.items():
             event_syst.systematic = syst 
             res = self._process(event_syst, evdict)
+
+            #For variated events, add pointer to nominal event
             if syst != "nominal":
                 res.nominal_event = evdict["nominal"]
             evdict[syst] = res
