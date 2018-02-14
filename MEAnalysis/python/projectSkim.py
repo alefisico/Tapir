@@ -17,6 +17,9 @@ for fi in os.environ["FILE_NAMES"].split():
     tt.AddFile(fn)
 
 tt.SetBranchStatus("*", False)
+if "all" in datatypes:
+    tt.SetBranchStatus("*", True)
+
 tt.SetBranchStatus("is_*", True)
 tt.SetBranchStatus("numJets*", True)
 tt.SetBranchStatus("nB*", True)
@@ -72,7 +75,7 @@ of = ROOT.TFile(ofname, "RECREATE")
 of.cd()
 #tt.CopyTree("1")
 #tt.CopyTree("(is_sl && numJets>=4 && nBCSVM>=2) || (numJets>=4 && nBCSVM>=3) || (numJets==5 && nBCSVM>=2))) || (is_dl && (numJets>=3 && nBCSVM >=2)) || (is_fh && (numJets>=4 && nBCSVM>=3))")
-tt.CopyTree("(is_sl && numJets>=4 && nBCSVM>=3) || (is_dl && numJets>=4 && nBCSVM>=3)")
+tt.CopyTree("(is_sl && numJets>=4 && nBCSVM>=2) || (is_dl && numJets>=4 && nBCSVM>=2)")
 #tt.CopyTree("(is_sl || is_dl)")
 of.Write()
 of.Close()

@@ -28,10 +28,15 @@ class BufferedTree:
     def __init__(self, tree):
         self.tree = tree
         self.tree.SetCacheSize(10*1024*1024)
+
+        #stores the branches of the current tree
         self.branches = {}
         for br in self.tree.GetListOfBranches():
             self.branches[br.GetName()] = br
+
         self.tree.AddBranchToCache("*")
+
+        #stores the branch values for the current event
         self.buf = {}
         self.iEv = 0
         self.maxEv = int(self.tree.GetEntries())
@@ -45,22 +50,9 @@ class BufferedTree:
                 self.__dict__["buf"][attr] = val
                 return val
         else:
-            if not defval is None:
+            if not (defval is None):
                 return defval
             raise Exception("Could not find branch with key: {0}".format(attr))
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        if self.iEv > self.maxEv:
-            raise StopIteration
-        self.buf = {}
-        self.iEv += 1
-        bytes = self.tree.GetEntry(self.iEv)
-        if bytes < 0:
-            raise Exception("Could not read entry {0}".format(self.iEv))
-        return self
         
     def GetEntries(self):
         return self.tree.GetEntries()
@@ -84,7 +76,7 @@ class BufferedChain( object ):
            print event.var1
     """
 
-    def __init__(self, input, tree_name=None):
+    def __init__(self, files, tree_name=None):
         """
         Create a chain.
 
@@ -96,22 +88,27 @@ class BufferedChain( object ):
                       if None and if each file contains only one TTree,
                       this TTree is used.
         """
-        self.files = input
+        self.files = files
         self.base_chain = ROOT.TChain(tree_name)
+
+        #Add all input files, which need to be opened, to the chain
         for fi in self.files:
+            LOG_MODULE_NAME.info("Adding tree {0}".format(fi))
             ret = self.base_chain.AddFile(fi, 0)
             if ret == 0:
                 raise IOError("Could not open file {0}".format(fi))
         self.chain = BufferedTree(self.base_chain)
 
-    def __getattr__(self, attr):
+        self.iTree = 0
+
+    def __getattr__(self, attr, defval=None):
         """
         All functions of the wrapped TChain are made available
         """
-        return getattr(self.chain, attr)
+        return self.chain.__getattr__(attr, defval)
 
-    def __iter__(self):
-        return self.chain
+    # def __iter__(self):
+    #     return self
 
     def __len__(self):
         return int(self.chain.GetEntries())
@@ -120,9 +117,22 @@ class BufferedChain( object ):
         """
         Returns the event at position index.
         """
-        self.chain.GetEntry(index)
-        return self
 
+        bytes = self.chain.GetEntry(index)
+
+        #Check if the chain has moved to the next tree
+        curTree = self.base_chain.GetTreeNumber()
+        if curTree != self.iTree:
+            LOG_MODULE_NAME.info("Switching tree to {0}".format(self.files[curTree]))
+            self.iTree = curTree
+
+            #Remake underlying tree along with the buffers
+            self.chain = BufferedTree(self.base_chain)
+
+        if bytes < 0:
+            raise Exception("Could not read entry {0}".format(self.iEv))
+
+        return self
 
 def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None):
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
@@ -214,6 +224,22 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         MECoreAnalyzers.EventIDFilterAnalyzer,
         'eventid',
         _conf = python_conf
+    )
+
+    #Set the json flag according to the provided data json
+    lumilist_ana = cfg.Analyzer(
+        MECoreAnalyzers.LumiListAnalyzer,
+        'lumilist',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
+
+    #Recompute pileup weight
+    puweight_ana = cfg.Analyzer(
+        MECoreAnalyzers.PUWeightAnalyzer,
+        'puweight',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
     )
 
     #fills the passPV flag 
@@ -368,6 +394,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter_name = "_final",
     )
     import TTH.MEAnalysis.metree
+
+    #Make the final output tree producer
     from TTH.MEAnalysis.metree import getTreeProducer
     treeProducer = getTreeProducer(python_conf)
 
@@ -375,10 +403,14 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     # the analyzers will process each event in this order
     sequence = cfg.Sequence([
         counter,
-        memory_ana,
+        # memory_ana,
         evtid_filter,
-        prefilter,
+        # prefilter,
         evs,
+
+        #After this, the event has been created
+        lumilist_ana,
+        puweight_ana,
         gentth_pre,
         pvana,
         trigger,
@@ -400,6 +432,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         mem_analyzer,
         #mva,
         treevar,
+
+        #Write the output tree
         treeProducer,
         counter_final,
     ])
@@ -471,9 +505,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     
     return looper.name, files
 
-if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    
+if __name__ == "__main__":   
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     if len(sys.argv) == 1:
         print "Call signature:"
@@ -505,7 +537,19 @@ if __name__ == "__main__":
         default=None,
         required=False
     )
+    parser.add_argument(
+        '--loglevel',
+        action="store",
+        help="log level",
+        choices=["ERROR", "INFO", "DEBUG"],
+        default="INFO",
+        required=False
+    )
     args = parser.parse_args(sys.argv[2:])
+
+    #configure logging
+    logging.basicConfig(stream=sys.stdout, level=getattr(logging, args.loglevel))
+
     if args.files:
         files = args.files.split(",")
     else:
