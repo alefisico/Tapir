@@ -32,6 +32,7 @@ class MEMConfig:
         self.maxLJets = 5
         self.btagMethod = "btagCSV"
         self.cfg.integrator_type = MEM.IntegratorType.Vegas
+        self.ncalls = -1
 
     def __str__(self):
         s = "MEMConfig(\n"
