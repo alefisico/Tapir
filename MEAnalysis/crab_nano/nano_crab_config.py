@@ -33,7 +33,8 @@ elif setEra == "94X":
 ###################################################################################################
 #
 # Configure this variables:
-imports = [('PhysicsTools.NanoAODTools.postprocessing.modules.jme.jecUncertainties', 'jecUncertAll')] 
+imports = [('PhysicsTools.NanoAODTools.postprocessing.modules.jme.jecUncertainties', 'jecUncertAll'),
+           ('PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer','btagSFProducer')] 
 json = None #Intended use: Skimming
 cuts = None #Intended use: Skimming
 branchsel = None #Intended use: Skimming

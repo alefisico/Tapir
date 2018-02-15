@@ -33,8 +33,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Submits crab jobs')
 parser.add_argument('--workflow', action="store", required=True, help="Type of workflow to run", type=str, choices=workflows)
 parser.add_argument('--tag', action="store", required=True, help="the version tag for this run, e.g. VHBBHeppyV22_tthbbV10_test1")
-parser.add_argument('--dataset', action="store", required=False, help="submit only matching datasets (shortname)", default="*")
-parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")
+parser.add_argument('--dataset', action="store", required=False, help="submit only matching datasets (shortname)", default="*") #FROM FH branch -> Not added yet
+parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")#FROM FH branch -> Not added yet
 args = parser.parse_args()
 
 localtesting = "localtesting" in args.workflow
@@ -364,18 +364,21 @@ for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2
     D["mem_cfg"] = me_cfgs["hadronic"]
     workflow_datasets["testing_hadronic_withme"][k] = D
 
+
+
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
-
+"""
+TODO: Chekc if DS is nanoAOD to change workflow
 #Check if Dataset are nanoAOD
 nanoFlag = None
-for datasetKey in sel_datasets[args.workflow]:
+for datasetKey in sel_datasets:
     isNANOAOD = workflow_datasets[args.workflow][datasetKey]["isNANOAOD"]
     if nanoFlag is None:
         nanoFlag = isNANOAOD
     if not(nanoFlag and isNANOAOD):
         exit() 
-
+"""
 if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
     from CRABClient.UserUtilities import getUsernameFromSiteDB
