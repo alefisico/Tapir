@@ -173,6 +173,7 @@ class Conf:
 
     general = {
         "passall": True,
+        "boosted": False,
         "QGLtoDo": {
          #3:[(3,0)] => "evalute qg LR of 3q vs 0q(+3g), considering only light jets, in events with 3 b-jets"
             3:[(3,0),(3,2),(4,0),(4,3),(5,0),(5,4)], 

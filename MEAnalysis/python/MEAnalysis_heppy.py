@@ -201,6 +201,14 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'events',
     )
 
+    if python_conf.general["boosted"] == True:
+        from TTH.MEAnalysis.nanoTreeBoosted import EventAnalyzerBoosted
+        boost = cfg.Analyzer(
+            EventAnalyzerBoosted,
+            'events',
+        )
+
+
     #Here we define all the main analyzers
     import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
@@ -401,42 +409,81 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
 
     # definition of a sequence of analyzers,
     # the analyzers will process each event in this order
-    sequence = cfg.Sequence([
-        counter,
-        # memory_ana,
-        evtid_filter,
-        # prefilter,
-        evs,
 
-        #After this, the event has been created
-        lumilist_ana,
-        puweight_ana,
-        gentth_pre,
-        pvana,
-        trigger,
-        counter_trg,
-        leps,
-        counter_lep,
-        jets,
-        counter_jet,
-        btaglr,
-        counter_blr,
-        #btaglr_bdt,
-        qglr,
-        wtag,
-        mecat,
-        #subjet_analyzer,
-        genrad,
-        gentth,
-        #multiclass_analyzer,
-        mem_analyzer,
-        #mva,
-        treevar,
+    if python_conf.general["boosted"] == False:
+        sequence = cfg.Sequence([
+            counter,
+            # memory_ana,
+            evtid_filter,
+            # prefilter,
+            evs,
 
-        #Write the output tree
-        treeProducer,
-        counter_final,
-    ])
+            #After this, the event has been created
+            lumilist_ana,
+            puweight_ana,
+            gentth_pre,
+            pvana,
+            trigger,
+            counter_trg,
+            leps,
+            counter_lep,
+            jets,
+            counter_jet,
+            btaglr,
+            counter_blr,
+            #btaglr_bdt,
+            qglr,
+            wtag,
+            mecat,
+            #subjet_analyzer,
+            genrad,
+            gentth,
+            #multiclass_analyzer,
+            mem_analyzer,
+            #mva,
+            treevar,
+
+            #Write the output tree
+            treeProducer,
+            counter_final,
+        ])
+    else:
+        sequence = cfg.Sequence([
+            counter,
+            # memory_ana,
+            evtid_filter,
+            # prefilter,
+            evs,
+            boost,
+            #After this, the event has been created
+            lumilist_ana,
+            puweight_ana,
+            gentth_pre,
+            pvana,
+            trigger,
+            counter_trg,
+            leps,
+            counter_lep,
+            jets,
+            counter_jet,
+            btaglr,
+            counter_blr,
+            #btaglr_bdt,
+            qglr,
+            wtag,
+            mecat,
+            subjet_analyzer,
+            genrad,
+            gentth,
+            #multiclass_analyzer,
+            mem_analyzer,
+            #mva,
+            treevar,
+
+            #Write the output tree
+            treeProducer,
+            counter_final,
+        ])
 
     #Book the output file
     from PhysicsTools.HeppyCore.framework.services.tfile import TFileService
