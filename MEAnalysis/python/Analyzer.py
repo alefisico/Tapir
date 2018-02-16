@@ -3,6 +3,11 @@ from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 import resource
 import ROOT
 import logging
+import os
+
+from FWCore.PythonUtilities.LumiList import LumiList
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeightProducer
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 class FilterAnalyzer(Analyzer):
     """
@@ -29,7 +34,7 @@ class MemoryAnalyzer(Analyzer):
                 self.hpy = hpy()
                 self.hpy.setrelheap()
             except Exception as e:
-                autolog("Could not import guppy, skipping")
+                logging.error("Could not import guppy, skipping memory logging")
 
         self.heap_prev = None
 
@@ -88,6 +93,7 @@ class CounterAnalyzer(FilterAnalyzer):
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
     """
+    Allows only events in a whitelist of (run, lumi, event) to pass.
     """
 
     def __init__(self, cfg_ana, cfg_comp, looperName):
@@ -134,6 +140,37 @@ class EventWeightAnalyzer(FilterAnalyzer):
 
         return True
 
+class LumiListAnalyzer(FilterAnalyzer):
+    """
+    """
+
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(LumiListAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.analysis_conf = cfg_ana._analysis_conf
+        path = self.analysis_conf.config.get("general", "json")
+        path = path.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+
+        self.runranges = self.analysis_conf.config.get("general", "runs").split("\n")
+        self.runranges = [map(int, s.split()[1:]) for s in self.runranges if len(s)>0]
+         
+        ll = LumiList(path)
+        self.lls = set(ll.getLumis())
+
+    def beginLoop(self, setup):
+        super(LumiListAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+        run_lumi = (event.input.run, event.input.luminosityBlock)
+        event.json = run_lumi in self.lls
+
+        event.runrange = -1
+        for irunrange, runrange in enumerate(self.runranges):
+            if event.input.run >= runrange[0] and event.input.run <= runrange[1]:
+                event.runrange = irunrange
+                break
+
+        return True
+
 class PrimaryVertexAnalyzer(FilterAnalyzer):
     """
     """
@@ -156,4 +193,60 @@ class PrimaryVertexAnalyzer(FilterAnalyzer):
             #cannot use passAll here because we want to ntuplize the primary vertex, in case it doesn't exist, the
             #code will fail
             return False
+        return True
+
+
+class NanoOutputEmulator:
+    def __init__(self):
+        self.data = {}
+        pass
+
+    def fillBranch(self, name, val):
+        self.data[name] = val
+
+    def fillEvent(self, event):
+        for key, val in self.data.items():
+            setattr(event, key, val)
+
+    def branch(self, name, type):
+        pass
+
+class PUWeightAnalyzer(Analyzer):
+    """
+    Recomputes the pileup weight using the nanoAOD postprocessing module.
+    """
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(PUWeightAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+
+        self.analysis_conf = cfg_ana._analysis_conf
+
+        self.pufile_mc = self.analysis_conf.config.get("puweight", "weightfile_mc")
+        self.pufile_data = self.analysis_conf.config.get("puweight", "weightfile_data")
+        
+        self.pufile_mc = self.pufile_mc.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+        self.pufile_data = self.pufile_data.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+
+        LOG_MODULE_NAME.debug("pileup MC file: {0}".format(self.pufile_mc))
+        LOG_MODULE_NAME.debug("pileup data file: {0}".format(self.pufile_data))
+
+        #create the nanoAOD pileup weight analyzer
+        self.nano_analyzer = puWeightProducer(self.pufile_mc, self.pufile_data, "pu_mc", "pileup", verbose=False, nvtx_var="Pileup_nTrueInt")
+        #create a kind of container that fakes the nanoAOD output
+        self.out = NanoOutputEmulator()
+        self.nano_analyzer.out = self.out
+
+    def beginLoop(self, setup):
+        super(PUWeightAnalyzer, self).beginLoop(setup)
+        self.nano_analyzer.beginJob()
+        self.nano_analyzer.beginFile(None, None, None, self.out)
+        
+    def process(self, event):
+
+        #Only process MC
+        if not self.cfg_comp.isMC:
+            return event 
+
+        self.nano_analyzer.analyze(event.input)
+        self.out.fillEvent(event)
+
         return True

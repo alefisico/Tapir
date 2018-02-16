@@ -1,0 +1,5 @@
+/SingleMuon/arizzi-RunII2017ReReco17Nov17-94X-Nano01-e70630e8aef2c186cd650f6150c31168/USER
+/SingleElectron/arizzi-RunII2017ReReco17Nov17-94X-Nano01-e70630e8aef2c186cd650f6150c31168/USER
+/DoubleEG/arizzi-RunII2017ReReco17Nov17-94X-Nano01-e70630e8aef2c186cd650f6150c31168/USER
+/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/arizzi-RunIIFall17MiniAOD-94X-Nano01Fall17-e273b12d9f89d622a34e4bc98b05ee29/USER
+/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/arizzi-RunIIFall17MiniAOD-94X-Nano01Fall17-e273b12d9f89d622a34e4bc98b05ee29/USER

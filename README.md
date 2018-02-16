@@ -1,5 +1,11 @@
-# ttH(bb) MEM code for Run 2
+# TOC
 
+- [Installation](#installation)
+- [Running](#running)
+- [Samples](#samples)
+- [Misc](#misc)
+
+# Installation
 Setup on SLC6 in a clean directory (no CMSSW) on a **shared file system (NFS)**
 ~~~
 $ mkdir -p ~/tth/sw
@@ -22,9 +28,12 @@ Note that if you run `scram b clean`, the matrix element library OpenLoops will 
 ~~~
 In order to fix this, you have to re-copy the libraries, see the end of `setup.sh` for the recipe.
 
+# Running
 ## Step0: environment
 
-We use rootpy in the plotting code, which is installed on T3_CH_PSI locally in `/swshare/anaconda`.
+Generally for running the code, `cmsenv` is sufficient. For some plotting tasks,
+we use a local python environment that can be configured on T3_CH_PSI
+through `source MEAnalysis/rq/env.sh`.
 
 ## Step1: Running the nanoAOD code
 
@@ -56,8 +65,8 @@ When some of the samples are done, you can produce smallish (<10GB) skims of the
 $ cd TTH/MEAnalysis/gc
 $ source makeEnv.sh #make an uncommited script to properly set the environment on the batch system
 v./grid-control/go.py confs/projectSkim.conf
-... #wait
-$ ./hadd.py /path/to/output/GC1234/ #call our merge script
+... #wait and make note of the task name, which is like GC123445
+$ ./hadd.py /path/to/output/GC123445/ #call our merge script
 ~~~
 
 This will produce some skimmed ntuples in
@@ -130,12 +139,40 @@ When you're done, don't forget to free up your jobs:
 qdel -u $USER
 ~~~
 
-# Continous integration (CI)
+# Samples
 
-We test the code regularly using the gitlab CI system. Since we are accessing the samples from T3_CH_PSI, this currently requires a valid proxy at CERN. 
+The currently used samples are listed below. Generally, they are stored at T3_CH_PSI.
+
+## NanoAOD
+
+| production name | comments |
+|-----------------|----------|
+| [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas) | no boosted or hadronic triggers |
+
+## tthbb13
+
+| production name | base NanoAOD | comments |
+|-----------------|--------------|----------|
+| [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26) | NanoCrabProdXmas | |
+
+# Misc
+
+## Copying nanoAOD ntuples
+
+The nanoAOD ntuples that are produced centrally are generally located on various
+T2 centers, we want to copy them to T3_CH_PSI for analysis.
+
+To do that, we extract the list of files corresponding to a dataset using the
+script `MEAnalysis/test/das_query.sh` and actually the copy the files using
+a grid-control workflow in `MEAnalysis/gc/confs/copyData.conf`.
+
+## Continous integration (CI)
+
+We test the code regularly using the gitlab CI system. Since we are accessing
+the samples from T3_CH_PSI, this currently requires a valid proxy at CERN. 
 
 
-# OpenLOOPS
+## OpenLOOPS
 
 Compile the signal and background amplitudes, which will be placed in `OpenLoops/proclib`.
 ~~~

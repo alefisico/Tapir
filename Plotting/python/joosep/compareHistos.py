@@ -2,15 +2,20 @@ import ROOT
 import rootpy
 import numpy as np
 import math
+import sys
+import os
 
 import matplotlib
 matplotlib.use('PS') #needed on T3
+
 from matplotlib import pyplot as plt
 from rootpy.plotting import root2matplotlib as rplt
 
-def compare_hists(files, labels, histo_name):
+def compare_hists(files, labels, histo_name, out):
+    
     hists = []
     tfiles = []
+
     for fi in files:
         tf = ROOT.TFile(fi)
         h = rootpy.asrootpy(tf.Get(histo_name))
@@ -43,37 +48,75 @@ def compare_hists(files, labels, histo_name):
     plt.ylim(0.5, 1.5)
     plt.axhline(1.0, color="black", lw=1)
 
-    plt.savefig(histo_name + ".pdf", bbox_inches="tight")
+    plt.savefig(os.path.join(out, histo_name) + ".pdf", bbox_inches="tight")
+    plt.savefig(os.path.join(out, histo_name) + ".png", bbox_inches="tight")
+    return histo_name
 
-histos = [
-    "ttH_hbb__dl_jge4_tge2__numJets__unweighted",
-    "ttH_hbb__dl_jge4_tge2__nBCSVM__unweighted",
-    "ttH_hbb__dl_jge4_tge2__ht__unweighted",
-    "ttH_hbb__dl_jge4_tge2__mll__unweighted",
-    "ttH_hbb__dl_jge4_tge2__nPVs__unweighted",
-    "ttH_hbb__dl_jge4_tge2__btag_LR_4b_2b_btagCSV_logit__unweighted",
-    "ttH_hbb__dl_jge4_tge2__jetsByPt_0_pt__unweighted",
-    "ttH_hbb__dl_jge4_tge2__leps_0_pt__unweighted",
-    "ttH_hbb__dl_jge4_tge2__leps_1_pt__unweighted",
-    "ttH_hbb__dl_jge4_tge2__met_pt__unweighted",
-    
-    "ttH_hbb__sl_jge4_tge2__btag_LR_4b_2b_btagCSV_logit__unweighted",
-    "ttH_hbb__sl_jge4_tge2__ht__unweighted",
-    "ttH_hbb__sl_jge4_tge2__leps_0_pt__unweighted",
-    "ttH_hbb__sl_jge4_tge2__met_pt__unweighted",
-    "ttH_hbb__sl_jge4_tge2__nBCSVM__unweighted",
-    "ttH_hbb__sl_jge4_tge2__nPVs__unweighted",
-    "ttH_hbb__sl_jge4_tge2__numJets__unweighted",
-]
+import argparse
+parser = argparse.ArgumentParser(description='Compares two sets of datacards')
+parser.add_argument(
+    '-p',
+    '--process',
+    action='append',
+    help="Processes to compare",
+    required=True
+)
 
-for histo in histos:
-    compare_hists(
-        [
-            "/mnt/t3nfs01/data01/shome/jpata/tth/gc/sparse/Jan18.root",
-            "/mnt/t3nfs01/data01/shome/jpata/tth/gc/sparse/GC08562acc5622/Jan26.root",
-        ],
-        [
-             "Jan18", "Jan26",
-        ],
-        histo
-    )
+parser.add_argument(
+    '-d',
+    '--distribution',
+    action='append',
+    help="Distributions to compare",
+    required=True
+)
+
+parser.add_argument(
+    '-f',
+    '--files',
+    action='append',
+    help="Files to compare",
+    required=True
+)
+
+parser.add_argument(
+    '--out',
+    action='store',
+    help="Output directory",
+    required=True
+)
+args = parser.parse_args(sys.argv[1:])
+os.makedirs(args.out)
+
+html = open("{0}/index.html".format(args.out), "w")
+html.write(" ".join(sys.argv) + "<br>\n")
+
+file_names = []
+file_tags = []
+for fi in args.files:
+    file_names += [fi]
+    #file name without path or extension
+    base = os.path.basename(fi)
+    file_tags += [os.path.splitext(base)[0]]
+
+html.write('<a name="top"></a>\n')
+html.write('Distributions:<br><ul>\n')
+for distr in args.distribution:
+    html.write('  <li><a href="#{0}">{0}</a>\n'.format(distr))
+    html.write('<ul>\n')
+    for proc in args.process:
+        html.write('  <li><a href="#{0}__{1}">{1}</a>\n'.format(distr, proc))
+    html.write('</ul></li>\n')
+html.write('</ul><hr>\n')
+
+for distr in args.distribution:
+    html.write('<a name="{0}"></a>\n'.format(distr))
+    for proc in args.process:
+        html.write('<a name="{0}__{1}"></a>\n'.format(distr, proc))
+        histo = "{0}__{1}".format(proc, distr)
+
+        plotfile = compare_hists(file_names, file_tags, histo, args.out)
+        
+        html.write('{0} <a href="#top">top</a><br>\n'.format(histo))
+        html.write('<img src="{1}.png" alt=""><br>\n'.format(args.out, plotfile))
+    html.write('<hr>\n'.format(distr))
+html.close()

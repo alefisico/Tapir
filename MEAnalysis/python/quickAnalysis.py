@@ -1,6 +1,7 @@
 import ROOT, uuid, glob, os, copy
 from TTH.Plotting.Datacards.sparse import save_hdict
 from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample
+import sys
 
 def process_chain(chain, func, bins, cut, max_entries=ROOT.TTree.kMaxEntries):
     _hname = str(uuid.uuid4())
@@ -40,7 +41,8 @@ def get_hists(dataset, chain, variable, bins, cut, mc_weight, name=""):
             chain,
             variable,
             bins,
-            "(json==1 && ({0}))".format(cut)
+            #"(json==1 && ({0}))".format(cut)
+            "({0})".format(cut)
         )
     elif is_ttbar(dataset): 
         hists[dataset + "_light" + name] = process_chain(
@@ -75,27 +77,33 @@ if __name__ == "__main__":
     hc = None 
     for fi in file_names:
         chain.Add(fi)
-        tf = ROOT.TFile.Open(fi)
-        _hc = tf.Get("vhbb/Count")
-        if _hc:
-            if not hc:
-                ROOT.gROOT.cd()
-                hc = copy.deepcopy(_hc)
-                hc.SetDirectory(ROOT.gROOT)
-            else:
-                hc.Add(_hc)
-        tf.Close()
+
+    weight = "1"
+    if not is_data(dataset):
+        weight = "(genWeight)"
 
     hists = get_hists(
         dataset, chain,
         "numJets",
         (6, 4, 10),
         "((HLT_ttH_SL_mu==1 && abs(leps_pdgId[0]==13))) && is_sl==1 && numJets>=4 && nBCSVM>=2",
-        "(genWeight * btagWeightCSV * puWeight)",
+        weight,
         "__numJets"
     )
-    if hc:
-        print "saving counts", hc.GetBinContent(1)
-        hists[dataset + "_Count"] = hc
-
-    save_hdict("out.root", copy.deepcopy(hists))
+    hists.update(get_hists(
+        dataset, chain,
+        "jets_pt",
+        (300, 0, 300),
+        "((HLT_ttH_SL_mu==1 && abs(leps_pdgId[0]==13))) && is_sl==1 && numJets>=4 && nBCSVM>=2",
+        weight,
+        "__jets_pt"
+    ))
+    hists.update(get_hists(
+        dataset, chain,
+        "jets_pt",
+        (300, -2.5, 2.5),
+        "((HLT_ttH_SL_mu==1 && abs(leps_pdgId[0]==13))) && is_sl==1 && numJets>=4 && nBCSVM>=2",
+        weight,
+        "__jets_eta"
+    ))
+    save_hdict(sys.argv[1], copy.deepcopy(hists))

@@ -26,7 +26,7 @@ class TriggerAnalyzer(FilterAnalyzer):
         for pathname, trigs in triglist.items():
             pathBit = False
             for name in trigs:
-                bit = int(getattr(event.input, name, -1))
+                bit = int(event.input.__getattr__(name, -1))
                 setattr(event, name, bit)                
                 event.trigvec += [bit == 1]
                 pathBit = pathBit or bool(bit)
