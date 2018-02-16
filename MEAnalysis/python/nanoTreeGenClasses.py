@@ -43,19 +43,49 @@ genbmass = 4.75
 def sign(number):
 	return cmp(number,0)
 
-def realGenMothers(GenParticle,gp, idx=20):
-    """Get the mothers of a particle X going through intermediate X -> X' chains.
-       e.g. if Y -> X, X -> X' realGenMothers(X') = Y"""
+def realGenMothers(GenParticle,gp):
+	"""Get the mothers of a particle X going through intermediate X -> X' chains.
+		e.g. if Y -> X, X -> X' realGenMothers(X') = Y"""
+	ret = []
+	#if idx == 0: #Shouldn't be needed...
+	#	print "NB: realGenMothers aborted due to deep recursion"
+	#	return ret
+	if gp.genPartIdxMother >= 0:
+		mom = GenParticle[gp.genPartIdxMother]
+		if mom.pdgId == gp.pdgId:
+			ret += realGenMothers(GenParticle,mom)
+		else:
+			ret.append(mom)
+	else:
+		return ret
+	return ret
+
+def realGenDaughters(GenParticle,gp,excludeRadiation=True):
+    """Get the daughters of a particle, going through radiative X -> X' + a
+       decays, either including or excluding the radiation among the daughters
+       e.g. for  
+                  X -> X' + a, X' -> b c 
+           realGenDaughters(X, excludeRadiation=True)  = { b, c }
+           realGenDaughters(X, excludeRadiation=False) = { a, b, c }"""
     ret = []
-    if idx == 0:
-        print "NB: realGenMothers aborted due to deep recursion"
-        return ret
-    mom = GenParticle[gp.genPartIdxMother]
-    if mom.pdgId == gp.pdgId:
-        ret += realGenMothers(GenParticle,mom, idx-1)
-    else:
-        ret.append(mom)
-    return ret
+    for dau in getDaughters(GenParticle,gp):
+        if dau.pdgId == gp.pdgId:
+            if excludeRadiation:
+                return realGenDaughters(GenParticle,dau)
+            else:
+                ret += realGenDaughters(GenParticle,dau)
+        else:
+            ret.append(dau)
+	return ret
+
+def getDaughters(GenParticle,gp):
+	ret = []
+	for part in GenParticle:
+		if part != gp:
+			if part.genPartIdxMother == GenParticle.index(gp):
+				ret.append(part)
+	return ret
+
 
 
 ### Get all generator level information
@@ -80,19 +110,19 @@ class GenLepFromTop:
 	def make_array(GenParticle):
 		ret = []
 		for i in range(len(GenParticle)):
-		    if (abs(GenParticle[i].pdgId) in {11,13}):
-		    #skip leptons from tau decays, as they are stored separately in gentauleps vector
-			    if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) != 15:
-			        momids = [(m, abs(m.pdgId)) for m in realGenMothers(GenParticle,GenParticle[i])]
-			        #have a look at the lepton mothers
-			        for mom, momid in momids:
-			            #lepton from W
-			            if momid == 24:
-			                wmomids = [abs(m.pdgId) for m in realGenMothers(GenParticle,mom)]
-			                #W from t
-			                if 6 in wmomids:
-			                    #save mu,e from t->W->mu/e
-			                    ret.append(i)
+			if (abs(GenParticle[i].pdgId) in {11,13}):
+			#skip leptons from tau decays, as they are stored separately in gentauleps vector
+				momids = [(m, abs(m.pdgId)) for m in realGenMothers(GenParticle,GenParticle[i])]
+				#have a look at the lepton mothers
+				for mom, momid in momids:
+					#lepton from W
+					if momid == 24:
+						wmomids = [abs(m.pdgId) for m in realGenMothers(GenParticle,mom)]
+						#W from t
+						if 6 in wmomids:
+							#save mu,e from t->W->mu/e
+							ret.append(i)
+
 		return [GenLepFromTop(GenParticle, i) for i in ret]
 
 
@@ -113,12 +143,14 @@ class GenBQuarkFromTop:
 	@staticmethod
 	def make_array(GenParticle):
 		ret = []
-		for i in range(len(GenParticle)):		    
-			if abs(GenParticle[i].pdgId) == 5:
-				momids = [abs(m.pdgId) for m in realGenMothers(GenParticle,GenParticle[i])]
-				if 6 in momids: 
-					ret.append(i)
-		return [GenBQuarkFromTop(GenParticle, i) for i in ret]
+		for i in range(len(GenParticle)):	
+			if abs(GenParticle[i].pdgId) == 5:	
+				mom = GenParticle[GenParticle[i].genPartIdxMother]  
+				if abs(mom.pdgId)  == 6: 
+					dauids = [abs(dau.pdgId) for dau in getDaughters(GenParticle,mom)]
+					if 6 not in dauids:	 
+						ret.append(i) 		
+		return list(set([GenBQuarkFromTop(GenParticle, i) for i in ret]))
 
 
 class GenLepFromTau:
@@ -141,19 +173,9 @@ class GenLepFromTau:
 		ret = []
 		for i in range(len(GenParticle)):		
 			if (abs(GenParticle[i].pdgId) in {11,13}):
-				c = i
-				#leptons from tau decays
-				#if abs(event.GenParticle[GenParticle[i].genPartIdxMother].pdgId) == 15:
-				while GenParticle[c].genPartIdxMother != -1:
-					momids = [(m, abs(m.pdgId)) for m in realGenMothers(GenParticle,GenParticle[c])]
-					c = GenParticle[c].genPartIdxMother
-				#have a look at the lepton mothers
-					for mom, momid in momids:
-						#lepton from tau
-						if momid == 15:
-							ret.append(i)
-							break
-			
+				if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) == 15:
+					ret.append(i)
+					break			
 		return [GenLepFromTau(GenParticle, i) for i in ret]
 
 class GenHiggsBoson:
@@ -173,7 +195,9 @@ class GenHiggsBoson:
 		ret = []
 		for i in range(len(GenParticle)):		    
 			if abs(GenParticle[i].pdgId) == 25: 
-				ret.append(i)
+				dauids = [abs(dau.pdgId) for dau in getDaughters(GenParticle,GenParticle[i])]
+				if 25 not in dauids:
+					ret.append(i)
 		return [GenHiggsBoson(GenParticle, i) for i in ret]
 
 class GenTop:
@@ -185,7 +209,28 @@ class GenTop:
 		self.status = GenParticle[n].status;
 		self.charge = -sign(GenParticle[n].pdgId);
 		self.mass = GenParticle[n].mass;
-        #What about isPromptHard? Is it needed?
+		#Need to get top decay mode
+		#go over top daughters
+		decayMode = -10
+		daus = getDaughters(GenParticle,GenParticle[n])
+		for dau in daus:
+			#found the W
+			if abs(dau.pdgId) == 24:
+				#find the true daughters of the W (in case of decay chain)
+				W_daus = realGenDaughters(GenParticle,dau)
+				decayMode = -1
+				#go over the daughters of the W
+				for idauw in range(len(W_daus)):
+					w_dau_id = abs(W_daus[idauw].pdgId)
+					#leptonic
+					if w_dau_id in [11,12,13,14,15,16]:
+						decayMode = 0
+						break
+					#hadronic
+					elif w_dau_id < 6:
+						decayMode = 1
+						break
+		self.decayMode = decayMode
 		pass
 
 	@staticmethod
@@ -193,7 +238,9 @@ class GenTop:
 		ret = []
 		for i in range(len(GenParticle)):		    
 			if abs(GenParticle[i].pdgId) == 6: 
-				ret.append(i)
+				dauids = [abs(dau.pdgId) for dau in getDaughters(GenParticle,GenParticle[i])]				
+				if 6 not in dauids:
+						ret.append(i)
 		return [GenTop(GenParticle, i) for i in ret]
 
 class GenTaus:
@@ -236,9 +283,24 @@ class GenLep:
 		ret = []
 		for i in range(len(GenParticle)):
 			if abs(GenParticle[i].pdgId) in {11,13}:
-				#skip leptons from tau decays, as they are stored separately in event.GenLepsFromTau
-				if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) != 15:
-					ret.append(i)
+				if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) not in {11,13,15}:
+					momids = [(m, abs(m.pdgId)) for m in realGenMothers(GenParticle,GenParticle[i])]
+					#have a look at the lepton mothers
+					isW = False
+					istop = False
+					isWZ = False
+					for mom, momid in momids:
+						if momid == 24:
+							isW = True
+							isWZ = True
+							wmomids = [(m, abs(m.pdgId)) for m in realGenMothers(GenParticle,mom)]
+							for wmom, wmomid in wmomids:
+								if wmomid == 6:
+									istop == True
+						if momid == 23:
+							isWZ = True
+					if istop == True or isWZ == True:	
+						ret.append(i)
 		return [GenLep(GenParticle, i) for i in ret]
 
 
@@ -257,10 +319,10 @@ class GenWZQuark:
 	@staticmethod
 	def make_array(GenParticle):
 		ret = []
-		for i in range(len(GenParticle)):	    
-			if abs(GenParticle[i].pdgId) <= 5 and any([abs(m.pdgId) in {23,24} for m in realGenMothers(GenParticle,GenParticle[i])]):
+		for i in range(len(GenParticle)):
+			if abs(GenParticle[i].pdgId) <= 5 and abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) in [23,24]:
 				ret.append(i)
-		return [GenWZQuark(GenParticle, i) for i in ret]
+		return list(set([GenWZQuark(GenParticle, i) for i in ret]))
 
 class GenBQuarkFromHiggs:
 	def __init__(self, GenParticle, n):
@@ -278,11 +340,14 @@ class GenBQuarkFromHiggs:
 	def make_array(GenParticle):
 		ret = []
 		for i in range(len(GenParticle)): 
-			if abs(GenParticle[i].pdgId) == 5:
-				momids = [abs(m.pdgId) for m in realGenMothers(GenParticle,GenParticle[i])]
-				if 25 in momids: 
-					ret.append(i)
-		return [GenBQuarkFromHiggs(GenParticle, i) for i in ret]
+			if abs(GenParticle[i].pdgId) in [3,4,5]:
+				mom = GenParticle[GenParticle[i].genPartIdxMother]  
+				if abs(mom.pdgId)  == 25: 
+					dauids = [abs(dau.pdgId) for dau in getDaughters(GenParticle,mom)]
+					if 25 not in dauids:	 
+						ret.append(i) 	
+		#list(set(..)) to remove hypothetic duplicates
+		return list(set([GenBQuarkFromHiggs(GenParticle, i) for i in ret]))
 
 class GenNuFromTop:
 	def __init__(self, GenParticle, n):
@@ -304,15 +369,13 @@ class GenNuFromTop:
 			if abs(GenParticle[i].pdgId) in {12,14,16}:
 				#skip neutrinos from tau decays, as they are stored separately in event.GenNuFromTau vector
 				if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) != 15:                     
-					momids = [(m, abs(m.pdgId)) for m in realGenMothers(GenParticle,GenParticle[i])]
-					#have a look at the neutrino mothers
-					for mom, momid in momids:
-						#neutrino from W
-						if momid == 24:
-							wmomids = [abs(m.pdgId) for m in realGenMothers(GenParticle,mom)]
-							#W from t
-							if 6 in wmomids:
-								ret.append(i)
+					mom = GenParticle[GenParticle[i].genPartIdxMother]
+					if abs(mom.pdgId) == 24:
+						#wmomids = [(m, abs(m.pdgId)) for m in realGenMothers(GenParticle,mom)]
+						wmomids = [abs(m.pdgId) for m in realGenMothers(GenParticle, mom)]
+						if 6 in wmomids:
+							#save mu,e from t->W->mu/e
+							ret.append(i)
 		return [GenNuFromTop(GenParticle, i) for i in ret]
 
 class GenNu:
@@ -379,8 +442,9 @@ class GenGluonFromTop:
 		ret = []
 		for i in range(len(GenParticle)):
 			if abs(GenParticle[i].pdgId) == 21:
-				if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) == 6:                     
-					ret.append(i)
+				if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) == 6:  
+					if GenParticle[i].pt > 20:           
+						ret.append(i)
 		return [GenGluonFromTop(GenParticle, i) for i in ret]
 
 class GenGluonFromB:
@@ -401,7 +465,8 @@ class GenGluonFromB:
 		for i in range(len(GenParticle)):
 			if abs(GenParticle[i].pdgId) == 21:
 				if abs(GenParticle[GenParticle[i].genPartIdxMother].pdgId) == 5:                     
-					ret.append(i)
+					if GenParticle[i].pt > 20:           
+						ret.append(i)
 		return [GenGluonFromB(GenParticle, i) for i in ret]
 
 
