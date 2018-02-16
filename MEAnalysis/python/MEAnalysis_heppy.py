@@ -181,7 +181,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             output_name = "Loop_" + sample_name
     elif schema:
         sample_name = "sample"
-        vhbb_tree_name = "tree"
+        vhbb_tree_name = "Events"
         pass
     else:
         raise Exception("Must specify either sample name or schema")
@@ -601,6 +601,7 @@ if __name__ == "__main__":
         files = args.files.split(",")
     else:
         files = []
+    print an
     looper_dir, files = main(an, sample_name=args.sample, numEvents=args.numEvents, files=files)
 
     import TTH.MEAnalysis.counts as counts
