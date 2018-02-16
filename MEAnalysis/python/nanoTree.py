@@ -23,7 +23,7 @@ class EventAnalyzer(Analyzer):
         #event.pileUpVertex_z = pileUpVertex_z.make_array(event.input)        
         event.Pileup_nPU = getattr(event.input, "Pileup_nPU", None)
         event.Pileup_nTrueInt = getattr(event.input, "Pileup_nTrueInt", None)
-        event.PV_npvs = getattr(event.input, "PV_npvs", None)
+        event.nPVs = getattr(event.input, "PV_npvs", None)
         #event.bx = getattr(event.input, "bx", None)
         #event.rho = getattr(event.input, "rho", None)
 
