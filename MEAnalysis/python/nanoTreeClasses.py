@@ -506,6 +506,7 @@ class FatjetCA15SoftDrop:
         self.area = tree.FatjetCA15SoftDrop_area[n];
         self.subJetIdx1 = tree.FatjetCA15SoftDrop_subJetIdx1[n];
         self.subJetIdx2 = tree.FatjetCA15SoftDrop_subJetIdx2[n];
+        self.subjetIDPassed = tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx1[n]] == 1 and tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx2[n]] == 1 
         pass
     @staticmethod
     def make_array(input, MC = False):
@@ -524,6 +525,38 @@ class FatjetCA15SoftDropSubjet:
     @staticmethod
     def make_array(input, MC = False):
         return [FatjetCA15SoftDropSubjet(input, i, MC) for i in range(input.nFatjetCA15SoftDropSubjets)]
+
+class FatjetAK8:
+    def __init__(self, tree, n, MC):
+        self.pt = tree.FatJet_pt[n];
+        self.eta = tree.FatJet_eta[n];
+        self.phi = tree.FatJet_phi[n];
+        self.mass = tree.FatJet_mass[n];
+        self.area = tree.FatJet_area[n];
+        self.bbtag = tree.FatJet_btagHbb[n];
+        self.tau1 = tree.FatJet_tau1[n];
+        self.tau2 = tree.FatJet_tau2[n];
+        self.tau3 = tree.FatJet_tau3[n];
+        self.btag = tree.FatJet_btagCSVV2[n];
+        self.subJetIdx1 = tree.FatJet_subJetIdx1[n];
+        self.subJetIdx2 = tree.FatJet_subJetIdx2[n];
+        self.msoftdrop = tree.FatJet_msoftdrop[n];
+        pass
+    @staticmethod
+    def make_array(input, MC = False):
+        return [FatjetAK8(input, i, MC) for i in range(input.nFatJet)]
+
+class SubjetAK8:
+    def __init__(self, tree, n, MC):
+        self.pt = tree.SubJet_pt[n];
+        self.eta = tree.SubJet_eta[n];
+        self.phi = tree.SubJet_phi[n];
+        self.mass = tree.SubJet_mass[n];
+        self.btag = tree.SubJet_btagCSVV2[n];
+        pass
+    @staticmethod
+    def make_array(input, MC = False):
+        return [SubjetAK8(input, i, MC) for i in range(input.nSubJet)]
 
 
 ##################################################################################

@@ -21,6 +21,7 @@ class TreeVarAnalyzer(FilterAnalyzer):
         setattr( event, 'othertopCandidate', [])
         setattr( event, 'topCandidatesSync', [])    
         setattr( event, 'higgsCandidate', [] )
+        setattr( event, 'higgsCandidateAK8', [] )
         event.b_quarks_h_nominal = []
         event.b_quarks_t_nominal = []
         event.l_quarks_w_nominal = []

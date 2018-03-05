@@ -344,8 +344,8 @@ class MEAnalyzer(FilterAnalyzer):
         if "meminput" in self.conf.general["verbosity"]:
             autolog("MEM id={run},{lumi},{evt} cat={cat} cat_b={cat_btag} nj={nj} nt={nb} nel={n_el} nmu={n_mu} syst={syst} blr={blr} 3blr={blr3} mW={mW}".format(
                 run=event.input.run,
-                lumi=event.input.lumi,
-                evt=event.input.evt,
+                lumi=event.lumi,
+                evt=event.evt,
                 is_sl=event.is_sl,
                 is_dl=event.is_dl,
                 cat=event.cat,
