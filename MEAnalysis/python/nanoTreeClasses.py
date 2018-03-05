@@ -41,7 +41,7 @@ class Electron:
             pass
 
         
-        #### Old variaables (for reference)
+        #### Old variables (for reference)
         #self.mcMatchIdx = tree.Electron_mcMatchIdx[n]; #KS: Not in nanoAOD. Please check this var.
         #self.mcMatchAny = tree.selLeptons_mcMatchAny[n];
         #self.mcMatchTau = tree.selLeptons_mcMatchTau[n];
@@ -137,7 +137,7 @@ class Muon:
             pass
 
         
-        #### Old variaables (for reference)
+        #### Old variables (for reference)
         #self.convVeto = tree.selLeptons_convVeto[n];
         #self.lostHits = tree.selLeptons_lostHits[n];
         #self.relIso03 = tree.selLeptons_relIso03[n];
@@ -232,7 +232,7 @@ class Jet:
             self.genJetIdx = tree.Jet_genJetIdx[n];
             pass
         
-        #### Old variaables (for reference)
+        #### Old variables (for reference)
         #self.corr_JECUp = tree.Jet_corr_JECUp[n];
         #self.corr_JECDown = tree.Jet_corr_JECDown[n];
         #self.corr_JERUp = tree.Jet_corr_JERUp[n];
@@ -426,7 +426,7 @@ class met:
 
 class trggerObject:
     """
-    Acessing the trigge objects saved in nanoAOD. 
+    Accessing the trigger objects saved in nanoAOD. 
 
     Trigger Objects are saved in nanoAOD as TrigObj_* with len nTrigObj
     They can be identified with the TrigObj_id variable
@@ -446,6 +446,85 @@ class trggerObject:
                 list_.append(trggerObjects(input, i))
 
         return list_
+
+class HTTV2:
+    def __init__(self, tree, n, MC):
+        self.pt = tree.HTTV2_pt[n];
+        self.eta = tree.HTTV2_eta[n];
+        self.phi = tree.HTTV2_phi[n];
+        self.mass = tree.HTTV2_mass[n];
+        self.area = tree.HTTV2_area[n];
+        self.subJetIdx1 = tree.HTTV2_subJetIdx1[n];
+        self.subJetIdx2 = tree.HTTV2_subJetIdx2[n];
+        self.subJetIdx3 = tree.HTTV2_subJetIdx3[n];
+        self.Ropt = tree.HTTV2_Ropt[n];
+        self.RoptCalc = tree.HTTV2_RoptCalc[n];
+        self.fRec = tree.HTTV2_fRec[n];
+        self.ptForRoptCalc = tree.HTTV2_ptForRoptCalc[n];
+        self.subjetIDPassed = tree.HTTV2Subjets_IDPassed[tree.HTTV2_subJetIdx1[n]] == 1 and tree.HTTV2Subjets_IDPassed[tree.HTTV2_subJetIdx2[n]] == 1 and tree.HTTV2Subjets_IDPassed[tree.HTTV2_subJetIdx3[n]] == 1
+        pass
+    @staticmethod
+    def make_array(input, MC = False):
+        return [HTTV2(input, i, MC) for i in range(input.nHTTV2)]
+
+class HTTV2Subjet:
+    def __init__(self, tree, n, MC):
+        self.pt = tree.HTTV2Subjets_pt[n];
+        self.eta = tree.HTTV2Subjets_eta[n];
+        self.phi = tree.HTTV2Subjets_phi[n];
+        self.mass = tree.HTTV2Subjets_mass[n];
+        self.area = tree.HTTV2Subjets_area[n];
+        self.btag = tree.HTTV2Subjets_btag[n];
+        self.IDPassed = tree.HTTV2Subjets_IDPassed[n];
+        pass
+    @staticmethod
+    def make_array(input, MC = False):
+        return [HTTV2Subjet(input, i, MC) for i in range(input.nHTTV2Subjets)]
+
+class FatjetCA15:
+    def __init__(self, tree, n, MC):
+        self.pt = tree.FatjetCA15_pt[n];
+        self.eta = tree.FatjetCA15_eta[n];
+        self.phi = tree.FatjetCA15_phi[n];
+        self.mass = tree.FatjetCA15_mass[n];
+        self.area = tree.FatjetCA15_area[n];
+        self.bbtag = tree.FatjetCA15_bbtag[n];
+        self.tau1 = tree.FatjetCA15_tau1[n];
+        self.tau2 = tree.FatjetCA15_tau2[n];
+        self.tau3 = tree.FatjetCA15_tau3[n];
+        pass
+    @staticmethod
+    def make_array(input, MC = False):
+        return [FatjetCA15(input, i, MC) for i in range(input.nFatjetCA15)]
+
+class FatjetCA15SoftDrop:
+    def __init__(self, tree, n, MC):
+        self.pt = tree.FatjetCA15SoftDrop_pt[n];
+        self.eta = tree.FatjetCA15SoftDrop_eta[n];
+        self.phi = tree.FatjetCA15SoftDrop_phi[n];
+        self.mass = tree.FatjetCA15SoftDrop_mass[n];
+        self.area = tree.FatjetCA15SoftDrop_area[n];
+        self.subJetIdx1 = tree.FatjetCA15SoftDrop_subJetIdx1[n];
+        self.subJetIdx2 = tree.FatjetCA15SoftDrop_subJetIdx2[n];
+        pass
+    @staticmethod
+    def make_array(input, MC = False):
+        return [FatjetCA15SoftDrop(input, i, MC) for i in range(input.nFatjetCA15SoftDrop)]
+
+class FatjetCA15SoftDropSubjet:
+    def __init__(self, tree, n, MC):
+        self.pt = tree.FatjetCA15SoftDropSubjets_pt[n];
+        self.eta = tree.FatjetCA15SoftDropSubjets_eta[n];
+        self.phi = tree.FatjetCA15SoftDropSubjets_phi[n];
+        self.mass = tree.FatjetCA15SoftDropSubjets_mass[n];
+        self.area = tree.FatjetCA15SoftDropSubjets_area[n];
+        self.btag = tree.FatjetCA15SoftDropSubjets_btag[n];
+        self.IDPassed = tree.FatjetCA15SoftDropSubjets_IDPassed[n];
+        pass
+    @staticmethod
+    def make_array(input, MC = False):
+        return [FatjetCA15SoftDropSubjet(input, i, MC) for i in range(input.nFatjetCA15SoftDropSubjets)]
+
 
 ##################################################################################
 ##################################################################################
