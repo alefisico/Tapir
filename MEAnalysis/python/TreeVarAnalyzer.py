@@ -18,8 +18,6 @@ class TreeVarAnalyzer(FilterAnalyzer):
         setattr( event, 'boosted_bjets', [] )
         setattr( event, 'boosted_ljets', [] )
         setattr( event, 'topCandidate', [] )
-        setattr( event, 'othertopCandidate', [])
-        setattr( event, 'topCandidatesSync', [])    
         setattr( event, 'higgsCandidate', [] )
         setattr( event, 'higgsCandidateAK8', [] )
         event.b_quarks_h_nominal = []
