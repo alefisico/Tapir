@@ -141,24 +141,24 @@ workflow_datasets["leptonic"] = {}
 for k in [
         "ttHTobb",
         "ttHToNonbb",
-        #"TTbar_inc",
+        "TTbar_inc",
         #"ttbb",
-        "TTbar_isr_up",
-        "TTbar_isr_down1",
-        "TTbar_isr_down2",
-        "TTbar_fsr_up1",
-        "TTbar_fsr_up2",
-        "TTbar_fsr_down",
-        "TTbar_tune_up1",
-        "TTbar_tune_up2",
-        "TTbar_tune_down1",
-        "TTbar_tune_down2",
-        "TTbar_hdamp_up1",
-        "TTbar_hdamp_up2",
-        "TTbar_hdamp_down1",
-        "TTbar_hdamp_down2",
-        "TTbar_sl",
-        "TTbar_dl",
+        #"TTbar_isr_up",
+        #"TTbar_isr_down1",
+        #"TTbar_isr_down2",
+        #"TTbar_fsr_up1",
+        #"TTbar_fsr_up2",
+        #"TTbar_fsr_down",
+        #"TTbar_tune_up1",
+        #"TTbar_tune_up2",
+        #"TTbar_tune_down1",
+        #"TTbar_tune_down2",
+        #"TTbar_hdamp_up1",
+        #"TTbar_hdamp_up2",
+        #"TTbar_hdamp_down1",
+        #"TTbar_hdamp_down2",
+        "TTbar_sl1","TTbar_sl2",
+        "TTbar_dl1", "TTbar_dl2",
         "ww1", "ww2",
         "wz1", "wz2",
         "zz1", "zz2",
@@ -172,7 +172,7 @@ for k in [
         "ttw_wqq",
         "ttz_zqq",
         "wjets",
-        "dy_50_inf1", "dy_50_inf2", "dy_10_50"
+        #"dy_50_inf1", "dy_50_inf2", "dy_10_50"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -184,9 +184,9 @@ for k in [
         "ttHTobb",
         "ttHToNonbb",
         "TTbar_inc",
-        "ttbb",
-        "TTbar_sl",
-        "TTbar_dl",
+        #"ttbb",
+        "TTbar_sl1","TTbar_sl2",
+        "TTbar_dl1", "TTbar_dl2",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_memcheck.py"
@@ -210,8 +210,8 @@ for k in [
         "ttHTobb",
         "ttHToNonbb",
         "TTbar_inc",
-        "TTbar_sl",
-        "TTbar_dl",
+        "TTbar_sl1","TTbar_sl2",
+        "TTbar_dl1", "TTbar_dl2",
         #"ww1", "ww2",
         #"wz1", "wz2",
         #"zz1", "zz2",
@@ -344,7 +344,7 @@ for k in ["mc", "data"]:
     workflow_datasets["localtesting_withme"][k] = D
 
 workflow_datasets["testing_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc"]:
+for k in ["ttHTobb","TTbar_inc"]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(D["perjob"]/10)
     D["maxlumis"] = 10 * D["perjob"]

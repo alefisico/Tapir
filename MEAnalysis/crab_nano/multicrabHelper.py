@@ -1,7 +1,8 @@
 import json, yaml
 import os
 
-def getDatasets(mem_cfg, script, files = ["ttH.json","ttbar.json","otherbkg.json", "QCD.json"]):
+#def getDatasets(mem_cfg, script, files = ["ttH.json","ttbar.json","otherbkg.json", "QCD.json"]):
+def getDatasets(mem_cfg, script, files = ["ttH_CMSSW_9X.json","ttbar_CMSSW_9X.json","otherbkg_CMSSW_9X.json", "QCD_CMSSW_9X.json"]):
     pwd = os.getcwd()
 
 
