@@ -51,68 +51,35 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/DoubleEG/Run2016B-03Feb2017_ver2-v2/MINIAOD",
-    "/DoubleEG/Run2016C-03Feb2017-v1/MINIAOD",
-    "/DoubleEG/Run2016D-03Feb2017-v1/MINIAOD",
-    "/DoubleEG/Run2016E-03Feb2017-v1/MINIAOD",
-    "/DoubleEG/Run2016F-03Feb2017-v1/MINIAOD",
-    "/DoubleEG/Run2016G-03Feb2017-v1/MINIAOD",
-    "/DoubleEG/Run2016H-03Feb2017_ver2-v1/MINIAOD",
-    "/DoubleEG/Run2016H-03Feb2017_ver3-v1/MINIAOD",
+    "/DoubleEG/Run2017B-17Nov2017-v1/MINIAOD",
+    "/DoubleEG/Run2017C-17Nov2017-v1/MINIAOD",
+    "/DoubleEG/Run2017D-17Nov2017-v1/MINIAOD",
+    "/DoubleEG/Run2017E-17Nov2017-v1/MINIAOD",
+    "/DoubleEG/Run2017F-17Nov2017-v1/MINIAOD",
     
-    "/DoubleMuon/Run2016B-03Feb2017_ver2-v2/MINIAOD",
-    "/DoubleMuon/Run2016C-03Feb2017-v1/MINIAOD",
-    "/DoubleMuon/Run2016D-03Feb2017-v1/MINIAOD",
-    "/DoubleMuon/Run2016E-03Feb2017-v1/MINIAOD",
-    "/DoubleMuon/Run2016F-03Feb2017-v1/MINIAOD",
-    "/DoubleMuon/Run2016G-03Feb2017-v1/MINIAOD",
-    "/DoubleMuon/Run2016H-03Feb2017_ver2-v1/MINIAOD",
-    "/DoubleMuon/Run2016H-03Feb2017_ver3-v1/MINIAOD",
-      
-    "/MuonEG/Run2016B-03Feb2017_ver2-v2/MINIAOD",
-    "/MuonEG/Run2016C-03Feb2017-v1/MINIAOD",
-    "/MuonEG/Run2016D-03Feb2017-v1/MINIAOD",
-    "/MuonEG/Run2016E-03Feb2017-v1/MINIAOD",
-    "/MuonEG/Run2016F-03Feb2017-v1/MINIAOD",
-    "/MuonEG/Run2016G-03Feb2017-v1/MINIAOD",
-    "/MuonEG/Run2016H-03Feb2017_ver2-v1/MINIAOD",
-    "/MuonEG/Run2016H-03Feb2017_ver3-v1/MINIAOD",
-   
-    "/SingleMuon/Run2016B-03Feb2017_ver2-v2/MINIAOD",
-    "/SingleMuon/Run2016C-03Feb2017-v1/MINIAOD",
-    "/SingleMuon/Run2016D-03Feb2017-v1/MINIAOD",
-    "/SingleMuon/Run2016E-03Feb2017-v1/MINIAOD",
-    "/SingleMuon/Run2016F-03Feb2017-v1/MINIAOD",
-    "/SingleMuon/Run2016G-03Feb2017-v1/MINIAOD",
-    "/SingleMuon/Run2016H-03Feb2017_ver2-v1/MINIAOD",
-    "/SingleMuon/Run2016H-03Feb2017_ver3-v1/MINIAOD",
-   
-    "/SingleElectron/Run2016B-03Feb2017_ver2-v2/MINIAOD",
-    "/SingleElectron/Run2016C-03Feb2017-v1/MINIAOD",
-    "/SingleElectron/Run2016D-03Feb2017-v1/MINIAOD",
-    "/SingleElectron/Run2016E-03Feb2017-v1/MINIAOD",
-    "/SingleElectron/Run2016F-03Feb2017-v1/MINIAOD",
-    "/SingleElectron/Run2016G-03Feb2017-v1/MINIAOD",
-    "/SingleElectron/Run2016H-03Feb2017_ver2-v1/MINIAOD",
-    "/SingleElectron/Run2016H-03Feb2017_ver3-v1/MINIAOD",
+    "/DoubleMuon/Run2017B-17Nov2017-v1/MINIAOD",
+    "/DoubleMuon/Run2017C-17Nov2017-v1/MINIAOD",
+    "/DoubleMuon/Run2017D-17Nov2017-v1/MINIAOD",
+    "/DoubleMuon/Run2017E-17Nov2017-v1/MINIAOD",
+    "/DoubleMuon/Run2017F-17Nov2017-v1/MINIAOD",
 
-#    "/BTagCSV/Run2016B-PromptReco-v1/MINIAOD",
-#    "/BTagCSV/Run2016B-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016C-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016D-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016E-PromptReco-v2/MINIAOD",
-#    "/BTagCSV/Run2016F-PromptReco-v2/MINIAOD",
-
-#    "/JetHT/Run2016B-23Sep2016-v2/MINIAOD",
-#    "/JetHT/Run2016B-23Sep2016-v3/MINIAOD",
-#    "/JetHT/Run2016C-23Sep2016-v1/MINIAOD",
-#    "/JetHT/Run2016D-23Sep2016-v1/MINIAOD",
-#    "/JetHT/Run2016E-23Sep2016-v1/MINIAOD",
-#    "/JetHT/Run2016F-23Sep2016-v1/MINIAOD",
-#    "/JetHT/Run2016G-23Sep2016-v1/MINIAOD",
-#    "/JetHT/Run2016H-PromptReco-v1/MINIAOD",
-#    "/JetHT/Run2016H-PromptReco-v2/MINIAOD",
-#    "/JetHT/Run2016H-PromptReco-v3/MINIAOD",
+    "/MuonEG/Run2017B-17Nov2017-v1/MINIAOD",
+    "/MuonEG/Run2017C-17Nov2017-v1/MINIAOD",
+    "/MuonEG/Run2017D-17Nov2017-v1/MINIAOD",
+    "/MuonEG/Run2017E-17Nov2017-v1/MINIAOD",
+    "/MuonEG/Run2017F-17Nov2017-v1/MINIAOD",
+   
+    "/SingleMuon/Run2017B-17Nov2017-v1/MINIAOD",
+    "/SingleMuon/Run2017C-17Nov2017-v1/MINIAOD",
+    "/SingleMuon/Run2017D-17Nov2017-v1/MINIAOD",
+    "/SingleMuon/Run2017E-17Nov2017-v1/MINIAOD",
+    "/SingleMuon/Run2017F-17Nov2017-v1/MINIAOD",
+   
+    "/SingleElectron/Run2017B-17Nov2017-v1/MINIAOD",
+    "/SingleElectron/Run2017C-17Nov2017-v1/MINIAOD",
+    "/SingleElectron/Run2017D-17Nov2017-v1/MINIAOD",
+    "/SingleElectron/Run2017E-17Nov2017-v1/MINIAOD",
+    "/SingleElectron/Run2017F-17Nov2017-v1/MINIAOD",
 ]
 
 #all available datasets.
@@ -140,39 +107,39 @@ workflow_datasets = {}
 workflow_datasets["leptonic"] = {}
 for k in [
         "ttHTobb",
-        "ttHToNonbb",
-        #"TTbar_inc",
+        #"ttHToNonbb",
+        "TTbar_had",
+        "TTbar_sl1",#"TTbar_sl2",
+        "TTbar_dl1",# "TTbar_dl2",
         #"ttbb",
-        "TTbar_isr_up",
-        "TTbar_isr_down1",
-        "TTbar_isr_down2",
-        "TTbar_fsr_up1",
-        "TTbar_fsr_up2",
-        "TTbar_fsr_down",
-        "TTbar_tune_up1",
-        "TTbar_tune_up2",
-        "TTbar_tune_down1",
-        "TTbar_tune_down2",
-        "TTbar_hdamp_up1",
-        "TTbar_hdamp_up2",
-        "TTbar_hdamp_down1",
-        "TTbar_hdamp_down2",
-        "TTbar_sl",
-        "TTbar_dl",
-        "ww1", "ww2",
-        "wz1", "wz2",
-        "zz1", "zz2",
-        "st_t", "stbar_t",
-        "st_tw", "stbar_tw",
-        "st_s",
-        "ttw_wlnu1",
-        "ttw_wlnu2",
-        "ttz_zllnunu1",
-        "ttz_zllnunu2",
-        "ttw_wqq",
-        "ttz_zqq",
-        "wjets",
-        "dy_50_inf1", "dy_50_inf2", "dy_10_50"
+        #"TTbar_isr_up",
+        #"TTbar_isr_down1",
+        #"TTbar_isr_down2",
+        #"TTbar_fsr_up1",
+        #"TTbar_fsr_up2",
+        #"TTbar_fsr_down",
+        #"TTbar_tune_up1",
+        #"TTbar_tune_up2",
+        #"TTbar_tune_down1",
+        #"TTbar_tune_down2",
+        #"TTbar_hdamp_up1",
+        #"TTbar_hdamp_up2",
+        #"TTbar_hdamp_down1",
+        #"TTbar_hdamp_down2",
+        #"ww1", "ww2",
+        #"wz1", "wz2",
+        #"zz1", "zz2",
+        #"st_t", "stbar_t",
+        #"st_tw", "stbar_tw",
+        #"st_s",
+        #"ttw_wlnu1",
+        #"ttw_wlnu2",
+        #"ttz_zllnunu1",
+        #"ttz_zllnunu2",
+        #"ttw_wqq",
+        #"ttz_zqq",
+        #"wjets",
+        #"dy_50_inf1", "dy_50_inf2", "dy_10_50"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_leptonic.py"
@@ -183,10 +150,10 @@ workflow_datasets["memcheck"] = {}
 for k in [
         "ttHTobb",
         "ttHToNonbb",
-        "TTbar_inc",
-        "ttbb",
-        "TTbar_sl",
-        "TTbar_dl",
+        "TTbar_had",
+        #"ttbb",
+        "TTbar_sl1","TTbar_sl2",
+        "TTbar_dl1", "TTbar_dl2",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_memcheck.py"
@@ -201,7 +168,7 @@ for k in [
     workflow_datasets["memcheck2"][k] = D
 
 workflow_datasets["signal"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_inc"]:
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1","TTbar_sl2"]:
     D = deepcopy(datasets[k])
     workflow_datasets["signal"][k] = D
 
@@ -209,9 +176,9 @@ workflow_datasets["leptonic_nome"] = {}
 for k in [
         "ttHTobb",
         "ttHToNonbb",
-        "TTbar_inc",
-        "TTbar_sl",
-        "TTbar_dl",
+        "TTbar_had",
+        "TTbar_sl1","TTbar_sl2",
+        "TTbar_dl1", "TTbar_dl2",
         #"ww1", "ww2",
         #"wz1", "wz2",
         #"zz1", "zz2",
@@ -286,7 +253,7 @@ for k in datasets.keys():
 
 workflow_datasets["allmc_nome"] = {}
 for k in datasets.keys():
-    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_inc", "TTbar_sl1", "TTbar_sl2", "TTbar_dl"] :
+    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_sl2", "TTbar_dl1","TTbar_dl2"] :
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome"]
         workflow_datasets["allmc_nome"][k] = D
@@ -344,7 +311,7 @@ for k in ["mc", "data"]:
     workflow_datasets["localtesting_withme"][k] = D
 
 workflow_datasets["testing_withme"] = {}
-for k in ["ttHTobb", "TTbar_inc"]:
+for k in ["TTbar_had","TTbar_sl1","TTbar_dl1"]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(D["perjob"]/10)
     D["maxlumis"] = 10 * D["perjob"]

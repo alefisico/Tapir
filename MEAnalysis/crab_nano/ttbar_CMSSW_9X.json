@@ -17,11 +17,11 @@
         "script": "heppy_crab_script.sh",
         "isNANOAOD" : False
     },
-    "TTbar_inc": {
-        "ds": "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v2/MINIAODSIM",
+    "TTbar_had": {
+        "ds": "/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
         "maxlumis": -1,
         "mem_cfg": "cfg_noME.py",
-        "perjob": 50,
+        "perjob": 75,
         "runtime": 20,
         "script": "heppy_crab_script.sh",
         "isNANOAOD" : False
