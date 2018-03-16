@@ -13,7 +13,7 @@
         "maxlumis": -1,
         "mem_cfg": "cfg_noME.py",
         "perjob": 10,
-        "runtime": 10,
+        "runtime": 20,
         "script": "heppy_crab_script.sh",
         "isNANOAOD" : False
     }
