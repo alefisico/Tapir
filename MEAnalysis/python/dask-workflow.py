@@ -1,4 +1,4 @@
-import ROOT, rootpy, uuid
+import ROOT, uuid
 
 def load(filename):
     import ROOT
@@ -7,7 +7,7 @@ def load(filename):
     return tf
 
 def draw(args):
-    import ROOT, rootpy, uuid
+    import ROOT, uuid
     ROOT.gROOT.SetBatch(True)
     tf, cut, func, bins = args
     tt = tf.Get("tree")
@@ -15,11 +15,14 @@ def draw(args):
     hn = str(uuid.uuid4())
     h = ROOT.TH1D(hn, hn, *bins)
     n = tt.Draw("{0} >> {1}".format(func, hn), cut, "goff")
-    return rootpy.asrootpy(h)
+    return h
 
 def add(histograms):
-    import rootpy
-    return rootpy.asrootpy(sum([rootpy.asrootpy(h) for h in histograms]))
+    import ROOT
+    htot = histograms[0].Clone()
+    for h in histograms[1:]:
+        htot.Add(h)
+    return htot
 
 def store(args):
     import ROOT
@@ -51,10 +54,9 @@ def make_histo_graph(infiles, cut, func, bins, outfile):
 if __name__ == "__main__":
 
     from TTH.MEAnalysis.samples_base import get_files
-    from threading import Thread, current_thread
     import dask
 
-    infiles = get_files("../gc/datasets/Jan26/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8.txt")
+    infiles = get_files("datasets/Jan26/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8.txt")
 
     from dask.distributed import progress
 

@@ -19,6 +19,13 @@ df = pandas.DataFrame(
     )
 )
 
+bin_edges = np.linspace(0,500,100)
+qh, _ = np.histogram(df["Quark_pt"], bins=bin_edges)
+
+inds = np.searchsorted(bin_edges, df["Quark_pt"], side="left")
+inds[inds>=98] = 98
+df["weights"] = 1.0/qh[inds].astype(np.float32)
+
 sel = (df["Quark_num_matches"]==1) & (df["Jet_pt"] < 400)
 dfsel = df[sel]
 
@@ -30,9 +37,9 @@ n_epoch = 10000
 
 print "creating inputs", len(dfsel)
 #dfsel_q = dfsel[(dfsel["Quark_pt"] > 200) & (dfsel["Quark_pt"] < 210)]
-dfsel_q = dfsel[(dfsel["Quark_pt"] < 300)]
+dfsel_q = dfsel[(dfsel["Quark_pt"] < 400)]
 print "quark pt sel", len(dfsel_q)
-dfsel_q = dfsel_q[:10000]
+#dfsel_q = dfsel_q[:10000]
 print "subsample", len(dfsel_q)
 
 print "quark pt mean", dfsel_q["Quark_pt"].mean(), "std", dfsel_q["Quark_pt"].std()
@@ -40,41 +47,35 @@ print "jet pt mean", dfsel_q["Jet_pt"].mean(), "std", dfsel_q["Jet_pt"].std()
 
 # Create random Tensors to hold inputs and outputs, and wrap them in Variables.
 x = Variable(torch.Tensor(dfsel_q[["Jet_pt"]].as_matrix().reshape(len(dfsel_q), 1).astype(np.float32)), requires_grad=False)
-x = torch.stack([x, torch.sqrt(x), torch.pow(x, 2)], dim=1)[:, :, 0]
+#x = torch.stack([x, torch.sqrt(x), torch.pow(x, 2)], dim=1)[:, :, 0]
 y = Variable(torch.Tensor(dfsel_q[["Quark_pt"]].as_matrix().reshape(len(dfsel_q), 1).astype(np.float32)), requires_grad=False)
 
+w = Variable(torch.Tensor(dfsel_q[["weights"]].as_matrix().reshape(len(dfsel_q), 1).astype(np.float32)), requires_grad=False)
 
 print "creating network"
+
+D_in = 1
+H = 500
+D_out = 6
+
 model = torch.nn.Sequential(
     torch.nn.Linear(D_in, H),
     
+    torch.nn.Dropout(0.5),
     torch.nn.ReLU(),
     torch.nn.Linear(H, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
-    
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
+
+    torch.nn.Dropout(0.5),
     torch.nn.ReLU(),
     torch.nn.Linear(H, H),
     
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
+    torch.nn.Dropout(0.5),
     torch.nn.ReLU(),
     torch.nn.Linear(H, H),
     
     torch.nn.ReLU(),
     torch.nn.Linear(H, D_out),
 )
-
-#model[0].weight.data.normal_(0.0, 0.00001)
-#model[0].bias.data.normal_(0.0, 0.00001)
 
 losses = []
 
@@ -105,8 +106,8 @@ def logpdf(_x, _y, _p, do_print=False):
 
     return v
 
-def lh_loss(_y_pred, _x, _y, do_print=False):
-    ll = logpdf(_x, _y, _y_pred, do_print)
+def lh_loss(_y_pred, _x, _y, weights, do_print=False):
+    ll = logpdf(_x, _y, _y_pred, do_print)*weights
     return -torch.mean(ll)
 
 optimizer = torch.optim.Adam(

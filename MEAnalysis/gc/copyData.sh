@@ -7,18 +7,21 @@ set -e
 #print out
 #set -x
 
-#SRC=srm://storm-se-01.ba.infn.it:8444/srm/managerv2?SFN=/cms
-SRC=root://cms-xrd-global.cern.ch
+#Source of files
+#SRC=srm://storm-se-01.ba.infn.it:8444/srm/managerv2?SFN=/cms #Directly from T2_IT_Bari
+#SRC=root://cms-xrd-global.cern.ch #Global redirector, sometimes can be very unreliable
+SRC=root://xrootd-cms.infn.it #Europe redirector, should be best general choice
+
+#Target destination of files, must be writeable
 DST=srm://t3se01.psi.ch:8443/srm/managerv2\?SFN=/pnfs/psi.ch/cms/trivcat
 
 source common.sh
 cd $GC_SCRATCH
 for fi in $FILE_NAMES; do
 
-    #Replace the username "arizzi" in the LFN with your own user name
     #On T3 we can only copy to our own directory
-    echo $fi
-    newfi="${fi/arizzi/$USER}"
+    echo $SRC/$fi $DST/$fi
+    newfi=/store/user/$USER/$fi
 
     #copy the file
     LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH gfal-copy -n1 --force $SRC/$fi $DST/$newfi
