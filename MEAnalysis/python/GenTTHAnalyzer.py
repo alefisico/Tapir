@@ -367,11 +367,12 @@ class GenTTHAnalyzer(FilterAnalyzer):
             nMatch_tb_btag = event.nMatch_tb_btag,
             nMatch_hb_btag = event.nMatch_hb_btag,
         ))
-        LOG_MODULE_NAME.debug("Subjet match W={nMatch_q_htt} t={nMatch_b_htt} h={nMatch_b_higgs}".format(
-            nMatch_q_htt = event.nMatch_q_htt,
-            nMatch_b_htt = event.nMatch_b_htt,
-            nMatch_b_higgs = event.nMatch_b_higgs,
-        ))
+        if self.conf.general["boosted"] == True:
+            LOG_MODULE_NAME.debug("Subjet match W={nMatch_q_htt} t={nMatch_b_htt} h={nMatch_b_higgs}".format(
+                nMatch_q_htt = event.nMatch_q_htt,
+                nMatch_b_htt = event.nMatch_b_htt,
+                nMatch_b_higgs = event.nMatch_b_higgs,
+            ))
 
         #reco-level tth-matched system
         spx = 0.0
