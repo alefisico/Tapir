@@ -5,7 +5,7 @@ import ROOT
 from ROOT import MEM
 #import VHbbAnalysis.Heppy.TriggerTableData as trigData
 #import VHbbAnalysis.Heppy.TriggerTable as trig
-import TriggerTable as trig
+import TTH.MEAnalysis.TriggerTable as trig
 
 def jet_baseline(jet):
     #Require that jet must have at least loose POG_PFID

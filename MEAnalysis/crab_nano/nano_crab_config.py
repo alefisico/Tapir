@@ -5,7 +5,7 @@
 ###################################################################################################
 #
 # Configure this variables:
-setEra = "80X" # Options: 80X, 92X, 94X
+setEra = "94X" # Options: 80X, 92X, 94X
 
 #
 ###################################################################################################
@@ -14,18 +14,23 @@ if setEra == "80X":
     eraData = "Run2_2016,run2_miniAOD_80XLegacy"
     conditionsMC = "auto:run2_mc"
     conditionsData = "auto:run2_data_relval"
+    eraBtagSF = "2016"
+    print "Using CMSSW 80X"
 elif setEra == "92X":
     eraMC = "Run2_2017,run2_nanoAOD_92X"
     eraData = "Run2_2017,run2_nanoAOD_92X"
     conditionsMC = "auto:phase1_2017_realistic"
     conditionsData = "auto:run2_data_relval"
+    eraBtagSF = "2017"
+    print "Using CMSSW 92X"
 elif setEra == "94X":
     eraMC = "Run2_2017"
     eraData = None
     conditionsMC = "auto:phase1_2017_realistic"
     conditionsData = None
-    print "Not working yet"
-    exit()
+    eraBtagSF = "2017"
+    print "Using CMSSW 94X"
+
 ###################################################################################################
 ###################################################################################################
 ################################# nanoAOD postprocessing ##########################################
@@ -55,4 +60,7 @@ for mod, names in imports:
         if name[0] == "_": continue
         if name in selnames:
             print "Loading %s from %s " % (name, mod)
-            modules.append(getattr(obj,name)())
+	    if name == "btagSFProducer":
+            	modules.append(getattr(obj,name)(eraBtagSF))
+	    else:
+		modules.append(getattr(obj,name)())

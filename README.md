@@ -154,6 +154,9 @@ The currently used samples are listed below. Generally, they are stored at T3_CH
 | production name | base NanoAOD | comments |
 |-----------------|--------------|----------|
 | [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26) | NanoCrabProdXmas | |
+|-----------------|--------------|----------|
+| [NanoBoostedMEM_Mar15](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoBoostedMEM_Mar15) | RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1 | postprocessing,MEM,Boosted |
+
 
 # Misc
 

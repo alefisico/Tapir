@@ -152,6 +152,7 @@ FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
 ])
 
 topCandidateType = NTupleObjectType("topCandidateType", variables = [
+    NTupleVariable("subjetIDPassed", lambda x: x.subjetIDPassed ),
     NTupleVariable("fRec", lambda x: x.fRec ),
     NTupleVariable("Ropt", lambda x: x.Ropt ),
     NTupleVariable("RoptCalc", lambda x: x.RoptCalc ),
@@ -164,39 +165,40 @@ topCandidateType = NTupleObjectType("topCandidateType", variables = [
     #NTupleVariable("phical", lambda x: x.phical ),
     NTupleVariable("mass", lambda x: x.mass ),
     #NTupleVariable("masscal", lambda x: x.masscal ),
-    #NTupleVariable("sjW1pt", lambda x: x.sjW1pt ),
+    NTupleVariable("sj1pt", lambda x: x.sj1pt ),
     #NTupleVariable("sjW1ptcal", lambda x: x.sjW1ptcal ),
-    #NTupleVariable("sjW1eta", lambda x: x.sjW1eta ),
-    #NTupleVariable("sjW1phi", lambda x: x.sjW1phi ),
-    #NTupleVariable("sjW1mass", lambda x: x.sjW1mass ),
+    NTupleVariable("sj1eta", lambda x: x.sj1eta ),
+    NTupleVariable("sj1phi", lambda x: x.sj1phi ),
+    NTupleVariable("sj1mass", lambda x: x.sj1mass ),
     #NTupleVariable("sjW1masscal", lambda x: x.sjW1masscal ),
-    #NTupleVariable("sjW1btag", lambda x: x.sjW1btag ),
-    #NTupleVariable("sjW2pt", lambda x: x.sjW2pt ),
+    NTupleVariable("sj1btag", lambda x: x.sj1btag ),
+    NTupleVariable("sj2pt", lambda x: x.sj2pt ),
     #NTupleVariable("sjW2ptcal", lambda x: x.sjW2ptcal ),
-    #NTupleVariable("sjW2eta", lambda x: x.sjW2eta ),
-    #NTupleVariable("sjW2phi", lambda x: x.sjW2phi ),
-    #NTupleVariable("sjW2mass", lambda x: x.sjW2mass ),
+    NTupleVariable("sj2eta", lambda x: x.sj2eta ),
+    NTupleVariable("sj2phi", lambda x: x.sj2phi ),
+    NTupleVariable("sj2mass", lambda x: x.sj2mass ),
     #NTupleVariable("sjW2masscal", lambda x: x.sjW2masscal ),
-    #NTupleVariable("sjW2btag", lambda x: x.sjW2btag ),
-    #NTupleVariable("sjNonWpt", lambda x: x.sjNonWpt ),
+    NTupleVariable("sj2btag", lambda x: x.sj2btag ),
+    NTupleVariable("sj3pt", lambda x: x.sj3pt ),
     #NTupleVariable("sjNonWptcal", lambda x: x.sjNonWptcal ),
-    #NTupleVariable("sjNonWeta", lambda x: x.sjNonWeta ),
-    #NTupleVariable("sjNonWphi", lambda x: x.sjNonWphi ),
-    #NTupleVariable("sjNonWmass", lambda x: x.sjNonWmass ),
+    NTupleVariable("sj3eta", lambda x: x.sj3eta ),
+    NTupleVariable("sj3phi", lambda x: x.sj3phi ),
+    NTupleVariable("sj3mass", lambda x: x.sj3mass ),
     #NTupleVariable("sjNonWmasscal", lambda x: x.sjNonWmasscal ),
-    #NTupleVariable("sjNonWbtag", lambda x: x.sjNonWbtag ),
-    #NTupleVariable("tau1", lambda x: x.tau1 ),   # Copied from matched fat jet
-    #NTupleVariable("tau2", lambda x: x.tau2 ),   # Copied from matched fat jet
-    #NTupleVariable("tau3", lambda x: x.tau3 ),   # Copied from matched fat jet
-    #NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
-    #NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ), # Calculated
+    NTupleVariable("sj3btag", lambda x: x.sj3btag ),
+    NTupleVariable("tau1", lambda x: x.tau1 ),   # Copied from matched fat jet
+    NTupleVariable("tau2", lambda x: x.tau2 ),   # Copied from matched fat jet
+    NTupleVariable("tau3", lambda x: x.tau3 ),   # Copied from matched fat jet
+    NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
+    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ), # Calculated
     #NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
-    #NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
-    #NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
-    #NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
+    NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
+    NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
+    NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
 ])
 
 higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
+    NTupleVariable("subjetIDPassed", lambda x: x.subjetIDPassed ),
     NTupleVariable("pt", lambda x: x.pt ),
     NTupleVariable("eta", lambda x: x.eta ),
     NTupleVariable("phi", lambda x: x.phi ),
@@ -205,27 +207,57 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("tau2", lambda x: x.tau2 ),
     NTupleVariable("tau3", lambda x: x.tau3 ),
     NTupleVariable("bbtag", lambda x: x.bbtag ),
+    NTupleVariable("area", lambda x: x.area ),
+    NTupleVariable("ungroomedpt", lambda x: x.ungroomedpt ),
+    NTupleVariable("ungroomedeta", lambda x: x.ungroomedeta ),
+    NTupleVariable("ungroomedphi", lambda x: x.ungroomedphi ),
+    NTupleVariable("ungroomedmass", lambda x: x.ungroomedmass ),
 
-    #NTupleVariable("nallsubjets_softdrop", lambda x: x.nallsubjets_softdrop ),
+    NTupleVariable("sj1pt",   lambda x: x.sj1pt ),
+    NTupleVariable("sj1eta",  lambda x: x.sj1eta ),
+    NTupleVariable("sj1phi",  lambda x: x.sj1phi ),
+    NTupleVariable("sj1mass", lambda x: x.sj1mass ),
+    NTupleVariable("sj1btag", lambda x: x.sj1btag ),
+    NTupleVariable("sj2pt",   lambda x: x.sj2pt ),
+    NTupleVariable("sj2eta",  lambda x: x.sj2eta ),
+    NTupleVariable("sj2phi",  lambda x: x.sj2phi ),
+    NTupleVariable("sj2mass", lambda x: x.sj2mass ),
+    NTupleVariable("sj2btag", lambda x: x.sj2btag ),
 
-    #NTupleVariable("sj1pt_softdrop",   lambda x: x.sj1pt_softdrop ),
-    #NTupleVariable("sj1eta_softdrop",  lambda x: x.sj1eta_softdrop ),
-    #NTupleVariable("sj1phi_softdrop",  lambda x: x.sj1phi_softdrop ),
-    #NTupleVariable("sj1mass_softdrop", lambda x: x.sj1mass_softdrop ),
-    #NTupleVariable("sj1btag_softdrop", lambda x: x.sj1btag_softdrop ),
-    #NTupleVariable("sj2pt_softdrop",   lambda x: x.sj2pt_softdrop ),
-    #NTupleVariable("sj2eta_softdrop",  lambda x: x.sj2eta_softdrop ),
-    #NTupleVariable("sj2phi_softdrop",  lambda x: x.sj2phi_softdrop ),
-    #NTupleVariable("sj2mass_softdrop", lambda x: x.sj2mass_softdrop ),
-    #NTupleVariable("sj2btag_softdrop", lambda x: x.sj2btag_softdrop ),
+    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
+    NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
+    NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
+    NTupleVariable("dr_genTop", lambda x: getattr(x, "dr_genTop", -1), help="deltaR to closest gen top"),
+])
 
 
-    #NTupleVariable("mass_softdrop", lambda x: x.mass_softdrop, help="mass of the matched softdrop jet" ),
+higgsCandidateAK8Type = NTupleObjectType("higgsCandidateAK8Type", variables = [
+    NTupleVariable("pt", lambda x: x.pt ),
+    NTupleVariable("eta", lambda x: x.eta ),
+    NTupleVariable("phi", lambda x: x.phi ),
+    NTupleVariable("mass", lambda x: x.mass ),
+    NTupleVariable("tau1", lambda x: x.tau1 ),
+    NTupleVariable("tau2", lambda x: x.tau2 ),
+    NTupleVariable("tau3", lambda x: x.tau3 ),
+    NTupleVariable("bbtag", lambda x: x.bbtag ),
+    NTupleVariable("area", lambda x: x.area ),
+    NTupleVariable("msoftdrop", lambda x: x.msoftdrop ),
 
-    #NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
-    #NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
-    #NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
-    #NTupleVariable("dr_genTop", lambda x: getattr(x, "dr_genTop", -1), help="deltaR to closest gen top"),
+    NTupleVariable("sj1pt",   lambda x: x.sj1pt ),
+    NTupleVariable("sj1eta",  lambda x: x.sj1eta ),
+    NTupleVariable("sj1phi",  lambda x: x.sj1phi ),
+    NTupleVariable("sj1mass", lambda x: x.sj1mass ),
+    NTupleVariable("sj1btag", lambda x: x.sj1btag ),
+    NTupleVariable("sj2pt",   lambda x: x.sj2pt ),
+    NTupleVariable("sj2eta",  lambda x: x.sj2eta ),
+    NTupleVariable("sj2phi",  lambda x: x.sj2phi ),
+    NTupleVariable("sj2mass", lambda x: x.sj2mass ),
+    NTupleVariable("sj2btag", lambda x: x.sj2btag ),
+
+    NTupleVariable("n_subjettiness", lambda x: x.tau2/x.tau1 if x.tau1 > 0 else -1 ),
+    NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
+    NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
+    NTupleVariable("dr_genTop", lambda x: getattr(x, "dr_genTop", -1), help="deltaR to closest gen top"),
 ])
 
 FatjetCA15Type = NTupleObjectType("FatjetCA15Type", variables = [
@@ -470,9 +502,9 @@ def getTreeProducer(conf):
            help="Number of excluded ljets: "
         )]
         treeProducer.collections.update({"FatjetCA15" : NTupleCollection("fatjets", FatjetCA15Type, 4, help="Ungroomed CA 1.5 fat jets")})
-        treeProducer.collections.update({"topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 1, help="Best top candidate in event. Currently chosen by max deltaR wrt. lepton")})
+        treeProducer.collections.update({"topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 4, help="Boosted Top candidates")})
         treeProducer.collections.update({"higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates")})
-
+        treeProducer.collections.update({"higgsCandidateAK8_nominal": NTupleCollection("higgsCandidateAK8", higgsCandidateAK8Type, 4, help="Boosted Higgs candidates AK8")})
     
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
@@ -514,9 +546,9 @@ def getTreeProducer(conf):
             #("btag_LR_4b_2b_btagCMVA_log",   float,      ""),
             ("btag_LR_4b_2b_btagCMVA",        float,      "4b vs 2b b-tag likelihood ratio using the cMVA tagger"),
             ("btag_LR_4b_2b_btagCSV",        float,      "4b vs 2b b-tag likelihood ratio using the CSV tagger"),
-            ("htt_mass",        float,      "HEPTopTagger candidate mass"),
-            ("htt_frec",        float,      "HEPTopTagger candidate mass"),
-            ("higgs_mass",      float,      "Higgs candidate mass"),
+            #("htt_mass",        float,      "HEPTopTagger candidate mass"),
+            #("htt_frec",        float,      "HEPTopTagger candidate mass"),
+            #("higgs_mass",      float,      "Higgs candidate mass"),
             #("btag_LR_4b_3b_btagCMVA_log",   float,      ""),
             ("btag_LR_4b_3b_btagCMVA",       float,      ""),
             ("btag_LR_4b_3b_btagCSV",        float,      ""),
@@ -602,9 +634,6 @@ def getTreeProducer(conf):
         ("nMatch_tb_btag",          int,    ""),
         ("nMatch_hb",               int,    ""),
         ("nMatch_hb_btag",          int,    ""),
-        #("nMatch_q_htt",            int,    "number of light quarks matched to HEPTopTagger subjets"),
-        #("nMatch_b_htt",            int,    "number of b-quarks matched to HEPTopTagger subjets"),
-        #("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
         ("ttCls",                   int,    "ttbar classification from GenHFHadronMatcher"),
         ("genHiggsDecayMode",       int,    ""),
         ("qgWeight",                float,  ""),
@@ -624,6 +653,14 @@ def getTreeProducer(conf):
         ("tth_rho_py_reco",  float,  ""),
     ]:
         treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
+
+    if conf.general["boosted"] == True:
+        for vtype in [
+            ("nMatch_q_htt",            int,    "number of light quarks matched to HEPTopTagger subjets"),
+            ("nMatch_b_htt",            int,    "number of b-quarks matched to HEPTopTagger subjets"),
+            ("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
+        ]:
+            treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
    
     #for bweight in bweights:
     #    treeProducer.globalVariables += [

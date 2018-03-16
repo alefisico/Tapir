@@ -11,3 +11,5 @@ class EventAnalyzerBoosted(Analyzer):
         event.FatjetCA15 = nanoTreeClasses.FatjetCA15.make_array(event.input, MC = True)
         event.FatjetCA15SoftDrop = nanoTreeClasses.FatjetCA15SoftDrop.make_array(event.input, MC = True)
         event.FatjetCA15SoftDropSubjet = nanoTreeClasses.FatjetCA15SoftDropSubjet.make_array(event.input, MC = True)
+        event.FatjetAK8 = nanoTreeClasses.FatjetAK8.make_array(event.input, MC = True)
+        event.SubjetAK8 = nanoTreeClasses.SubjetAK8.make_array(event.input, MC = True)
