@@ -28,8 +28,10 @@ else:
     
 import copy
 import json
-import nano_crab_config as nanoCFG
 
+#Create the NanoAOD postprocessing configuration
+from TTH.MEAnalysis.nano_config import NanoConfig
+nanoCFG = NanoConfig("94X", jec=True, pu=True, btag=True)
 
 import heppy_crab_functions as fn
 

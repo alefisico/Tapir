@@ -1,0 +1,68 @@
+<FrameworkJobReport>
+    <ReadBranches>
+    </ReadBranches>
+    <PerformanceReport>
+      <PerformanceSummary Metric="StorageStatistics">
+        <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
+        <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
+        <Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
+        <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
+        <Metric Name="ROOT-tfile-read-totalMegabytes" Value="0"/>
+        <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
+      </PerformanceSummary>
+    </PerformanceReport>
+    
+    <GeneratorInfo>
+    </GeneratorInfo>
+
+        <InputFile>
+        <LFN>root://cms-xrd-global.cern.ch//store/mc/RunIISummer16MiniAODv2/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0C0796F5-CFC6-E611-ADB6-008CFA0A58B4.root</LFN>
+        <PFN></PFN>
+        <Catalog></Catalog>
+        <InputType>primaryFiles</InputType>
+        <ModuleLabel>source</ModuleLabel>
+        <GUID></GUID>
+        <InputSourceClass>PoolSource</InputSourceClass>
+        <EventsRead>6417</EventsRead>
+        <Runs>
+        <Run ID="1">
+            <LumiSection ID="883"/>
+                <LumiSection ID="884"/>
+                <LumiSection ID="885"/>
+                <LumiSection ID="886"/>
+                <LumiSection ID="887"/>
+                <LumiSection ID="888"/>
+                <LumiSection ID="889"/>
+                <LumiSection ID="890"/>
+                <LumiSection ID="2205"/>
+                <LumiSection ID="2206"/>
+                </Run>
+        </Runs>
+        </InputFile>
+        
+    <File>
+    <LFN></LFN>
+    <PFN>tree.root</PFN>
+    <Catalog></Catalog>
+    <ModuleLabel>HEPPY</ModuleLabel>
+    <Runs>
+    <Run ID="1">
+        <LumiSection ID="883"/>
+            <LumiSection ID="884"/>
+            <LumiSection ID="885"/>
+            <LumiSection ID="886"/>
+            <LumiSection ID="887"/>
+            <LumiSection ID="888"/>
+            <LumiSection ID="889"/>
+            <LumiSection ID="890"/>
+            <LumiSection ID="2205"/>
+            <LumiSection ID="2206"/>
+            </Run>
+    </Runs>
+    <GUID></GUID>
+    <OutputModuleClass>PoolOutputModule</OutputModuleClass>
+    <TotalEvents>558</TotalEvents>
+    <BranchHash>dc90308e392b2fa1e0eff46acbfa24bc</BranchHash>
+    </File>
+    
+    </FrameworkJobReport>

@@ -149,11 +149,12 @@ if __name__ == "__main__":
         HistCommand("jets_pt5", "jets_pt[5]", "(genWeight)", (100, 0, 300)),
     ]
     
+    cat_command0 = CategoryCommand("sl_jge6_tge4", "is_sl && numJets>=6 && nBCSVM>=4", histograms)
     cat_command1 = CategoryCommand("sl_jge6", "is_sl && numJets>=6", histograms)
     cat_command2 = CategoryCommand("sl_j5", "is_sl && numJets==5", histograms)
     cat_command3 = CategoryCommand("sl_j4", "is_sl && numJets==4", histograms)
 
-    params = [(fn, [cat_command1, cat_command2, cat_command3]) for fn in file_names]
+    params = [(fn, [cat_command0, cat_command1, cat_command2, cat_command3]) for fn in file_names]
 
     if args.parallelize == "no":
         ds = map(func, params)
