@@ -113,8 +113,6 @@ def getSitePrefix(fn=""):
         return fn
     else:
         return fn
-    #else:
-    #    raise Exception("Could not open file: {0} due to unknown path format".format(fn))
 
 def get_prefix_sample(datasetpath):
     spl = datasetpath.split("__")
