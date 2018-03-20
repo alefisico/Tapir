@@ -151,14 +151,6 @@ FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
     NTupleVariable("v", lambda x : x),
 ])
 
-quarkType = NTupleObjectType("quarkType", variables = [
-    NTupleVariable("pt", lambda x : x.pt),
-    NTupleVariable("eta", lambda x : x.eta),
-    NTupleVariable("phi", lambda x : x.phi),
-    NTupleVariable("mass", lambda x : x.mass),
-    NTupleVariable("id", lambda x : x.pdgId),
-])
-
 topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("subjetIDPassed", lambda x: x.subjetIDPassed ),
     NTupleVariable("fRec", lambda x: x.fRec ),
@@ -438,6 +430,7 @@ def getTreeProducer(conf):
             "GenHiggsBoson" : NTupleCollection("genHiggs", quarkType, 2, help="Generated Higgs boson", mcOnly=True),
             "genTopLep" : NTupleCollection("genTopLep", genTopType, 2, help="Generated top quark (leptonic)", mcOnly=True),
             "genTopHad" : NTupleCollection("genTopHad", genTopType, 2, help="Generated top quark (hadronic)", mcOnly=True),
+            "GenLep" : NTupleCollection("GenLep", quarkType, 2, help="Generated leptons", mcOnly=True),
             #"LHE_weights_scale" : NTupleCollection("LHE_weights_scale", LHE_weights_type, 6, help="LHE weights scale", mcOnly=True),
             #"LHE_weights_pdf" : NTupleCollection("LHE_weights_pdf", LHE_weights_type, 102, help="LHE weights pdf", mcOnly=True),
 

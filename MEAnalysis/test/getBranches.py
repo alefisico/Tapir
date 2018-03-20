@@ -5,7 +5,7 @@ fn = sys.argv[1]
 if os.path.isfile(fn):
     tf = ROOT.TFile(fn)
 else:
-    tf = ROOT.TFile.Open(getSitePrefix(fn))
+    tf = ROOT.TFile.Open(fn)
 
 if not tf:
     raise Exception("Could not open file")

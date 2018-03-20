@@ -1,5 +1,3 @@
-from TTH.MEAnalysis.vhbb_utils import autolog
-
 import ROOT
 ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
@@ -9,11 +7,14 @@ import numpy as np
 from TTH.MEAnalysis.MEMUtils import set_integration_vars, add_obj
 from TTH.MEAnalysis.MEMConfig import MEMConfig
 
+import logging
+
 #Pre-define shorthands for permutation and integration variable vectors
 CvectorPermutations = getattr(ROOT, "std::vector<MEM::Permutations::Permutations>")
 CvectorPSVar = getattr(ROOT, "std::vector<MEM::PSVar::PSVar>")
 #CmapDistributionTypeTH3D = getattr(ROOT, "std::map<MEM::DistributionType::DistributionType,TH3D>")
 
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 def normalize_proba(vec):
     proba_vec = np.array(vec)
@@ -71,8 +72,8 @@ class MECategoryAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
 
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("MECategoryAnalyzer started")
+        eventstr = "{0}:{1}:{2}".format(event.input.run, event.input.luminosityBlock, event.input.event)
+        LOG_MODULE_NAME.debug("MECategoryAnalyzer started {0}".format(eventstr))
 
         cat = "NOCAT"
 
@@ -265,11 +266,11 @@ class MEAnalyzer(FilterAnalyzer):
             b.btagFlag = 1.0
 
         if len(bquarks) > mem_cfg.maxBJets:
-            autolog("More than {0} b-quarks supplied, dropping last {1} from MEM".format(
-                mem_cfg.maxBJets, len(bquarks) - mem_cfg.maxBJets)
-            )
+            LOG_MODULE_NAME.info("More than {0} b-quarks supplied, dropping last {1} from MEM".format(
+                mem_cfg.maxBJets, len(bquarks) - mem_cfg.maxBJets
+            ))
             for q in bquarks[mem_cfg.maxBJets:]:
-                print "Dropping jet", q.pt, q.eta
+                LOG_MODULE_NAME.info("Dropping jet pt={0} eta={1}".format(q.pt, q.eta))
             bquarks = bquarks[:mem_cfg.maxBJets]
 
         lquarks = sorted(list(mem_cfg.l_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
@@ -277,11 +278,11 @@ class MEAnalyzer(FilterAnalyzer):
             l.btagFlag = 0.0
             
         if len(lquarks) > mem_cfg.maxLJets:
-            autolog("More than {0} l-quarks supplied, dropping last {1} from MEM".format(
-                mem_cfg.maxLJets, len(lquarks) - mem_cfg.maxLJets)
-            )
+            LOG_MODULE_NAME.info("More than {0} l-quarks supplied, dropping last {1} from MEM".format(
+                mem_cfg.maxLJets, len(lquarks) - mem_cfg.maxLJets
+            ))
             for q in lquarks[mem_cfg.maxLJets:]:
-                print "Dropping jet", q.pt, q.eta
+                LOG_MODULE_NAME.info("Dropping jet pt={0} eta={1}".format(q.pt, q.eta))
             lquarks = lquarks[:mem_cfg.maxLJets]
 
         event.mem_jets = bquarks + lquarks
@@ -316,10 +317,9 @@ class MEAnalyzer(FilterAnalyzer):
                 },
                 corrections = jetcorrs,
             )
-            if "meminput" in self.conf.general["verbosity"]:
-                autolog("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4}".format(
-                    jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag
-                ))
+            LOG_MODULE_NAME.info("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4}".format(
+                jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag
+            ))
 
         for lep in mem_cfg.lepton_candidates(event):
             add_obj(
@@ -328,10 +328,9 @@ class MEAnalyzer(FilterAnalyzer):
                 p4s=(lep.pt, lep.eta, lep.phi, lep.mass),
                 obs_dict={MEM.Observable.CHARGE: lep.charge},
             )
-            if "meminput" in self.conf.general["verbosity"]:
-                autolog("adding lep: pt={0} eta={1} phi={2} mass={3} charge={4}".format(
-                    lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
-                ))
+            LOG_MODULE_NAME.info("adding lep: pt={0} eta={1} phi={2} mass={3} charge={4}".format(
+                lep.pt, lep.eta, lep.phi, lep.mass, lep.charge
+            ))
 
         met_cand = mem_cfg.met_candidates(event)
         add_obj(
@@ -340,10 +339,9 @@ class MEAnalyzer(FilterAnalyzer):
             #MET is caused by massless object
             p4s=(met_cand.pt, 0, met_cand.phi, 0),
         )
-        if "meminput" in self.conf.general["verbosity"]:
-            autolog("adding met: pt={0} phi={1}".format(
-                met_cand.pt, met_cand.phi
-            ))
+        LOG_MODULE_NAME.info("adding met: pt={0} phi={1}".format(
+            met_cand.pt, met_cand.phi
+        ))
 
     def process(self, event):
         if event.catChange: #DS
@@ -381,9 +379,8 @@ class MEAnalyzer(FilterAnalyzer):
 
 
     def _process(self, event):
-
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("MEMAnalyzer started")
+        eventstr = "{0}:{1}:{2}".format(event.input.run, event.input.luminosityBlock, event.input.event)
+        LOG_MODULE_NAME.debug("MEMAnalyzer started {0}".format(eventstr))
 
         #Clean up any old MEM state
         self.vars_to_integrate.clear()
@@ -391,24 +388,23 @@ class MEAnalyzer(FilterAnalyzer):
         self.integrator.next_event()
         event.res = {}
 
-        if "meminput" in self.conf.general["verbosity"]:
-            autolog("MEM id={run},{lumi},{evt} cat={cat} cat_b={cat_btag} nj={nj} nt={nb} nel={n_el} nmu={n_mu} syst={syst} blr={blr} 3blr={blr3} mW={mW}".format(
-                run=event.input.run,
-                lumi=event.lumi,
-                evt=event.evt,
-                is_sl=event.is_sl,
-                is_dl=event.is_dl,
-                cat=event.cat,
-                cat_btag=event.cat_btag,
-                nj=event.numJets,
-                nb=event.nBCSVM,
-                n_el=event.n_el_SL,
-                n_mu=event.n_mu_SL,
-                syst=getattr(event, "systematic", None),
-                blr=event.btag_LR_4b_2b,
-                blr3=event.btag_LR_3b_2b,
-                mW=event.Wmass,
-            ))
+        LOG_MODULE_NAME.debug(
+            str("MEM id={run},{lumi},{evt} cat={cat} cat_b={cat_btag} nj={nj} nt={nb} nel={n_el} nmu={n_mu} syst={syst} blr={blr} mW={mW}".format(
+            run=event.input.run,
+            lumi=event.input.luminosityBlock,
+            evt=event.input.event,
+            cat=event.cat,
+            cat_btag=event.cat_btag,
+            #is_sl=event.is_sl,
+            #is_dl=event.is_dl,
+            nj=event.numJets,
+            nb=event.nBCSVM,
+            n_el=event.n_el_SL,
+            n_mu=event.n_mu_SL,
+            syst=getattr(event, "systematic", None),
+            blr=event.btag_LR_4b_2b,
+            mW=event.Wmass,
+        )))
         event.was_run = {}
 
         for hypo in [MEM.Hypothesis.TTH, MEM.Hypothesis.TTBB]:
@@ -441,12 +437,12 @@ class MEAnalyzer(FilterAnalyzer):
 
                     self.configure_mem(event, mem_cfg)
                     if self.conf.mem["calcME"]:
-                        autolog("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5} blr={6} 3blr={7}".format(
+                        LOG_MODULE_NAME.info("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5}".format(
                             hypo, confname,
                             event.input.run, event.lumi, event.evt,
-                            event.category_string, event.btag_LR_4b_2b, event.btag_LR_3b_2b
+                            event.category_string
                         ))
-                        autolog("Integrator conf: b={0} l={1} syst={2}".format(
+                        LOG_MODULE_NAME.info("Integrator conf: candidates for bq={0} lq={1} syst={2}".format(
                             len(mem_cfg.b_quark_candidates(event)),
                             len(mem_cfg.l_quark_candidates(event)),
                             event.systematic
@@ -457,10 +453,10 @@ class MEAnalyzer(FilterAnalyzer):
                             hypo,
                             self.vars_to_integrate,
                             self.vars_to_marginalize,
-                            0 #max number of calls per iteration (if > 0)
+                            mem_cfg.ncalls #if ncalls > 0, override builtin ncalls in MEIntegratorStandalone/src/Parameters.cpp
                         )
                         event.was_run[confname] = True
-                        autolog("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
+                        LOG_MODULE_NAME.info("Integrator::run done hypo={0} conf={1} cat={2}".format(hypo, confname, event.cat))
                     else:
                         #Create a dummy output
                         r = MEM.MEMOutput()
@@ -498,8 +494,7 @@ class MEAnalyzer(FilterAnalyzer):
                     skipped += [confname]
                     r = MEM.MEMOutput()
                     event.res[(hypo, confname)] = r
-            if "meminput" in self.conf.general["verbosity"]:
-                autolog("skipped confs", skipped)
+            LOG_MODULE_NAME.info("skipped confs {0}".format(skipped))
 
         #Add MEM results to event
         for key in self.memkeysToRun:
