@@ -25,6 +25,15 @@ def print_mu(mu):
 
 factorizedJetCorrections = []
 
+def el_baseline_loose(el):
+    sca = abs(el.etaSc)
+    ret = ( el.eleCutId == 2 and
+            not ( sca >= 1.4442 and
+                  sca < 1.5669 )
+    )
+
+    return ret
+
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
     ret = ( el.eleCutId == 3 and
@@ -94,7 +103,7 @@ class Conf:
             "veto": {
                 "pt": 15.0,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_tight(el),
+                "idcut": lambda el: el_baseline_loose(el),
             },
             #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff
             "isotype": "relIso03", #KS: changed for nanoAOD.
@@ -135,26 +144,28 @@ class Conf:
         #The default b-tagging WP
         "btagWP": "CSVM",
 
-        #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
-        #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
-        "btagWPs": {
-            "CSVL": ("btagCSV", 0.5426),
-            "CSVM": ("btagCSV", 0.8484),
-            "CSVT": ("btagCSV", 0.9535),
+        #The loose b-tag WP for QCD data estimation
+        "looseBWP": "CSVL",
 
-            "DeepCSVL": ("btagDeepCSV", 0.2219),
-            "DeepCSVM": ("btagDeepCSV", 0.6324),
-            "DeepCSVT": ("btagDeepCSV", 0.8958),
-            
-            "CMVAL": ("btagCMVA", -0.5884),
-            "CMVAM": ("btagCMVA", 0.4432),
-            "CMVAT": ("btagCMVA", 0.9432)
+
+        #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
+        #https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation94X
+        "btagWPs": {
+            "CSVL": ("btagCSV", 0.5803),
+            "CSVM": ("btagCSV", 0.8838),
+            "CSVT": ("btagCSV", 0.9693),
+
+            "DeepCSVL": ("btagDeepCSV", 0.1522),
+            "DeepCSVM": ("btagDeepCSV", 0.4641),
+            "DeepCSVT": ("btagDeepCSV", 0.8001),
+
+            #Removed CMVA since not supported (at least in the BtagRecommendation94X
         },
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
         #if btagLR, selection is done by the btag likelihood ratio permutation
         #"untaggedSelection": "btagCMVA",
-        "untaggedSelection": "btagLR",
+        "untaggedSelection": "btagCSV",
 
         #how many jets to consider for the btag LR permutations
         "NJetsForBTagLR": 15, #DS
@@ -339,14 +350,14 @@ class Conf:
             #"FH_0w0w1h2t"  #all cats
         ],
         # btag LR cuts for FH MEM categories
-        "FH_bLR_3b_SR": 0.83,
-        "FH_bLR_4b_SR": 0.98,
-        "FH_bLR_3b_excl": 0.90,
-        "FH_bLR_4b_excl": 0.99,       
+        "FH_bLR_3b_SR": 0.94,
+        "FH_bLR_4b_SR": 0.99,
+        "FH_bLR_3b_excl": 1.96,
+        "FH_bLR_4b_excl": 0.998,       
         "FH_bLR_3b_CR_lo": 0.60,
-        "FH_bLR_3b_CR_hi": 0.80,
-        "FH_bLR_4b_CR_lo": 0.75,
-        "FH_bLR_4b_CR_hi": 0.88,
+        "FH_bLR_3b_CR_hi": 0.94,
+        "FH_bLR_4b_CR_lo": 0.80,
+        "FH_bLR_4b_CR_hi": 0.99,
     }
 
     mem_configs = OrderedDict()
@@ -632,7 +643,7 @@ FH_bLR_4b_CR_lo = Conf.mem["FH_bLR_4b_CR_lo"]
 FH_bLR_4b_CR_hi = Conf.mem["FH_bLR_4b_CR_hi"]
 
 ###
-### FH_4w2h2t #8j,4b, 9j,4b
+### FH_4w2h2t #only 9j,4b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
@@ -644,8 +655,8 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.b_quark_candidates(ev)) >= 4 and #although from BTagLRAnalyzer there are max 4 candidates
     (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
      (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
-    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
-      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) #DS do not consider 10 jet events
+    ( #(len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))>=9 ) #DS do not consider 10 jet events
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("4w2h2t")
@@ -657,7 +668,7 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_4w2h2t"] = c
 
 ###
-### FH_3w2h2t #7j,4b (& 8j,4b & 9j,4b)
+### FH_3w2h2t #7j,4b & 8j,4b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
@@ -694,7 +705,7 @@ c.do_calculate = lambda ev, mcfg: (
     (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
     (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
      (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
-    ( len(mcfg.l_quark_candidates(ev)) >= 4 and len(mcfg.l_quark_candidates(ev)) <= 6 )
+    ( len(mcfg.l_quark_candidates(ev)) >= 4 ) #max 9 jets considered in bLR, but only 5 light q for MEM
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("4w2h1t")

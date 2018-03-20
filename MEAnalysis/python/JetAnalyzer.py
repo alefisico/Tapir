@@ -36,6 +36,7 @@ class JetAnalyzer(FilterAnalyzer):
 
     def variateJets(self, jets, systematic, sigma):
         newjets = [SystematicObject(jet, {"pt": jet.pt, "mass": jet.mass}) for jet in jets]
+        count = 0
         for i in range(len(jets)):
             if sigma > 0:
                 sdir = "Up"
@@ -55,12 +56,34 @@ class JetAnalyzer(FilterAnalyzer):
             if new_corr > 0 and old_corr > 0:
                 cf =  _sigma * new_corr / old_corr
             else:
-                cf = 0.0
+                cf = 1.0 #Should always be 1.0 if not correction!
+                if count==0:
+                    count += 1 #prints only first jet with non-positive systematic
+                    print "negative jet {0} correction {1} {2} {3}".format(i,systematic,new_corr,sdir) #DS
+
 
             newjets[i].pt *= cf
             newjets[i].mass *= cf
         return newjets
 
+    
+    def compareJets(self, jetsvar, jetsnom): #DS
+        newjets = []
+        for jvar in jetsvar:
+            match = False
+            for jnom in jetsnom:
+                if (abs(jvar.eta - jnom.eta)<0.01 and abs(jvar.phi - jnom.phi)<0.01):
+                    match = True
+                    newjets.append(jnom)
+                    break
+            if not match:
+                print "compareJets: no match found jvar_pt={0}".format(jvar.pt)
+                newjets.append(jvar)
+        return newjets #DS
+
+
+
+    
     def calculate_mbb_closest(self, bjet_candidates):
 
         if len(bjet_candidates)<2:
@@ -114,8 +137,8 @@ class JetAnalyzer(FilterAnalyzer):
             res = self._process(event_syst, evdict)
 
             #For variated events, add pointer to nominal event
-            if syst != "nominal":
-                res.nominal_event = evdict["nominal"]
+            #if syst != "nominal":#DS possibly source of exploding Memory usage
+            #    res.nominal_event = evdict["nominal"]
             evdict[syst] = res
         event.systResults = evdict 
 
@@ -125,10 +148,32 @@ class JetAnalyzer(FilterAnalyzer):
         event.systResults["nominal"].nominal_event = event.systResults["nominal"]
         nj_nominal = event.systResults["nominal"].numJets
         nt_nominal = getattr(event.systResults["nominal"],"nB"+btag_wp)
+        pass_nominal = event.systResults["nominal"].passes_jet #DS
+        event.catChange = 0 
         for syst in evdict.keys():
+            if not evdict[syst].passes_jet:
+                continue #DS
             nj = evdict[syst].numJets
             nt = getattr(evdict[syst],"nB"+btag_wp)
             evdict[syst].changes_jet_category = False
+            if not pass_nominal or nj != nj_nominal or nt != nt_nominal: #DS
+                if not event.catChange: #DS
+                    print syst+" invokes catChange from (j,b): {0},{1} to {2},{3}".format(nj_nominal,nt_nominal,nj,nt) ##DS temp
+                    event.catChange = deepcopy( evdict[syst] ) #requires change in sparsinator.py
+                    event.catChange.systematic = "CatChange"
+                    event.catChange.changes_jet_category = False
+                    if syst.rfind("Up") == (len(syst)-2):
+                        name = syst.rsplit("Up",1)[0]
+                        #print name ##DS temp
+                        jets_var = self.variateJets(event.catChange.good_jets, name, -1.0)
+                        event.catChange.good_jets = self.compareJets(jets_var, event.systResults["nominal"].Jet)
+                    elif syst.rfind("Down") == (len(syst)-4):
+                        name = syst.rsplit("Down",1)[0]
+                        #print name ##DS temp
+                        jets_var = self.variateJets(event.catChange.good_jets, name, 1.0)
+                        event.catChange.good_jets = self.compareJets(jets_var, event.systResults["nominal"].Jet)
+            evdict[syst].catChange_event = event.catChange
+
             if nj != nj_nominal or nt != nt_nominal:
                 evdict[syst].changes_jet_category = True
         ret = self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
@@ -246,6 +291,9 @@ class JetAnalyzer(FilterAnalyzer):
             setattr(event, "nB"+btag_wp_name, len(event.btagged_jets_bdisc[btag_wp_name]))
 
         #Find jets that pass/fail the specified default b-tagging algo/working point
+        event.loosebuntag_jets_bdisc = event.buntagged_jets_bdisc[self.conf.jets["looseBWP"]] #DS
+        event.loosebtag_jets_bdisc = event.btagged_jets_bdisc[self.conf.jets["looseBWP"]] #DS
+
         event.buntagged_jets_bdisc = event.buntagged_jets_bdisc[self.conf.jets["btagWP"]]
         event.btagged_jets_bdisc = event.btagged_jets_bdisc[self.conf.jets["btagWP"]]
 
@@ -360,4 +408,21 @@ class JetAnalyzer(FilterAnalyzer):
         event.csv2 = csv2
         event.qgWeight = qgWeight
 
+
+        """#TODO Implement Trigger SF
+        #calculate trigger scale factor
+        if self.cfg_comp.isMC:
+            if len(event.good_jets)>5:
+                trigSF = get_trigger_factor(event.ht, event.good_jets[5].pt, event.nBCSVM)
+            else:
+                trigSF = get_trigger_factor(event.ht, 0.0, event.nBCSVM)
+            #print "nb={0} 6jpt={1} ht={2} SF={3} err={4}".format(event.nBCSVM, event.good_jets[5].pt, event.ht, trigSF[0], trigSF[1] ) ##DS temp
+        else:
+            trigSF = (1.0,0.0)
+        event.triggerWeight = trigSF[0]
+        event.triggerWeightErr = trigSF[1]
+        event.triggerWeightUp = trigSF[0]+trigSF[1]
+        event.triggerWeightDown = trigSF[0]-trigSF[1]
+        """
+        
         return event

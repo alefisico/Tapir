@@ -55,6 +55,11 @@ class MECategoryAnalyzer(FilterAnalyzer):
         self.btag_cat_map = {"NOCAT":-1, "L": 0, "H": 1}
 
     def process(self, event):
+        if event.catChange: #DS
+            print "MECatAna: processing catChange"
+            res = self._process(event.catChange)
+            event.catChange = res #DS
+
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_wtag:
                 #print syst, event_syst, event_syst.__dict__
@@ -76,23 +81,37 @@ class MECategoryAnalyzer(FilterAnalyzer):
         )
         
         # printouts by DS
-        # if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh and event.systematic == "nominal": #DS
-        #     if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
-        #         print "4b_SR",
-        #     if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and 
-        #         event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
-        #         print "3b_SR",
-        #     if (event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_excl"] and 
-        #         event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and 
-        #         event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
-        #         print "4b_CR",
-        #     if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and 
-        #         event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
-        #         print "3b_CR",
-        #     if (len(event.selected_btagged_jets_high)<3):
-        #         print "2b_event",
-        #     print
+        if "debug" in self.conf.general["verbosity"]:
+            if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh and event.systematic == "nominal": #DS
+                if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
+                    print "4b_SR",
+                if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and 
+                    event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
+                    print "3b_SR",
+                if (event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_excl"] and 
+                    event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and 
+                    event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+                    print "4b_CR",
+                if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and 
+                    event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+                    print "3b_CR",
+                if (len(event.selected_btagged_jets_high)<3):
+                    print "2b_event"
 
+            elif event.is_fh and event.systematic == "nominal": #DS
+                print "event considered:",
+                if len(event.btagged_jets_bdisc) >= 4:
+                    print "4b_SR",
+                if len(event.btagged_jets_bdisc) == 3:
+                    print "3b_SR",
+                if len(event.btagged_jets_bdisc)==2 and len(event.loosebtag_jets_bdisc)>=4:
+                    print "4b_CR",
+                if len(event.btagged_jets_bdisc)==2 and len(event.loosebtag_jets_bdisc)==3:
+                    print "3b_CR",
+                if (len(event.btagged_jets_bdisc)==2 and len(event.loosebtag_jets_bdisc)==2) or len(event.btagged_jets_bdisc)<=1:
+                    print "2b_event",
+                print "{0}j,{1}b,{2}lb".format(len(event.good_jets),len(event.btagged_jets_bdisc),len(event.loosebtag_jets_bdisc))
+            print "{0}j".format(len(event.good_jets))
         #Here we define if an event was of high-btag multiplicity
         cat_btag = "NOCAT"
         if event.pass_category_blr or pass_btag_csv:
@@ -132,8 +151,8 @@ class MECategoryAnalyzer(FilterAnalyzer):
                     cat = "cat7"
                 elif(len(event.selected_btagged_jets_high) == 3):
                     cat = "cat11"
-            #exactly 9 jets, Wtag in [72,94] - new allow more than 9 jets, just drop the 10th...
-            if (len(event.good_jets) >= 9 and event.Wmass >= 72 and event.Wmass < 94):
+            #exactly 9 jets, Wtag in [70,92] - new allow more than 9 jets, just drop the 10th...
+            if (len(event.good_jets) >= 9 and event.Wmass >= 70 and event.Wmass < 92):
                 #event.wquark_candidate_jets = event.buntagged_jets + event.selected_btagged_jets_low
                 if(len(event.selected_btagged_jets_high) == 4):
                     cat = "cat9"
@@ -217,7 +236,7 @@ class MEAnalyzer(FilterAnalyzer):
         cfg.configure_transfer_function(self.conf)
         cfg.cfg.num_jet_variations = len(self.conf.mem["jet_corrections"])
         self.integrator = MEM.Integrand(
-            0,
+            0,#verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
             cfg.cfg
         )
 
@@ -268,6 +287,20 @@ class MEAnalyzer(FilterAnalyzer):
         event.mem_jets = bquarks + lquarks
         ##Only take up to 4 candidates, otherwise runtimes become too great        
         for jet in bquarks + lquarks:
+            #calculate jet corrections with an exception for JER
+            #the Jetcorrs are expected to be relative correction. E.g. jetcorrs[JESUp] = JESUp / JES
+            #TODO: CHECK THIS AGAIN ONCE JET CORRECTIONS ARE IMPLEMENTED FROM NANOAODPOSTPROCESSING!
+            jetcorrs = []
+            if (event.systematic=="nominal" or event.systematic=="CatChange") and self.cfg_comp.isMC:
+                for jc in self.conf.mem["jet_corrections"]:
+                    new_corr = getattr(jet, "corr_"+jc)
+                    if new_corr<=0.0:
+                        print "negative jet correction {0} {1}".format(jc,new_corr) #DS
+                        jetcorrs.append( 1.0 )
+                    elif jc=="JERUp" or jc=="JERDown":
+                        jetcorrs.append( new_corr/(jet.corr_JER if jet.corr_JER>0 else 1.0) )
+                    else:
+                        jetcorrs.append( new_corr/jet.corr )
 
             add_obj(
                 self.integrator,
@@ -281,7 +314,7 @@ class MEAnalyzer(FilterAnalyzer):
                 tf_dict={
                     MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                 },
-                corrections = [self.getRightCorrection(jet,x) for x in self.conf.mem["jet_corrections"]] if event.systematic == "nominal" and self.cfg_comp.isMC else [],
+                corrections = jetcorrs,
             )
             if "meminput" in self.conf.general["verbosity"]:
                 autolog("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4}".format(
@@ -313,8 +346,25 @@ class MEAnalyzer(FilterAnalyzer):
             ))
 
     def process(self, event):
+        if event.catChange: #DS
+            print "MEMAna: processing catChange"
+            res = self._process(event.catChange)
+            event.catChange = res
+
         for (syst, event_syst) in event.systResults.items():
+            if event_syst.systematic == "CatChange": #DS
+                print "\n*************************"
+                print "*** strange occurance ***"
+                print "*************************\n"
+                print "syst =", syst                 #DS
+
             if event_syst.passes_btag:
+                if syst != "nominal":  #DS carry nominal mem results on each systematic (instead of whole nominal event)
+                    if hasattr(event.systResults["nominal"], 'res'):
+                        event_syst.nominal_memres = event.systResults["nominal"].res
+                    if event.catChange:
+                        event_syst.catChange_memres = event.catChange.res #DS
+
                 res = self._process(event_syst)
                 event.systResults[syst] = res
             else:
@@ -384,8 +434,9 @@ class MEAnalyzer(FilterAnalyzer):
                         mem_cfg.do_calculate(event, mem_cfg) and
                         self.conf.mem["selection"](event) and
                         confname in self.memkeysToRun and
-                        ((event.systematic in self.conf.mem["enabled_systematics"]
-                        or event.changes_jet_category) or event.systematic == "nominal")
+                        (event.systematic in self.conf.mem["enabled_systematics"] or
+                         event.systematic == "CatChange" or event.systematic == "nominal") #DS
+
                     ):
 
                     self.configure_mem(event, mem_cfg)
@@ -431,6 +482,18 @@ class MEAnalyzer(FilterAnalyzer):
                                 dw[fc] += r.grad.at(ijet) * delta_pt
                     r.dw = dw
                     event.res[(hypo, confname)] = r
+                elif( #DS
+                    event.changes_jet_category and 
+                    mem_cfg.do_calculate(event, mem_cfg) and
+                    self.conf.mem["selection"](event) and
+                    confname in self.memkeysToRun
+                    ):
+                    if "meminput" in self.conf.general["verbosity"]:
+                        print event.systematic+" changes category - skipping mem "+confname
+                    skipped += [confname]
+                    r = MEM.MEMOutput()
+                    event.res[(hypo, confname)] = r #DS
+
                 else:
                     skipped += [confname]
                     r = MEM.MEMOutput()
@@ -444,16 +507,36 @@ class MEAnalyzer(FilterAnalyzer):
             p1 = 0.0
 
             #if it was a systematic event
-            #AND the variation changed the jet category
+            #AND the variation did not change the jet category
             #AND the nominal MEM was computed, get the variation off of that
-            if event.systematic != "nominal" and not event.changes_jet_category and hasattr(event.nominal_event, 'was_run') and key in event.nominal_event.was_run.keys():
+            if event.systematic != "nominal" and not event.changes_jet_category and hasattr(event, 'nominal_memres') and (MEM.Hypothesis.TTH,key) in event.nominal_memres.keys() and not event.systematic in self.conf.mem["enabled_systematics"]:
+                if "meminput" in self.conf.general["verbosity"]:
+                    print "getting mem for "+event.systematic+" from event.nominal_memres"
+
                 icorr = self.conf.mem["jet_corrections"].index(event.systematic)
-                r1 = event.nominal_event.res[(MEM.Hypothesis.TTH, key)].variated
-                r2 = event.nominal_event.res[(MEM.Hypothesis.TTBB, key)].variated
+                #r1 = event.nominal_event.res[(MEM.Hypothesis.TTH, key)].variated
+                #r2 = event.nominal_event.res[(MEM.Hypothesis.TTBB, key)].variated
+                r1 = event.nominal_memres[(MEM.Hypothesis.TTH, key)].variated #DS
+                r2 = event.nominal_memres[(MEM.Hypothesis.TTBB, key)].variated #DS
+
                 p0 = r1.at(icorr) if icorr < r1.size() else 0.0
                 p1 = r2.at(icorr) if icorr < r2.size() else 0.0
+            elif event.systematic != "CatChange" and event.changes_jet_category and hasattr(event, 'catChange_memres') and (MEM.Hypothesis.TTH,key) in event.catChange_memres.keys() and not event.systematic in self.conf.mem["enabled_systematics"]: #DS
+                if "meminput" in self.conf.general["verbosity"]:
+                    print "getting mem for "+event.systematic+" from event.catChange_memres"
+                icorr = self.conf.mem["jet_corrections"].index(event.systematic)
+                #r1 = event.catChange_event.res[(MEM.Hypothesis.TTH, key)].variated
+                #r2 = event.catChange_event.res[(MEM.Hypothesis.TTBB, key)].variated
+                r1 = event.catChange_memres[(MEM.Hypothesis.TTH, key)].variated #DS
+                r2 = event.catChange_memres[(MEM.Hypothesis.TTBB, key)].variated #DS
+                p0 = r1.at(icorr) if icorr < r1.size() else 0.0
+                p1 = r2.at(icorr) if icorr < r2.size() else 0.0 #DS
+
             #MEM was recomputed
             else:
+                if "meminput" in self.conf.general["verbosity"]:
+                    print "cannot get mem for "+event.systematic+" from nominal or catChange"
+
                 p0 = event.res[(MEM.Hypothesis.TTH, key)].p
                 p1 = event.res[(MEM.Hypothesis.TTBB, key)].p
             mem_p = p0 / (p0 + self.conf.mem["weight"]*p1) if p0 > 0 else 0.0
@@ -464,6 +547,9 @@ class MEAnalyzer(FilterAnalyzer):
                 ("ttbb", MEM.Hypothesis.TTBB)
             ]:
                 mem_res = event.res[(hypo, key)]
+                if  event.systematic != "nominal": #DS
+                    mem_res.p = p0 if hypo_name=="tth" else p1 #DS
+
                 setattr(event, "mem_{0}_{1}".format(hypo_name, key), mem_res)
 
         #print out the JSON format for the standalone integrator

@@ -134,7 +134,7 @@ class BufferedChain( object ):
 
         return self
 
-def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None):
+def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None, dataset=None):
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
     #Create python configuration object based on path
 
@@ -180,7 +180,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         if not output_name:
             output_name = "Loop_" + sample_name
     elif schema:
-        sample_name = "sample"
+        sample_name = dataset if dataset else "sample"
         vhbb_tree_name = "Events"
         pass
     else:
@@ -192,7 +192,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     if schema == "mc":
         from TTH.MEAnalysis.nanoTree import EventAnalyzer
     else:
-        from TTH.MEAnalysis.nanoTree_data import EventAnalyzer #TODO convert to nanoAOD
+        from TTH.MEAnalysis.nanoTree_data import EventAnalyzer
 
 
     #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
