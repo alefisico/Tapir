@@ -107,9 +107,9 @@ test_ttjets:
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
     - python python/test_MEAnalysis_heppy.py --sample TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
-    - python test/validationHistos.py Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/validationHistos.py Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
-    - tar -czf plots_ttjets.tgz *.pdf Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - tar -czf plots_ttjets.tgz *.pdf Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - du -csh plots_ttjets.tgz
     - mv plots_ttjets.tgz $CI_HOME/
   artifacts:
