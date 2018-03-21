@@ -106,10 +106,10 @@ test_ttjets:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
-    - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
+    - python python/test_MEAnalysis_heppy.py --sample TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/validationHistos.py Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - ls -al
-    - tar -czf plots_ttjets.tgz *.pdf Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
+    - tar -czf plots_ttjets.tgz *.pdf Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - du -csh plots_ttjets.tgz
     - mv plots_ttjets.tgz $CI_HOME/
   artifacts:

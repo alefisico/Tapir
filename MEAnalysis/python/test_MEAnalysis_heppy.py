@@ -18,23 +18,24 @@ def launch_test_MEAnalysis(analysis, sample, **kwargs):
 
     return output_name
 
-def test_MEAnalysis(sample_pattern, analysis_cfg, **kwargs):
+def test_MEAnalysis(sample_name, analysis_cfg, **kwargs):
     analysis = analysisFromConfig(analysis_cfg)
-    if not sample_pattern:
-        raise KeyError("Choose sample from {0}".format([s.name for s in analysis.samples]))
+
+    samples = {
+        sample.name: sample for sample in analysis.samples
+    }
+    sample = samples[sample_name] 
     
-    for sample in analysis.samples:
-        if sample.name == sample_pattern:
-            logging.info("Running on sample {0}".format(sample.name))
-            out = launch_test_MEAnalysis(analysis, sample, numEvents=analysis.config.getint(sample.name, "test_events"))
-            
-            tf = ROOT.TFile(out + "/tree.root")
-            tt = tf.Get("tree")
-            if not tt:
-                raise Exception("Could not find tree in output")
-            logging.info("produced {0} entries".format(tt.GetEntries()))
-            
-            tf.Close()
+    logging.info("Running on sample {0}".format(sample.name))
+    out = launch_test_MEAnalysis(analysis, sample, numEvents=analysis.config.getint(sample.name, "test_events"))
+    
+    tf = ROOT.TFile(out + "/tree.root")
+    tt = tf.Get("tree")
+    if not tt:
+        raise Exception("Could not find tree in output")
+    logging.info("produced {0} entries".format(tt.GetEntries()))
+    
+    tf.Close()
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     
