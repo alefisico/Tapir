@@ -8,27 +8,30 @@ class NanoConfig:
             self.eraData = "Run2_2016,run2_miniAOD_80XLegacy"
             self.conditionsMC = "auto:run2_mc"
             self.conditionsData = "auto:run2_data_relval"
-            self.eraBtagSF = "csvv2"
+            self.eraBtagSF = "2016"
+            self.algoBtag = "csvv2"
             print "Using CMSSW 80X"
         elif setEra == "92X":
             self.eraMC = "Run2_2017,run2_nanoAOD_92X"
             self.eraData = "Run2_2017,run2_nanoAOD_92X"
             self.conditionsMC = "auto:phase1_2017_realistic"
             self.conditionsData = "auto:run2_data_relval"
-            self.eraBtagSF = "csvv2"
+            self.eraBtagSF = "2017"
+            self.algoBtag = "csvv2"
             print "Using CMSSW 92X"
         elif setEra == "94X":
             self.eraMC = "Run2_2017"
             self.eraData = None
             self.conditionsMC = "auto:phase1_2017_realistic"
             self.conditionsData = None
-            self.eraBtagSF = "csvv2"
+            self.eraBtagSF = "2017"
+            self.algoBtag = "csvv2"
             print "Using CMSSW 94X"
         
         imports = []
         if jec:
             imports += [
-                ('PhysicsTools.NanoAODTools.postprocessing.modules.jme.jecUncertainties', 'jecUncertAll')
+                ('PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties', 'jetmetUncertainties2017All')
             ]
 
         if btag:
@@ -58,6 +61,6 @@ class NanoConfig:
                 if name in selnames:
                     print "Loading %s from %s " % (name, mod)
                     if name == "btagSFProducer":
-                        self.modules.append(getattr(obj,name)(self.eraBtagSF))
+                        self.modules.append(getattr(obj,name)(self.eraBtagSF, self.algoBtag))
                     else:
                         self.modules.append(getattr(obj,name)())

@@ -379,11 +379,11 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
-#    mva = cfg.Analyzer(
-#        MECoreAnalyzers.MVAVarAnalyzer,
-#        'mva',
-#        _conf = python_conf
-#    )
+    mva = cfg.Analyzer(
+        MECoreAnalyzers.MVAVarAnalyzer,
+        'mva',
+        _conf = python_conf
+    )
 
     treevar = cfg.Analyzer(
         MECoreAnalyzers.TreeVarAnalyzer,
@@ -440,7 +440,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             gentth,
             #multiclass_analyzer,
             mem_analyzer,
-            #mva,
+            mva,
             treevar,
 
             #Write the output tree
