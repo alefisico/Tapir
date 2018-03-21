@@ -100,9 +100,18 @@ def func(args):
     fn, cat_commands = args
     return process_file(fn, cat_commands)
 
+def xrdfs_cat(server, path):
+    process = Popen(['xrdfs', server, 'cat', path], stdout=PIPE, stderr=PIPE, shell=True)
+    stdout, stderr = process.communicate()
+
 def get_files_path(path):
     prefix = "root://t3dcachedb03.psi.ch/"
     files = [prefix + f for f in glob.glob(path + "/*.root")]
+
+    input_nanoaod_files = []
+    for fi in files:
+        input_file = fi.replace("out.root", "inputs.txt")
+
     return files
 
 if __name__ == "__main__":
