@@ -105,7 +105,7 @@ def xrdfs_cat(server, path):
     stdout, stderr = process.communicate()
 
 def get_files_path(path):
-    prefix = "root://t3dcachedb03.psi.ch/"
+    prefix = "root://t3dcachedb.psi.ch/"
     files = [prefix + f for f in glob.glob(path + "/*.root")]
 
     input_nanoaod_files = []
