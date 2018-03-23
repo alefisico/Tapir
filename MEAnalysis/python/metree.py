@@ -307,7 +307,7 @@ def getTreeProducer(conf):
             "corr_"+c,
             lambda x,c="corr_"+c : getattr(x, c),
             mcOnly=True,
-            the_type=float,
+            type=float,
         ) for c in conf.mem["jet_corrections"]
     ]
 
@@ -342,7 +342,7 @@ def getTreeProducer(conf):
         #NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
-        #NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
         NTupleVariable("puId", lambda x : x.puId),
     ] + corrs)
 

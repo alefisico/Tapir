@@ -8,13 +8,16 @@ from TTH.MEAnalysis.samples_base import getSitePrefix
 from TTH.MEAnalysis.nano_config import NanoConfig
 
 
-def main(outdir = "./", _input = None, asFriend = True, _era = "94X"):
+def main(outdir = "./", _input = None, asFriend = True, _era = "94X", runAll = False):
     if _input is None:
         infiles = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     else:
         infiles = map(getSitePrefix, _input)
-    
-    nano_cfg = NanoConfig(_era, btag=True, pu=True)
+
+    if runAll:
+        nano_cfg = NanoConfig(_era, jec = True, btag=True, pu=True)
+    else:
+        nano_cfg = NanoConfig(_era, btag=True, pu=True)
     print nano_cfg.modules
     p=PostProcessor(
         outdir, infiles,
@@ -61,9 +64,16 @@ if __name__ == "__main__":
         action = "store_false",
         help = "Disables friend option in nanoAOD postprocessor",
     )
+    argumentparser.add_argument(
+        "--runAllModules",
+        action = "store_true",
+        help = "Disables friend option in nanoAOD postprocessor",
+    )
+    
+
 
 
     args = argumentparser.parse_args()
     #
     ##############################################################################################################
-    main(args.outputdir, args.input, args.noFriend, args.era)
+    main(args.outputdir, args.input, args.noFriend, args.era, args.runAllModules)

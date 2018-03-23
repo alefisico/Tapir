@@ -23,7 +23,66 @@ def mu_baseline_tight(mu):
 def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, dxy=%s, dz=%s, nhits=%s, stat=%s)" % (mu.pt, mu.eta, mu.tightId, mu.dxy , mu.dz, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.nStations)
 
-factorizedJetCorrections = []
+factorizedJetCorrections = [
+    "AbsoluteStat",
+    "AbsoluteScale",
+    "AbsoluteFlavMap",
+    "AbsoluteMPFBias",
+    "Fragmentation",
+    "SinglePionECAL",
+    "SinglePionHCAL",
+    "FlavorQCD",
+    "TimePtEta",
+    "RelativeJEREC1",
+    "RelativeJEREC2",
+    "RelativeJERHF",
+    "RelativePtBB",
+    "RelativePtEC1",
+    "RelativePtEC2",
+    "RelativePtHF",
+    "RelativeBal",
+    "RelativeFSR",
+    "RelativeStatFSR",
+    "RelativeStatEC",
+    "RelativeStatHF",
+    "PileUpDataMC",
+    "PileUpPtRef",
+    "PileUpPtBB",
+    "PileUpPtEC1",
+    "PileUpPtEC2",
+    "PileUpPtHF",
+    "PileUpMuZero",
+    "PileUpEnvelope",
+    "SubTotalPileUp",
+    "SubTotalRelative",
+    "SubTotalPt",
+    "SubTotalScale",
+    "SubTotalAbsolute",
+    "SubTotalMC",
+    "Total",
+    "TotalNoFlavor",
+    "TotalNoTime",
+    "TotalNoFlavorNoTime",
+    "FlavorZJet",
+    "FlavorPhotonJet",
+    "FlavorPureGluon",
+    "FlavorPureQuark",
+    "FlavorPureCharm",
+    "FlavorPureBottom",
+    "TimeRunB",
+    "TimeRunC",
+    "TimeRunD",
+    "TimeRunE",
+    "TimeRunF",
+#    "TimeRunG",
+#    "TimeRunH",
+    "CorrelationGroupMPFInSitu",
+    "CorrelationGroupIntercalibration",
+    "CorrelationGroupbJES",
+    "CorrelationGroupFlavor",
+    "CorrelationGroupUncorrelated",
+    "JER"
+]
 
 def el_baseline_loose(el):
     sca = abs(el.etaSc)
@@ -209,7 +268,7 @@ class Conf:
         "verbosity": [
             #"eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
-            #"input", #print input particles
+            "input", #print input particles
             #"gen", #print out gen-level info
             #"matching", 
             #"debug", #very high-level debug info
@@ -217,6 +276,8 @@ class Conf:
             #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
+            "debug",
+            "subdebug",
         ],
 
         # "eventWhitelist": [
@@ -280,8 +341,8 @@ class Conf:
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-        #    "TotalUp",
-        #    "TotalDown",
+            #"TotalUp",
+            #"TotalDown",
         ],
 
         "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)

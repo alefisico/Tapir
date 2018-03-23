@@ -35,8 +35,20 @@ class JetAnalyzer(FilterAnalyzer):
         super(JetAnalyzer, self).beginLoop(setup)
 
     def variateJets(self, jets, systematic, sigma):
+        """Recalculate pt and mass of Jet depending on systamtic
+
+        Args:
+            jets (list): input jet collection
+            systematic (str): Part of mem["factorized_sources"] in config
+            sigma (float): Either 1.0 for Up variation of -1.0 for Down
+
+        Returns:
+            newjets : A list of jet pt and mass for systamtic change
+        """
         newjets = [SystematicObject(jet, {"pt": jet.pt, "mass": jet.mass}) for jet in jets]
         count = 0
+        if "subdebug" in self.conf.general["verbosity"]:
+            autolog("Processing: {0}, sigma {1}".format(systematic, sigma))
         for i in range(len(jets)):
             if sigma > 0:
                 sdir = "Up"
@@ -49,6 +61,7 @@ class JetAnalyzer(FilterAnalyzer):
             new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
             old_corr = newjets[i].corr
 
+            
             #for JER need to uncorrect by a different factor
             if systematic == "JER":
                 old_corr = newjets[i].corr_JER
@@ -64,6 +77,9 @@ class JetAnalyzer(FilterAnalyzer):
 
             newjets[i].pt *= cf
             newjets[i].mass *= cf
+            if "subdebug" in self.conf.general["verbosity"]:
+                autolog("Correction jet with pt = {0:06.2f}, eta = {1:05.2f}, oldcorr = {2:.4f}, newcorr {3:.4f}, cf = {4:.8f}".format(jets[i].pt, jets[i].eta, old_corr, new_corr, cf))
+
         return newjets
 
     
@@ -132,7 +148,11 @@ class JetAnalyzer(FilterAnalyzer):
                 ev = SystematicObject(event, {"Jet": jets, "systematic": name})
                 evdict[name] = ev
 
+        print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         for syst, event_syst in evdict.items():
+            print "+++++++++++++++++++++++++++ "+syst
             event_syst.systematic = syst 
             res = self._process(event_syst, evdict)
 
@@ -141,7 +161,9 @@ class JetAnalyzer(FilterAnalyzer):
             #    res.nominal_event = evdict["nominal"]
             evdict[syst] = res
         event.systResults = evdict 
-
+        print "#####################################################################"
+        print "#####################################################################"
+        print "#####################################################################"
         btag_wp = self.conf.jets["btagWP"]
         
         event.systResults["nominal"].changes_jet_category = False
@@ -149,7 +171,10 @@ class JetAnalyzer(FilterAnalyzer):
         nj_nominal = event.systResults["nominal"].numJets
         nt_nominal = getattr(event.systResults["nominal"],"nB"+btag_wp)
         pass_nominal = event.systResults["nominal"].passes_jet #DS
-        event.catChange = 0 
+        print pass_nominal
+        event.catChange = 0
+        print "-----------------------------------------"
+        print evdict
         for syst in evdict.keys():
             if not evdict[syst].passes_jet:
                 continue #DS
@@ -259,14 +284,18 @@ class JetAnalyzer(FilterAnalyzer):
 
         if "debug" in self.conf.general["verbosity"]:
             autolog("All jets: ", len(event.injets))
-            for x in event.injets:
-                autolog(str(x))
+            for ix, x in enumerate(event.injets):
+                if event.systematic != "nominal":
+                    autolog("Jet: {0}: -pt = {1:06.2f}, eta= {2:05.2f}, {3} = {4:.4f}".format(ix, x.pt, x.eta, event.systematic, getattr(x, "corr_"+event.systematic)))
+                else:
+                    autolog("Jet: {0}: -pt = {1}, eta= {2}".format(ix, x.pt, x.eta))
             autolog("Loose jets: ", len(event.loose_jets))
-            for x in event.loose_jets:
-                autolog(str(x))
+            for ix,x in enumerate(event.loose_jets):
+                autolog("Jet: {0} - pt = {1}, eta= {2}".format(ix, x.pt, x.eta))
             autolog("Good jets: ", len(event.good_jets))
-            for x in event.good_jets:
-                autolog(str(x))
+            for ix,x in enumerate(event.good_jets):
+                autolog("Jet: {0} - pt = {1}, eta= {2}".format(ix, x.pt, x.eta))
+
 
         #Assing jet transfer functions
         for jet in event.loose_jets + event.good_jets:
@@ -322,11 +351,18 @@ class JetAnalyzer(FilterAnalyzer):
                 passes = False
         elif event.is_fh:
             if len(event.good_jets) < self.conf.jets["minjets_fh"]: #DS
-                passes = False        
+                passes = False
+                if "debug" in self.conf.general["verbosity"]:
+                    autolog("fails because FH NJ<{0}".format(self.conf.jets["minjets_fh"]))
             if len(event.good_jets) >= self.conf.jets["minjets_fh"]:
                 if event.good_jets[ self.conf.jets["nhard_fh"]-1 ].pt<self.conf.jets["pt_fh"]:
+                    if "debug" in self.conf.general["verbosity"]:
+                        autolog("fails because FH Jet {0} pt = {1} (> {2} requ.)".format(self.conf.jets["nhard_fh"]-1,
+                                                                                        event.good_jets[ self.conf.jets["nhard_fh"]-1 ].pt,
+                                                                                        self.conf.jets["pt_fh"] )
+                        )
                     passes = False
-
+        print "***********************************",event.is_fh, event.is_sl, event.is_dl, passes
 
         #Calculate jet corrections to MET
         corrMet_px = event.MET.px
