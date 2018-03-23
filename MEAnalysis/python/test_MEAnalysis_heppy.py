@@ -13,7 +13,9 @@ def launch_test_MEAnalysis(analysis, sample, **kwargs):
     files = sample.file_names_step1[:sample.debug_max_files]
 
     #replace local SE access with remote SE access
-    files = [fi.replace("t3dcachedb03", "t3se01") for fi in files]
+    import pdb
+    pdb.set_trace()
+    files = [fi.replace("root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/", "root://t3se.psi.ch//") for fi in files]
     main(analysis, sample_name=sample.name, firstEvent=0, output_name=output_name, files=files, **kwargs)
 
     return output_name
