@@ -169,7 +169,7 @@ test_ttjets_sparsinator:
     - cd $CMSSW_BASE/src/TTH
     - tar xfz $CI_HOME/plots_ttjets.tgz
     - ls -al
-    - FILE_NAMES=Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root DATASETPATH=TT_TuneCUETP8M2T4_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
+    - FILE_NAMES=Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
     - mv out.root $CI_HOME/sparse_ttjets.root
   artifacts:
     paths:
