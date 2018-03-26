@@ -31,9 +31,6 @@ for infile in infiles:
     print "scanned file={0} Nentries={1}".format(infile, tt.GetEntries())
     tf.Close()
 
-
-print "unique runs", sorted(list(set(runs)))
-
 for (k, v) in lumidict.items():
     if len(v) > 1:
         print "DUPE", k, len(v)

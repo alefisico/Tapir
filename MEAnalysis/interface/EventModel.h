@@ -288,10 +288,10 @@ public:
 
     TTreeReader reader;
 
-    TTreeReaderValue<unsigned long long> evt;
-    TTreeReaderValue<unsigned int> run;
-    TTreeReaderValue<unsigned int> lumi;
-    TTreeReaderValue<T> json;
+    TTreeReaderValue<int> evt;
+    TTreeReaderValue<int> run;
+    TTreeReaderValue<int> lumi;
+    TTreeReaderValue<int> json;
 
     TTreeReaderValue<int> is_sl;
     TTreeReaderValue<int> is_dl;

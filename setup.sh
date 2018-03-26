@@ -1,6 +1,6 @@
 export SCRAM_ARCH=slc6_amd64_gcc630
 
-scram project -n CMSSW CMSSW CMSSW_9_4_4
+scram project -n CMSSW CMSSW CMSSW_9_4_5_cand1
 cd CMSSW/src/
 eval `scramv1 runtime -sh`
 

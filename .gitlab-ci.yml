@@ -14,7 +14,7 @@ before_script:
   - git submodule update --init --recursive
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc630"
-  - export CMSSW_VERSION="CMSSW_9_4_4"
+  - export CMSSW_VERSION="CMSSW_9_4_5_cand1"
   - export CMS_PATH=/cvmfs/cms-ib.cern.ch/week0 #https://gitlab.cern.ch/cms-nanoAOD/nanoAOD-integration/blob/master/scripts/restore_cmssw.sh#L14
   - cd ..
   - cd $CI_HOME
@@ -106,10 +106,10 @@ test_ttjets:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
-    - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
+    - python python/test_MEAnalysis_heppy.py --sample TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/validationHistos.py Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
-    - tar -czf plots_ttjets.tgz *.pdf Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
+    - tar -czf plots_ttjets.tgz *.pdf Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - du -csh plots_ttjets.tgz
     - mv plots_ttjets.tgz $CI_HOME/
   artifacts:
@@ -169,7 +169,7 @@ test_ttjets_sparsinator:
     - cd $CMSSW_BASE/src/TTH
     - tar xfz $CI_HOME/plots_ttjets.tgz
     - ls -al
-    - FILE_NAMES=Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root DATASETPATH=TT_TuneCUETP8M2T4_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
+    - FILE_NAMES=Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
     - mv out.root $CI_HOME/sparse_ttjets.root
   artifacts:
     paths:
