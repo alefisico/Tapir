@@ -109,6 +109,29 @@ class SystematicObject(object):
     def __getattr__(self, attr):
         return getattr(self.__dict__["orig"], attr)
 
+    #Necessary custom definition of deepcopy for this class.
+    def __deepcopy__(self, obj):
+        variated_values = {}
+        for key, obj in self.__dict__.items():
+            if not key == "orig": #KS: HeppyCore.Event would also need custom __deepcopy__
+                variated_values[key] = deepcopy(obj)
+        
+        ret = SystematicObject(self.orig,variated_values)
+        return ret
+
+    """Can cause RuntimeError: maximum recursion depth errors. Use with caution
+    def __str__(self):
+        #Redefined print statement for debugging and testing        
+        ret =  "-----------------------------------------------\n"
+        ret += "Printing {0} \n".format(self.__repr__())
+        ret += "-----------------------------------------------\n"
+        for key, obj in self.__dict__.items():
+            if not key == "orig":
+                ret += "{0} : {1} \n".format(key, obj)
+            else:
+                ret += "{0} : {1} \n".format(key, type(obj))
+        return ret+"-----------------------------------------------"
+    """
 def autolog(*args):
     import inspect, logging
     # Get the previous frame in the stack, otherwise it would

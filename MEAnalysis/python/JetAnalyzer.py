@@ -35,7 +35,7 @@ class JetAnalyzer(FilterAnalyzer):
         super(JetAnalyzer, self).beginLoop(setup)
 
     def variateJets(self, jets, systematic, sigma):
-        """Recalculate pt and mass of Jet depending on systamtic
+        """Recalculate pt and mass of Jet depending on jet systamtic
 
         Args:
             jets (list): input jet collection
@@ -47,7 +47,7 @@ class JetAnalyzer(FilterAnalyzer):
         """
         newjets = [SystematicObject(jet, {"pt": jet.pt, "mass": jet.mass}) for jet in jets]
         count = 0
-        if "subdebug" in self.conf.general["verbosity"]:
+        if "systematics" in self.conf.general["verbosity"]:
             autolog("Processing: {0}, sigma {1}".format(systematic, sigma))
         for i in range(len(jets)):
             if sigma > 0:
@@ -77,7 +77,7 @@ class JetAnalyzer(FilterAnalyzer):
 
             newjets[i].pt *= cf
             newjets[i].mass *= cf
-            if "subdebug" in self.conf.general["verbosity"]:
+            if "systematics" in self.conf.general["verbosity"]:
                 autolog("Correction jet with pt = {0:06.2f}, eta = {1:05.2f}, oldcorr = {2:.4f}, newcorr {3:.4f}, cf = {4:.8f}".format(jets[i].pt, jets[i].eta, old_corr, new_corr, cf))
 
         return newjets
@@ -147,12 +147,8 @@ class JetAnalyzer(FilterAnalyzer):
 
                 ev = SystematicObject(event, {"Jet": jets, "systematic": name})
                 evdict[name] = ev
-
-        print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                
         for syst, event_syst in evdict.items():
-            print "+++++++++++++++++++++++++++ "+syst
             event_syst.systematic = syst 
             res = self._process(event_syst, evdict)
 
@@ -161,9 +157,6 @@ class JetAnalyzer(FilterAnalyzer):
             #    res.nominal_event = evdict["nominal"]
             evdict[syst] = res
         event.systResults = evdict 
-        print "#####################################################################"
-        print "#####################################################################"
-        print "#####################################################################"
         btag_wp = self.conf.jets["btagWP"]
         
         event.systResults["nominal"].changes_jet_category = False
@@ -171,19 +164,26 @@ class JetAnalyzer(FilterAnalyzer):
         nj_nominal = event.systResults["nominal"].numJets
         nt_nominal = getattr(event.systResults["nominal"],"nB"+btag_wp)
         pass_nominal = event.systResults["nominal"].passes_jet #DS
-        print pass_nominal
         event.catChange = 0
-        print "-----------------------------------------"
-        print evdict
+
+
+        #Loop over all systematic variations to finde change in category, number of jets or tags
         for syst in evdict.keys():
             if not evdict[syst].passes_jet:
                 continue #DS
             nj = evdict[syst].numJets
             nt = getattr(evdict[syst],"nB"+btag_wp)
             evdict[syst].changes_jet_category = False
+            #Do for all syst. variation that do
+            # - not pass nominal selection OR
+            # - have different number of good jets than nominal OR
+            # - have different number of btags than nominal
             if not pass_nominal or nj != nj_nominal or nt != nt_nominal: #DS
+                # Only consider the first change in Category
                 if not event.catChange: #DS
                     print syst+" invokes catChange from (j,b): {0},{1} to {2},{3}".format(nj_nominal,nt_nominal,nj,nt) ##DS temp
+                    if not pass_nominal and "systematics" in self.conf.general["verbosity"]:
+                        print "   --> nominal did not pass"
                     event.catChange = deepcopy( evdict[syst] ) #requires change in sparsinator.py
                     event.catChange.systematic = "CatChange"
                     event.catChange.changes_jet_category = False
@@ -278,7 +278,7 @@ class JetAnalyzer(FilterAnalyzer):
                     good_jets_dl += [jet]
             loose_jets = good_jets_dl
 
-        #Now apply true pt cuts to identify analysis jets
+       #Now apply true pt cuts to identify analysis jets
         event.good_jets = filter(jetsel, loose_jets)
         event.loose_jets = filter(lambda x, event=event: x not in event.good_jets, loose_jets) 
 
@@ -288,13 +288,13 @@ class JetAnalyzer(FilterAnalyzer):
                 if event.systematic != "nominal":
                     autolog("Jet: {0}: -pt = {1:06.2f}, eta= {2:05.2f}, {3} = {4:.4f}".format(ix, x.pt, x.eta, event.systematic, getattr(x, "corr_"+event.systematic)))
                 else:
-                    autolog("Jet: {0}: -pt = {1}, eta= {2}".format(ix, x.pt, x.eta))
+                    autolog("Jet: {0}: -pt = {1:06.2f}, eta= {2:05.2f}".format(ix, x.pt, x.eta))
             autolog("Loose jets: ", len(event.loose_jets))
             for ix,x in enumerate(event.loose_jets):
-                autolog("Jet: {0} - pt = {1}, eta= {2}".format(ix, x.pt, x.eta))
+                autolog("Jet: {0} - pt = {1:06.2f}, eta= {2:05.2f}".format(ix, x.pt, x.eta))
             autolog("Good jets: ", len(event.good_jets))
             for ix,x in enumerate(event.good_jets):
-                autolog("Jet: {0} - pt = {1}, eta= {2}".format(ix, x.pt, x.eta))
+                autolog("Jet: {0} - pt = {1:06.2f}, eta= {2:05.2f}".format(ix, x.pt, x.eta))
 
 
         #Assing jet transfer functions
@@ -362,7 +362,6 @@ class JetAnalyzer(FilterAnalyzer):
                                                                                         self.conf.jets["pt_fh"] )
                         )
                     passes = False
-        print "***********************************",event.is_fh, event.is_sl, event.is_dl, passes
 
         #Calculate jet corrections to MET
         corrMet_px = event.MET.px

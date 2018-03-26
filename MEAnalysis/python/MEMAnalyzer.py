@@ -345,7 +345,7 @@ class MEAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         if event.catChange: #DS
-            print "MEMAna: processing catChange"
+            LOG_MODULE_NAME.info("MEMAna: processing catChange")
             res = self._process(event.catChange)
             event.catChange = res
 
