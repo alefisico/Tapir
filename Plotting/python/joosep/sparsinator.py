@@ -19,10 +19,10 @@ from TTH.CommonClassifier.db import ClassifierDB
 
 from TTH.MEAnalysis.leptonSF import calc_lepton_SF
 
+#prefetch the C++ classes
 CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
-
 
 #Need to access this to initialize the library (?)
 dummy = ROOT.TTH_MEAnalysis.TreeDescription
@@ -33,6 +33,7 @@ topPTreweight = lambda x,y: math.exp(0.5*((0.0843616-0.000743051*x)+(0.0843616-0
 topPTreweightUp = lambda x,y: math.exp(0.5*((0.00160296-0.000411375*x)+(0.00160296-0.000411375*y)))
 topPTreweightDown = lambda x,y: math.exp(0.5*((0.16712-0.00107473*x)+(0.16712-0.00107473*y)))
 
+#Create a mapping between a string and the C++ systematic enum defined in EventModel.h
 syst_pairs = OrderedDict([
     (x+d, ROOT.TTH_MEAnalysis.Systematic.make_id(
         getattr(ROOT.TTH_MEAnalysis.Systematic, x),
@@ -246,6 +247,10 @@ def createEvent(
     calculate_bdt,
     sample
     ):
+    """
+    Creates an event with a specified systematic.
+    """
+    
 
     event = events.create_event(syst_pairs[syst])
     if schema.startswith("mc"): 
@@ -296,8 +301,8 @@ def createEvent(
         #        "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
         #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         #    ]}
-        #event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"]) * event.lepton_weight
-        event.weight_nominal *= event.weights.at(syst_pairs["gen"])
+        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
+        #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
@@ -546,39 +551,63 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     for file_name in file_names:
         if break_file_loop:
             break
+
+        #Check if postprocessing file specified
+        file_name_postproc = None
+        if sample.file_names_postproc:
+            fn_base = os.path.basename(file_name).replace(".root", "")
+            fns_postproc = [fn for fn in sample.file_names_postproc if fn_base in fn]
+            if len(fns_postproc) != 1:
+                raise Exception("Expected exactly one matching postprocessing file but got {0}".format(fns_postproc))
+            file_name_postproc = fns_postproc[0]
+
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
-        tf = ROOT.TFile.Open(file_name)
-        if not tf:
+        tfile = ROOT.TFile.Open(file_name)
+        if not tfile:
             raise IOError("Could not open file {0}".format(file_name))
         treemodel = getattr(ROOT.TTH_MEAnalysis, sample.treemodel.split(".")[-1])
         LOG_MODULE_NAME.debug("treemodel {0}".format(treemodel))
 
         if schema == "mc" or schema == "mc_syst":
+            #Create MC-specific event model from tree
             events = treemodel(
-                tf,
+                tfile,
                 ROOT.TTH_MEAnalysis.SampleDescription(
                     ROOT.TTH_MEAnalysis.SampleDescription.MC
                 )
             )
         else:
+            #Create data-specific event model
              events = treemodel(
-                tf,
+                tfile,
                 ROOT.TTH_MEAnalysis.SampleDescription(
                     ROOT.TTH_MEAnalysis.SampleDescription.DATA
                 )
             )
 
+        tfile_postproc = None
+        ttree_postproc = None
+        if file_name_postproc:
+            tfile_postproc = ROOT.TFile.Open(file_name_postproc)
+            ttree_postproc = tfile_postproc.Get("Friends")
+            if ttree_postproc.GetEntries() != events.reader.GetEntries(True):
+                raise Exception("Expected same number of entries in main tree and postprocessed tree")
+
         LOG_MODULE_NAME.info("looping over {0} events".format(events.reader.GetEntries(True)))
        
         iEv = 0
         
-        #Loop over events
+        #Loop over events using the TTreeReader
         while events.reader.Next():
+            if ttree_postproc:
+                ttree_postproc.GetEntry(iEv)
 
             nevents += 1
             iEv += 1
+
             if skip_events > 0 and nevents < skip_events:
                 continue
+
             if max_events > 0:
                 if nevents > (skip_events + max_events):
                     LOG_MODULE_NAME.info("event loop: breaking due to MAX_EVENTS: {0} > {1} + {2}".format(
@@ -603,9 +632,19 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     calculate_bdt,
                     sample
                 )
+
                 if event is None:
                     continue
                 
+                if ttree_postproc:
+                    event.weights[syst_pairs["CMS_pu"]] = ttree_postproc.puWeight
+                    w = reduce(
+                        lambda x,y: x*y,
+                        [ttree_postproc.Jet_btagSF_shape[i] for i in range(ttree_postproc.nJet)],
+                        1
+                    )
+                    event.weights[syst_pairs["CMS_ttH_CSV"]] = w
+
                 #make sure data event is in golden JSON
                 if schema == "data" and not event.json:
                     continue
@@ -645,7 +684,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             #end of loop over event systematics
         #end of loop over events
         try:
-            tf.Close()
+            tfile.Close()
         except Exception as e:
             print(e)
     #end of loop over file names
@@ -693,12 +732,12 @@ if __name__ == "__main__":
 
     else:
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"
-        #sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
         #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        sample = "SingleMuon"
+        #sample = "SingleMuon"
         #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
         skip_events = 0
         max_events = 100000

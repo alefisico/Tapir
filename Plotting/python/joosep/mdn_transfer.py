@@ -39,7 +39,7 @@ print "creating inputs", len(dfsel)
 #dfsel_q = dfsel[(dfsel["Quark_pt"] > 200) & (dfsel["Quark_pt"] < 210)]
 dfsel_q = dfsel[(dfsel["Quark_pt"] < 400)]
 print "quark pt sel", len(dfsel_q)
-#dfsel_q = dfsel_q[:10000]
+dfsel_q = dfsel_q[:100000]
 print "subsample", len(dfsel_q)
 
 print "quark pt mean", dfsel_q["Quark_pt"].mean(), "std", dfsel_q["Quark_pt"].std()
@@ -65,6 +65,14 @@ model = torch.nn.Sequential(
     torch.nn.ReLU(),
     torch.nn.Linear(H, H),
 
+    torch.nn.Dropout(0.5),
+    torch.nn.ReLU(),
+    torch.nn.Linear(H, H),
+    
+    torch.nn.Dropout(0.5),
+    torch.nn.ReLU(),
+    torch.nn.Linear(H, H),
+    
     torch.nn.Dropout(0.5),
     torch.nn.ReLU(),
     torch.nn.Linear(H, H),

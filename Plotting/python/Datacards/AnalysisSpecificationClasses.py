@@ -58,6 +58,10 @@ FUNCTION_TABLE = {
 }
 
 class Cut(object):
+    """
+    Defines a sequence of (variable, lower, upper) cuts
+    that can be applied on a set of events
+    """
 
     @staticmethod
     def string_to_cuts(s):
@@ -97,24 +101,40 @@ class Cut(object):
 
 class Sample(object):
     def __init__(self, *args, **kwargs):
+
+        #Flag to set whether in debug mode
         self.debug = kwargs.get("debug")
+
+        #Name of sample, e.g. ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
         self.name = kwargs.get("name")
+
+        #Schema of sample, e.g. mc, data, or mc_syst (MC that is a systematic variation)
         self.schema = kwargs.get("schema")
+
+        #Name of the underlying event model, based in MEAnalysis/interface/EventModel.h
         self.treemodel = kwargs.get("treemodel")
+
+        #Step2 files (tthbb13 output)
         self.files_load = kwargs.get("files_load")
+
+        #Step1 files (nanoAOD, optional)
         self.files_load_step1 = kwargs.get("files_load_step1", None)
+
+        #postprocessing files (nanoAOD, optional)
+        self.files_load_postproc = kwargs.get("files_load_postproc", None)
+
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
         self.tags = kwargs.get("tags", "").split()
 
-        #Load the filenames for step2 (VHBB + tthbb13)
+        #Load the filenames for step2 (nanoAOD + tthbb13)
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
         except Exception as e:
             LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
             self.file_names = []
 
-        #Load the filenames for step1 (VHBB)
+        #Load the filenames for step1 (nanoAOD)
         if self.files_load_step1 is None:
             self.file_names_step1 = self.file_names
         else:
@@ -124,12 +144,16 @@ class Sample(object):
                 LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
                 self.file_names_step1 = []
 
+        if self.files_load_postproc:
+            self.file_names_postproc = [getSitePrefix(fn) for fn in get_files(self.files_load_postproc)]
+
         #Limit list of files in debug mode
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
+
         self.ngen = int(kwargs.get("ngen"))
         self.xsec = kwargs.get("xsec")
-        self.vhbb_tree_name = kwargs.get("vhbb_tree_name", "vhbb/tree")
+        self.step1_tree_name = kwargs.get("step1_tree_name")
         
     @staticmethod
     def fromConfigParser(config, sample_name):
@@ -138,12 +162,13 @@ class Sample(object):
             name = sample_name,
             files_load = config.get(sample_name, "files_load"),
             files_load_step1 = config.get(sample_name, "files_load_step1"),
+            files_load_postproc = config.get(sample_name, "files_load_postproc"),
             schema = config.get(sample_name, "schema"),
             treemodel = config.get(sample_name, "treemodel"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen_weight"),
-            vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
+            step1_tree_name = config.get(sample_name, "step1_tree_name"),
             xsec = config.getfloat(sample_name, "xsec"),
             tags = config.get(sample_name, "tags")
         )
