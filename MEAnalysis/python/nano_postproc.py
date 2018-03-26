@@ -7,10 +7,7 @@ from TTH.MEAnalysis.samples_base import getSitePrefix
 
 from TTH.MEAnalysis.nano_config import NanoConfig
 
-if __name__ == "__main__":
-    outdir = "./"
-    infiles = map(getSitePrefix, os.environ["FILE_NAMES"].split())
-   
+def main(infiles, outdir):
     nano_cfg = NanoConfig("94X", btag=True, pu=True)
     p=PostProcessor(
         outdir, infiles,
@@ -19,3 +16,8 @@ if __name__ == "__main__":
         jsonInput=nano_cfg.json, noOut=False, justcount=False
     )
     p.run()
+
+if __name__ == "__main__":
+    outdir = "./"
+    infiles = map(getSitePrefix, os.environ["FILE_NAMES"].split())
+    main(infiles, outdir)

@@ -45,8 +45,7 @@ if __name__ == "__main__":
         '--sample',
         action="store",
         help="Sample to process",
-        required=False,
-        default=None
+        required=True,
     )
     parser.add_argument(
         '--analysis_cfg',

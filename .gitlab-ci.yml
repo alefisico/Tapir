@@ -75,6 +75,19 @@ test_nano:
       - nano.root
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
+test_nano_postproc:
+  tags: [ cvmfs ]
+  stage: test
+  allow_failure: true
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH/MEAnalysis
+    - python test/test_nano_postproc.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+
 test_tth:
   tags: [ cvmfs ]
   stage: test
@@ -85,7 +98,7 @@ test_tth:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - python test/validationHistos.py Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
     - tar -czf plots_tth.tgz *.pdf Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
@@ -106,7 +119,7 @@ test_ttjets:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/test_MEAnalysis_heppy.py --sample TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - python test/validationHistos.py Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
     - tar -czf plots_ttjets.tgz *.pdf Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
@@ -127,7 +140,7 @@ test_data:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample SingleMuon
+    - python test/test_MEAnalysis_heppy.py --sample SingleMuon
     - python test/validationHistos.py Loop_SingleMuon/tree.root
     - ls -al
     - tar -czf plots_singlemuon.tgz *.pdf Loop_SingleMuon/tree.root

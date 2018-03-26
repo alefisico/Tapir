@@ -173,7 +173,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     if sample_name:
         an_sample = analysis_cfg.get_sample(sample_name)
         sample_name = an_sample.name
-        vhbb_tree_name = an_sample.vhbb_tree_name
+        step1_tree_name = an_sample.step1_tree_name
         schema = an_sample.schema
         if len(files) == 0:
             files = an_sample.file_names_step1[:an_sample.debug_max_files]
@@ -181,7 +181,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             output_name = "Loop_" + sample_name
     elif schema:
         sample_name = "sample"
-        vhbb_tree_name = "Events"
+        step1_tree_name = "Events"
         pass
     else:
         raise Exception("Must specify either sample name or schema")
@@ -502,7 +502,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     comp = comp_cls(
         sample_name,
         files = files,
-        tree_name = vhbb_tree_name, #DS requires change to ../../PhysicsTools/HeppyCore/python/framework/config.py
+        tree_name = step1_tree_name, #DS requires change to ../../PhysicsTools/HeppyCore/python/framework/config.py
     )
 
     #from PhysicsTools.HeppyCore.framework.chain import Chain
