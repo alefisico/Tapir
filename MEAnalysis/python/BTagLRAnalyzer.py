@@ -80,7 +80,8 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         if event.catChange: #DS
-            print "BLRAna: processing catChange"
+            if "systematics" in self.conf.general["verbosity"]:
+                autolog("BLRAna: processing catChange")
             res = self._process(event.catChange)
             event.catChange = res #DS
 

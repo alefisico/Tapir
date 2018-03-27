@@ -4,6 +4,7 @@ from copy import deepcopy
 import numpy as np
 import copy
 from collections import OrderedDict
+import logging
 
 #FIXME: understand the effect of cropping the transfer functions
 def attach_jet_transfer_function(jet, conf):
@@ -179,11 +180,12 @@ class JetAnalyzer(FilterAnalyzer):
             # - have different number of good jets than nominal OR
             # - have different number of btags than nominal
             if not pass_nominal or nj != nj_nominal or nt != nt_nominal: #DS
+                evdict[syst].changes_jet_category = True
                 # Only consider the first change in Category
                 if not event.catChange: #DS
-                    print syst+" invokes catChange from (j,b): {0},{1} to {2},{3}".format(nj_nominal,nt_nominal,nj,nt) ##DS temp
-                    if not pass_nominal and "systematics" in self.conf.general["verbosity"]:
-                        print "   --> nominal did not pass"
+                    logging.info(syst+" invokes catChange from (j,b): {0},{1} to {2},{3}".format(nj_nominal,nt_nominal,nj,nt))
+                    if not pass_nominal:
+                        logging.debug("   --> nominal did not pass")
                     event.catChange = deepcopy( evdict[syst] ) #requires change in sparsinator.py
                     event.catChange.systematic = "CatChange"
                     event.catChange.changes_jet_category = False
@@ -199,8 +201,7 @@ class JetAnalyzer(FilterAnalyzer):
                         event.catChange.good_jets = self.compareJets(jets_var, event.systResults["nominal"].Jet)
             evdict[syst].catChange_event = event.catChange
 
-            if nj != nj_nominal or nt != nt_nominal:
-                evdict[syst].changes_jet_category = True
+
         ret = self.conf.general["passall"] or np.any([v.passes_jet for v in event.systResults.values()])
         return ret
 
@@ -278,7 +279,7 @@ class JetAnalyzer(FilterAnalyzer):
                     good_jets_dl += [jet]
             loose_jets = good_jets_dl
 
-       #Now apply true pt cuts to identify analysis jets
+        #Now apply true pt cuts to identify analysis jets
         event.good_jets = filter(jetsel, loose_jets)
         event.loose_jets = filter(lambda x, event=event: x not in event.good_jets, loose_jets) 
 
@@ -340,12 +341,16 @@ class JetAnalyzer(FilterAnalyzer):
 
         #Require at least 4 good resolved jets to continue analysis
         passes = True
-        if event.is_sl and not (len(event.good_jets) >= 4 and getattr(event,"nB"+btag_wp)>=2):
+        if event.systematic == "nominal":
+            event_proxy = event
+        else:
+            event_proxy = evdict["nominal"]
+        if event.is_sl and not (len(event_proxy.good_jets) >= 4 and getattr(event_proxy,"nB"+btag_wp)>=2):
             if "debug" in self.conf.general["verbosity"]:
                 autolog("fails because SL NJ<3")
             passes = False
         elif event.is_dl:
-            if not (len(event.good_jets) >= 4 and getattr(event,"nB"+btag_wp)>=2):
+            if not (len(event_proxy.good_jets) >= 4 and getattr(event_proxy,"nB"+btag_wp)>=2):
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False

@@ -57,7 +57,8 @@ class MECategoryAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         if event.catChange: #DS
-            print "MECatAna: processing catChange"
+            if "systematics" in self.conf.general["verbosity"]:
+                autolog("MECatAna: processing catChange")
             res = self._process(event.catChange)
             event.catChange = res #DS
 

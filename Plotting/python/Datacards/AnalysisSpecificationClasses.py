@@ -3,7 +3,7 @@ import ConfigParser
 from itertools import izip
 import cPickle as pickle
 import fnmatch
-
+from copy import deepcopy
 import ROOT
 
 from TTH.MEAnalysis import samples_base
@@ -477,6 +477,9 @@ class Analysis:
             return parent
         return config
 
+    def __deepcopy__(self, memo):
+        return self
+    
 def make_csv_categories_abstract(di):
 
     import csv

@@ -2,6 +2,7 @@ from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 from TTH.MEAnalysis.vhbb_utils import lvec
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 
+
 class TriggerAnalyzer(FilterAnalyzer):
     """
     """
@@ -14,7 +15,6 @@ class TriggerAnalyzer(FilterAnalyzer):
         super(TriggerAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
-
         event.triggerDecision = False
         event.trigvec = []
         if self.cfg_comp.isMC:

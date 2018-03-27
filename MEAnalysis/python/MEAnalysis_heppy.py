@@ -1,14 +1,14 @@
-#!/usr/bin/env python
 import os
-import PhysicsTools.HeppyCore.framework.config as cfg
-import ROOT
-import imp
-
-#pickle and transfer function classes to load transfer functions
-import cPickle as pickle
-import TTH.MEAnalysis.TFClasses as TFClasses
 import sys
 import logging
+from copy import deepcopy
+import imp
+#pickle and transfer function classes to load transfer functions
+import cPickle as pickle
+
+import TTH.MEAnalysis.TFClasses as TFClasses
+import PhysicsTools.HeppyCore.framework.config as cfg
+import ROOT
 
 sys.modules["TFClasses"] = TFClasses
 ROOT.gROOT.SetBatch(True)
@@ -42,6 +42,7 @@ class BufferedTree:
         self.maxEv = int(self.tree.GetEntries())
 
     def __getattr__(self, attr, defval=None):
+        #print "BufferedTree getAttr", attr, defval
         if self.__dict__["branches"].has_key(attr):
             if self.__dict__["buf"].has_key(attr):
                 return self.__dict__["buf"][attr]
@@ -53,7 +54,11 @@ class BufferedTree:
             if not (defval is None):
                 return defval
             raise Exception("Could not find branch with key: {0}".format(attr))
-        
+            #raise AttributeError
+
+    def __str__(self):
+        return self.tree.GetName()
+
     def GetEntries(self):
         return self.tree.GetEntries()
 
@@ -62,7 +67,12 @@ class BufferedTree:
         self.iEv = idx
         return self.tree.GetEntry(idx)
 
-
+    def __deepcopy__(self, memo):
+        return BufferedTree(deepcopy(self.tree, memo))
+    
+    def __iter__(self):
+        return self
+    
 class BufferedChain( object ):
     """Wrapper to TChain, with a python iterable interface.
 
@@ -89,6 +99,7 @@ class BufferedChain( object ):
                       this TTree is used.
         """
         self.files = files
+        self.tree_name = tree_name
         self.base_chain = ROOT.TChain(tree_name)
 
         #Add all input files, which need to be opened, to the chain
@@ -105,19 +116,16 @@ class BufferedChain( object ):
         """
         All functions of the wrapped TChain are made available
         """
-        return self.chain.__getattr__(attr, defval)
-
-    # def __iter__(self):
-    #     return self
+        return getattr(self.chain, attr)
 
     def __len__(self):
         return int(self.chain.GetEntries())
 
+    
     def __getitem__(self, index):
         """
         Returns the event at position index.
         """
-
         bytes = self.chain.GetEntry(index)
 
         #Check if the chain has moved to the next tree
@@ -131,6 +139,7 @@ class BufferedChain( object ):
 
         if bytes < 0:
             raise Exception("Could not read entry {0}".format(self.iEv))
+
 
         return self
 

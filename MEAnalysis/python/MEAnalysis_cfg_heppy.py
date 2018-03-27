@@ -237,8 +237,8 @@ class Conf:
 
         "filter": False,
         #Change to trig.triggerTable for 2017 menu (starting from 92X samples)
-        "trigTable": trig.triggerTable2016,
-        "trigTableData": trig.triggerTable2016,
+        "trigTable": trig.triggerTable,
+        "trigTableData": trig.triggerTable,
     }
 
     general = {
