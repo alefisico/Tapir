@@ -59,25 +59,14 @@ class JetAnalyzer(FilterAnalyzer):
                 _sigma = abs(sigma)
             else:
                 raise Exception("sigma must be != 0")
-            new_corr = getattr(newjets[i], "corr_{0}{1}".format(systematic, sdir))
-            old_corr = newjets[i].corr
+            corr_pt = getattr(newjets[i], "pt_corr_{0}{1}".format(systematic, sdir))
+            nominal_pt = newjets[i].pt
 
             
-            #for JER need to uncorrect by a different factor
-            if systematic == "JER":
-                old_corr = newjets[i].corr_JER
+            
 
-            if new_corr > 0 and old_corr > 0:
-                cf =  _sigma * new_corr / old_corr
-            else:
-                cf = 1.0 #Should always be 1.0 if not correction!
-                if count==0:
-                    count += 1 #prints only first jet with non-positive systematic
-                    print "negative jet {0} correction {1} {2} {3}".format(i,systematic,new_corr,sdir) #DS
-
-
-            newjets[i].pt *= cf
-            newjets[i].mass *= cf
+            newjets[i].pt = corr_pt
+            newjets[i].mass *= corr_pt/nominal_pt
             if "systematics" in self.conf.general["verbosity"]:
                 autolog("Correction jet with pt = {0:06.2f}, eta = {1:05.2f}, oldcorr = {2:.4f}, newcorr {3:.4f}, cf = {4:.8f}".format(jets[i].pt, jets[i].eta, old_corr, new_corr, cf))
 

@@ -295,14 +295,8 @@ class MEAnalyzer(FilterAnalyzer):
             jetcorrs = []
             if (event.systematic=="nominal" or event.systematic=="CatChange") and self.cfg_comp.isMC:
                 for jc in self.conf.mem["jet_corrections"]:
-                    new_corr = getattr(jet, "corr_"+jc)
-                    if new_corr<=0.0:
-                        print "negative jet correction {0} {1}".format(jc,new_corr) #DS
-                        jetcorrs.append( 1.0 )
-                    elif jc=="JERUp" or jc=="JERDown":
-                        jetcorrs.append( new_corr/(jet.corr_JER if jet.corr_JER>0 else 1.0) )
-                    else:
-                        jetcorrs.append( new_corr/jet.corr )
+                    new_pt = getattr(jet, "pt_corr_"+jc)
+                    jetcorrs.append( new_pt/jet.pt )
 
             add_obj(
                 self.integrator,

@@ -304,8 +304,8 @@ def getTreeProducer(conf):
    
     #create jet up/down variations
     corrs = [NTupleVariable(
-            "corr_"+c,
-            lambda x,c="corr_"+c : getattr(x, c),
+            "pt_corr_"+c,
+            lambda x,c="pt_corr_"+c : getattr(x, c),
             mcOnly=True,
             type=float,
         ) for c in conf.mem["jet_corrections"]
