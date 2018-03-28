@@ -115,7 +115,7 @@ class Sample(object):
         self.treemodel = kwargs.get("treemodel")
 
         #Step2 files (tthbb13 output)
-        self.files_load = kwargs.get("files_load")
+        self.files_load_step2 = kwargs.get("files_load_step2")
 
         #Step1 files (nanoAOD, optional)
         self.files_load_step1 = kwargs.get("files_load_step1", None)
@@ -129,9 +129,9 @@ class Sample(object):
 
         #Load the filenames for step2 (nanoAOD + tthbb13)
         try:
-            self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
+            self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load_step2)]
         except Exception as e:
-            LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
+            LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load_step2, e))
             self.file_names = []
 
         #Load the filenames for step1 (nanoAOD)
@@ -141,7 +141,7 @@ class Sample(object):
             try:
                 self.file_names_step1 = [getSitePrefix(fn) for fn in get_files(self.files_load_step1)]
             except Exception as e:
-                LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
+                LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load_step1, e))
                 self.file_names_step1 = []
 
         self.file_names_postproc = None
@@ -161,7 +161,7 @@ class Sample(object):
         sample = Sample(
             debug = config.getboolean("general", "debug"),
             name = sample_name,
-            files_load = config.get(sample_name, "files_load"),
+            files_load_step2 = config.get(sample_name, "files_load_step2"),
             files_load_step1 = config.get(sample_name, "files_load_step1"),
             files_load_postproc = config.get(sample_name, "files_load_postproc"),
             schema = config.get(sample_name, "schema"),
