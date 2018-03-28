@@ -186,7 +186,7 @@ def fillBase(matched_processes, event, syst, schema):
             if schema == "mc" or schema == "mc_syst":
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
-                    LOG_MODULE_NAME.debug("weight_nominal<=0: gen={0}".format(event.weights.at(syst_pairs["gen"])))
+                    LOG_MODULE_NAME.debug("negative weight, weight_nominal<=0: gen={0}".format(event.weights.at(syst_pairs["gen"])))
             if histo_out.cut(event):
                 histo_out.fill(event, weight)
 
@@ -552,14 +552,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         if break_file_loop:
             break
 
-        #Check if postprocessing file specified
+        # Check if running on predefined files in configuration and if
+        # postprocessing file specified
         file_name_postproc = None
         if sample.file_names_postproc:
-            fn_base = os.path.basename(file_name).replace(".root", "")
-            fns_postproc = [fn for fn in sample.file_names_postproc if fn_base in fn]
-            if len(fns_postproc) != 1:
-                raise Exception("Expected exactly one matching postprocessing file but got {0}".format(fns_postproc))
-            file_name_postproc = fns_postproc[0]
+            if not (file_name in sample.file_names):
+                LOG_MODULE_NAME.error(
+                    "Specified postprocessing files, but base input "
+                    "file {0} is untracked in configuration, skipping "
+                    "use of postprocessing".format(file_name)
+                )
+            else:
+                fn_base = os.path.basename(file_name).replace(".root", "")
+                fns_postproc = [fn for fn in sample.file_names_postproc if fn_base in fn]
+                if len(fns_postproc) != 1:
+                    raise Exception("Expected exactly one matching postprocessing file but got {0}".format(fns_postproc))
+                file_name_postproc = fns_postproc[0]
+                LOG_MODULE_NAME.info("Postprocessing file: {0}".format(file_name_postproc))
 
         LOG_MODULE_NAME.info("opening {0}".format(file_name))
         tfile = ROOT.TFile.Open(file_name)
@@ -729,21 +738,18 @@ if __name__ == "__main__":
         skip_events = int(os.environ.get("SKIP_EVENTS", -1))
         max_events = int(os.environ.get("MAX_EVENTS", -1))
         analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
-
-    else:
-        #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        #sample = "TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        #sample = "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
-        #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrup-pythia8"
-        #sample = "TT_TuneCUETP8M2T4_13TeV-powheg-isrdown-pythia8"
-        #sample = "SingleMuon"
-        #sample = "WW_TuneCUETP8M1_13TeV-pythia8"
+    elif os.environ.has_key("DATASETPATH"):
+        prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
         skip_events = 0
-        max_events = 100000
+        max_events = 10000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
-        #file_names = ["root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/jpata/tth/Aug3_syst/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Aug3_syst/170803_183651/0001/tree_1483.root"]
+    else:
+        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        skip_events = 0
+        max_events = 10000
+        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        file_names = analysis.get_sample(sample).file_names
 
     outfilter = os.environ.get("OUTFILTER", None)
     main(analysis, file_names, sample, "out.root", skip_events, max_events, outfilter)

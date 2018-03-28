@@ -144,6 +144,7 @@ class Sample(object):
                 LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
                 self.file_names_step1 = []
 
+        self.file_names_postproc = None
         if self.files_load_postproc:
             self.file_names_postproc = [getSitePrefix(fn) for fn in get_files(self.files_load_postproc)]
 
