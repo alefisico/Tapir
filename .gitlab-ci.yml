@@ -180,7 +180,7 @@ test_sparsinator_postproc:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH
-    - python Plotting/python/test/test_sparsinator.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python Plotting/test/test_sparsinator.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - mv out.root $CI_HOME/sparse_tth.root
   artifacts:
     paths:
