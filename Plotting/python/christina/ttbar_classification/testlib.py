@@ -15,15 +15,11 @@ import pandas as pd
 # calculate naive discriminator
 def CSVM(btags, d, proc):
 
-    d = pd.read_csv(d)
-
 # cut on events from special process 
-    if proc == "ttbarOther":
-        d_cut = d[d["ttCls"] == 0] 
-    elif proc == "ttbarPlusBBbar":
+    if proc == "2b":
+        d_cut = d[d["ttCls"] == 0]
+    elif proc == "4b":
         d_cut = d[d["ttCls"] == 53] 
-    else:
-        d_cut = d
     nevt = d_cut.shape[0]
 
 # use nBCSVM as discriminant
@@ -34,7 +30,38 @@ def CSVM(btags, d, proc):
 
     print eff
     return eff
-    
+
+
+# make ttH test sample
+def ttH_test_sample(fpath, csv):
+
+# load grid-control output
+    os.chdir(fpath)
+
+    count = 0
+    for npfile in glob.glob("*_dataframe.csv"):
+        filepath = os.path.join(fpath, npfile)
+        print filepath
+        if count == 0:
+            d_ttH = pd.read_csv(filepath)
+        else:
+            d_ttH = d_ttH.append(pd.read_csv(filepath), ignore_index = True)
+        count += 1
+
+    os.chdir(sys.path[0])
+
+# add tt+light output
+
+    d_ttlight = pd.read_csv(csv)
+    print d_ttlight
+    # select only tt+light events
+    d_ttlight = d_ttlight[d_ttlight["ttCls"] == 0]
+    print d_ttlight
+
+    d_ttH = d_ttH.append(d_ttlight, ignore_index=True)
+    d_ttH = d_ttH.sample(frac=1, random_state=0).reset_index(drop=True)
+    print d_ttH
+    d_ttH.to_csv("output/dataframe_ttH.csv")
 
 # calculate fpr, tpr for roc curve
 def fpr_tpr(y_true, y_score, unc = False , weight = None):
@@ -81,27 +108,18 @@ def fpr_tpr(y_true, y_score, unc = False , weight = None):
 
     return tpr, fpr
 
-# define sample containing ttH evt
-def make_ttH_sample(fpath):
-
-    
-
-     
-
-
 # plot roc curves
-def plot_roc(classifier, test, plot_blr = None, unc = False):
+def plot_roc(classifier, data, plot_blr = False, unc = False):
 
     clf = joblib.load(classifier)
 
-    test = pd.read_csv("test.csv")
+    test = pd.read_csv(data)
     numJets = 6
     var = ["jets_btagCSV_" + str(x) for x in range(numJets)]
     X_test = np.array(test[var])
     X_test = np.sort(X_test)
     y_test = np.array(test["ttCls"]) 
     y_score = clf.decision_function(X_test)
-
 
     fig = plt.figure()
     if unc == True:
@@ -121,10 +139,9 @@ def plot_roc(classifier, test, plot_blr = None, unc = False):
         plt.semilogy(tpr_test, fpr_test, "r-", label='BDT output')
         #plt.plot(tpr_test, fpr_test, "r-", label='BDT output')
     
-    if plot_blr != None:
-        d = pd.read_csv(plot_blr)
-        blr = d["btag_LR_4b_2b_btagCSV"]
-        ttCls = d["ttCls"]
+    if plot_blr == True:
+        blr = test["btag_LR_4b_2b_btagCSV"]
+        ttCls = test["ttCls"]
         if unc == True:
             tpr_blr_up, fpr_blr_up = fpr_tpr(ttCls, blr, unc = unc,  weight = test["btagWeightCSV_up_lf"])
             tpr_blr_down, fpr_blr_down = fpr_tpr(ttCls, blr, unc = unc, weight = test["btagWeightCSV_down_lf"])
@@ -141,27 +158,28 @@ def plot_roc(classifier, test, plot_blr = None, unc = False):
             #plt.plot(tpr_blr, fpr_blr, "g-", label="BLR")
             plt.semilogy(tpr_blr, fpr_blr, "g-", label='BLR')
 
-    eff_sig = CSVM(4, "dataframe.csv", "ttbarPlusBBbar") 
-    eff_bkg = CSVM(4, "dataframe.csv", "ttbarOther")
+    eff_sig = CSVM(4, test, "4b") 
+    eff_bkg = CSVM(4, test, "2b")
     plt.scatter([eff_sig], [eff_bkg], c="k", marker = "^", label = "4x BCSVM", zorder = 1) 
 
-    eff_sig = CSVM(3, "dataframe.csv", "ttbarPlusBBbar") 
-    eff_bkg = CSVM(3, "dataframe.csv", "ttbarOther")
+    eff_sig = CSVM(3, test, "4b") 
+    eff_bkg = CSVM(3, test, "2b")
     plt.scatter([eff_sig], [eff_bkg], c="k", marker = "o", label = "3x BCSVM", zorder = 1) 
-
-
 
     plt.xlim([0.0, .5])
     #plt.ylim([0.0, 1.05])
     plt.ylabel('tt+jets (light) efficiency', fontsize=16)
-    plt.xlabel('tt+bb efficiency', fontsize=16)
+    plt.xlabel('ttH efficiency', fontsize=16)
     plt.title(r"SL/DL, $N_j = 6$", fontsize=16)
     plt.legend(loc="upper left")
     os.chdir(sys.path[0])
-    fig.savefig("roc.pdf")
+    fig.savefig("output/roc_ttH.pdf")
 
 if __name__ == "__main__":
 
-    plot_roc("classifier.pkl", "test.csv", plot_blr = "test.csv", unc = True)
-    #CSVM(4,"dataframe.csv", "ttbarOther")
+    #plot_roc("output/classifier.pkl", "output/test.csv", plot_blr = "output/test.csv", unc = True)
+    #CSVM(4,"output/dataframe.csv", "ttbarOther")
+    #CSVM(4,"output/dataframe.csv", "ttbarPlusBBbar")
+    ttH_test_sample("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC5b3bd28701d3/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8", "output/test.csv")
+    plot_roc("output/classifier.pkl", "output/dataframe_ttH.csv", plot_blr = True, unc = False)
 

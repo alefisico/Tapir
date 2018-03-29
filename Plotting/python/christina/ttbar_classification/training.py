@@ -31,7 +31,7 @@ def training(fpath):
     d.to_csv("dataframe.csv")
 
 # divide dataframe in train and test sample
-    #d = d.sample(frac=1, random_state=0).reset_index(drop=True)
+    d = d.sample(frac=1, random_state=0).reset_index(drop=True)
     nevt = d.shape[0]
     train = d[:int(nevt*0.9)]
     print train

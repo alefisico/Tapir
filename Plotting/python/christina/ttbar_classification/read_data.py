@@ -68,7 +68,8 @@ if __name__ == "__main__":
     if os.environ.has_key("FILE_NAMES"):
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     else:
-        file_names = np.loadtxt("/mnt/t3nfs01/data01/shome/creissel/tth/sw/CMSSW/src/TTH/MEAnalysis/gc/datasets/Nov30_ttbb/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8.txt", usecols = [0], dtype = str, skiprows = 1)
+        #file_names = np.loadtxt("/mnt/t3nfs01/data01/shome/creissel/tth/sw/CMSSW/src/TTH/MEAnalysis/gc/datasets/Nov30_ttbb/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8.txt", usecols = [0], dtype = str, skiprows = 1)
+        file_names = np.loadtxt("/mnt/t3nfs01/data01/shome/creissel/tth/sw/CMSSW/src/TTH/MEAnalysis/gc/datasets/Oct16_puid_LHE_v3/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8.txt", usecols = [0], dtype = str, skiprows = 1)
         file_names = file_names[:10]
         # print file_names
 
