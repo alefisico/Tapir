@@ -31,6 +31,4 @@ if __name__ == "__main__":
     analysis = analysisFromConfig(args.analysis_cfg)
     file_names = analysis.get_sample(args.sample).file_names
     file_names = [fi.replace("root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/", "root://t3se.psi.ch//") for fi in file_names]
-    import pdb
-    pdb.set_trace()
     main(analysis, file_names, args.sample, "out.root", 0, 10000, "*")
