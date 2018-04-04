@@ -11,31 +11,78 @@ import sys
 import os
 import glob
 import pandas as pd
+import rootpy.plotting.root2matplotlib as rplt
+import matplotlib as mpl
+from rootpy.plotting import Hist
+
+# logit transformation
+def logit(x):
+
+    res = np.log(x / (1-x))
+    return res
+
+
 
 # calculate naive discriminator
 def CSVM(btags, d, proc):
 
-# cut on events from special process 
+    # cut on events from special process 
     if proc == "2b":
         d_cut = d[d["ttCls"] == 0]
     elif proc == "4b":
-        d_cut = d[d["ttCls"] == 53] 
+        d_cut = d[d["ttCls"] == 1] 
     nevt = d_cut.shape[0]
+    #print "number of " + proc + " " + str(nevt)
 
-# use nBCSVM as discriminant
-    d_cut = d_cut[d_cut["nBCSVM"] == btags]
+    # use nBCSVM as discriminant
+    if btags == 4:
+        d_cut = d_cut[d_cut["nBCSVM"] >= btags]
+    elif btags == 3:
+        d_cut = d_cut[d_cut["nBCSVM"] == btags]
     nevt_nBCSVM = d_cut.shape[0]
 
     eff = nevt_nBCSVM/float(nevt)
 
-    print eff
+    #print eff
     return eff
 
 
-# make ttH test sample
-def ttH_test_sample(fpath, csv):
+# plot histograms 
+def histograms(test):
 
-# load grid-control output
+    test = pd.read_csv(test) 
+
+    numJets = 6
+    var = ["jets_btagCSV_" + str(x) for x in range(numJets)]
+    test_4b = test[test["ttCls"] == 1]
+    test_2b = test[test["ttCls"] == 0]
+    data_4b = np.array(test_4b[var])
+    data_4b = np.sort(data_4b)
+    data_2b = np.array(test_2b[var])
+    data_2b = np.sort(data_2b)
+
+
+    # plot histograms
+    for i in var:
+        fig = plt.figure()
+
+        label = var[-(var.index(i)+1)]
+        print label
+
+        plt.hist(data_4b[:,var.index(i)], 50, range = (0.0,1.0), normed = 1, histtype = "step", alpha = 0.75, label = "4b")
+        plt.hist(data_2b[:,var.index(i)], 50, range = (0.0,1.0), normed = 1, histtype = "step", alpha = 0.75, label = "2b")
+        plt.xlabel(label)
+        plt.legend(loc = "lower left")
+        plt.ylabel("number of entries")
+        #plt.grid(True)
+
+        fig.savefig("histograms/" + label + ".pdf")
+
+
+# function to merge gc output
+def load_gc_output(fpath):
+
+    # load grid-control output
     os.chdir(fpath)
 
     count = 0
@@ -43,47 +90,85 @@ def ttH_test_sample(fpath, csv):
         filepath = os.path.join(fpath, npfile)
         print filepath
         if count == 0:
-            d_ttH = pd.read_csv(filepath)
+            d = pd.read_csv(filepath)
         else:
-            d_ttH = d_ttH.append(pd.read_csv(filepath), ignore_index = True)
+            d = d.append(pd.read_csv(filepath), ignore_index = True)
         count += 1
 
+    return d
+    
+
+
+# make ttH test sample
+def test_sample(fpath_4b, fpath_2b):
+
+    d_4b = load_gc_output(fpath_4b)
+
+    # set ttCls to one in whole sample
+    d_4b["ttCls"] = 1
     os.chdir(sys.path[0])
+    d_4b.to_csv("output/dataframe_4b.csv")
 
-# add tt+light output
+    d_2b = load_gc_output(fpath_2b)
+    # make sure to only consider tt+light events
+    d_2b = d_2b[d_2b["ttCls"] == 0]
 
-    d_ttlight = pd.read_csv(csv)
-    print d_ttlight
-    # select only tt+light events
-    d_ttlight = d_ttlight[d_ttlight["ttCls"] == 0]
-    print d_ttlight
+    # merge two dataframes to test sample
+    d_4b = d_4b.append(d_2b, ignore_index=True)
+    d = d_4b.sample(frac=1, random_state=0).reset_index(drop=True)
+    os.chdir(sys.path[0])
+    d.to_csv("output/dataframe_test.csv")
 
-    d_ttH = d_ttH.append(d_ttlight, ignore_index=True)
-    d_ttH = d_ttH.sample(frac=1, random_state=0).reset_index(drop=True)
-    print d_ttH
-    d_ttH.to_csv("output/dataframe_ttH.csv")
+
+# function to plot input histograms in ROC curve
+def plot_input(process, h, plot):
+
+    ax = {}
+
+    fig = plt.figure()
+    for p in process:
+
+        h[p].linewidth = 1
+        if p == "4b":
+            h[p].linecolor = "b"
+        if p == "2b":
+            h[p].linecolor = "r"
+
+        h[p].Rebin(10)
+
+        ax[p], = rplt.step(h[p])
+
+    names = [i for i in process]
+    ob = [ax[i] for i in process]
+    plt.legend(ob, names, prop={'size': 18})
+    os.chdir(sys.path[0])
+    fig.savefig("output/input_" + plot + ".pdf")
+
+
 
 # calculate fpr, tpr for roc curve
-def fpr_tpr(y_true, y_score, unc = False , weight = None):
+def roc(y_true, y_score, unc = False , weight = None, plot = None):
 
-# fill histo to calculate tpr, fpr
+    # fill histo to calculate tpr, fpr
     h = {}
     c_histo = {}
 
-    nbin = len(y_true)
+    nbin = 10000 
     hmin = np.amin(y_score)
     hmax = np.amax(y_score)
 
-    if hmin == -9999:
+    if hmin == -9999 or hmin == -10:
         hmin = 0
+
+    #output = ROOT.TFile.Open("output/BLR.root", "RECREATE")
 
     process = ["4b", "2b"]
     for p in process:
-        h[p] = ROOT.TH1F(p, "x", nbin, hmin, hmax)
+        h[p] = Hist(nbin, hmin, hmax, name = p, title = p)
         if p == "4b":
-            y_filtered = y_score[y_true == 53]
+            y_filtered = y_score[y_true == 1]
             if unc == True:
-                weights = weight[y_true == 53] 
+                weights = weight[y_true == 1] 
         elif p == "2b":
             y_filtered = y_score[y_true == 0]
             if unc == True:
@@ -96,90 +181,133 @@ def fpr_tpr(y_true, y_score, unc = False , weight = None):
         if N == 0:
             raise ValueError("Integral of histogram equals zero, normalization not possible")
         else:
-            h[p].Scale(1/N)
-        c_histo[p] = h[p].GetCumulative()
+            h[p].Scale(1.0/N)
 
-    nbin = h[process[0]].GetSize()-2
+        #h[p].Write()
+
+        c_histo[p] = h[p].GetCumulative()
+    
+    nbin = h[process[0]].GetNbinsX()
     tpr = []
     fpr = []
-    for j in range(0, nbin + 1):
-        tpr.append(1 - c_histo[process[0]].GetBinContent(j))
-        fpr.append(1 - c_histo[process[1]].GetBinContent(j))
 
+    for j in range(0, nbin + 2):
+        #tpr.append(1 - c_histo[process[0]].GetBinContent(j))
+        #fpr.append(1 - c_histo[process[1]].GetBinContent(j))
+        tpr.append(float(h[process[0]].Integral(j, nbin+2)))
+        fpr.append(float(h[process[1]].Integral(j, nbin+2)))
+
+    if plot != None:
+
+        plot_input(process, h, plot)
+
+    #output.Close()    
     return tpr, fpr
 
+# plot comparison of input files based on .root files containing histograms
+def comparison_inputs(file1, file2, name1, name2, output):
+
+    f = root_open(file1)
+    h1 = f.Get(name1)
+
+    f = root_open(file2)
+    h2 = f.Get(name2)
+
+    fig = plt.figure()
+    h1.linewidth = 1
+    h2.linewidth = 1
+    h1.linecolor = "b"
+    h2.linecolor = "r"
+
+    nbin1 = h1.GetNbinsX()
+    nbin2 = h2.GetNbinsX()
+    #print nbin1
+    #print nbin2
+    h1.Rebin(10)
+    h2.Rebin(10)
+
+    ax1, = rplt.step(h1)
+    ax2, = rplt.step(h2)
+
+    names = ["joosep", "christina"]
+    ob = [ax1, ax2]
+    plt.legend(ob, names, prop={"size":18})
+    os.chdir(sys.path[0])
+    fig.savefig(output + ".pdf")
+
+
 # plot roc curves
-def plot_roc(classifier, data, plot_blr = False, unc = False):
+def plot_roc(true, test, unc, weight, style, label):
 
-    clf = joblib.load(classifier)
+    if unc == True:
+        tpr_up, fpr_up = roc(true, test, unc = unc,  weight = weight )
+        tpr_down, fpr_down = roc(true, test, unc = unc, weight = weight)
+        tpr, fpr = roc(true, test, unc = unc, weight = weight)
 
+        #plt.plot(tpr, fpr, style, label=label)
+        #plt.plot(tpr_up, fpr_up, style, alpha = 0.5 )
+        #plt.plot(tpr_down, fpr_down, style, alpha = 0.5)
+        plt.semilogy(tpr, fpr, style, label=label)
+        plt.semilogy(tpr_up, fpr_up, style, alpha = 0.5 )
+        plt.semilogy(tpr_down, fpr_down, style, alpha = 0.5)
+    else:
+        tpr, fpr = roc(true, test)
+        #plt.plot(tpr, fpr, style, label=label)
+        plt.semilogy(tpr, fpr, style, label=label)
+
+
+# plot all roc curves and naiv estimate in same figure 
+def plot(classifier, data, unc = False):
+
+    fig = plt.figure()
+
+    # load test sample
     test = pd.read_csv(data)
+
+    # BDT output
+    clf = joblib.load(classifier)
     numJets = 6
     var = ["jets_btagCSV_" + str(x) for x in range(numJets)]
     X_test = np.array(test[var])
     X_test = np.sort(X_test)
     y_test = np.array(test["ttCls"]) 
     y_score = clf.decision_function(X_test)
+    #y_score = clf.predict_proba(X_test)[:,0]
+    plot_roc(y_test, y_score, unc, False, "r-", "BDT")
 
-    fig = plt.figure()
-    if unc == True:
-        tpr_up, fpr_up = fpr_tpr(y_test, y_score, unc = unc,  weight = test["btagWeightCSV_up_lf"])
-        tpr_down, fpr_down = fpr_tpr(y_test, y_score, unc = unc, weight = test["btagWeightCSV_down_lf"])
-        tpr_nom, fpr_nom = fpr_tpr(y_test, y_score, unc = unc, weight = test["btagWeightCSV"])
-        
-        #plt.plot(tpr_nom, fpr_nom, "r-", label='BDT output')
-        #plt.plot(tpr_up, fpr_up, "r-", alpha = 0.5 )
-        #plt.plot(tpr_down, fpr_down, "r-", alpha = 0.5)
-        plt.semilogy(tpr_nom, fpr_nom, "r-", label='BDT output', zorder=4)
-        plt.semilogy(tpr_up, fpr_up, "r-", alpha = 0.5 )
-        plt.semilogy(tpr_down, fpr_down, "r-", alpha = 0.5)
- 
-    else:
-        tpr_test, fpr_test = fpr_tpr(y_test, y_score)
-        plt.semilogy(tpr_test, fpr_test, "r-", label='BDT output')
-        #plt.plot(tpr_test, fpr_test, "r-", label='BDT output')
-    
-    if plot_blr == True:
-        blr = test["btag_LR_4b_2b_btagCSV"]
-        ttCls = test["ttCls"]
-        if unc == True:
-            tpr_blr_up, fpr_blr_up = fpr_tpr(ttCls, blr, unc = unc,  weight = test["btagWeightCSV_up_lf"])
-            tpr_blr_down, fpr_blr_down = fpr_tpr(ttCls, blr, unc = unc, weight = test["btagWeightCSV_down_lf"])
-            tpr_blr_nom, fpr_blr_nom = fpr_tpr(ttCls, blr, unc = unc, weight = test["btagWeightCSV"])
-         
-            #plt.plot(tpr_blr_nom, fpr_blr_nom, "g-", label='BLR')
-            #plt.plot(tpr_blr_up, fpr_blr_up, "g-", alpha = 0.5 )
-            #plt.plot(tpr_blr_down, fpr_blr_down, "g-", alpha = 0.5)
-            plt.semilogy(tpr_blr_nom, fpr_blr_nom, "g-", label='BLR', zorder=4)
-            plt.semilogy(tpr_blr_up, fpr_blr_up, "g-", alpha = 0.5 )
-            plt.semilogy(tpr_blr_down, fpr_blr_down, "g-", alpha = 0.5)
-        else:
-            tpr_blr, fpr_blr = fpr_tpr(ttCls, blr)    
-            #plt.plot(tpr_blr, fpr_blr, "g-", label="BLR")
-            plt.semilogy(tpr_blr, fpr_blr, "g-", label='BLR')
+    # BLR 
+    blr = test["btag_LR_4b_2b_btagCSV"]
+    #blr = logit(blr)
+    ttCls = test["ttCls"]
+    plot_roc(ttCls, blr, unc, False, "g-", "BLR")
 
+    # 3rd jet btagCSV
+    jetbtag = X_test[:, -3] 
+    ttCls = test["ttCls"]
+    plot_roc(ttCls, jetbtag, unc, False, "b-", "3rd jet btagCSV")
+
+    # add naive estimates
     eff_sig = CSVM(4, test, "4b") 
     eff_bkg = CSVM(4, test, "2b")
-    plt.scatter([eff_sig], [eff_bkg], c="k", marker = "^", label = "4x BCSVM", zorder = 1) 
+    plt.scatter([eff_sig], [eff_bkg], c="k", marker = "^", label = "4x BCSVM", zorder = 1000) 
 
     eff_sig = CSVM(3, test, "4b") 
     eff_bkg = CSVM(3, test, "2b")
-    plt.scatter([eff_sig], [eff_bkg], c="k", marker = "o", label = "3x BCSVM", zorder = 1) 
+    plt.scatter([eff_sig], [eff_bkg], c="k", marker = "o", label = "3x BCSVM", zorder = 1000) 
 
+    # some further style settings
     plt.xlim([0.0, .5])
     #plt.ylim([0.0, 1.05])
     plt.ylabel('tt+jets (light) efficiency', fontsize=16)
     plt.xlabel('ttH efficiency', fontsize=16)
-    plt.title(r"SL/DL, $N_j = 6$", fontsize=16)
+    plt.title(r"SL, $N_j = 6$", fontsize=16)
     plt.legend(loc="upper left")
     os.chdir(sys.path[0])
-    fig.savefig("output/roc_ttH.pdf")
+    fig.savefig("output/roc.pdf")
 
 if __name__ == "__main__":
 
-    #plot_roc("output/classifier.pkl", "output/test.csv", plot_blr = "output/test.csv", unc = True)
-    #CSVM(4,"output/dataframe.csv", "ttbarOther")
-    #CSVM(4,"output/dataframe.csv", "ttbarPlusBBbar")
-    ttH_test_sample("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC5b3bd28701d3/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8", "output/test.csv")
-    plot_roc("output/classifier.pkl", "output/dataframe_ttH.csv", plot_blr = True, unc = False)
+    test_sample("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC809bf2133b08/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8", "/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GCb6120c1578b2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8")
+    #histograms("output/dataframe_ttH.csv")
+    plot("output/classifier.pkl", "output/dataframe_test.csv", unc = False)
 

@@ -20,9 +20,10 @@ def read_data(file_names):
     arr = tree2array(chain, branches=["jets_btagCSV","is_sl", "is_dl", "btag_LR_4b_2b_btagCSV", "ttCls", "nBCSVM", "btagWeightCSV", "btagWeightCSV_up_lf", "btagWeightCSV_down_lf"], selection="numJets=={0}".format(numJets))
     d = pd.DataFrame(arr)
 
-# apply cuts: leptonic events 
-    d = d[(d['is_sl'] == 1) | (d['is_dl'] == 1)]
-    d = d[(d['ttCls'] == 0) | (d['ttCls'] == 53)]
+# apply cuts: semi-leptonic events 
+    d = d[(d['is_sl'] == 1)]
+    #d = d[(d['is_sl'] == 1) | (d['is_dl'] == 1)]
+    #d = d[(d['ttCls'] == 0) | (d['ttCls'] >= 51)]
 
 # split csv values
     j = pd.DataFrame(d["jets_btagCSV"].values.tolist())
