@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#Prepares grid-control dataset files based on a scan of the /pnfs file system tree
 import sys
 import glob
 import ROOT
