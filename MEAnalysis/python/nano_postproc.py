@@ -53,10 +53,10 @@ if __name__ == "__main__":
     argumentparser.add_argument(
         "--era",
         action = "store",
-        help = "Era. Defailt: 94X",
-        choices = ["80X", "92X", "94X"],
+        help = "Era. Defailt: 94Xv1",
+        choices = ["80X", "92X", "94Xv1", "94Xv2"],
         type = str,
-        default = "94X",
+        default = "94Xv1",
     )
     
     argumentparser.add_argument(

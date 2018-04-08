@@ -32,7 +32,7 @@ class Electron:
         self.DEta = -99#tree.Electron_DEta[n];#KS: Not in nanoAOD. Please check this var.
         self.DPhi = -99#tree.Electron_DPhi[n];#KS: Not in nanoAOD. Please check this var.
         self.hoe = tree.Electron_hoe[n];
-        self.mvaSpring16GP = tree.Electron_mvaSpring16GP[n];
+        self.mvaFall17Iso = tree.Electron_mvaFall17Iso[n];
         self.eleCutId = tree.Electron_cutBased[n]; #https://github.com/cms-nanoAOD/cmssw/blob/master/PhysicsTools/NanoAOD/python/electrons_cff.py#L187
         self.jetIdx = tree.Electron_jetIdx[n];
         self.etaSc = tree.Electron_deltaEtaSC[n] + tree.Electron_eta[n];

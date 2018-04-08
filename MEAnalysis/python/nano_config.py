@@ -19,14 +19,23 @@ class NanoConfig:
             self.eraBtagSF = "2017"
             self.algoBtag = "csvv2"
             print "Using CMSSW 92X"
-        elif setEra == "94X":
-            self.eraMC = "Run2_2017"
+        #For RunIIFall17MiniAOD we need v1
+        elif setEra == "94Xv1": 
+            self.eraMC = "Run2_2017,run2_nanoAOD_94XMiniAODv1"
             self.eraData = None
             self.conditionsMC = "auto:phase1_2017_realistic"
             self.conditionsData = None
             self.eraBtagSF = "2017"
             self.algoBtag = "csvv2"
-            print "Using CMSSW 94X"
+            print "Using CMSSW 94X with v1 era"
+        elif setEra == "94Xv2":
+            self.eraMC = "Run2_2017,run2_nanoAOD_94XMiniAODv2"
+            self.eraData = None
+            self.conditionsMC = "auto:phase1_2017_realistic"
+            self.conditionsData = None
+            self.eraBtagSF = "2017"
+            self.algoBtag = "csvv2"
+            print "Using CMSSW 94X with v2 era"
         
         imports = []
         if jec:

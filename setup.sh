@@ -1,12 +1,20 @@
 export SCRAM_ARCH=slc6_amd64_gcc630
 
-scram project -n CMSSW CMSSW CMSSW_9_4_5_cand1
-cd CMSSW/src/
-eval `scramv1 runtime -sh`
+cmsrel CMSSW_9_4_5_cand1
+cd CMSSW_9_4_5_cand1/src/
+cmsenv 
+cms git-init
 
-#need to add these always also to ../.gitlab-ci.yml in the compile stage
-git cms-init
-git cms-merge-topic kschweiger:cmssw945c1_boostedNano #Created with cmsswSetup.sh
+#As long as this is the only change to heppy, it not worth dealing w/ merge conflicts in cmssw 
+#Was git cms-merge-topic jpata:heppy_fixes
+git cms-addpkg PhysicsTools/HeppyCore
+sed -i s/json=None/json=None,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
+sed -i s/triggers=triggers/triggers=triggers,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
+
+#merge rebased version of mmeinhard:BoostedNanoAOD
+#inlcudes nanoAOD/master from April 7
+git cms-merge-topic kschweiger:BoostedMiniAODReBaseMasterApr7 
+
 
 git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
 #Until nanoAOD tools RP#68 is merged:
@@ -30,5 +38,7 @@ cd $CMSSW_BASE/src
 cp -R TTH/MEIntegratorStandalone/libs/* ../lib/$SCRAM_ARCH/
 scram setup lhapdf
 scram setup TTH/MEIntegratorStandalone/deps/gsl.xml
+
+
 
 
