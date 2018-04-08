@@ -23,7 +23,77 @@ def mu_baseline_tight(mu):
 def print_mu(mu):
     print "Muon: (pt=%s, eta=%s, tight=%s, dxy=%s, dz=%s, nhits=%s, stat=%s)" % (mu.pt, mu.eta, mu.tightId, mu.dxy , mu.dz, (getattr(mu, "nMuonHits", 0) > 0 or getattr(mu, "nChamberHits", 0) > 0) , mu.nStations)
 
+factorizedJetCorrections = [
+    "AbsoluteStat",
+    "AbsoluteScale",
+    "AbsoluteFlavMap",
+    "AbsoluteMPFBias",
+    "Fragmentation",
+    "SinglePionECAL",
+    "SinglePionHCAL",
+    "FlavorQCD",
+    "TimePtEta",
+    "RelativeJEREC1",
+    "RelativeJEREC2",
+    "RelativeJERHF",
+    "RelativePtBB",
+    "RelativePtEC1",
+    "RelativePtEC2",
+    "RelativePtHF",
+    "RelativeBal",
+    "RelativeFSR",
+    "RelativeStatFSR",
+    "RelativeStatEC",
+    "RelativeStatHF",
+    "PileUpDataMC",
+    "PileUpPtRef",
+    "PileUpPtBB",
+    "PileUpPtEC1",
+    "PileUpPtEC2",
+    "PileUpPtHF",
+    "PileUpMuZero",
+    "PileUpEnvelope",
+    "SubTotalPileUp",
+    "SubTotalRelative",
+    "SubTotalPt",
+    "SubTotalScale",
+    "SubTotalAbsolute",
+    "SubTotalMC",
+    "Total",
+    "TotalNoFlavor",
+    "TotalNoTime",
+    "TotalNoFlavorNoTime",
+    "FlavorZJet",
+    "FlavorPhotonJet",
+    "FlavorPureGluon",
+    "FlavorPureQuark",
+    "FlavorPureCharm",
+    "FlavorPureBottom",
+    "TimeRunB",
+    "TimeRunC",
+    "TimeRunD",
+    "TimeRunE",
+    "TimeRunF",
+#    "TimeRunG",
+#    "TimeRunH",
+    "CorrelationGroupMPFInSitu",
+    "CorrelationGroupIntercalibration",
+    "CorrelationGroupbJES",
+    "CorrelationGroupFlavor",
+    "CorrelationGroupUncorrelated",
+    "JER"
+]
+
 factorizedJetCorrections = []
+
+def el_baseline_loose(el):
+    sca = abs(el.etaSc)
+    ret = ( el.eleCutId == 2 and
+            not ( sca >= 1.4442 and
+                  sca < 1.5669 )
+    )
+
+    return ret
 
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
@@ -94,7 +164,7 @@ class Conf:
             "veto": {
                 "pt": 15.0,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_tight(el),
+                "idcut": lambda el: el_baseline_loose(el),
             },
             #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff
             "isotype": "relIso03", #KS: changed for nanoAOD.
@@ -135,26 +205,28 @@ class Conf:
         #The default b-tagging WP
         "btagWP": "CSVM",
 
-        #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
-        #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
-        "btagWPs": {
-            "CSVL": ("btagCSV", 0.5426),
-            "CSVM": ("btagCSV", 0.8484),
-            "CSVT": ("btagCSV", 0.9535),
+        #The loose b-tag WP for QCD data estimation
+        "looseBWP": "CSVL",
 
-            "DeepCSVL": ("btagDeepCSV", 0.2219),
-            "DeepCSVM": ("btagDeepCSV", 0.6324),
-            "DeepCSVT": ("btagDeepCSV", 0.8958),
-            
-            "CMVAL": ("btagCMVA", -0.5884),
-            "CMVAM": ("btagCMVA", 0.4432),
-            "CMVAT": ("btagCMVA", 0.9432)
+
+        #These working points are evaluated and stored in the trees as nB* - number of jets passing the WP
+        #https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation94X
+        "btagWPs": {
+            "CSVL": ("btagCSV", 0.5803),
+            "CSVM": ("btagCSV", 0.8838),
+            "CSVT": ("btagCSV", 0.9693),
+
+            "DeepCSVL": ("btagDeepCSV", 0.1522),
+            "DeepCSVM": ("btagDeepCSV", 0.4641),
+            "DeepCSVT": ("btagDeepCSV", 0.8001),
+
+            #Removed CMVA since not supported (at least in the BtagRecommendation94X
         },
 
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
         #if btagLR, selection is done by the btag likelihood ratio permutation
         #"untaggedSelection": "btagCMVA",
-        "untaggedSelection": "btagLR",
+        "untaggedSelection": "btagCSV",
 
         #how many jets to consider for the btag LR permutations
         "NJetsForBTagLR": 15, #DS
@@ -167,8 +239,8 @@ class Conf:
 
         "filter": False,
         #Change to trig.triggerTable for 2017 menu (starting from 92X samples)
-        "trigTable": trig.triggerTable2016,
-        "trigTableData": trig.triggerTable2016,
+        "trigTable": trig.triggerTable,
+        "trigTableData": trig.triggerTable,
     }
 
     general = {
@@ -178,7 +250,7 @@ class Conf:
          #3:[(3,0)] => "evalute qg LR of 3q vs 0q(+3g), considering only light jets, in events with 3 b-jets"
             3:[(3,0),(3,2),(4,0),(4,3),(5,0),(5,4)], 
             4:[(3,0),(3,2),(4,0),(4,3),(5,0)] },
-        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/ControlPlotsJul13.root",
+        "controlPlotsFile": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/3Dplots.root",
         #"QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/Histos_QGL_flavour.root",
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/QGL_3dPlot.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
@@ -206,6 +278,8 @@ class Conf:
             #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
+            #"debug",
+            #"systematics",
         ],
 
         # "eventWhitelist": [
@@ -269,8 +343,8 @@ class Conf:
         #compute MEM from scratch with these variations
         "enabled_systematics": [
             "nominal",
-        #    "TotalUp",
-        #    "TotalDown",
+            #"TotalUp",
+            #"TotalDown",
         ],
 
         "weight": 0.10, #k in Psb = Ps/(Ps+k*Pb)
@@ -339,14 +413,14 @@ class Conf:
             #"FH_0w0w1h2t"  #all cats
         ],
         # btag LR cuts for FH MEM categories
-        "FH_bLR_3b_SR": 0.83,
-        "FH_bLR_4b_SR": 0.98,
-        "FH_bLR_3b_excl": 0.90,
-        "FH_bLR_4b_excl": 0.99,       
+        "FH_bLR_3b_SR": 0.94,
+        "FH_bLR_4b_SR": 0.99,
+        "FH_bLR_3b_excl": 1.96,
+        "FH_bLR_4b_excl": 0.998,       
         "FH_bLR_3b_CR_lo": 0.60,
-        "FH_bLR_3b_CR_hi": 0.80,
-        "FH_bLR_4b_CR_lo": 0.75,
-        "FH_bLR_4b_CR_hi": 0.88,
+        "FH_bLR_3b_CR_hi": 0.94,
+        "FH_bLR_4b_CR_lo": 0.80,
+        "FH_bLR_4b_CR_hi": 0.99,
     }
 
     mem_configs = OrderedDict()
@@ -632,7 +706,7 @@ FH_bLR_4b_CR_lo = Conf.mem["FH_bLR_4b_CR_lo"]
 FH_bLR_4b_CR_hi = Conf.mem["FH_bLR_4b_CR_hi"]
 
 ###
-### FH_4w2h2t #8j,4b, 9j,4b
+### FH_4w2h2t #only 9j,4b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low #DS adds 5th,6th,... btags
@@ -644,8 +718,8 @@ c.do_calculate = lambda ev, mcfg: (
     len(mcfg.b_quark_candidates(ev)) >= 4 and #although from BTagLRAnalyzer there are max 4 candidates
     (not bLR or ev.btag_LR_4b_2b > FH_bLR_4b_SR or 
      (ev.btag_LR_3b_2b < FH_bLR_3b_excl and ev.btag_LR_4b_2b > FH_bLR_4b_CR_lo and ev.btag_LR_4b_2b < FH_bLR_4b_CR_hi) ) and
-    ( (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
-      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==9 ) #DS do not consider 10 jet events
+    ( #(len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))==8 or
+      (len(mcfg.l_quark_candidates(ev))+len(mcfg.b_quark_candidates(ev)))>=9 ) #DS do not consider 10 jet events
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("4w2h2t")
@@ -657,7 +731,7 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["FH_4w2h2t"] = c
 
 ###
-### FH_3w2h2t #7j,4b (& 8j,4b & 9j,4b)
+### FH_3w2h2t #7j,4b & 8j,4b
 ###
 c = MEMConfig(Conf)
 c.l_quark_candidates = lambda event: event.buntagged_jets + event.selected_btagged_jets_low
@@ -694,7 +768,7 @@ c.do_calculate = lambda ev, mcfg: (
     (bLR or len(mcfg.b_quark_candidates(ev)) == 3 ) and
     (not bLR or (ev.btag_LR_4b_2b < FH_bLR_4b_excl and (ev.btag_LR_3b_2b > FH_bLR_3b_SR or 
      (ev.btag_LR_3b_2b > FH_bLR_3b_CR_lo and ev.btag_LR_3b_2b < FH_bLR_3b_CR_hi) ) ) ) and
-    ( len(mcfg.l_quark_candidates(ev)) >= 4 and len(mcfg.l_quark_candidates(ev)) <= 6 )
+    ( len(mcfg.l_quark_candidates(ev)) >= 4 ) #max 9 jets considered in bLR, but only 5 light q for MEM
 )
 c.mem_assumptions.add("fh")
 c.mem_assumptions.add("4w2h1t")

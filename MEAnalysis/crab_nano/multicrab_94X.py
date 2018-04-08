@@ -80,6 +80,18 @@ sets_data = [
     "/SingleElectron/Run2017D-17Nov2017-v1/MINIAOD",
     "/SingleElectron/Run2017E-17Nov2017-v1/MINIAOD",
     "/SingleElectron/Run2017F-17Nov2017-v1/MINIAOD",
+
+    "/JetHT/Run2017F-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017E-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017D-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017C-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017B-17Nov2017-v1/MINIAOD",
+
+    "/BTagCSV/Run2017F-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017E-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017D-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017C-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017B-17Nov2017-v1/MINIAOD",
 ]
 
 #all available datasets.
@@ -400,7 +412,11 @@ if __name__ == '__main__':
 
     from CRABClient.UserUtilities import config
     config = config()
-    submitname = args.tag
+    if args.recovery:
+	submitname = args.recovery.split("/")[1].split(".json")[0]
+    else:
+	submitname = args.tag
+    
     config.General.workArea = 'crab_projects/' + submitname
     config.General.transferLogs = True
    
@@ -448,7 +464,9 @@ if __name__ == '__main__':
     config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
+    config.Data.lumiMask = args.recovery
 
+    
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
     config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
 
@@ -456,6 +474,10 @@ if __name__ == '__main__':
 
     #loop over samples
     for sample in sel_datasets.keys():
+        if not args.dataset=="*" and not args.dataset in sample:
+	    continue
+	if args.recovery and not sample in args.recovery:
+	    continue
         print 'submitting ' + sample, sel_datasets[sample]
         
         mem_cfg = sel_datasets[sample]["mem_cfg"]
@@ -468,7 +490,10 @@ if __name__ == '__main__':
             runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
 
             config.JobType.maxJobRuntimeMin = runtime_min
-            config.General.requestName = sample + "_" + submitname
+            if args.recovery:
+		config.General.requestName = submitname
+	    else:
+		config.General.requestName = sample + "_" + submitname
             config.Data.inputDataset = dataset
             config.Data.unitsPerJob = perjob
             config.Data.totalUnits = nlumis
