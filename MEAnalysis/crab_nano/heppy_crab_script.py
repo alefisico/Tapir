@@ -31,7 +31,7 @@ import json
 
 #Create the NanoAOD postprocessing configuration
 from TTH.MEAnalysis.nano_config import NanoConfig
-nanoCFG = NanoConfig("94X", jec=True, pu=True, btag=True)
+nanoCFG = NanoConfig("94Xv1", jec=True, pu=True, btag=True)
 
 import heppy_crab_functions as fn
 

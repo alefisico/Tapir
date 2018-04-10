@@ -8,7 +8,7 @@ from TTH.MEAnalysis.samples_base import getSitePrefix
 from TTH.MEAnalysis.nano_config import NanoConfig
 
 
-def main(outdir = "./", _input = None, asFriend = True, _era = "94X", runAll = False):
+def main(outdir = "./", _input = None, asFriend = True, _era = "94Xv1", runAll = False):
     if _input is None:
         infiles = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     else:
