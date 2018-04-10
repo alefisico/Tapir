@@ -1,7 +1,8 @@
 stages:
   - compile
   - test_nano
-  - test
+  - test_unit
+  - test_tthbb13
   - test_sparsinator
 
 before_script:
@@ -58,7 +59,7 @@ compile:
 
 test_nano:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_nano
   allow_failure: true
   script:
     - cd $CI_HOME/..
@@ -76,7 +77,7 @@ test_nano:
 
 test_nano_postproc:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_nano
   allow_failure: true
   script:
     - cd $CI_HOME/..
@@ -87,9 +88,21 @@ test_nano_postproc:
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
     - python test/test_nano_postproc.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
 
+test_unit_Plotting:
+  tags: [ cvmfs ]
+  stage: test_unit
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH
+    - python $CMSSW_BASE/src/TTH/Plotting/test/test_config.py
+
 test_tth:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_tthbb13
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -110,7 +123,7 @@ test_tth:
 
 test_ttjets:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_tthbb13
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -131,7 +144,7 @@ test_ttjets:
 
 test_data:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_tthbb13
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
