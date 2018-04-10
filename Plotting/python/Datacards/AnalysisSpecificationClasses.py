@@ -466,6 +466,8 @@ class Analysis:
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
         self.sample_d = dict([(s.name, s) for s in self.samples])
 
+        LOG_MODULE_NAME.info("Created analysis with samples: {0}".format(",".join([s.name for s in self.samples])))
+        
     def get_sample(self, sample_name):
         return self.sample_d[sample_name]
 
