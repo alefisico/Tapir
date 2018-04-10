@@ -38,11 +38,10 @@ compile:
     - cd $CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - git cms-init
-    - git cms-merge-topic cms-nanoAOD:master
-    - git cms-merge-topic kschweiger:HeppyttHbb_Jan12
-    - git checkout -b nanoAOD cms-nanoAOD/master
-    - git cms-merge-topic mmeinhard:BoostedNanoAOD
-    - git cms-merge-topic jpata:heppy_fixes
+    - git cms-addpkg PhysicsTools/HeppyCore
+    - sed -i s/json=None/json=None,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
+    - sed -i s/triggers=triggers/triggers=triggers,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
+    - git cms-merge-topic kschweiger:BoostedMiniAODReBaseMasterApr7 
     - git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/

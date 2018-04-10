@@ -33,13 +33,13 @@ dfsel = df[sel]
 # H is hidden dimension; D_out is output dimension.
 D_in, H, D_out = 3, 100, 6
 batch_size = 10000
-n_epoch = 200
+n_epoch = 500
 
 print "creating inputs", len(dfsel)
 #dfsel_q = dfsel[(dfsel["Quark_pt"] > 200) & (dfsel["Quark_pt"] < 210)]
 dfsel_q = dfsel[(dfsel["Quark_pt"] < 300)]
 print "quark pt sel", len(dfsel_q)
-dfsel_q = dfsel_q[:200000]
+dfsel_q = dfsel_q[:1000000]
 print "subsample", len(dfsel_q)
 
 print "quark pt mean", dfsel_q["Quark_pt"].mean(), "std", dfsel_q["Quark_pt"].std()
@@ -60,54 +60,64 @@ w = Variable(torch.Tensor(dfsel_q[["weights"]].as_matrix().reshape(len(dfsel_q),
 print "creating network"
 
 D_in = x.shape[1]
-H = 400
+H = 200
 D_out = 6
 
 model = torch.nn.Sequential(
     torch.nn.Linear(D_in, H),
-#    torch.nn.BatchNorm1d(H),
+    torch.nn.BatchNorm1d(H),
     torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
+    torch.nn.Dropout(0.5),
     
-    torch.nn.Linear(H, H),
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
-    
-    torch.nn.Linear(H, H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
-    
-    torch.nn.Linear(H, H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
-    
-    torch.nn.Linear(H, H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
-   
-    torch.nn.Linear(H, H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#   
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
-    
-    torch.nn.Linear(H, H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
-    
-    torch.nn.Linear(H, H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
-    
-    torch.nn.Linear(H, H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
 #    torch.nn.BatchNorm1d(H),
-    torch.nn.ReLU(),
-    torch.nn.Dropout(0.2),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
     
     torch.nn.Linear(H, D_out),
 )

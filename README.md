@@ -182,3 +182,19 @@ Compile the signal and background amplitudes, which will be placed in `OpenLoops
 ./openloops libinstall pphtt compile_extra=1
 ./openloops libinstall ppttjj compile_extra=1
 ~~~
+
+# Known issues and bugs
+
+## Compilation failed
+
+Errors when compiling the code:
+~~~
+>> Compiling  /builds/jpata/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc 
+In file included from /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/include/TGLIncludes.h:21:0,
+                 from /builds/jpata/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc:4:
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/include/GL/glew.h:1141:20: fatal error: GL/glu.h: No such file or directory
+ #include <GL/glu.h>
+                    ^
+~~~
+
+This means that the base CMSSW release for nanoAOD has been updated, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Recipe_for_CMSSW_9_4_X_and_the_c 

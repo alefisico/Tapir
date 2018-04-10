@@ -153,7 +153,7 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
         event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
-        event.is_fh = (not event.is_sl and not event.is_dl)
+        event.is_fh = (event.n_lep_veto == 0)
         if "debug" in self.conf.general["verbosity"]:
             autolog("is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh)
         
@@ -170,6 +170,10 @@ class LeptonAnalyzer(FilterAnalyzer):
         elif event.is_fh:
             event.good_leptons = []
             event.veto_leptons = []
+        else:
+            event.good_leptons = []
+            event.veto_leptons = []
+
         
         event.good_leptons = sorted(event.good_leptons, key=lambda x: x.pt, reverse=True)
         event.veto_leptons = sorted(event.veto_leptons, key=lambda x: x.pt, reverse=True)
