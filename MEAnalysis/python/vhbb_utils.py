@@ -13,6 +13,29 @@ def lvec(self):
 #        raise Exception("Invalid values for TLorentzVector")
     return lv
 
+def match_deltaR(coll1, coll2, deltaR=0.3):
+    pairs = []
+    for idx1, obj1 in enumerate(coll1):
+        lv1 = lvec(obj1)
+        for idx2, obj2 in enumerate(coll2):
+            lv2 = lvec(obj2)
+            dr = lv1.DeltaR(lv2)
+            if dr < deltaR:
+                pairs += [(idx1, idx2, dr)]
+    return pairs
+
+def remove_duplicates(coll):
+    seen = set([])
+    deduped = []
+    for obj in coll:
+        key = (obj.pt, obj.eta, obj.phi) 
+        if key not in seen:
+            seen.add(key)
+            deduped += [obj]
+        else:
+            continue
+    return deduped
+
 class MET:
     def __init__(self, **kwargs):
         self.p4 = ROOT.TLorentzVector()
@@ -85,23 +108,6 @@ class SystematicObject(object):
 
     def __getattr__(self, attr):
         return getattr(self.__dict__["orig"], attr)
-
-from TTH.MEAnalysis.VHbbTree import Jet
-
-jet_keys = ["pt", "eta", "phi", "m", "btagCSV", "chMult", "nhMult"]
-
-def printJet(j):
-    s = ""
-    for k, v in sorted(j.__dict__.items(), key=lambda x: x[0]):
-        if k in jet_keys:
-            try:
-                v = float(v)
-                s += "{0}={1:2.2f} ".format(k, v)
-            except TypeError as e:
-                pass
-    return s
-
-Jet.__str__ = printJet
 
 def autolog(*args):
     import inspect, logging

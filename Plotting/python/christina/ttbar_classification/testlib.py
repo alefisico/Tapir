@@ -14,6 +14,7 @@ import pandas as pd
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib as mpl
 from rootpy.plotting import Hist
+from scipy.interpolate import interp1d
 
 # logit transformation
 def logit(x):
@@ -241,59 +242,86 @@ def plot_roc(true, test, unc, weight, style, label):
 
     if unc == True:
         tpr_up, fpr_up = roc(true, test, unc = unc,  weight = weight )
+        f_up = interp1d(tpr_up, fpr_up)
         tpr_down, fpr_down = roc(true, test, unc = unc, weight = weight)
+        f_down = interp1d(tpr_down, fpr_down)
         tpr, fpr = roc(true, test, unc = unc, weight = weight)
+        f = interp1d(tpr, fpr)
+
+        xnew = np.linspace(min(tpr), max(tpr), num = 1000, endpoint = True)
 
         #plt.plot(tpr, fpr, style, label=label)
         #plt.plot(tpr_up, fpr_up, style, alpha = 0.5 )
         #plt.plot(tpr_down, fpr_down, style, alpha = 0.5)
-        plt.semilogy(tpr, fpr, style, label=label)
+        plt.semilogy(tpr, fpr, style, label=label, zorder = 500)
         plt.semilogy(tpr_up, fpr_up, style, alpha = 0.5 )
         plt.semilogy(tpr_down, fpr_down, style, alpha = 0.5)
+        plt.fill_between(xnew, f_up(xnew), f_down(xnew), style, alpha = 0.5)
     else:
         tpr, fpr = roc(true, test)
         #plt.plot(tpr, fpr, style, label=label)
         plt.semilogy(tpr, fpr, style, label=label)
 
+    return tpr, fpr
 
-# plot all roc curves and naiv estimate in same figure 
-def plot(classifier, data, unc = False):
+# measure improvment in comparison to naive estimate
+def improvement(eff_sig, eff_bkg, tpr, fpr, c = "k--"):
+
+    f = interp1d(tpr, fpr, kind="linear")
+    xnew = np.linspace(min(tpr), max(tpr), num = 1000, endpoint = True)
+
+    #plt.plot(xnew, f(xnew), c)
+    print "Naive estimate:", eff_bkg
+    print "Alternative:", f(eff_sig)
+    print "Improvement:", eff_bkg/f(eff_sig)
+
+
+# plot roc curves for test and training sample in same figure
+def plot_test_training(classifier, data_test, data_train, unc = False):
+
+    data = {"test" : data_test, "train" : data_train}
 
     fig = plt.figure()
 
-    # load test sample
-    test = pd.read_csv(data)
-
-    # BDT output
     clf = joblib.load(classifier)
     numJets = 6
-    var = ["jets_btagCSV_" + str(x) for x in range(numJets)]
-    X_test = np.array(test[var])
-    X_test = np.sort(X_test)
-    y_test = np.array(test["ttCls"]) 
+    #var = ["btagCSV", "pt", "eta"]
+    var = ["btagCSV"]
+    arrays = {}
+
+    for i in ["test", "train"]:
+
+        d = pd.read_csv(data[i])
+        l = []
+
+        for n in var:
+            names = ["jets_" + n + "_" + str(x) for x in range(numJets)]
+            arr = np.array(d[names])
+            if n == "btagCSV":
+                index = np.argsort(arr, axis = -1)
+                static = np.indices(arr.shape)
+            arr = arr[static[0], index]
+            #arr = np.sort(arr)
+            l.append(arr)
+
+        arrays[i] = l
+        if i == "test":
+            y_test = np.array(d["ttCls"])
+            X_test = np.hstack(tuple(arrays[i]))
+        elif i == "train":
+            y_train = np.array(d["ttCls"])
+            X_train = np.hstack(tuple(arrays[i]))
+
+    # plot test sample
     y_score = clf.decision_function(X_test)
     #y_score = clf.predict_proba(X_test)[:,0]
-    plot_roc(y_test, y_score, unc, False, "r-", "BDT")
+    tpr, fpr = plot_roc(y_test, y_score, unc, False, "r-", "test")
 
-    # BLR 
-    blr = test["btag_LR_4b_2b_btagCSV"]
-    #blr = logit(blr)
-    ttCls = test["ttCls"]
-    plot_roc(ttCls, blr, unc, False, "g-", "BLR")
 
-    # 3rd jet btagCSV
-    jetbtag = X_test[:, -3] 
-    ttCls = test["ttCls"]
-    plot_roc(ttCls, jetbtag, unc, False, "b-", "3rd jet btagCSV")
-
-    # add naive estimates
-    eff_sig = CSVM(4, test, "4b") 
-    eff_bkg = CSVM(4, test, "2b")
-    plt.scatter([eff_sig], [eff_bkg], c="k", marker = "^", label = "4x BCSVM", zorder = 1000) 
-
-    eff_sig = CSVM(3, test, "4b") 
-    eff_bkg = CSVM(3, test, "2b")
-    plt.scatter([eff_sig], [eff_bkg], c="k", marker = "o", label = "3x BCSVM", zorder = 1000) 
+    # plot train sample
+    y_score = clf.decision_function(X_train)
+    #y_score = clf.predict_proba(X_test)[:,0]
+    tpr, fpr = plot_roc(y_train, y_score, unc, False, "b-", "train")
 
     # some further style settings
     plt.xlim([0.0, .5])
@@ -303,11 +331,78 @@ def plot(classifier, data, unc = False):
     plt.title(r"SL, $N_j = 6$", fontsize=16)
     plt.legend(loc="upper left")
     os.chdir(sys.path[0])
-    fig.savefig("output/roc.pdf")
+    fig.savefig("output/roc_test_train.pdf")
+
+
+
+# plot all roc curves and naiv estimate in same figure 
+def plot_comp(classifier, data, unc = False):
+
+    fig = plt.figure()
+
+    # load test sample
+    test = pd.read_csv(data)
+
+    # add naive estimates
+    eff_sig_4 = CSVM(4, test, "4b")
+    eff_bkg_4 = CSVM(4, test, "2b")
+    plt.scatter([eff_sig_4], [eff_bkg_4], c="k", marker = "^", label = "4x BCSVM", zorder = 1000)
+
+    eff_sig_3 = CSVM(3, test, "4b")
+    eff_bkg_3 = CSVM(3, test, "2b")
+    plt.scatter([eff_sig_3], [eff_bkg_3], c="k", marker = "o", label = "3x BCSVM", zorder = 1000)
+
+    # BDT output
+    clf = joblib.load(classifier)
+    numJets = 6
+    l = []
+    #var = ["btagCSV", "pt", "eta"]
+    var = ["btagCSV"]
+    for n in var:
+        names = ["jets_" + n + "_" + str(x) for x in range(numJets)]
+        arr = np.array(test[names])
+        if n == "btagCSV":
+            index = np.argsort(arr, axis = -1)
+            static = np.indices(arr.shape)
+        arr = arr[static[0], index]
+        #arr = np.sort(arr)
+        l.append(arr)
+
+    X_test = np.hstack(tuple(l))
+    #print X_train.shape
+    y_test = np.array(test["ttCls"])
+
+    y_score = clf.decision_function(X_test)
+    #y_score = clf.predict_proba(X_test)[:,0]
+    tpr, fpr = plot_roc(y_test, y_score, unc, False, "r-", "BDT")
+    improvement(eff_sig_4, eff_bkg_4, tpr, fpr)
+
+    # BLR 
+    blr = test["btag_LR_4b_2b_btagCSV"]
+    #blr = logit(blr)
+    ttCls = np.array(test["ttCls"])
+    tpr, fpr = plot_roc(ttCls, blr, unc, False, "g-", "BLR")
+    improvement(eff_sig_4, eff_bkg_4, tpr, fpr)
+
+    # 3rd jet btagCSV
+    jetbtag = X_test[:,3]
+    ttCls = np.array(test["ttCls"])
+    tpr, fpr = plot_roc(ttCls, jetbtag, unc, False, "b-", "3rd jet btagCSV")
+
+    # some further style settings
+    plt.xlim([0.0, .5])
+    #plt.ylim([0.0, 1.05])
+    plt.ylabel('tt+jets (light) efficiency', fontsize=16)
+    plt.xlabel('ttH efficiency', fontsize=16)
+    plt.title(r"SL, $N_j = 6$", fontsize=16)
+    plt.legend(loc="upper left")
+    os.chdir(sys.path[0])
+    fig.savefig("output/roc_comp.pdf")
 
 if __name__ == "__main__":
 
-    test_sample("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC809bf2133b08/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8", "/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GCb6120c1578b2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8")
+    test_sample("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC1afcee217b01/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8", "/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC1afcee217b01/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8")
     #histograms("output/dataframe_ttH.csv")
-    plot("output/classifier.pkl", "output/dataframe_test.csv", unc = False)
+    plot_comp("output/classifier_btagonly.pkl", "output/dataframe_test.csv", unc = False)
+    plot_test_training("output/classifier_btagonly.pkl", "output/test.csv", "output/train.csv", unc = False)
 

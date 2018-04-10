@@ -1,0 +1,20 @@
+{
+    "ttHToNonbb": {
+        "ds": "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
+        "maxlumis": -1,
+        "mem_cfg": "cfg_noME.py",
+        "perjob": 20,
+        "runtime": 10,
+        "script": "heppy_crab_script.sh",
+        "isNANOAOD" : False
+    },
+    "ttHTobb": {
+        "ds": "/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
+        "maxlumis": -1,
+        "mem_cfg": "cfg_noME.py",
+        "perjob": 10,
+        "runtime": 20,
+        "script": "heppy_crab_script.sh",
+        "isNANOAOD" : False
+    }
+}

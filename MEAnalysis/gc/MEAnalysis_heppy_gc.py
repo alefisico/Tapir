@@ -22,8 +22,10 @@ import FWCore.ParameterSet.Config as cms
 from TTH.MEAnalysis.samples_base import getSitePrefix
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 import TTH.MEAnalysis.counts as counts
- 
+import logging
+
 if __name__ == "__main__":
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     an = analysisFromConfig(sys.argv[1])
     firstEvent = int(os.environ["SKIP_EVENTS"])
     nEvents = int(os.environ["MAX_EVENTS"])
@@ -31,6 +33,3 @@ if __name__ == "__main__":
     dataset = os.environ["DATASETPATH"].split("__")[-1]
 
     main(an, sample_name=dataset, firstEvent=firstEvent, numEvents=nEvents, output_name="Loop", files=fns)
-    
-    #NB! in case of using event-based splitting in grid-control, the counting will be wrong!
-    #counts.main(os.environ["FILE_NAMES"].split(), "counts.root")

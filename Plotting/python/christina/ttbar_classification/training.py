@@ -42,17 +42,30 @@ def training(fpath):
     train = d[:int(nevt*0.9)]
     test = d[int(nevt*0.9):]
 
-    #train.to_csv("train.csv")
-    #test.to_csv("test.csv")
+    train.to_csv("output/train.csv")
+    test.to_csv("output/test.csv")
 
 # get arrays as BDT input
     numJets = 6
-    var = ["jets_btagCSV_" + str(x) for x in range(numJets)]
-    X_train = np.array(train[var]) 
-    X_train = np.sort(X_train) 
+
+    l = []
+    #var = ["btagCSV", "pt", "eta"]
+    var = ["btagCSV"]
+    for n in var:
+        print n
+        names = ["jets_" + n + "_" + str(x) for x in range(numJets)]
+        arr = np.array(train[names])
+        if n == "btagCSV":
+            index = np.argsort(arr, axis = -1)
+            static = np.indices(arr.shape)
+        arr = arr[static[0], index]        
+        #arr = np.sort(arr)
+        l.append(arr)
+
+    X_train = np.hstack(tuple(l))
+    #print X_train.shape
     y_train = np.array(train["ttCls"])
 
-   
 # construct estimator for classification
     clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=0) 
     clf.fit(X_train, y_train)
@@ -63,7 +76,7 @@ def training(fpath):
     print "feature importance:", clf.feature_importances_
 
 # save model
-    joblib.dump(clf, "output/classifier.pkl")
+    joblib.dump(clf, "output/classifier_btagonly.pkl")
 
     """
     from sklearn import svm
@@ -73,4 +86,4 @@ def training(fpath):
     """
 if __name__ == "__main__":
 
-    training("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GCb6120c1578b2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8")
+    training("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC1afcee217b01/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8")

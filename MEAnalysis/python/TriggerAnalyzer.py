@@ -21,20 +21,21 @@ class TriggerAnalyzer(FilterAnalyzer):
             triglist = self.conf.trigger["trigTable"]
         else:
             triglist = self.conf.trigger["trigTableData"]
-        triglist = filter(lambda x: "tth" in x[0], triglist.items())
+        triglist = filter(lambda x: "ttH" in x[0], triglist.items())
         triglist = dict(triglist)
-
         for pathname, trigs in triglist.items():
+            pathBit = False
             for name in trigs:
-                bit = int(getattr(event.input, name, -1))
-                setattr(event, name, bit)
+                bit = int(event.input.__getattr__(name, -1))
+                setattr(event, name, bit)                
                 event.trigvec += [bit == 1]
+                pathBit = pathBit or bool(bit)
                 #print name, bit
                 if "trigger" in self.conf.general["verbosity"]:
                     print "[trigger]", name, bit
                 if (bit == 1):
                     event.triggerDecision = True
-
+            setattr(event, "HLT_"+pathname, int(pathBit))
         passes = True
         if self.conf.trigger["filter"] and not event.triggerDecision:
             passes = False

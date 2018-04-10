@@ -123,7 +123,9 @@ def analysisFromConfig(config_file_path):
 
             in_name  = config.get(process,"in")
             out_name = config.get(process,"out")
-
+            
+            if not in_name in samples_dict.keys():
+                raise KeyError("process {0} needs sample {1}, but it was not defined".format(process, in_name))
             # Build cuts..
             cuts = []
             # ..Process Cut

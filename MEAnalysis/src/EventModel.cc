@@ -58,8 +58,8 @@ EventDescription TreeDescriptionMCSystematic<T>::create_event(Systematic::SystId
     event.ttCls = *ttCls;
     event.genTopHad_pt = *genTopHad_pt;
     event.genTopLep_pt = *genTopLep_pt;
-    event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = (*btagWeightCSV);
-    event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = (*puWeight);
+    event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = 1.0;
+    event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = 1.0;
     event.weights[std::make_pair(Systematic::gen, Systematic::None)] = (*genWeight);
     return event;
 }
@@ -84,34 +84,34 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
     event.nBCSVM = nBCSVM.GetValue(syst_id);
 
     event.weights[std::make_pair(Systematic::gen, Systematic::None)] = (*genWeight);
-    event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = (*btagWeightCSV);
-    event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = (*puWeight);
+    event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = 1.0;
+    event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = 1.0;
 
     if (Systematic::is_nominal(syst_id)) {
 
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Up)] = (*btagWeightCSV_CSVcferr1Up);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Up)] = (*btagWeightCSV_CSVcferr2Up);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Up)] = (*btagWeightCSV_CSVhfUp);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Up)] = (*btagWeightCSV_CSVhfstats1Up);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Up)] = (*btagWeightCSV_CSVhfstats2Up);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Up)] = (*btagWeightCSV_CSVjesUp);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Up)] = (*btagWeightCSV_CSVlfUp);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Up)] = (*btagWeightCSV_CSVlfstats1Up);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Up)] = (*btagWeightCSV_CSVlfstats2Up);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Up)] = (*btagWeightCSV_CSVcferr1Up);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Up)] = (*btagWeightCSV_CSVcferr2Up);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Up)] = (*btagWeightCSV_CSVhfUp);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Up)] = (*btagWeightCSV_CSVhfstats1Up);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Up)] = (*btagWeightCSV_CSVhfstats2Up);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Up)] = (*btagWeightCSV_CSVjesUp);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Up)] = (*btagWeightCSV_CSVlfUp);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Up)] = (*btagWeightCSV_CSVlfstats1Up);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Up)] = (*btagWeightCSV_CSVlfstats2Up);
 
-        event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Up)] = (*puWeightUp);
+        //event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Up)] = (*puWeightUp);
 
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Down)] = (*btagWeightCSV_CSVcferr1Down);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Down)] = (*btagWeightCSV_CSVcferr2Down);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Down)] = (*btagWeightCSV_CSVhfDown);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Down)] = (*btagWeightCSV_CSVhfstats1Down);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Down)] = (*btagWeightCSV_CSVhfstats2Down);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Down)] = (*btagWeightCSV_CSVjesDown);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Down)] = (*btagWeightCSV_CSVlfDown);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Down)] = (*btagWeightCSV_CSVlfstats1Down);
-        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Down)] = (*btagWeightCSV_CSVlfstats2Down);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Down)] = (*btagWeightCSV_CSVcferr1Down);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Down)] = (*btagWeightCSV_CSVcferr2Down);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Down)] = (*btagWeightCSV_CSVhfDown);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Down)] = (*btagWeightCSV_CSVhfstats1Down);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Down)] = (*btagWeightCSV_CSVhfstats2Down);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Down)] = (*btagWeightCSV_CSVjesDown);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Down)] = (*btagWeightCSV_CSVlfDown);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Down)] = (*btagWeightCSV_CSVlfstats1Down);
+        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Down)] = (*btagWeightCSV_CSVlfstats2Down);
 
-        event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Down)] = (*puWeightDown);
+        //event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Down)] = (*puWeightDown);
     }
 
     if (Systematic::is_jec(syst_id) || Systematic::is_jer(syst_id)) {
@@ -125,8 +125,8 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
     event.genTopHad_pt = *genTopHad_pt;
     event.genTopLep_pt = *genTopLep_pt;
 
-    event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Up)] = LHE_weights_scale_wgt[4];
-    event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Down)] = LHE_weights_scale_wgt[5];
+    //event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Up)] = LHE_weights_scale_wgt[4];
+    //event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Down)] = LHE_weights_scale_wgt[5];
     return event;
 }
 
@@ -151,13 +151,6 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.HLT_ttH_DL_elmu = *(this->HLT_ttH_DL_elmu);
     event.HLT_ttH_DL_elel = *(this->HLT_ttH_DL_elel);
     event.HLT_ttH_FH = *(this->HLT_ttH_FH);
-    
-    event.Flag_goodVertices = *(this->Flag_goodVertices);
-    event.Flag_GlobalTightHalo2016Filter = *(this->Flag_GlobalTightHalo2016Filter);
-    event.Flag_HBHENoiseFilter = *(this->Flag_HBHENoiseFilter);
-    event.Flag_HBHENoiseIsoFilter = *(this->Flag_HBHENoiseIsoFilter);
-    event.Flag_EcalDeadCellTriggerPrimitiveFilter = *(this->Flag_EcalDeadCellTriggerPrimitiveFilter);
-    event.Flag_eeBadScFilter = *(this->Flag_eeBadScFilter);
     
     event.numJets = *(this->numJets);
     event.nBCSVM = *(this->nBCSVM);
@@ -226,15 +219,15 @@ std::vector<Jet> TreeDescriptionMC<T>::build_jets(Systematic::SystId syst_id) {
         double base_corr = 1.0;
         
         
-        if (Systematic::is_jec(syst_id)) {
-            auto* correction_branch = get_correction_branch(syst_id);
-            corr = (*correction_branch)[njet];
-            base_corr = this->jets_corr_JEC[njet];
-        } else if (Systematic::is_jer(syst_id)) {
-            auto* correction_branch = get_correction_branch(syst_id);
-            corr = (*correction_branch)[njet];
-            base_corr = this->jets_corr_JER[njet];
-        }
+        //if (Systematic::is_jec(syst_id)) {
+        //    auto* correction_branch = get_correction_branch(syst_id);
+        //    corr = (*correction_branch)[njet];
+        //    base_corr = this->jets_corr_JEC[njet];
+        //} else if (Systematic::is_jer(syst_id)) {
+        //    auto* correction_branch = get_correction_branch(syst_id);
+        //    corr = (*correction_branch)[njet];
+        //    base_corr = this->jets_corr_JER[njet];
+        //}
 
         lv.SetPtEtaPhiM(this->jets_pt[njet] * corr/base_corr, this->jets_eta[njet], this->jets_phi[njet], this->jets_mass[njet]);
         Jet jet(lv, this->jets_btagCSV[njet]);

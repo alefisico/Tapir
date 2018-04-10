@@ -36,7 +36,7 @@ class GenRadiationModeAnalyzer(FilterAnalyzer):
             if (lv_j.Pt() > 20 and abs(lv_j.Eta()) < 2.5):
                 if any([lv_b.DeltaR(lv_j) < 0.5 for lv_b in lv_bs]):
                     continue
-                absid = abs(jet.mcFlavour)
+                absid = abs(jet.partonFlavour)
                 if absid == 5:
                     event.nMatchSimB += 1
                 if absid == 4:

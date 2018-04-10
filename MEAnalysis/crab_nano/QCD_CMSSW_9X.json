@@ -1,0 +1,21 @@
+{
+    
+    "QCDHT1500bEnriched": {
+        "ds": "/QCD_bEnriched_HT1500to2000_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v2/MINIAODSIM",
+        "maxlumis": -1,
+        "mem_cfg": "cfg_noME.py",
+        "perjob": 50,
+        "runtime": 40,
+        "script": "heppy_crab_script.sh",
+        "isNANOAOD" : False
+    },
+    "QCDHT700BGenFilter": {
+        "ds": "/QCD_HT700to1000_BGenFilter_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v2/MINIAODSIM",
+        "maxlumis": -1,
+        "mem_cfg": "cfg_noME.py",
+        "perjob": 100,
+        "runtime": 40,
+        "script": "heppy_crab_script.sh",
+        "isNANOAOD" : False
+    },
+}

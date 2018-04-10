@@ -129,7 +129,6 @@ class Sample(object):
             self.file_names = self.file_names[:self.debug_max_files]
         self.ngen = int(kwargs.get("ngen"))
         self.xsec = kwargs.get("xsec")
-        self.classifier_db_path = kwargs.get("classifier_db_path")
         self.vhbb_tree_name = kwargs.get("vhbb_tree_name", "vhbb/tree")
         
     @staticmethod
@@ -144,7 +143,6 @@ class Sample(object):
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen_weight"),
-            classifier_db_path = config.get(sample_name, "classifier_db_path", None),
             vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
             xsec = config.getfloat(sample_name, "xsec"),
             tags = config.get(sample_name, "tags")
@@ -373,7 +371,7 @@ class Category:
         self.signal_processes = kwargs.get("signal_processes", [])
         self.out_processes_mc = list(set([s.output_name for s in self.processes]))
         self.out_processes_data = list(set([s.output_name for s in self.data_processes]))
-        self.out_processes = self.out_processes_mc + self.out_processes_data 
+        self.out_processes = self.out_processes_mc + self.out_processes_data
 
         #[process][syst]
         self.shape_uncertainties = {}
@@ -390,17 +388,22 @@ class Category:
             for systname, systval in self.common_scale_uncertainties.items():
                 self.scale_uncertainties[proc][systname] = systval
 
+        #Load the process-dependent shape uncertainties
         self.proc_shape_uncertainties = kwargs.get("shape_uncertainties", {})
-        self.proc_scale_uncertainties = kwargs.get("scale_uncertainties", {})
-        
-        for k, v in self.proc_shape_uncertainties.items():
-            self.shape_uncertainties[k].update(v)
+        for proc, v in self.proc_shape_uncertainties.items():
+            self.shape_uncertainties[proc].update(v)
 
-        for k, v in self.proc_scale_uncertainties.items():
-            if k in self.scale_uncertainties.keys():
-                self.scale_uncertainties[k].update(v)
+        #Load the process-dependent scale uncertainties
+        self.proc_scale_uncertainties = kwargs.get("scale_uncertainties", {})
+        for proc, v in self.proc_scale_uncertainties.items():
+            if proc in self.scale_uncertainties:
+                self.scale_uncertainties[proc].update(v)
             else:
-                LOG_MODULE_NAME.info("Could not find process {0} to update scale uncertainties".format(k))
+                LOG_MODULE_NAME.debug(
+                    "Could not find process {0} to update scale "
+                    "uncertainties for category={1}, uncertainty={2} "
+                    "make sure the category definition contains the process".format(proc, self.name, v)
+                )
     
     def __str__(self):
         s = "Category(full_name={0})".format(

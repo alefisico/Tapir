@@ -1,5 +1,7 @@
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
-from TTH.MEAnalysis.vhbb_utils import autolog
+import logging
+
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 class TreeVarAnalyzer(FilterAnalyzer):
     """
@@ -12,15 +14,12 @@ class TreeVarAnalyzer(FilterAnalyzer):
         self.conf = cfg_ana._conf
 
     def process(self, event):
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("TreeVarAnalyzer started")
         #Need to create empty lists for objects that may not be produced in case the analyzer is skipped
         setattr( event, 'boosted_bjets', [] )
         setattr( event, 'boosted_ljets', [] )
         setattr( event, 'topCandidate', [] )
-        setattr( event, 'othertopCandidate', [])
-        setattr( event, 'topCandidatesSync', [])    
         setattr( event, 'higgsCandidate', [] )
+        setattr( event, 'higgsCandidateAK8', [] )
         event.b_quarks_h_nominal = []
         event.b_quarks_t_nominal = []
         event.l_quarks_w_nominal = []
@@ -39,10 +38,5 @@ class TreeVarAnalyzer(FilterAnalyzer):
             #add all variated quantities to event with a suffix
             for k, v in all_items:
                 event.__dict__[k + "_" + syst] = v
-                
-        #for br in ["boosted_bjets", "boosted_ljets", "topCandidate", "othertopCandidate", "topCandidatesSync", "higgsCandidate"]:
-        #    if not hasattr(event, br+"_nominal"):
-        #        setattr(event, br + "_nominal", [])
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("TreeVarAnalyzer ended")
+
         return True

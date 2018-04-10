@@ -81,20 +81,26 @@ def chunks(l, n):
 def get_files(fname):
     # Expect fname relative to CMSSW BASE
     fname = fname.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
+    
+    lines = [fname]
+
     #Load list of file names from textfile
     if fname.endswith(".txt"):
         lines = open(fname).readlines()
         lines = map(lambda x: x.strip(), lines)
         lines = filter(lambda x: "root" in x, lines)
         lines = map(lambda x: x.split()[0], lines)
+    
     #Filename is a globstring
-    elif fname.endswith("*"):
+    elif fname.endswith("*.root"):
         #Files in T3_CH_PSI storage element
         if "/pnfs/" in fname:
             lines = ["root://t3dcachedb.psi.ch/" + f for f in glob.glob(fname)]
         #Files are really on local filesystem
         else:
             lines = ["file://" + f for f in glob.glob(fname)]
+    if len(lines) == 0:
+        raise Exception("Could not match any files for {0}".format(fname))
     return lines
 
 # This function is used everywher to translate LFN /store to PFN root://
@@ -107,7 +113,7 @@ def getSitePrefix(fn=""):
     elif fn.startswith("file://") or fn.startswith("root://"):
         return fn
     else:
-        raise Exception("Could not open file: {0} due to unknown path format".format(fn))
+        return fn
 
 def get_prefix_sample(datasetpath):
     spl = datasetpath.split("__")
