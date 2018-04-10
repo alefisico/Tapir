@@ -33,5 +33,5 @@ if __name__ == "__main__":
 
     #replace local SE access with remote SE access
     files = [fi.replace("root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/", "root://t3se.psi.ch//") for fi in files]
-    main(files, "./")
+    main(outdir="./", _input=files)
 
