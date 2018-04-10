@@ -116,6 +116,7 @@ test_unit_Plotting:
 test_tth:
   tags: [ cvmfs ]
   stage: test_tthbb13
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -137,6 +138,7 @@ test_tth:
 test_ttjets:
   tags: [ cvmfs ]
   stage: test_tthbb13
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -158,6 +160,7 @@ test_ttjets:
 test_data:
   tags: [ cvmfs ]
   stage: test_tthbb13
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -179,6 +182,7 @@ test_data:
 test_tth_sparsinator:
   tags: [ cvmfs ]
   stage: test_sparsinator
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -198,6 +202,7 @@ test_tth_sparsinator:
 test_sparsinator_postproc:
   tags: [ cvmfs ]
   stage: test_sparsinator
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -215,6 +220,7 @@ test_sparsinator_postproc:
 test_ttjets_sparsinator:
   tags: [ cvmfs ]
   stage: test_sparsinator
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz

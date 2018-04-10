@@ -29,7 +29,7 @@ if __name__ == "__main__":
     }
     sample = samples[args.sample] 
 
-    files = sample.file_names_step1[:sample.debug_max_files]
+    files = sample.file_names_step1[:1]
 
     #replace local SE access with remote SE access
     files = [fi.replace("root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/", "root://t3se.psi.ch//") for fi in files]
