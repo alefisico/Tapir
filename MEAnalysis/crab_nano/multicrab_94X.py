@@ -15,6 +15,7 @@ workflows = [
     "leptonic", #ttH with SL/DL decays
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
+    "hadronic_nome_testing", #ttH with FH decays data + MC
     "QCD_nome", #QCD samples without MEM
     "pilot", #ttH sample only, with no MEM
     "signal", #signal sample with common config
@@ -23,6 +24,7 @@ workflows = [
     "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
+    "testall",#Test all samples w/ small nJobs and no ME
     "testing_hadronic_withme", #single-lumi jobs, a few samples
     "memcheck", #specific MEM jobs that contain lots of hypotheses for validation, many interpretations
     "memcheck2", #specific MEM jobs that contain lots of hypotheses for validation, JES variations
@@ -33,8 +35,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Submits crab jobs')
 parser.add_argument('--workflow', action="store", required=True, help="Type of workflow to run", type=str, choices=workflows)
 parser.add_argument('--tag', action="store", required=True, help="the version tag for this run, e.g. VHBBHeppyV22_tthbbV10_test1")
-parser.add_argument('--dataset', action="store", required=False, help="submit only matching datasets (shortname)", default="*") #FROM FH branch -> Not added yet
-parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")#FROM FH branch -> Not added yet
+parser.add_argument('--dataset', action="store", required=False, help="submit only matching datasets (shortname)", default="*") 
+parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")#Never tested it. Use with caution
 args = parser.parse_args()
 
 localtesting = "localtesting" in args.workflow
@@ -44,7 +46,9 @@ me_cfgs = {
     "default": "MEAnalysis_cfg_heppy.py",
     "cMVA": "MEAnalysis_cfg_heppy.py",
     "nome": "cfg_noME.py",
+    "nometesting": "cfg_noME_testing.py",
     "leptonic": "cfg_leptonic.py",
+    "nome_hadSel" : "cfg_noME_FH.py",
     "hadronic": "cfg_FH.py",
     "memcheck": "cfg_memcheck.py",
     "memcheck2": "cfg_memcheck2.py"
@@ -106,13 +110,17 @@ for sd in sets_data:
         "perjob": 30,
         "runtime": 20, #hours
         "mem_cfg": me_cfgs["leptonic"],
-        "script": 'heppy_crab_script_data.sh'
+        "script": 'heppy_crab_script_data.sh',
+        "json" : "",
+        "isMC" : False
     }
+
 
 
 #Add MC datasets from JSON files
 import multicrabHelper
 datasets.update(multicrabHelper.getDatasets(mem_cfg = me_cfgs["default"], script = "heppy_crab_script.sh"))
+
 
 #now we construct the workflows from all the base datasets
 workflow_datasets = {}
@@ -235,7 +243,7 @@ for k in datasets.keys():
 
 workflow_datasets["data_hadronic"] = {}
 for k in datasets.keys():
-    if "JetHT" in k:
+    if "JetHT" in k or "BTagCSV" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["hadronic"]
         D["perjob"] = 20
@@ -255,6 +263,7 @@ for k in datasets.keys():
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
 
+        
 workflow_datasets["QCD_nome"] = {}
 for k in datasets.keys():
     if "QCD" in k:
@@ -271,6 +280,46 @@ for k in datasets.keys():
         workflow_datasets["allmc_nome"][k] = D
 
 
+workflow_datasets["hadronic_nome"] = {}
+for k in datasets.keys():
+    if k == "TTbar_had" or k == "ttHTobb" or "QCD" in k:
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["nome_hadSel"]
+        workflow_datasets["hadronic_nome"][k] = D
+    if "BTagCSV" in k or "JetHT" in k:
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["nome_hadSel"]
+        D["perjob"] = 70
+        D["runtime"] = 24
+        workflow_datasets["hadronic_nome"][k] = D
+
+workflow_datasets["hadronic_nome_testing"] = {}
+for k in  workflow_datasets["hadronic_nome"].keys():
+    D = deepcopy(workflow_datasets["hadronic_nome"][k])
+    D["maxlumis"] = 10
+    D["runtime"] = 1
+    workflow_datasets["hadronic_nome_testing"][k] = D
+
+
+workflow_datasets["testall"] = {}
+for k in [ "SingleElectron-Run2017E-17Nov2017-v1",
+           "JetHT-Run2017E-17Nov2017-v1",
+           "BTagCSV-Run2017E-17Nov2017-v1",
+           "MuonEG-Run2017E-17Nov2017-v1",
+           "TTbar_had",
+           "TTbar_sl1",
+           "ttHTobb",
+           "QCD1500to2000"
+]:
+    D = deepcopy(datasets[k])
+    D["mem_cfg"] = me_cfgs["nometesting"]
+    D["perjob"] = 10
+    D["maxlumis"] = 200
+    D["runtime"] = 4
+    if not D["isMC"]:
+        D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
+    workflow_datasets["testall"][k] = D
+    
 #Pilot job for updating transfer functions, retraining BLR
 workflow_datasets["pilot"] = {}
 pilot_name = 'ttHTobb'
@@ -464,13 +513,11 @@ if __name__ == '__main__':
     config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
-    config.Data.lumiMask = args.recovery
-
     
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-    config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
+   # config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
 
-    config.Site.storageSite = "T3_CH_PSI"
+    config.Site.storageSite = "T2_CH_CSCS"
 
     #loop over samples
     for sample in sel_datasets.keys():
@@ -478,8 +525,15 @@ if __name__ == '__main__':
 	    continue
 	if args.recovery and not sample in args.recovery:
 	    continue
+        if not args.recovery and sel_datasets[sample]["json"] != "":
+            print "Setting json for Dataset:",sample
+            config.Data.lumiMask = sel_datasets[sample]["json"]
+        else:
+            config.Data.lumiMask = args.recovery
+
+
         print 'submitting ' + sample, sel_datasets[sample]
-        
+
         mem_cfg = sel_datasets[sample]["mem_cfg"]
         config.JobType.scriptExe = sel_datasets[sample]["script"]
         

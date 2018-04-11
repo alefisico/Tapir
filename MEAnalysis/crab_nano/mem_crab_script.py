@@ -57,12 +57,15 @@ os.getcwd()
 if not "--nostep2" in args:
     print "Running tth code"
 
-    infile = ROOT.TFile("Output/tree.root")
+    infile = ROOT.TFile("Output/nanoAOD_postprocessed.root")
+    """Needs to be reimplemented w/ nanoAOD
     inhist = infile.Get("Count")
     if not inhist:
-        raise Exception("Error occurred in processing step1")
+        raise Exception("Count histo not valid")
     infile.Close()
+    """
 
+    
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
@@ -77,7 +80,7 @@ if not "--nostep2" in args:
         for arg in sys.argv:
             if arg.startswith("ME_CONF="):
                 me_conf_name = arg.split("=")[1]
-            if args.startswith("AN_CFG="):
+            if arg.startswith("AN_CFG="):
                 an_conf_name = arg.split("=")[1]
 
     #Make Analysis object and set mem config if changed
