@@ -110,35 +110,47 @@ class MVAVarAnalyzer(FilterAnalyzer):
 
         
         ##---- compute sphericity --------------------#DS
-        Txx = sumPxx/sumP2
-        Tyy = sumPyy/sumP2
-        Tzz = sumPzz/sumP2
-        Txy = sumPxy/sumP2
-        Txz = sumPxz/sumP2
-        Tyz = sumPyz/sumP2
-        T = TMatrixDSym(3)
-        T[0,0] = Txx
-        T[0,1] = Txy
-        T[0,2] = Txz
-        T[1,0] = Txy
-        T[1,1] = Tyy
-        T[1,2] = Tyz
-        T[2,0] = Txz
-        T[2,1] = Tyz
-        T[2,2] = Tzz
-        TEigen = TMatrixDSymEigen(T)
-        eigenValues = TEigen.GetEigenValues()
-        event.sphericity = 1.5*(eigenValues(1)+eigenValues(2))
-        event.aplanarity = 1.5*eigenValues(2)
-        event.C = 3.0*(eigenValues(0)*eigenValues(1) + eigenValues(0)*eigenValues(2) + eigenValues(1)*eigenValues(2))
-        event.D = 27.*eigenValues(0)*eigenValues(1)*eigenValues(2) #---------DS 
+        if sumP2 > 0:
+            Txx = sumPxx/sumP2
+            Tyy = sumPyy/sumP2
+            Tzz = sumPzz/sumP2
+            Txy = sumPxy/sumP2
+            Txz = sumPxz/sumP2
+            Tyz = sumPyz/sumP2
+            T = TMatrixDSym(3)
+            T[0,0] = Txx
+            T[0,1] = Txy
+            T[0,2] = Txz
+            T[1,0] = Txy
+            T[1,1] = Tyy
+            T[1,2] = Tyz
+            T[2,0] = Txz
+            T[2,1] = Tyz
+            T[2,2] = Tzz
+            TEigen = TMatrixDSymEigen(T)
+            eigenValues = TEigen.GetEigenValues()
+            event.sphericity = 1.5*(eigenValues(1)+eigenValues(2))
+            event.aplanarity = 1.5*eigenValues(2)
+            event.C = 3.0*(eigenValues(0)*eigenValues(1) + eigenValues(0)*eigenValues(2) + eigenValues(1)*eigenValues(2))
+            event.D = 27.*eigenValues(0)*eigenValues(1)*eigenValues(2) #---------DS 
 
-        event.isotropy = evshape.isotropy()
-        event.sphericity = 1.5*(eigs[1]+eigs[2]) #evshape.sphericity(eigs) #DS
-        event.aplanarity = 1.5*eigs[2] #evshape.aplanarity(eigs) #DS
-        event.C = 3.0*(eigs[0]*eigs[1] + eigs[0]*eigs[2] + eigs[1]*eigs[2]) #evshape.C(eigs) #DS
-        event.D = 27.*eigs[0]*eigs[1]*eigs[2] #evshape.D(eigs) #DS
+            event.isotropy = evshape.isotropy()
+            event.sphericity = 1.5*(eigs[1]+eigs[2]) #evshape.sphericity(eigs) #DS
+            event.aplanarity = 1.5*eigs[2] #evshape.aplanarity(eigs) #DS
+            event.C = 3.0*(eigs[0]*eigs[1] + eigs[0]*eigs[2] + eigs[1]*eigs[2]) #evshape.C(eigs) #DS
+            event.D = 27.*eigs[0]*eigs[1]*eigs[2] #evshape.D(eigs) #DS
+        else:
+            event.sphericity = -99.0
+            event.aplanarity = -99.0
+            event.C = -99.0
+            event.D = -99.0
 
+            event.isotropy = -99.0
+            event.sphericity = -99.0
+            event.aplanarity = -99.0
+            event.C = -99.0
+            event.D = -99.0
+            
         event.mean_bdisc = np.mean([j.btagCSV for j in event.good_jets])
         event.mean_bdisc_btag = np.mean([j.btagCSV for j in event.selected_btagged_jets_high])
         event.std_bdisc = np.std([j.btagCSV for j in event.good_jets])
@@ -245,15 +257,21 @@ class MVAVarAnalyzer(FilterAnalyzer):
             #    print "maxjet={0}".format(maxjet)
             #    for i in range(njets):
             #        print "jets_CSVindex[{2}]={0} njets={1}".format(event.good_jets[i].CSVindex, njets, i)
-            lv0 = lvec(event.good_jets[event.good_jets[0].CSVindex])
-            lv1 = lvec(event.good_jets[event.good_jets[1].CSVindex])
-            for i in range(njets):
-                lv = lvec(event.good_jets[i])
-                dr0 = lv.DeltaR(lv0)
-                dr1 = lv.DeltaR(lv1)
-                event.good_jets[i].dRmax = max(dr0,dr1)
-                event.good_jets[i].dRmin = min(dr0,dr1)
-                event.good_jets[i].dRave = 0.5*(dr0+dr1)
+            if njets > 1:
+                lv0 = lvec(event.good_jets[event.good_jets[0].CSVindex])
+                lv1 = lvec(event.good_jets[event.good_jets[1].CSVindex])
+                for i in range(njets):
+                    lv = lvec(event.good_jets[i])
+                    dr0 = lv.DeltaR(lv0)
+                    dr1 = lv.DeltaR(lv1)
+                    event.good_jets[i].dRmax = max(dr0,dr1)
+                    event.good_jets[i].dRmin = min(dr0,dr1)
+                    event.good_jets[i].dRave = 0.5*(dr0+dr1)
+            else:
+                for i in range(njets):
+                    event.good_jets[i].dRmax = -99
+                    event.good_jets[i].dRmin = -99
+                    event.good_jets[i].dRave = -99
 
 
 

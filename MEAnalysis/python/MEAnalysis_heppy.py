@@ -143,7 +143,10 @@ class BufferedChain( object ):
 
         return self
 
-def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None, dataset=None):
+def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None, dataset=None, loglevel="INFO"):
+    #configure logging
+    logging.basicConfig(stream=sys.stdout, level=getattr(logging, loglevel))
+    
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
     #Create python configuration object based on path
 
@@ -453,7 +456,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             treevar,
 
             #Write the output tree
-            treeProducer,
+            treeProducers,
             counter_final,
         ])
     else:
@@ -603,15 +606,14 @@ if __name__ == "__main__":
     )
     args = parser.parse_args(sys.argv[2:])
 
-    #configure logging
-    logging.basicConfig(stream=sys.stdout, level=getattr(logging, args.loglevel))
+    
 
     if args.files:
         files = args.files.split(",")
     else:
         files = []
     print an
-    looper_dir, files = main(an, sample_name=args.sample, numEvents=args.numEvents, files=files)
+    looper_dir, files = main(an, sample_name=args.sample, numEvents=args.numEvents, files=files, loglevel = args.loglevel)
 
     import TTH.MEAnalysis.counts as counts
     counts.main(files, "{0}/tree.root".format(looper_dir))

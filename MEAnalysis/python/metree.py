@@ -458,7 +458,7 @@ def getTreeProducer(conf):
             tn = "HLT_BIT_" + tn
             if not tn in trignames:
                 trignames += [tn]
-        
+
     for trig in trignames:
         if trig.startswith("HLT_BIT_"):
             trig_ = trig[len("HLT_BIT_"):] #Bit is saved w/o "HLT_BIT_" in the beginning
@@ -529,7 +529,7 @@ def getTreeProducer(conf):
     ]
     for metfilter in metfilter_flags:
         treeProducer.globalVariables += [NTupleVariable(
-            trig, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
+            metfilter, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
         )]
        
     #Add systematically variated quantities
