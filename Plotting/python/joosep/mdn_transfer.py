@@ -19,7 +19,7 @@ df = pandas.DataFrame(
     )
 )
 
-bin_edges = np.linspace(0,500,100)
+bin_edges = np.linspace(0,300,100)
 qh, _ = np.histogram(df["Quark_pt"], bins=bin_edges)
 
 inds = np.searchsorted(bin_edges, df["Quark_pt"], side="left")
@@ -33,13 +33,13 @@ dfsel = df[sel]
 # H is hidden dimension; D_out is output dimension.
 D_in, H, D_out = 3, 100, 6
 batch_size = 10000
-n_epoch = 10000
+n_epoch = 500
 
 print "creating inputs", len(dfsel)
 #dfsel_q = dfsel[(dfsel["Quark_pt"] > 200) & (dfsel["Quark_pt"] < 210)]
-dfsel_q = dfsel[(dfsel["Quark_pt"] < 400)]
+dfsel_q = dfsel[(dfsel["Quark_pt"] < 300)]
 print "quark pt sel", len(dfsel_q)
-#dfsel_q = dfsel_q[:10000]
+dfsel_q = dfsel_q[:1000000]
 print "subsample", len(dfsel_q)
 
 print "quark pt mean", dfsel_q["Quark_pt"].mean(), "std", dfsel_q["Quark_pt"].std()
@@ -47,39 +47,84 @@ print "jet pt mean", dfsel_q["Jet_pt"].mean(), "std", dfsel_q["Jet_pt"].std()
 
 # Create random Tensors to hold inputs and outputs, and wrap them in Variables.
 x = Variable(torch.Tensor(dfsel_q[["Jet_pt"]].as_matrix().reshape(len(dfsel_q), 1).astype(np.float32)), requires_grad=False)
-#x = torch.stack([x, torch.sqrt(x), torch.pow(x, 2)], dim=1)[:, :, 0]
+x = torch.stack([
+    x,
+    torch.sqrt(x),
+    torch.pow(x, 2),
+    Variable(torch.Tensor(dfsel_q[["Jet_eta"]].as_matrix().reshape(len(dfsel_q))), requires_grad=False),
+    ], dim=1)[:, :, 0]
 y = Variable(torch.Tensor(dfsel_q[["Quark_pt"]].as_matrix().reshape(len(dfsel_q), 1).astype(np.float32)), requires_grad=False)
 
 w = Variable(torch.Tensor(dfsel_q[["weights"]].as_matrix().reshape(len(dfsel_q), 1).astype(np.float32)), requires_grad=False)
 
 print "creating network"
 
-D_in = 1
-H = 500
+D_in = x.shape[1]
+H = 200
 D_out = 6
 
 model = torch.nn.Sequential(
     torch.nn.Linear(D_in, H),
-    
+    torch.nn.BatchNorm1d(H),
+    torch.nn.ReLU(),
     torch.nn.Dropout(0.5),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
-
-    torch.nn.Dropout(0.5),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
     
-    torch.nn.Dropout(0.5),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#   
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
+#    
+#    torch.nn.Linear(H, H),
+#    torch.nn.BatchNorm1d(H),
+#    torch.nn.ReLU(),
+#    torch.nn.Dropout(0.5),
     
-    torch.nn.ReLU(),
     torch.nn.Linear(H, D_out),
 )
 
 losses = []
 
-def logpdf(_x, _y, _p, do_print=False):
+def logpdf(_x, _y, _p):
 
     sigma1 = torch.exp(torch.clamp(_p[:, 0:1], -2, 6)) + 1
     sigma2 = torch.exp(torch.clamp(_p[:, 1:2], -2, 6)) + 1
@@ -106,8 +151,8 @@ def logpdf(_x, _y, _p, do_print=False):
 
     return v
 
-def lh_loss(_y_pred, _x, _y, weights, do_print=False):
-    ll = logpdf(_x, _y, _y_pred, do_print)*weights
+def lh_loss(_y_pred, _x, _y, weights):
+    ll = logpdf(_x, _y, _y_pred)*weights
     return -torch.mean(ll)
 
 optimizer = torch.optim.Adam(
@@ -119,12 +164,14 @@ print "starting training"
 grad_means = []
 grad_std = []
 
-for t in range(n_epoch):
+tprev = 0
+tcur = 0
+for iEpoch in range(n_epoch):
     losses_batch = []
     for mb in xrange(0, len(x), batch_size):
         y_pred = model(x[mb:mb+batch_size])
         
-        loss = lh_loss(y_pred, x[mb:mb+batch_size], y[mb:mb+batch_size], True)
+        loss = lh_loss(y_pred, x[mb:mb+batch_size], y[mb:mb+batch_size], w[mb:mb+batch_size])
 
         optimizer.zero_grad()
         loss.backward()
@@ -145,20 +192,24 @@ for t in range(n_epoch):
 #    print "l1 W", model[-1].weight.data.numpy()
 #    print "l1 b", model[-1].bias.data.numpy()
 
-    y_pred = model(x[:10, :])
-    p = logpdf(x[:10], y[:10], y_pred)
-    data = np.hstack([x[:10, 0:1].data.numpy().astype(np.float32), y[:10].data.numpy().astype(np.float32), y_pred.data.numpy().astype(np.float32), p.data.numpy().astype(np.float32)])
-    data[:, 2] = np.exp(data[:, 2])
-    data[:, 3] = np.exp(data[:, 3])
-    data[:, -1] = np.exp(data[:, -1])
-    print "data", data
+#    y_pred = model(x[:10, :])
+#    p = logpdf(x[:10], y[:10], y_pred)
+#    data = np.hstack([x[:10, 0:1].data.numpy().astype(np.float32), y[:10].data.numpy().astype(np.float32), y_pred.data.numpy().astype(np.float32), p.data.numpy().astype(np.float32)])
+#    data[:, 2] = np.exp(data[:, 2])
+#    data[:, 3] = np.exp(data[:, 3])
+#    data[:, -1] = np.exp(data[:, -1])
+#    print "data", data
     
     tot_loss = np.mean(losses_batch)
     losses += [tot_loss]
-    print t, tot_loss, time.time()
+
+    tcur = time.time()
+
+    print iEpoch, tot_loss, tcur - tprev
+    tprev = tcur
 
 plt.figure(figsize=(5,5))
-plt.plot(losses[5:])
+plt.plot(losses[10:])
 #plt.yscale("log")
 plt.savefig("loss.pdf")
 
@@ -188,15 +239,15 @@ plt.title("sigma2")
 
 plt.savefig("pars.pdf")
 
-plt.figure(figsize=(5,5))
 xvals = np.linspace(0, 500, 100)
-i = 5
-yvals = y[i].data.numpy()[0]*np.ones(100)
-vs = []
-for _x, _y in zip(xvals, yvals):
-    p = logpdf(Variable(torch.Tensor([[_x]])), Variable(torch.Tensor([[_y]])), y_pred[i:i+1]).data.numpy()[0,0]
-    vs += [np.exp(p)]
-plt.plot(xvals, vs)
-q = (dfsel["Quark_pt"]>=y[i].data.numpy()[0]-2) & (dfsel["Quark_pt"]<y[i].data.numpy()[0]+2)
-plt.hist(dfsel[q]["Jet_pt"], bins=xvals, normed=True)
-plt.savefig("distr.pdf")
+for i in range(20):
+    plt.figure(figsize=(5,5))
+    yvals = y[i].data.numpy()[0]*np.ones(100)
+    vs = []
+    for _x, _y in zip(xvals, yvals):
+        p = logpdf(Variable(torch.Tensor([[_x]])), Variable(torch.Tensor([[_y]])), y_pred[i:i+1]).data.numpy()[0,0]
+        vs += [np.exp(p)]
+    plt.plot(xvals, vs)
+    q = (dfsel["Quark_pt"]>=y[i].data.numpy()[0]-2) & (dfsel["Quark_pt"]<y[i].data.numpy()[0]+2)
+    plt.hist(dfsel[q]["Jet_pt"], bins=xvals, normed=True)
+    plt.savefig("distr_{0}.pdf".format(i))

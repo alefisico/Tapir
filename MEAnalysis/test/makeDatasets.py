@@ -19,7 +19,7 @@ parser.add_argument(
     action="store",
     help="XRootD prefix to open files",
     required=False,
-    default="root://t3dcachedb03.psi.ch/"
+    default="root://t3dcachedb.psi.ch"
 )
 parser.add_argument(
     '--path',
