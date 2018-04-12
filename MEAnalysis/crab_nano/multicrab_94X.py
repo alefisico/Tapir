@@ -313,8 +313,8 @@ for k in [ "SingleElectron-Run2017E-17Nov2017-v1",
 ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = me_cfgs["nometesting"]
-    D["perjob"] = 10
-    D["maxlumis"] = 200
+    D["perjob"] = 2
+    D["maxlumis"] = 20
     D["runtime"] = 4
     if not D["isMC"]:
         D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
@@ -503,7 +503,6 @@ if __name__ == '__main__':
         'python.tar.gz',
         'data.tar.gz',
         'MEAnalysis_heppy.py',
-        tth_data_dir + '/BDT.pickle',
         #nanoTools_dir + '/scripts/nano_postproc.py',
         #nanoTools_dir + '/python/postprocessing/modules/jme/jecUncertainties.py'
     ]

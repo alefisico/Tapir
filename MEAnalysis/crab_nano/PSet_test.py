@@ -20,7 +20,7 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         #'root://cms-xrd-global.cern.ch//store/data/Run2017F/JetHT/MINIAOD/17Nov2017-v1/50000/00280B8B-36E0-E711-A549-02163E01421E.root'
         #'/store/data/Run2017E/SingleElectron/MINIAOD/17Nov2017-v1/60000/E45D32D2-33F6-E711-9ABA-A0369F836372.root'
-        'file:/pnfs/psi.ch/cms/trivcat/store/mc/RunIISummer17MiniAOD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/92X_upgrade2017_realistic_v10-v2/10000/0C164E52-C692-E711-B1C8-00266CFEFDEC.root'
+        'root://t3se.psi.ch//store/mc/RunIISummer17MiniAOD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/92X_upgrade2017_realistic_v10-v2/10000/0C164E52-C692-E711-B1C8-00266CFEFDEC.root'
         
     ),
 #    lumisToProcess = cms.untracked.VLuminosityBlockRange(
