@@ -456,7 +456,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             treevar,
 
             #Write the output tree
-            treeProducers,
+            treeProducer,
             counter_final,
         ])
     else:
