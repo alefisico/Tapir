@@ -277,7 +277,7 @@ def improvement(eff_sig, eff_bkg, tpr, fpr, c = "k--"):
 
 
 # plot roc curves for test and training sample in same figure
-def plot_test_training(classifier, data_test, data_train, unc = False):
+def plot_test_training(classifier, btagger, data_test, data_train, unc = False):
 
     data = {"test" : data_test, "train" : data_train}
 
@@ -285,8 +285,7 @@ def plot_test_training(classifier, data_test, data_train, unc = False):
 
     clf = joblib.load(classifier)
     numJets = 6
-    #var = ["btagCSV", "pt", "eta"]
-    var = ["btagCSV"]
+    var = [btagger, "pt", "eta"]
     arrays = {}
 
     for i in ["test", "train"]:
@@ -297,7 +296,7 @@ def plot_test_training(classifier, data_test, data_train, unc = False):
         for n in var:
             names = ["jets_" + n + "_" + str(x) for x in range(numJets)]
             arr = np.array(d[names])
-            if n == "btagCSV":
+            if n == btagger:
                 index = np.argsort(arr, axis = -1)
                 static = np.indices(arr.shape)
             arr = arr[static[0], index]
@@ -331,12 +330,12 @@ def plot_test_training(classifier, data_test, data_train, unc = False):
     plt.title(r"SL, $N_j = 6$", fontsize=16)
     plt.legend(loc="upper left")
     os.chdir(sys.path[0])
-    fig.savefig("output/roc_test_train.pdf")
+    fig.savefig("output/roc_" + btagger + "_test_train.pdf")
 
 
 
 # plot all roc curves and naiv estimate in same figure 
-def plot_comp(classifier, data, unc = False):
+def plot_comp(btaggers, data, unc = False):
 
     fig = plt.figure()
 
@@ -352,30 +351,33 @@ def plot_comp(classifier, data, unc = False):
     eff_bkg_3 = CSVM(3, test, "2b")
     plt.scatter([eff_sig_3], [eff_bkg_3], c="k", marker = "o", label = "3x BCSVM", zorder = 1000)
 
-    # BDT output
-    clf = joblib.load(classifier)
-    numJets = 6
-    l = []
-    #var = ["btagCSV", "pt", "eta"]
-    var = ["btagCSV"]
-    for n in var:
-        names = ["jets_" + n + "_" + str(x) for x in range(numJets)]
-        arr = np.array(test[names])
-        if n == "btagCSV":
-            index = np.argsort(arr, axis = -1)
-            static = np.indices(arr.shape)
-        arr = arr[static[0], index]
-        #arr = np.sort(arr)
-        l.append(arr)
+    # BDT btagCSV output
+    for b in btaggers:
+        clf = joblib.load("output/classifier_" + b + ".pkl")
+        numJets = 6
+        l = []
+        var = [b, "pt", "eta"]
+        for n in var:
+            names = ["jets_" + n + "_" + str(x) for x in range(numJets)]
+            arr = np.array(test[names])
+            if n == b:
+                index = np.argsort(arr, axis = -1)
+                static = np.indices(arr.shape)
+            arr = arr[static[0], index]
+            #arr = np.sort(arr)
+            l.append(arr)
 
-    X_test = np.hstack(tuple(l))
-    #print X_train.shape
-    y_test = np.array(test["ttCls"])
+        X_test = np.hstack(tuple(l))
+        #print X_train.shape
+        y_test = np.array(test["ttCls"])
 
-    y_score = clf.decision_function(X_test)
-    #y_score = clf.predict_proba(X_test)[:,0]
-    tpr, fpr = plot_roc(y_test, y_score, unc, False, "r-", "BDT")
-    improvement(eff_sig_4, eff_bkg_4, tpr, fpr)
+        y_score = clf.decision_function(X_test)
+        #y_score = clf.predict_proba(X_test)[:,0]
+        if b == "btagCSV":
+            tpr, fpr = plot_roc(y_test, y_score, unc, False, "r-", "BDT (CSV)")
+        elif b == "btagDeepCSV":
+            tpr, fpr = plot_roc(y_test, y_score, unc, False, "m-", "BDT (DeepCSV)")
+        improvement(eff_sig_4, eff_bkg_4, tpr, fpr)
 
     # BLR 
     blr = test["btag_LR_4b_2b_btagCSV"]
@@ -393,7 +395,8 @@ def plot_comp(classifier, data, unc = False):
     plt.xlim([0.0, .5])
     #plt.ylim([0.0, 1.05])
     plt.ylabel('tt+jets (light) efficiency', fontsize=16)
-    plt.xlabel('ttH efficiency', fontsize=16)
+    #plt.xlabel('ttH efficiency', fontsize=16)
+    plt.xlabel('tt+bb efficiency', fontsize=16)
     plt.title(r"SL, $N_j = 6$", fontsize=16)
     plt.legend(loc="upper left")
     os.chdir(sys.path[0])
@@ -401,8 +404,10 @@ def plot_comp(classifier, data, unc = False):
 
 if __name__ == "__main__":
 
-    test_sample("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC1afcee217b01/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8", "/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC1afcee217b01/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8")
+    #test_sample("/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC61b0ed3d6c5e/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8", "/mnt/t3nfs01/data01/shome/creissel/tth/gc/bdt/GC61b0ed3d6c5e/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8")
     #histograms("output/dataframe_ttH.csv")
-    plot_comp("output/classifier_btagonly.pkl", "output/dataframe_test.csv", unc = False)
-    plot_test_training("output/classifier_btagonly.pkl", "output/test.csv", "output/train.csv", unc = False)
+    #plot_comp(["output/classifier_btagCSV.pkl", "output/classifier_btagDeepCSV.pkl"], "output/dataframe_test.csv", unc = False)
+    #plot_test_training("output/classifier_btagDeepCSV.pkl", "btagDeepCSV", "output/test.csv", "output/train.csv", unc = False)
+    #plot_test_training("output/classifier_btagCSV.pkl", "btagCSV", "output/test.csv", "output/train.csv", unc = False)
+    plot_comp(["btagCSV", "btagDeepCSV"], "output/test.csv", unc = False)
 

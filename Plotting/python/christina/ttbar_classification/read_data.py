@@ -17,8 +17,7 @@ def read_data(file_names):
     print "Chain contains {0} events".format(chain.GetEntries())
 
     numJets = 6
-    #arr = tree2array(chain, branches=["jets_btagCSV","is_sl", "is_dl", "btag_LR_4b_2b_btagCSV", "ttCls", "nBCSVM", "btagWeightCSV", "btagWeightCSV_up_lf", "btagWeightCSV_down_lf"], selection="numJets=={0}".format(numJets))
-    arr = tree2array(chain, branches=["jets_btagCSV","is_sl", "is_dl", "btag_LR_4b_2b_btagCSV", "ttCls", "nBCSVM", "jets_pt", "jets_eta"], selection="numJets=={0}".format(numJets))
+    arr = tree2array(chain, branches=["jets_btagCSV", "jets_btagDeepCSV", "is_sl", "is_dl", "btag_LR_4b_2b_btagCSV", "ttCls", "nBCSVM", "jets_pt", "jets_eta"], selection="numJets=={0}".format(numJets))
     d = pd.DataFrame(arr)
 
 # apply cuts: semi-leptonic events 
@@ -28,7 +27,7 @@ def read_data(file_names):
 
 # split jet values
 
-    for n in ["btagCSV", "pt", "eta"]:
+    for n in ["btagCSV", "btagDeepCSV", "pt", "eta"]:
 
         j = pd.DataFrame(d["jets_" + n].values.tolist())
         names = []
