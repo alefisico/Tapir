@@ -128,6 +128,7 @@ class Sample(object):
         self.tags = kwargs.get("tags", "").split()
 
         #Load the filenames for step2 (nanoAOD + tthbb13)
+        #This can fail on the grid, where the stuff under src/MEAnalysis/gc is not available
         try:
             self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load_step2)]
         except Exception as e:
@@ -145,8 +146,12 @@ class Sample(object):
                 self.file_names_step1 = []
 
         self.file_names_postproc = None
-        if self.files_load_postproc:
-            self.file_names_postproc = [getSitePrefix(fn) for fn in get_files(self.files_load_postproc)]
+        try:
+            if self.files_load_postproc:
+                self.file_names_postproc = [getSitePrefix(fn) for fn in get_files(self.files_load_postproc)]
+        except IOError as e:
+            LOG_MODULE_NAME.error("ERROR: could not load postprocessing file {0}: {1}".format(self.files_load_postproc, e))
+            self.file_names_postproc = []
 
         #Limit list of files in debug mode
         if self.debug:
