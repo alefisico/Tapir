@@ -342,7 +342,7 @@ for k in [
     if "data" in D["script"]:
         D["maxlumis"] = 4
         D["perjob"] = 2
-    D["runtime"] = 0.2
+    D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
 
@@ -516,7 +516,7 @@ if __name__ == '__main__':
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
    # config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
 
-    config.Site.storageSite = "T2_CH_CSCS"
+    config.Site.storageSite = "T3_CH_PSI"
 
     #loop over samples
     for sample in sel_datasets.keys():
