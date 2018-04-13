@@ -1,5 +1,13 @@
 '''
-Some path for testing from the 2017 menu. Move to config?
+Trigger defintions:
+
+Set different trigger configurations containing one or more HLT paths. If more than on is given 
+for a configuration the or of all is used.
+
+Possibility to define dataset sprecific configurations. Define configuration with name [ttH_configname]
+that is used as default. For dataset specific variatitions add element to dict with [ttH_configname]:[datasetname].
+The [datasetname] sould be true for the comparison of [datasetname] in cfg_comp.name (the name set in e.g. in 
+default.cfg). For this dataset the default configuration will be replaced.
 '''
 
 triggerTable = {
@@ -24,10 +32,19 @@ triggerTable = {
 #    "ttH_DL_elel" : [
 #        "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*",
 #    ],
-    "ttH_FH" : [
-        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0",
-        "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
-    ],
+#    "ttH_FH" : [
+#        "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
+#        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0",
+#        "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
+#    ],
+#    "ttH_FH:JetHT" : [
+#        "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
+#        "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
+#        ("and","!HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0")
+#    ],
+#    "ttH_FH:BTagCSV" : [
+#        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0"
+#    ],
 #    "ttH_FH_prescaled" : [
 #        "HLT_PFHT450_SixJet40_v*",
 #        "HLT_PFHT400_SixJet30_v*",

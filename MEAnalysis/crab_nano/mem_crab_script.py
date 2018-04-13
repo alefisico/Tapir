@@ -56,20 +56,39 @@ os.getcwd()
 ### tthbb13 code
 if not "--nostep2" in args:
     print "Running tth code"
+
+    infile = ROOT.TFile("Output/nanoAOD_postprocessed.root")
+    """Needs to be reimplemented w/ nanoAOD
+    inhist = infile.Get("Count")
+    if not inhist:
+        raise Exception("Count histo not valid")
+    infile.Close()
+    """
+
     
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
+    #Set config names for analysis and MEM
+    an_conf_name = None
+    me_conf_name = None
     if "AN_CFG" in os.environ and os.environ["AN_CFG"]:
-        an = analysisFromConfig(os.environ["AN_CFG"])
+        an_conf_name = os.environ["AN_CFG"]
     else:
-        an = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        an_conf_name = os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg"
         me_conf_name = "MEAnalysis_cfg_heppy.py"
         for arg in sys.argv:
             if arg.startswith("ME_CONF="):
                 me_conf_name = arg.split("=")[1]
-                an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
-    print "I'm using ",an, " and ", an.mem_python_config
+            if arg.startswith("AN_CFG="):
+                an_conf_name = arg.split("=")[1]
+
+    #Make Analysis object and set mem config if changed
+    an = analysisFromConfig(an_conf_name)
+    if me_conf_name is not None:
+        an.mem_python_config = "$CMSSW_BASE/src/TTH/MEAnalysis/python/" + me_conf_name
+        
+    print "I'm using ",an_conf_name, " and ", an.mem_python_config
     mem_python_conf = tth_main(
         an,
         schema="mc" if isMC else "data",

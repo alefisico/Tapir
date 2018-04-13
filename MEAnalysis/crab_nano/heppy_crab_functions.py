@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import os, re
 import ROOT
+from copy import copy
+import json
 
 def updateJetGT(config, crabFiles):
     print "Setting Data GT if needed"
@@ -29,6 +31,8 @@ def convertLFN(crabFiles,crabFiles_pfn):
         if not ("overflow" in os.getenv("GLIDECLIENT_Group","overflow")):
             pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read()
             pfn=re.sub("\n","",pfn)
+            if pfn.startswith("/"):
+                pfn = "file:"+pfn
             print "replaced", crabFiles[i],"->",pfn
             crabFiles_pfn[i]=pfn
         else:
@@ -41,7 +45,6 @@ def getLumisProcessed(vlumiblock):
     print vlumiblock
     for ll in vlumiblock:
         runs_lumis = map(lambda x: map(int, x.split(":")), ll.split("-"))
-        print runs_lumis 
         if len(runs_lumis) == 1:
             run, lumi1 = tuple(runs_lumis[0])
             lumi2 = lumi1
@@ -60,6 +63,19 @@ def getLumisProcessed(vlumiblock):
         
         lumidict[run] += [i for i in range(lumi1, lumi2 + 1)]
     return lumidict
+
+#Convert the Lumis for the PSet to a JSON that can be e.g. read by the cmsDriver
+def makeLumiJSON(vlumiblock, jsonname):
+    _dict = {}
+    lumis = getLumisProcessed(vlumiblock)
+    for run in lumis.keys():
+        runlumis = []
+        for LS in lumis[run]:
+            runlumis.append([LS,LS]) # Lazy implementation... 
+        _dict[run] = copy(runlumis)
+
+    with open(jsonname, 'w') as fp:
+        json.dump(_dict, fp)
 
 def copyTo(src, dst, keys=[]):
     #copy ttjets output

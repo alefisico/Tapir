@@ -304,10 +304,10 @@ def getTreeProducer(conf):
    
     #create jet up/down variations
     corrs = [NTupleVariable(
-            "corr_"+c,
-            lambda x,c="corr_"+c : getattr(x, c),
+            "pt_corr_"+c,
+            lambda x,c="pt_corr_"+c : getattr(x, c),
             mcOnly=True,
-            the_type=float,
+            type=float,
         ) for c in conf.mem["jet_corrections"]
     ]
 
@@ -342,7 +342,7 @@ def getTreeProducer(conf):
         #NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
-        #NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
         NTupleVariable("puId", lambda x : x.puId),
     ] + corrs)
 
@@ -444,26 +444,31 @@ def getTreeProducer(conf):
     
     #add HLT bits to final tree
     trignames = []
-    for pathname, trigs in list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items()):
-        for pref in ["HLT"]:
-            #add trigger path (combination of trigger)
-            _pathname = "_".join([pref, pathname])
-            print _pathname
-            if not _pathname in trignames:
-                trignames += [_pathname]
+    triggerlist = list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items())
+    triggerlist = filter(lambda x: not ":" in x[0], triggerlist) # remove ds specific trigger configurations
+    for pathname, trigs in triggerlist:
+        #add trigger path (combination of trigger)
+        _pathname = "_".join(["HLT", pathname])
+        if not _pathname in trignames:
+            trignames += [_pathname]
 
-            #add individual trigger bits
-            for tn in trigs:
-                #strip the star
-                tn = pref + "_BIT_" + tn[:-1]
-                if not tn in trignames:
-                    trignames += [tn]
-    print trignames
+        #add individual trigger bits
+        for tn in trigs:
+            #strip the star
+            tn = "HLT_BIT_" + tn
+            if not tn in trignames:
+                trignames += [tn]
 
     for trig in trignames:
-        treeProducer.globalVariables += [NTupleVariable(
-            trig, lambda ev, name=trig: getattr(ev, name, -1), type=int, mcOnly=False
-        )]
+        if trig.startswith("HLT_BIT_"):
+            trig_ = trig[len("HLT_BIT_"):] #Bit is saved w/o "HLT_BIT_" in the beginning
+            treeProducer.globalVariables += [NTupleVariable(
+                trig, lambda ev, name=trig_: getattr(ev, name, -1), type=int, mcOnly=False
+            )]
+        else:
+            treeProducer.globalVariables += [NTupleVariable(
+                trig, lambda ev, name=trig: getattr(ev, name, -1), type=int, mcOnly=False
+            )]
 
     if conf.general["boosted"] == True:
         treeProducer.globalVariables += [NTupleVariable(
@@ -524,7 +529,7 @@ def getTreeProducer(conf):
     ]
     for metfilter in metfilter_flags:
         treeProducer.globalVariables += [NTupleVariable(
-            trig, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
+            metfilter, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
         )]
        
     #Add systematically variated quantities

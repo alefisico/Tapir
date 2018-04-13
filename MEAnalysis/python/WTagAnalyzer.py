@@ -47,6 +47,12 @@ class WTagAnalyzer(FilterAnalyzer):
         return ms
 
     def process(self, event):
+        if event.catChange: #DS
+            if "systematics" in self.conf.general["verbosity"]:
+                autolog("WTagAna: processing catChange")
+            res = self._process(event.catChange)
+            event.catChange = res #DS
+
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_btag:
                 res = self._process(event_syst)

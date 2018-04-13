@@ -4,7 +4,7 @@ import resource
 import ROOT
 import logging
 import os
-
+from copy import deepcopy
 from FWCore.PythonUtilities.LumiList import LumiList
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeightProducer
 LOG_MODULE_NAME = logging.getLogger(__name__)
@@ -89,6 +89,7 @@ class CounterAnalyzer(FilterAnalyzer):
             self.chist.Fill(0)
         else:
             raise Exception("Could not read event")
+
         return True
 
 class EventIDFilterAnalyzer(FilterAnalyzer):
@@ -146,14 +147,15 @@ class LumiListAnalyzer(FilterAnalyzer):
 
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(LumiListAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
-        self.analysis_conf = cfg_ana._analysis_conf
-        path = self.analysis_conf.config.get("general", "json")
+        analysis_conf = self.cfg_ana._analysis_conf
+        path = analysis_conf.config.get("general", "json")
         path = path.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
 
-        self.runranges = self.analysis_conf.config.get("general", "runs").split("\n")
+        self.runranges = analysis_conf.config.get("general", "runs").split("\n")
         self.runranges = [map(int, s.split()[1:]) for s in self.runranges if len(s)>0]
          
         ll = LumiList(path)
+        
         self.lls = set(ll.getLumis())
 
     def beginLoop(self, setup):
@@ -163,12 +165,14 @@ class LumiListAnalyzer(FilterAnalyzer):
         run_lumi = (event.input.run, event.input.luminosityBlock)
         event.json = run_lumi in self.lls
 
+       
+        
         event.runrange = -1
         for irunrange, runrange in enumerate(self.runranges):
             if event.input.run >= runrange[0] and event.input.run <= runrange[1]:
                 event.runrange = irunrange
                 break
-
+            
         return True
 
 class PrimaryVertexAnalyzer(FilterAnalyzer):
