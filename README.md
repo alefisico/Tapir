@@ -148,6 +148,7 @@ The currently used samples are listed below. Generally, they are stored at T3_CH
 | production name | comments |
 |-----------------|----------|
 | [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas) | no boosted or hadronic triggers |
+| [nano_05Feb2018](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/nano_05Feb2018) | nanoAODv1, 2016 datasets |
 
 ## tthbb13
 
