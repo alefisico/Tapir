@@ -15,6 +15,7 @@ workflows = [
     "leptonic", #ttH with SL/DL decays
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
+    "hadronic_nome",
     "hadronic_nome_testing", #ttH with FH decays data + MC
     "QCD_nome", #QCD samples without MEM
     "pilot", #ttH sample only, with no MEM
@@ -286,26 +287,27 @@ for k in datasets.keys():
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
         workflow_datasets["hadronic_nome"][k] = D
-    if "BTagCSV" in k or "JetHT" in k:
+    if ("BTagCSV" in k or "JetHT" in k) and "Run2017C" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
-        D["perjob"] = 70
+        D["perjob"] = 75
         D["runtime"] = 24
+        D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
         workflow_datasets["hadronic_nome"][k] = D
 
 workflow_datasets["hadronic_nome_testing"] = {}
 for k in  workflow_datasets["hadronic_nome"].keys():
     D = deepcopy(workflow_datasets["hadronic_nome"][k])
-    D["maxlumis"] = 10
+    D["maxlumis"] = 2
     D["runtime"] = 1
     workflow_datasets["hadronic_nome_testing"][k] = D
 
 
 workflow_datasets["testall"] = {}
-for k in [ "SingleElectron-Run2017E-17Nov2017-v1",
-           "JetHT-Run2017E-17Nov2017-v1",
-           "BTagCSV-Run2017E-17Nov2017-v1",
-           "MuonEG-Run2017E-17Nov2017-v1",
+for k in [ "SingleElectron-Run2017D-17Nov2017-v1",
+           "JetHT-Run2017D-17Nov2017-v1",
+           "BTagCSV-Run2017D-17Nov2017-v1",
+           "MuonEG-Run2017D-17Nov2017-v1",
            "TTbar_had",
            "TTbar_sl1",
            "ttHTobb",
@@ -313,8 +315,8 @@ for k in [ "SingleElectron-Run2017E-17Nov2017-v1",
 ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = me_cfgs["nometesting"]
-    D["perjob"] = 2
-    D["maxlumis"] = 20
+    D["perjob"] = 1
+    D["maxlumis"] = 1
     D["runtime"] = 4
     if not D["isMC"]:
         D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
@@ -396,17 +398,8 @@ for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2
 
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
-"""
-TODO: Chekc if DS is nanoAOD to change workflow
-#Check if Dataset are nanoAOD
-nanoFlag = None
-for datasetKey in sel_datasets:
-    isNANOAOD = workflow_datasets[args.workflow][datasetKey]["isNANOAOD"]
-    if nanoFlag is None:
-        nanoFlag = isNANOAOD
-    if not(nanoFlag and isNANOAOD):
-        exit() 
-"""
+print sel_datasets
+raw_input("Press ret to start")
 if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
     from CRABClient.UserUtilities import getUsernameFromSiteDB
@@ -513,8 +506,10 @@ if __name__ == '__main__':
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
     
-    #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-   # config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
+    #config.Site.whitelist = ["T2_US_Vanderbilt"]
+    config.Site.blacklist = [
+        "T3_UK_London_QMUL",
+    ] 
 
     config.Site.storageSite = "T2_CH_CSCS"
 

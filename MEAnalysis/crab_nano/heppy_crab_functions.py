@@ -31,8 +31,8 @@ def convertLFN(crabFiles,crabFiles_pfn):
         if not ("overflow" in os.getenv("GLIDECLIENT_Group","overflow")):
             pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read()
             pfn=re.sub("\n","",pfn)
-            if pfn.startswith("/"):
-                pfn = "file:"+pfn
+            #if pfn.startswith("/"):
+            #    pfn = "file:"+pfn
             print "replaced", crabFiles[i],"->",pfn
             crabFiles_pfn[i]=pfn
         else:

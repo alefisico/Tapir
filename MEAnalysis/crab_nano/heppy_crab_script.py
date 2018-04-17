@@ -84,13 +84,14 @@ os.system("mkdir Output")
 ### nanoAOD code
 if not "--nostep1" in args:
     #Building cmsDriver.py command
-    if len(crabFiles_pfn.value()) == 1:
-        filename = crabFiles_pfn.value()[0]
+    #cmsRun handles LFN files. So we give it those
+    if len(crabFiles.value()) == 1:
+        filename = crabFiles.value()[0]
     else:
         filename = ""
-        for infile in crabFiles_pfn.value():
+        for infile in crabFiles.value():
             filename += infile+','
-        filename = filename[:-1]
+        filename = filename[:-1] #remove tailing ,
     driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root --no_exec -s NANO --filein {1} -n {2}" .format("runConfig",filename, crabMaxEvents)
     if VLuminosityBlockRange is not None:
         driverCommand = "{0}  --lumiToProcess={1}".format(driverCommand, lumiJSON)

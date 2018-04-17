@@ -57,14 +57,10 @@ os.getcwd()
 if not "--nostep2" in args:
     print "Running tth code"
 
+    if not os.path.isfile("Output/nanoAOD_postprocessed.root"):
+         raise Exception("Step 1 failed! Output/nanoAOD_postprocessed.root does not exist")
+    
     infile = ROOT.TFile("Output/nanoAOD_postprocessed.root")
-    """Needs to be reimplemented w/ nanoAOD
-    inhist = infile.Get("Count")
-    if not inhist:
-        raise Exception("Count histo not valid")
-    infile.Close()
-    """
-
     
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
