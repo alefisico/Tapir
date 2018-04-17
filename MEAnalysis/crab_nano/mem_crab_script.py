@@ -60,8 +60,6 @@ if not "--nostep2" in args:
     if not os.path.isfile("Output/nanoAOD_postprocessed.root"):
          raise Exception("Step 1 failed! Output/nanoAOD_postprocessed.root does not exist")
     
-    infile = ROOT.TFile("Output/nanoAOD_postprocessed.root")
-    
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     from TTH.MEAnalysis.MEAnalysis_heppy import main as tth_main
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
@@ -118,7 +116,7 @@ assert(fn.getEntries("Output_tth/tree.root", "tree") == fn.getEntries("tree.root
 #Now write the FWKJobReport
 report=open('./FrameworkJobReport.xml', 'w+')
 #report.write(fn.getFJR(lumidict, crabFiles, crabFiles_pfn, "tree.root"))
-report.write(fn.getFJR({}, crabFiles, crabFiles_pfn, "tree.root"))
+#report.write(fn.getFJR({}, crabFiles, crabFiles_pfn, "tree.root"))
 report.close()
 print "timeto_totalJob ",(time.time()-t0)
 dumpfile.close()
