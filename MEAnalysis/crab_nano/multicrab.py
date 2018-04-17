@@ -259,20 +259,20 @@ for k in datasets.keys():
     if "JetHT" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["hadronic"]
-        D["perjob"] = 20
-        D["runtime"] = 24
+	D["perjob"] = 20
+	D["runtime"] = 24
         workflow_datasets["data_hadronic"][k] = D
 
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
     if "QCD300_ext1" in k: #"TTbar_inc" in k: #"QCD" in k or or "ttH" in k 
         D = deepcopy(datasets[k])
-    if k == "ttHTobb":
-        D["perjob"] = 4 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
-    elif k == "TTbar_inc":
-        D["perjob"] = 70 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
+	if k == "ttHTobb":
+	    D["perjob"] = 4 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
+	elif k == "TTbar_inc":
+	    D["perjob"] = 70 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
         D["mem_cfg"] = me_cfgs["hadronic"]
-        D["runtime"] = max(20,D["runtime"])
+	D["runtime"] = max(20,D["runtime"])
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
 
@@ -356,9 +356,9 @@ workflow_datasets["testing_hadronic_withme"] = {}
 for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2016B-PromptReco-v1"]:
     D = deepcopy(datasets[k])
     if k == "ttHTobb":
-        D["perjob"] = 1 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
+	D["perjob"] = 1 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
     else:
-        D["perjob"] = 20 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
+	D["perjob"] = 20 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
     D["maxlumis"] = 4 * D["perjob"]
     D["runtime"] = 20
     D["mem_cfg"] = me_cfgs["hadronic"]
@@ -433,7 +433,10 @@ if __name__ == '__main__':
 
     from CRABClient.UserUtilities import config
     config = config()
-    submitname = args.tag
+    if args.recovery:
+	submitname = args.recovery.split("/")[1].split(".json")[0]
+    else:
+	submitname = args.tag
     config.General.workArea = 'crab_projects/' + submitname
     config.General.transferLogs = True
    
@@ -467,8 +470,8 @@ if __name__ == '__main__':
         'post.sh',
         'heppy_crab_script.py',
         'mem_crab_script.py',
-    'heppy_crab_functions.py',
-    'nano_crab_config.py',
+	'heppy_crab_functions.py',
+	'nano_crab_config.py',
         'python.tar.gz',
         'data.tar.gz',
         'MEAnalysis_heppy.py',
@@ -482,6 +485,7 @@ if __name__ == '__main__':
     config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
+    config.Data.lumiMask = args.recovery
 
     #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
     config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
@@ -490,6 +494,10 @@ if __name__ == '__main__':
 
     #loop over samples
     for sample in sel_datasets.keys():
+        if not args.dataset=="*" and not args.dataset in sample:
+	    continue
+	if args.recovery and not sample in args.recovery:
+	    continue
         print 'submitting ' + sample, sel_datasets[sample]
         
         mem_cfg = sel_datasets[sample]["mem_cfg"]
@@ -502,7 +510,10 @@ if __name__ == '__main__':
             runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
 
             config.JobType.maxJobRuntimeMin = runtime_min
-            config.General.requestName = sample + "_" + submitname
+            if args.recovery:
+		config.General.requestName = submitname
+	    else:
+		config.General.requestName = sample + "_" + submitname
             config.Data.inputDataset = dataset
             config.Data.unitsPerJob = perjob
             config.Data.totalUnits = nlumis

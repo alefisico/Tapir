@@ -1,7 +1,8 @@
 stages:
   - compile
   - test_nano
-  - test
+  - test_unit
+  - test_tthbb13
   - test_sparsinator
 
 before_script:
@@ -14,7 +15,7 @@ before_script:
   - git submodule update --init --recursive
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc630"
-  - export CMSSW_VERSION="CMSSW_9_4_4"
+  - export CMSSW_VERSION="CMSSW_9_4_5_cand1"
   - export CMS_PATH=/cvmfs/cms-ib.cern.ch/week0 #https://gitlab.cern.ch/cms-nanoAOD/nanoAOD-integration/blob/master/scripts/restore_cmssw.sh#L14
   - cd ..
   - cd $CI_HOME
@@ -38,11 +39,10 @@ compile:
     - cd $CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - git cms-init
-    - git cms-merge-topic cms-nanoAOD:master
-    - git cms-merge-topic kschweiger:HeppyttHbb_Jan12
-    - git checkout -b nanoAOD cms-nanoAOD/master
-    - git cms-merge-topic mmeinhard:BoostedNanoAOD
-    - git cms-merge-topic jpata:heppy_fixes
+    - git cms-addpkg PhysicsTools/HeppyCore
+    - sed -i s/json=None/json=None,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
+    - sed -i s/triggers=triggers/triggers=triggers,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
+    - git cms-merge-topic kschweiger:BoostedMiniAODReBaseMasterApr7 
     - git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
@@ -59,7 +59,7 @@ compile:
 
 test_nano:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_nano
   allow_failure: true
   script:
     - cd $CI_HOME/..
@@ -75,9 +75,10 @@ test_nano:
       - nano.root
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
-test_tth:
+test_nano_postproc:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_nano
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -85,7 +86,45 @@ test_tth:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/test_nano_postproc.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+
+test_nano_combined_workflow:
+  tags: [ cvmfs ]
+  stage: test_nano
+  allow_failure: true
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH/MEAnalysis/crab_nano
+    - python heppy_crab_script.py --test
+
+test_unit_Plotting:
+  tags: [ cvmfs ]
+  stage: test_unit
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH
+    - python $CMSSW_BASE/src/TTH/Plotting/test/test_config.py
+
+test_tth:
+  tags: [ cvmfs ]
+  stage: test_tthbb13
+  allow_failure: true
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH/MEAnalysis
+    - python test/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
     - python test/validationHistos.py Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
     - tar -czf plots_tth.tgz *.pdf Loop_ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
@@ -98,7 +137,8 @@ test_tth:
 
 test_ttjets:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_tthbb13
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -106,10 +146,10 @@ test_ttjets:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample TT_TuneCUETP8M2T4_13TeV-powheg-pythia8
-    - python test/validationHistos.py Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
+    - python test/test_MEAnalysis_heppy.py --sample TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - python test/validationHistos.py Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - ls -al
-    - tar -czf plots_ttjets.tgz *.pdf Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root
+    - tar -czf plots_ttjets.tgz *.pdf Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root
     - du -csh plots_ttjets.tgz
     - mv plots_ttjets.tgz $CI_HOME/
   artifacts:
@@ -119,7 +159,8 @@ test_ttjets:
 
 test_data:
   tags: [ cvmfs ]
-  stage: test
+  stage: test_tthbb13
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -127,7 +168,7 @@ test_data:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src/TTH/MEAnalysis
-    - python python/test_MEAnalysis_heppy.py --sample SingleMuon
+    - python test/test_MEAnalysis_heppy.py --sample SingleMuon
     - python test/validationHistos.py Loop_SingleMuon/tree.root
     - ls -al
     - tar -czf plots_singlemuon.tgz *.pdf Loop_SingleMuon/tree.root
@@ -141,6 +182,7 @@ test_data:
 test_tth_sparsinator:
   tags: [ cvmfs ]
   stage: test_sparsinator
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -157,9 +199,28 @@ test_tth_sparsinator:
       - sparse_tth.root
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
 
+test_sparsinator_postproc:
+  tags: [ cvmfs ]
+  stage: test_sparsinator
+  allow_failure: true
+  script:
+    - cd $CI_HOME/..
+    - tar xfz $CI_HOME/cmssw.tgz
+    - cd $CI_HOME/../$CMSSW_VERSION/src
+    - eval `scramv1 runtime -sh`
+    - cd $CI_HOME
+    - cd $CMSSW_BASE/src/TTH
+    - python Plotting/test/test_sparsinator.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+    - mv out.root $CI_HOME/sparse_tth.root
+  artifacts:
+    paths:
+      - sparse_tth.root
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+
 test_ttjets_sparsinator:
   tags: [ cvmfs ]
   stage: test_sparsinator
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -169,10 +230,9 @@ test_ttjets_sparsinator:
     - cd $CMSSW_BASE/src/TTH
     - tar xfz $CI_HOME/plots_ttjets.tgz
     - ls -al
-    - FILE_NAMES=Loop_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/tree.root DATASETPATH=TT_TuneCUETP8M2T4_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
+    - FILE_NAMES=Loop_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/tree.root DATASETPATH=TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8 SKIP_EVENTS=0 MAX_EVENTS=5000 ANALYSIS_CONFIG=MEAnalysis/data/default.cfg python Plotting/python/joosep/sparsinator.py
     - mv out.root $CI_HOME/sparse_ttjets.root
   artifacts:
     paths:
       - sparse_ttjets.root
     name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
-

@@ -15,6 +15,8 @@ workflows = [
     "leptonic", #ttH with SL/DL decays
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
+    "hadronic_nome",
+    "hadronic_nome_testing", #ttH with FH decays data + MC
     "QCD_nome", #QCD samples without MEM
     "pilot", #ttH sample only, with no MEM
     "signal", #signal sample with common config
@@ -23,6 +25,7 @@ workflows = [
     "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
+    "testall",#Test all samples w/ small nJobs and no ME
     "testing_hadronic_withme", #single-lumi jobs, a few samples
     "memcheck", #specific MEM jobs that contain lots of hypotheses for validation, many interpretations
     "memcheck2", #specific MEM jobs that contain lots of hypotheses for validation, JES variations
@@ -33,8 +36,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Submits crab jobs')
 parser.add_argument('--workflow', action="store", required=True, help="Type of workflow to run", type=str, choices=workflows)
 parser.add_argument('--tag', action="store", required=True, help="the version tag for this run, e.g. VHBBHeppyV22_tthbbV10_test1")
-parser.add_argument('--dataset', action="store", required=False, help="submit only matching datasets (shortname)", default="*") #FROM FH branch -> Not added yet
-parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")#FROM FH branch -> Not added yet
+parser.add_argument('--dataset', action="store", required=False, help="submit only matching datasets (shortname)", default="*") 
+parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")#Never tested it. Use with caution
 args = parser.parse_args()
 
 localtesting = "localtesting" in args.workflow
@@ -44,7 +47,9 @@ me_cfgs = {
     "default": "MEAnalysis_cfg_heppy.py",
     "cMVA": "MEAnalysis_cfg_heppy.py",
     "nome": "cfg_noME.py",
+    "nometesting": "cfg_noME_testing.py",
     "leptonic": "cfg_leptonic.py",
+    "nome_hadSel" : "cfg_noME_FH.py",
     "hadronic": "cfg_FH.py",
     "memcheck": "cfg_memcheck.py",
     "memcheck2": "cfg_memcheck2.py"
@@ -80,6 +85,18 @@ sets_data = [
     "/SingleElectron/Run2017D-17Nov2017-v1/MINIAOD",
     "/SingleElectron/Run2017E-17Nov2017-v1/MINIAOD",
     "/SingleElectron/Run2017F-17Nov2017-v1/MINIAOD",
+
+    "/JetHT/Run2017F-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017E-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017D-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017C-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017B-17Nov2017-v1/MINIAOD",
+
+    "/BTagCSV/Run2017F-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017E-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017D-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017C-17Nov2017-v1/MINIAOD",
+    "/BTagCSV/Run2017B-17Nov2017-v1/MINIAOD",
 ]
 
 #all available datasets.
@@ -94,13 +111,17 @@ for sd in sets_data:
         "perjob": 30,
         "runtime": 20, #hours
         "mem_cfg": me_cfgs["leptonic"],
-        "script": 'heppy_crab_script_data.sh'
+        "script": 'heppy_crab_script_data.sh',
+        "json" : "",
+        "isMC" : False
     }
+
 
 
 #Add MC datasets from JSON files
 import multicrabHelper
 datasets.update(multicrabHelper.getDatasets(mem_cfg = me_cfgs["default"], script = "heppy_crab_script.sh"))
+
 
 #now we construct the workflows from all the base datasets
 workflow_datasets = {}
@@ -223,7 +244,7 @@ for k in datasets.keys():
 
 workflow_datasets["data_hadronic"] = {}
 for k in datasets.keys():
-    if "JetHT" in k:
+    if "JetHT" in k or "BTagCSV" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["hadronic"]
         D["perjob"] = 20
@@ -243,6 +264,7 @@ for k in datasets.keys():
 #        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
 
+        
 workflow_datasets["QCD_nome"] = {}
 for k in datasets.keys():
     if "QCD" in k:
@@ -259,6 +281,47 @@ for k in datasets.keys():
         workflow_datasets["allmc_nome"][k] = D
 
 
+workflow_datasets["hadronic_nome"] = {}
+for k in datasets.keys():
+    if k == "TTbar_had" or k == "ttHTobb" or "QCD" in k:
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["nome_hadSel"]
+        workflow_datasets["hadronic_nome"][k] = D
+    if ("BTagCSV" in k or "JetHT" in k) and "Run2017C" in k:
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["nome_hadSel"]
+        D["perjob"] = 75
+        D["runtime"] = 24
+        D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
+        workflow_datasets["hadronic_nome"][k] = D
+
+workflow_datasets["hadronic_nome_testing"] = {}
+for k in  workflow_datasets["hadronic_nome"].keys():
+    D = deepcopy(workflow_datasets["hadronic_nome"][k])
+    D["maxlumis"] = 2
+    D["runtime"] = 1
+    workflow_datasets["hadronic_nome_testing"][k] = D
+
+
+workflow_datasets["testall"] = {}
+for k in [ "SingleElectron-Run2017D-17Nov2017-v1",
+           "JetHT-Run2017D-17Nov2017-v1",
+           "BTagCSV-Run2017D-17Nov2017-v1",
+           "MuonEG-Run2017D-17Nov2017-v1",
+           "TTbar_had",
+           "TTbar_sl1",
+           "ttHTobb",
+           "QCD1500to2000"
+]:
+    D = deepcopy(datasets[k])
+    D["mem_cfg"] = me_cfgs["nometesting"]
+    D["perjob"] = 1
+    D["maxlumis"] = 1
+    D["runtime"] = 4
+    if not D["isMC"]:
+        D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
+    workflow_datasets["testall"][k] = D
+    
 #Pilot job for updating transfer functions, retraining BLR
 workflow_datasets["pilot"] = {}
 pilot_name = 'ttHTobb'
@@ -281,7 +344,7 @@ for k in [
     if "data" in D["script"]:
         D["maxlumis"] = 4
         D["perjob"] = 2
-    D["runtime"] = 0.2
+    D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
 
@@ -335,17 +398,8 @@ for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2
 
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
-"""
-TODO: Chekc if DS is nanoAOD to change workflow
-#Check if Dataset are nanoAOD
-nanoFlag = None
-for datasetKey in sel_datasets:
-    isNANOAOD = workflow_datasets[args.workflow][datasetKey]["isNANOAOD"]
-    if nanoFlag is None:
-        nanoFlag = isNANOAOD
-    if not(nanoFlag and isNANOAOD):
-        exit() 
-"""
+print sel_datasets
+raw_input("Press ret to start")
 if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
     from CRABClient.UserUtilities import getUsernameFromSiteDB
@@ -400,7 +454,11 @@ if __name__ == '__main__':
 
     from CRABClient.UserUtilities import config
     config = config()
-    submitname = args.tag
+    if args.recovery:
+	submitname = args.recovery.split("/")[1].split(".json")[0]
+    else:
+	submitname = args.tag
+    
     config.General.workArea = 'crab_projects/' + submitname
     config.General.transferLogs = True
    
@@ -434,12 +492,10 @@ if __name__ == '__main__':
         'post.sh',
         'heppy_crab_script.py',
         'mem_crab_script.py',
-    'heppy_crab_functions.py',
-    'nano_crab_config.py',
+        'heppy_crab_functions.py',
         'python.tar.gz',
         'data.tar.gz',
         'MEAnalysis_heppy.py',
-        tth_data_dir + '/BDT.pickle',
         #nanoTools_dir + '/scripts/nano_postproc.py',
         #nanoTools_dir + '/python/postprocessing/modules/jme/jecUncertainties.py'
     ]
@@ -449,16 +505,29 @@ if __name__ == '__main__':
     config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
-
-    #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-    config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
+    
+    #config.Site.whitelist = ["T2_US_Vanderbilt"]
+    config.Site.blacklist = [
+        "T3_UK_London_QMUL",
+    ] 
 
     config.Site.storageSite = "T3_CH_PSI"
 
     #loop over samples
     for sample in sel_datasets.keys():
+        if not args.dataset=="*" and not args.dataset in sample:
+	    continue
+	if args.recovery and not sample in args.recovery:
+	    continue
+        if not args.recovery and sel_datasets[sample]["json"] != "":
+            print "Setting json for Dataset:",sample
+            config.Data.lumiMask = sel_datasets[sample]["json"]
+        else:
+            config.Data.lumiMask = args.recovery
+
+
         print 'submitting ' + sample, sel_datasets[sample]
-        
+
         mem_cfg = sel_datasets[sample]["mem_cfg"]
         config.JobType.scriptExe = sel_datasets[sample]["script"]
         
@@ -469,7 +538,10 @@ if __name__ == '__main__':
             runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
 
             config.JobType.maxJobRuntimeMin = runtime_min
-            config.General.requestName = sample + "_" + submitname
+            if args.recovery:
+		config.General.requestName = submitname
+	    else:
+		config.General.requestName = sample + "_" + submitname
             config.Data.inputDataset = dataset
             config.Data.unitsPerJob = perjob
             config.Data.totalUnits = nlumis

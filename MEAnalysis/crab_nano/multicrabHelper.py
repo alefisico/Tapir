@@ -34,6 +34,8 @@ def getDatasets(mem_cfg, script, files = ["ttH_CMSSW_9X.json","ttbar_CMSSW_9X.js
         for ds in data:
             data[ds]["mem_cfg"] = mem_cfg
             data[ds]["script"] = script
+            data[ds]["json"] = ""
+            data[ds]["isMC"] = True
             retDataSets[ds] = data[ds]
 
     return retDataSets

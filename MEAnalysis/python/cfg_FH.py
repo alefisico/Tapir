@@ -17,14 +17,17 @@ for k, v in Conf.mem_configs.items():
 #other options
 Conf.general["passall"] = False
 Conf.leptons["selection"] = lambda event: event.is_fh 
-Conf.mem["selection"] = lambda event: (event.is_fh 
+Conf.mem["selection"] = lambda event: (event.is_fh and event.ht>450 
                                        and event.cat in ["cat7","cat8","cat9","cat10","cat11","cat12"]
                                        #and event.cat in ["cat8"]
                                        )
 #Conf.jets["untaggedSelection"] = "btagLR" #or "btagCSV" #DS needs to be set in MEAnalysis_cfg_heppy!!!
 Conf.jets["NJetsForBTagLR"] = 9
+Conf.jets["btagAlgo"] = "btagCSV"
 
-Conf.mem["calcME"] = True
+
+Conf.mem["calcME"] = False
+Conf.mem["weight"] = 0.02 #k in Psb = Ps/(Ps+k*Pb)    
 Conf.mem["methodsToRun"] = [
             #"SL_0w2h2t",                 #[0]
             #"DL_0w2h2t",                 #[1]
@@ -50,7 +53,7 @@ Conf.mem["methodsToRun"] = [
         ]
 
 Conf.general["verbosity"] = [
-            "eventboundary",
+            #"eventboundary",
             #"input",
             #"matching",
             #"trigger",
@@ -61,8 +64,9 @@ Conf.general["verbosity"] = [
             #"meminput", #info about particles used for MEM input
             #"commoninput", #print out inputs for CommonClassifier
             #"commonclassifier",
+            #"systematics"
        ]
 
 Conf.general["systematics"] = ["nominal"]
-Conf.general["transferFunctionsPickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle"
-Conf.general["transferFunctions_sj_Pickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle"
+#Conf.general["transferFunctionsPickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle"
+#Conf.general["transferFunctions_sj_Pickle"] = os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle"

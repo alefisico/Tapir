@@ -40,7 +40,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
         self.csv_pdfs = {}
-        for algo in ["btagCSV", "btagCMVA", "btagCMVA_log"]:
+        for algo in ["btagCSV", "btagCMVA", "btagCMVA_log", "btagDeepCSV"]:
             self.csv_pdfs[algo] = self.getPdfs(self.cplots, algo)
 
         self.conf.BTagLRAnalyzer = self
@@ -79,6 +79,12 @@ class BTagLRAnalyzer(FilterAnalyzer):
         #end permutation loop
 
     def process(self, event):
+        if event.catChange: #DS
+            if "systematics" in self.conf.general["verbosity"]:
+                autolog("BLRAna: processing catChange")
+            res = self._process(event.catChange)
+            event.catChange = res #DS
+
         for (syst, event_syst) in event.systResults.items():
             if event_syst.passes_jet:
                 res = self._process(event_syst)
@@ -94,7 +100,8 @@ class BTagLRAnalyzer(FilterAnalyzer):
         for tagger in taggers:
             #Use only the first N jets by b-tagger value for likelihood ratio calculation 
             jets_for_btag_lr[tagger] =  sorted(
-                event.good_jets, key=lambda x: x.pt, reverse=True
+                #event.good_jets, key=lambda x: x.pt, reverse=True #CHECK: Changed by DS
+                event.good_jets, key=lambda x, tagger=tagger: getattr(x, tagger), reverse=True
             )[0:self.conf.jets["NJetsForBTagLR"]]
             jet_probs[tagger] =  [ 
                 self.evaluate_jet_prob(pdfs[tagger], j.pt, j.eta, getattr(j, tagger))
@@ -115,9 +122,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
         for ij in range(len(event.good_jets)):
             x = event.good_jets[ij].btagCMVA 
             event.good_jets[ij].btagCMVA_log = math.log((1.0 + x)/(1.0 - x))
-            
+            event.good_jets[ij].btagDeepCSV = event.good_jets[ij].btagDeepCSV
+
         #btag algos for which to calculate btag LR
-        btagalgos = ["btagCSV", "btagCMVA_log", "btagCMVA"]
+        btagalgos = ["btagCSV", "btagCMVA_log", "btagCMVA","btagDeepCSV"]
         jets_for_btag_lr, jet_probs = self.getJetProbs(self.csv_pdfs, event, btagalgos )
 
         btag_likelihood_results = {}
@@ -193,13 +201,13 @@ class BTagLRAnalyzer(FilterAnalyzer):
                     #if event.systematic == "nominal":
                     #    print "BTagLRAna: considered 3b SR event" #DS temp
 #DS FIXME - allow TTbar MC to have CRs...                        or "TT" in self.cfg_comp.name
-                elif (not self.cfg_comp.isMC or 0 ) and (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
+                elif ( not self.cfg_comp.isMC or "TT" in self.cfg_comp.name or "QCD" in self.cfg_comp.name ) and (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
                     event.fh_region = 2
                     #if event.systematic == "nominal":
                     #    print "BTagLRAna: considered 4b CR event" #DS temp
-                elif (not self.cfg_comp.isMC or 0 ) and (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
+                elif (not self.cfg_comp.isMC or "TT" in self.cfg_comp.name or "QCD" in self.cfg_comp.name ) and (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
                     event.selected_btagged_jets = event.btagged_jets_maxLikelihood_3b
                     event.buntagged_jets = event.buntagged_jets_maxLikelihood_3b
                     event.fh_region = 3
@@ -215,16 +223,48 @@ class BTagLRAnalyzer(FilterAnalyzer):
                 event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
                 event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
         #Jets are untagged according to b-discriminatr
-        elif self.conf.jets["untaggedSelection"] == "btagCSV":
+        #"""CHECK: Removed by DS not sure if imporatant
+        #elif self.conf.jets["untaggedSelection"] == "btagCSV":
+        #    if "debug" in self.conf.general["verbosity"]:
+        #        autolog("using btagCSV for btag/untag jet selection")
+        #    event.buntagged_jets = event.buntagged_jets_bdisc
+        #    event.selected_btagged_jets = event.btagged_jets_bdisc
+        #elif self.conf.jets["untaggedSelection"] == "btagCMVA":
+        #"""
+        else:
             if "debug" in self.conf.general["verbosity"]:
-                autolog("using btagCSV for btag/untag jet selection")
-            event.buntagged_jets = event.buntagged_jets_bdisc
-            event.selected_btagged_jets = event.btagged_jets_bdisc
-        elif self.conf.jets["untaggedSelection"] == "btagCMVA":
-            if "debug" in self.conf.general["verbosity"]:
-                autolog("using btagCMVA for btag/untag jet selection")
-            event.buntagged_jets = event.buntagged_jets_bdisc
-            event.selected_btagged_jets = event.btagged_jets_bdisc
+                autolog("using "+self.conf.jets["untaggedSelection"]+" for btag/untag jet selection")
+            if self.conf.jets["untaggedSelection"] != "btagLR" and event.is_fh and (not "ttH" in self.cfg_comp.name): #DS
+                if len(event.btagged_jets_bdisc)>=4:
+                    event.buntagged_jets = event.buntagged_jets_bdisc
+                    event.selected_btagged_jets = event.btagged_jets_bdisc
+                    #if event.systematic == "nominal":
+                        #print "BTagLRAna: considered 4b SR event" #DS temp
+                elif len(event.btagged_jets_bdisc)==3:
+                    event.buntagged_jets = event.buntagged_jets_bdisc
+                    event.selected_btagged_jets = event.btagged_jets_bdisc
+                    #if event.systematic == "nominal":
+                        #print "BTagLRAna: considered 3b SR event" #DS temp
+                elif len(event.btagged_jets_bdisc)==2 and len(event.loosebtag_jets_bdisc)>=4:
+                    event.buntagged_jets = event.loosebuntag_jets_bdisc
+                    event.selected_btagged_jets = event.loosebtag_jets_bdisc
+                    #if event.systematic == "nominal":
+                        #print "BTagLRAna: considered 4b CR event" #DS temp
+                elif len(event.btagged_jets_bdisc)==2 and len(event.loosebtag_jets_bdisc)==3:
+                    event.buntagged_jets = event.loosebuntag_jets_bdisc
+                    event.selected_btagged_jets = event.loosebtag_jets_bdisc                
+                    #if event.systematic == "nominal":
+                        #print "BTagLRAna: considered 3b CR event" #DS temp
+                else:
+                    event.buntagged_jets = event.buntagged_jets_bdisc
+                    event.selected_btagged_jets = event.btagged_jets_bdisc
+                    #if event.systematic == "nominal":
+                        #print "BTagLRAna: considered 2b event" #DS temp
+            else:
+                event.buntagged_jets = event.buntagged_jets_bdisc
+                event.selected_btagged_jets = event.btagged_jets_bdisc
+
+
         if "debug" in self.conf.general["verbosity"]:
             autolog("N(untagged)={0} N(tagged)={1}".format(
                 len(event.buntagged_jets),
@@ -232,7 +272,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
             ))
 
         btagged = sorted(event.selected_btagged_jets, key=lambda x, self=self: getattr(x, self.default_bTagAlgo) , reverse=True)
-
+        looseb = sorted(event.loosebtag_jets_bdisc, key=lambda x, self=self: getattr(x, self.default_bTagAlgo) , reverse=True)
         #Take first 4 most b-tagged jets, these are used for the top and higgs candidates
         event.selected_btagged_jets_high = btagged[0:4]
 

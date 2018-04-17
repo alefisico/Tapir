@@ -3,7 +3,7 @@ import ConfigParser
 from itertools import izip
 import cPickle as pickle
 import fnmatch
-
+from copy import deepcopy
 import ROOT
 
 from TTH.MEAnalysis import samples_base
@@ -58,6 +58,10 @@ FUNCTION_TABLE = {
 }
 
 class Cut(object):
+    """
+    Defines a sequence of (variable, lower, upper) cuts
+    that can be applied on a set of events
+    """
 
     @staticmethod
     def string_to_cuts(s):
@@ -97,53 +101,80 @@ class Cut(object):
 
 class Sample(object):
     def __init__(self, *args, **kwargs):
+
+        #Flag to set whether in debug mode
         self.debug = kwargs.get("debug")
+
+        #Name of sample, e.g. ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
         self.name = kwargs.get("name")
+
+        #Schema of sample, e.g. mc, data, or mc_syst (MC that is a systematic variation)
         self.schema = kwargs.get("schema")
+
+        #Name of the underlying event model, based in MEAnalysis/interface/EventModel.h
         self.treemodel = kwargs.get("treemodel")
-        self.files_load = kwargs.get("files_load")
+
+        #Step2 files (tthbb13 output)
+        self.files_load_step2 = kwargs.get("files_load_step2")
+
+        #Step1 files (nanoAOD, optional)
         self.files_load_step1 = kwargs.get("files_load_step1", None)
+
+        #postprocessing files (nanoAOD, optional)
+        self.files_load_postproc = kwargs.get("files_load_postproc", None)
+
         self.step_size_sparsinator = int(kwargs.get("step_size_sparsinator"))
         self.debug_max_files = int(kwargs.get("debug_max_files"))
         self.tags = kwargs.get("tags", "").split()
 
-        #Load the filenames for step2 (VHBB + tthbb13)
+        #Load the filenames for step2 (nanoAOD + tthbb13)
+        #This can fail on the grid, where the stuff under src/MEAnalysis/gc is not available
         try:
-            self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load)]
+            self.file_names = [getSitePrefix(fn) for fn in get_files(self.files_load_step2)]
         except Exception as e:
-            LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
+            LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load_step2, e))
             self.file_names = []
 
-        #Load the filenames for step1 (VHBB)
+        #Load the filenames for step1 (nanoAOD)
         if self.files_load_step1 is None:
             self.file_names_step1 = self.file_names
         else:
             try:
                 self.file_names_step1 = [getSitePrefix(fn) for fn in get_files(self.files_load_step1)]
             except Exception as e:
-                LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load, e))
+                LOG_MODULE_NAME.error("ERROR: could not load sample file {0}: {1}".format(self.files_load_step1, e))
                 self.file_names_step1 = []
+
+        self.file_names_postproc = None
+        try:
+            if self.files_load_postproc:
+                self.file_names_postproc = [getSitePrefix(fn) for fn in get_files(self.files_load_postproc)]
+        except IOError as e:
+            LOG_MODULE_NAME.error("ERROR: could not load postprocessing file {0}: {1}".format(self.files_load_postproc, e))
+            self.file_names_postproc = []
 
         #Limit list of files in debug mode
         if self.debug:
             self.file_names = self.file_names[:self.debug_max_files]
+
         self.ngen = int(kwargs.get("ngen"))
         self.xsec = kwargs.get("xsec")
-        self.vhbb_tree_name = kwargs.get("vhbb_tree_name", "vhbb/tree")
+        self.step1_tree_name = kwargs.get("step1_tree_name")
         
     @staticmethod
     def fromConfigParser(config, sample_name):
         sample = Sample(
             debug = config.getboolean("general", "debug"),
             name = sample_name,
-            files_load = config.get(sample_name, "files_load"),
+            files_load_step2 = config.get(sample_name, "files_load_step2"),
             files_load_step1 = config.get(sample_name, "files_load_step1"),
+            files_load_postproc = config.get(sample_name, "files_load_postproc"),
             schema = config.get(sample_name, "schema"),
             treemodel = config.get(sample_name, "treemodel"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
             ngen = config.getfloat(sample_name, "ngen_weight"),
-            vhbb_tree_name = config.get(sample_name, "vhbb_tree_name", "vhbb/tree"),
+            step1_tree_name = config.get(sample_name, "step1_tree_name"),
             xsec = config.getfloat(sample_name, "xsec"),
             tags = config.get(sample_name, "tags")
         )
@@ -371,7 +402,7 @@ class Category:
         self.signal_processes = kwargs.get("signal_processes", [])
         self.out_processes_mc = list(set([s.output_name for s in self.processes]))
         self.out_processes_data = list(set([s.output_name for s in self.data_processes]))
-        self.out_processes = self.out_processes_mc + self.out_processes_data 
+        self.out_processes = self.out_processes_mc + self.out_processes_data
 
         #[process][syst]
         self.shape_uncertainties = {}
@@ -388,17 +419,22 @@ class Category:
             for systname, systval in self.common_scale_uncertainties.items():
                 self.scale_uncertainties[proc][systname] = systval
 
+        #Load the process-dependent shape uncertainties
         self.proc_shape_uncertainties = kwargs.get("shape_uncertainties", {})
-        self.proc_scale_uncertainties = kwargs.get("scale_uncertainties", {})
-        
-        for k, v in self.proc_shape_uncertainties.items():
-            self.shape_uncertainties[k].update(v)
+        for proc, v in self.proc_shape_uncertainties.items():
+            self.shape_uncertainties[proc].update(v)
 
-        for k, v in self.proc_scale_uncertainties.items():
-            if k in self.scale_uncertainties.keys():
-                self.scale_uncertainties[k].update(v)
+        #Load the process-dependent scale uncertainties
+        self.proc_scale_uncertainties = kwargs.get("scale_uncertainties", {})
+        for proc, v in self.proc_scale_uncertainties.items():
+            if proc in self.scale_uncertainties:
+                self.scale_uncertainties[proc].update(v)
             else:
-                LOG_MODULE_NAME.debug("Could not find process {0} to update scale uncertainties".format(k))
+                LOG_MODULE_NAME.debug(
+                    "Could not find process {0} to update scale "
+                    "uncertainties for category={1}, uncertainty={2} "
+                    "make sure the category definition contains the process".format(proc, self.name, v)
+                )
     
     def __str__(self):
         s = "Category(full_name={0})".format(
@@ -435,6 +471,8 @@ class Analysis:
         self.do_stat_variations = kwargs.get("do_stat_variations", False)
         self.sample_d = dict([(s.name, s) for s in self.samples])
 
+        LOG_MODULE_NAME.info("Created analysis with samples: {0}".format(",".join([s.name for s in self.samples])))
+        
     def get_sample(self, sample_name):
         return self.sample_d[sample_name]
 
@@ -477,6 +515,9 @@ class Analysis:
             return parent
         return config
 
+    def __deepcopy__(self, memo):
+        return self
+    
 def make_csv_categories_abstract(di):
 
     import csv

@@ -28,8 +28,11 @@ else:
     
 import copy
 import json
-import nano_crab_config as nanoCFG
 
+#Create the NanoAOD postprocessing configuration
+from TTH.MEAnalysis.nano_config import NanoConfig
+#TODO: Make the era sys.argv so it is set depending on the sample
+nanoCFG = NanoConfig("94Xv1", jec=isMC, pu=isMC, btag=isMC)
 
 import heppy_crab_functions as fn
 
@@ -67,19 +70,31 @@ print "-------------------------",crabFiles_pfn
 lumisToProcess = None
 VLuminosityBlockRange = None
 lumidict = {}
+lumiJSON = 'joblumis.json'
 
 if hasattr(PSet.process.source, "lumisToProcess"):
     lumisToProcess = PSet.process.source.lumisToProcess
     VLuminosityBlockRange = PSet.process.source.lumisToProcess
     lumidict = fn.getLumisProcessed(lumisToProcess)
+    fn.makeLumiJSON(lumisToProcess, lumiJSON)
 
-
+    
 os.system("mkdir Output")
 
 ### nanoAOD code
 if not "--nostep1" in args:
     #Building cmsDriver.py command
-    driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root --no_exec -s NANO --filein {1} -n {2}" .format("runConfig",crabFiles_pfn.value()[0], crabMaxEvents)
+    #cmsRun handles LFN files. So we give it those
+    if len(crabFiles.value()) == 1:
+        filename = crabFiles.value()[0]
+    else:
+        filename = ""
+        for infile in crabFiles.value():
+            filename += infile+','
+        filename = filename[:-1] #remove tailing ,
+    driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root --no_exec -s NANO --filein {1} -n {2}" .format("runConfig",filename, crabMaxEvents)
+    if VLuminosityBlockRange is not None:
+        driverCommand = "{0}  --lumiToProcess={1}".format(driverCommand, lumiJSON)
     if isMC:
         conditions = nanoCFG.conditionsMC
         era = nanoCFG.eraMC
@@ -99,17 +114,7 @@ if not "--nostep1" in args:
 
     #Modfiy the config for multiple input files
     dir_ = os.getcwd()
-    print dir_
-
-    cmsswConfig = imp.load_source("cmsRunProcess",os.path.expandvars("runConfig_NANO.py"))
-    cmsswConfig.process.source.fileNames = crabFiles_pfn.value()
-    if VLuminosityBlockRange is not None:
-        cmsswConfig.process.source.lumisToProcess = VLuminosityBlockRange
-    
-    configfile=dir_+"/mod_runConfig_NANO.py"
-    f = open(configfile, 'w')
-    f.write(cmsswConfig.process.dumpPython())
-    f.close()
+    configfile=dir_+"/runConfig_NANO.py"
 
     #Run cmsRun with the modified config file
     runstring="{0} {1} >& {2}/Output/cmsRun.log".format("cmsRun",configfile,dir_)

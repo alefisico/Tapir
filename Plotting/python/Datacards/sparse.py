@@ -19,6 +19,7 @@ def mkdirs(fi, path):
         if d == None:
             d = sfi.mkdir(p)
             d.Write()
+        print p, d
         sfi = d
     return sfi
 
@@ -52,13 +53,12 @@ def save_hdict(ofn="", hdict={}, outfile=None):
         if len(kname) == 0:
             raise KeyError("Object had no name")
         if kpath:
-            try:
-                d = outfile.get(kpath)
-            except Exception as e:
-                print(e)
+            d = outfile.Get(kpath)
+            if not d:
                 d = mkdirs(outfile, kpath)
                 dirs[kpath] = d
             assert(obj != None)
+            assert(d != None)
             obj.SetName(kname)
             d.Add(obj)
         else:
