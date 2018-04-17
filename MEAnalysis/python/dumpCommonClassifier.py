@@ -117,7 +117,7 @@ if __name__ == "__main__":
     else:
         #file_names = ["/mnt/t3nfs01/data01/shome/mameinha/tth/data/marchsamples.root"]
         file_names = map(getSitePrefix, [
-            "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/meanalysis/GCd1660f1280ba/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/job_13_out.root"
+            "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/chreisse/tth/Apr16/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/Apr16/180416_072809/0000/tree_49.root"
         ])
         prefix = ""
         sample_name = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
@@ -131,37 +131,37 @@ if __name__ == "__main__":
 
     outfile = ROOT.TFile('out.root', 'recreate')
     tree = Tree('tree', 'MEM tree')
-    tree.var('systematic', the_type=int)
-    tree.var('njets', the_type=int)
+    tree.var('systematic', type=int)
+    tree.var('njets', type=int)
     max_jets = 10
     for v in ["jet_pt", "jet_eta", "jet_phi", "jet_mass", "jet_csv", "jet_cmva"]:
-        tree.vector(v, "njets", maxlen=max_jets, the_type=float, storageType="F")
+        tree.vector(v, "njets", maxlen=max_jets, type=float, storageType="F")
 
     for v in ["jet_type"]:
-        tree.vector(v, "njets", maxlen=max_jets, the_type=int, storageType="i")
+        tree.vector(v, "njets", maxlen=max_jets, type=int, storageType="I")
 
     for v in ["jet_corr"]:
-        tree.vector(v, "njets", maxlen=max_jets, the_type=float, storageType="F")
+        tree.vector(v, "njets", maxlen=max_jets, type=float, storageType="F")
 
     for v in ["jet_corr_JER"]:
-        tree.vector(v, "njets", maxlen=max_jets, the_type=float, storageType="F")
+        tree.vector(v, "njets", maxlen=max_jets, type=float, storageType="F")
 
     for v in jet_corrections:
         for ud in ["Up","Down"]:
-            tree.vector("jet_{}{}".format(v,ud), "njets", maxlen=max_jets, the_type=float, storageType="F")
+            tree.vector("jet_{}{}".format(v,ud), "njets", maxlen=max_jets, type=float, storageType="F")
     
     max_leps = 2
-    tree.var('nleps', the_type=int)
+    tree.var('nleps', type=int)
     for v in ["lep_pt", "lep_eta", "lep_phi", "lep_mass", "lep_charge"]:
-        tree.vector(v, "nleps", maxlen=max_leps, the_type=float, storageType="F")
+        tree.vector(v, "nleps", maxlen=max_leps, type=float, storageType="F")
     
-    tree.var('met_pt', the_type=float, storageType="F")
-    tree.var('met_phi', the_type=float, storageType="F")
+    tree.var('met_pt', type=float, storageType="F")
+    tree.var('met_phi', type=float, storageType="F")
     
-    tree.var('hypothesis', the_type=int, storageType="I")
+    tree.var('hypothesis', type=int, storageType="I")
    
     for v in ["event", "run", "lumi"]:
-        tree.var(v, the_type=int, storageType="L")
+        tree.var(v, type=int, storageType="L")
 
     for iEv, ev in enumerate(ch):
         accept = (ev.is_sl and ev.njets >= 4 and (ev.nBCSVM >= 3 or ev.nBCMVAM >= 3))
@@ -195,12 +195,12 @@ if __name__ == "__main__":
             dic["mass"] = ev.jets_mass[ijet]
             dic["csv"] = ev.jets_btagCSV[ijet]
             dic["cmva"] = ev.jets_btagCMVA[ijet]
-            dic["corr"] = ev.jets_corr[ijet]
-            dic["corr_JER"] = ev.jets_corr_JER[ijet]
+            dic["corr"] = ev.jets_corr[ijet] if hasattr(ev,"jet_corr") else 0
+            dic["corr_JER"] = ev.jets_corr_JER[ijet] if hasattr(ev,"jet_corr_JER") else 0
 
             for v in jet_corrections:
                 for ud in ["Up","Down"]:
-                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"jets_corr_{a}{b}".format(a = v,b = ud))[ijet]
+                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"jets_corr_{a}{b}".format(a = v,b = ud))[ijet] if hasattr(ev,"jets_corr_{a}{b}".format(a = v,b = ud)) else 0 
 
             jets += [Jet(**dic)]
 
@@ -213,14 +213,16 @@ if __name__ == "__main__":
             dic["mass"] = ev.loose_jets_mass[ijet]
             dic["csv"] = ev.loose_jets_btagCSV[ijet]
             dic["cmva"] = ev.loose_jets_btagCMVA[ijet]
-            dic["corr"] = ev.loose_jets_corr[ijet]
-            dic["corr_JER"] = ev.loose_jets_corr_JER[ijet]
+            dic["corr"] = ev.loose_jets_corr[ijet] if hasattr(ev,"loose_jet_corr") else 0
+            dic["corr_JER"] = ev.loose_jets_corr_JER[ijet] if hasattr(ev,"loose_jet_corr_JER") else 0 
 
             for v in jet_corrections:
                 for ud in ["Up","Down"]:
-                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"loose_jets_corr_{a}{b}".format(a = v,b = ud))[ijet]
+                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"loose_jets_corr_{a}{b}".format(a = v,b = ud))[ijet] if hasattr(ev,"loose_jets_corr_{a}{b}".format(a = v,b = ud)) else 0 
 
             jets += [Jet(**dic)]
+
+        jets = jets[0:max_jets]
 
         scenarios = []
         #for isf in range(len(jets[0].corrections)):
