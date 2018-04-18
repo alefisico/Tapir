@@ -76,11 +76,18 @@ class myQuickAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  
 		edm::EDGetTokenT<pat::JetCollection> AK8jets_;
 		edm::EDGetTokenT<reco::GenParticleCollection> genParticles_;
 		int particle1, particle2, particle3;
+		double boostedDistance;
+		string groomedMass;
 
 		int boostedHiggs = 0;
 		int resolvedHiggs = 0;
 		int boostedAndResolvedHiggs = 0;
 		int noneboostedAndResolvedHiggs = 0;
+
+		int boostedTop = 0;
+		int resolvedTop = 0;
+		int boostedAndResolvedTop = 0;
+		int noneboostedAndResolvedTop = 0;
 
 		std::map< std::string, TH1D* > histos1D_;
 		std::map< std::string, TH2D* > histos2D_;
@@ -112,6 +119,8 @@ myQuickAnalyzer::myQuickAnalyzer(const edm::ParameterSet& iConfig):
 {
     particle1 = iConfig.getParameter<int>("particle1");
     particle2 = iConfig.getParameter<int>("particle2");
+    boostedDistance = iConfig.getParameter<double>("boostedDistance");
+    groomedMass = iConfig.getParameter<string>("groomedMass");
    //now do what ever initialization is needed
    usesResource("TFileService");
 
@@ -230,14 +239,14 @@ void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	vector< fullParentInfo > higgsInfo; 
 	for( auto & part : p1Collection ) {
 
-		reco::CandidateCollection higgsDaughterColection = checkDaughters( part, finalParticlesCollection ); 
+		reco::CandidateCollection higgsDaughterCollection = checkDaughters( part, finalParticlesCollection ); 
 		
 		pat::JetCollection ak8JetsHiggsMatched, ak4JetsHiggsMatched;
 		//double tmpAK8JetPt = 999, tmpAK4JetPt = 999;
 		//int tmpNumDauAK8 = 0; 
-		for( auto & dau : higgsDaughterColection ) {
+		for( auto & dau : higgsDaughterCollection ) {
 			//LogWarning( "daughters") << "Parent " << part.pdgId() << " daughter " << dau.pdgId();
-			pat::Jet tmpAK8Jet = checkDeltaR( dau, AK8jets, 0.6, histos1D_[ "boostedHiggsDeltaR" ] );
+			pat::Jet tmpAK8Jet = checkDeltaR( dau, AK8jets, boostedDistance, histos1D_[ "boostedHiggsDeltaR" ] );
 			if( tmpAK8Jet.pt() > 0 ) ak8JetsHiggsMatched.push_back( tmpAK8Jet );
 			/*if( tmpAK8Jet.pt() > 0 ) { 
 				tmpNumDauAK8+=1;
@@ -265,7 +274,7 @@ void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		tmpParent.genPartId = part.pdgId();
 		tmpParent.AK8matchedJets = ak8JetsHiggsMatched;
 		tmpParent.AK4matchedJets = ak4JetsHiggsMatched;
-		tmpParent.daughters = higgsDaughterColection;
+		tmpParent.daughters = higgsDaughterCollection;
 		higgsInfo.push_back( tmpParent );
 	}
 
@@ -276,7 +285,7 @@ void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		if ( higgsBoson.AK8matchedJets.size() == 2 ) {
 			if ( higgsBoson.AK8matchedJets[0].pt() ==  higgsBoson.AK8matchedJets[1].pt() ) { 
 				numBoostedHiggs += 1;
-				histos1D_[ "boostedHiggsMass" ]->Fill( higgsBoson.AK8matchedJets[1].userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass") );
+				histos1D_[ "boostedHiggsMass" ]->Fill( higgsBoson.AK8matchedJets[1].userFloat(groomedMass) );
 				histos1D_[ "boostedHiggsPt" ]->Fill( higgsBoson.AK8matchedJets[1].pt() );
 				//LogWarning("matched ak8") << higgsBoson.AK8matchedJets[0].pt() << " " << higgsBoson.AK8matchedJets[1].pt();
 			}
@@ -333,112 +342,103 @@ void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	else if ( ( numBoostedHiggs==0 ) && ( numResolvedHiggs == 2 ) ) resolvedHiggs+=1;
 	else noneboostedAndResolvedHiggs+=1; 
 
-//	////// TOP 
-//	vector< fullParentInfo > higgsInfo; 
-//	for( auto & part : p1Collection ) {
-//
-//		reco::CandidateCollection higgsDaughterColection = checkDaughters( part, finalParticlesCollection ); 
-//		
-//		pat::JetCollection ak8JetsHiggsMatched, ak4JetsHiggsMatched;
-//		//double tmpAK8JetPt = 999, tmpAK4JetPt = 999;
-//		//int tmpNumDauAK8 = 0; 
-//		for( auto & dau : higgsDaughterColection ) {
-//			//LogWarning( "daughters") << "Parent " << part.pdgId() << " daughter " << dau.pdgId();
-//			pat::Jet tmpAK8Jet = checkDeltaR( dau, AK8jets, 0.6, histos1D_[ "boostedHiggsDeltaR" ] );
-//			if( tmpAK8Jet.pt() > 0 ) ak8JetsHiggsMatched.push_back( tmpAK8Jet );
-//			/*if( tmpAK8Jet.pt() > 0 ) { 
-//				tmpNumDauAK8+=1;
-//				if( ( tmpNumDauAK8 > 1 ) && ( tmpAK8JetPt == tmpAK8Jet.pt() ) ) ak8JetsHiggsMatched.push_back( tmpAK8Jet );
-//				tmpAK8JetPt = tmpAK8Jet.pt();
-//			}*/
-//
-//			pat::Jet tmpAK4Jet = checkDeltaR( dau, AK4jets, 0.3, histos1D_[ "resolvedHiggsDeltaR" ] );
-//			if( tmpAK4Jet.pt() > 0 ) ak4JetsHiggsMatched.push_back( tmpAK4Jet );
-//			/*if( ( tmpAK4Jet.pt() > 0 ) && ( tmpAK4JetPt != tmpAK4Jet.pt() ) ) {
-//				//LogWarning("testAK4") << tmpAK4JetPt << " " << tmpAK4Jet.pt();
-//				ak4JetsHiggsMatched.push_back( tmpAK4Jet );
-//				tmpAK4JetPt = tmpAK4Jet.pt();
-//			}*/
-//
-//		}
-//		//for( auto & ak8J : ak8JetsHiggsMatched ) LogWarning("matched AK8") << ak8J.pt();
-//		//for( auto & ak4J : ak4JetsHiggsMatched ) LogWarning("matched AK4") << ak4J.pt();
-//
-//		TLorentzVector tmpParentP4;
-//		tmpParentP4.SetPtEtaPhiE( part.pt(), part.eta(), part.phi(), part.energy() );
-//		
-//		fullParentInfo tmpParent;
-//		tmpParent.genPartP4 = tmpParentP4;
-//		tmpParent.genPartId = part.pdgId();
-//		tmpParent.AK8matchedJets = ak8JetsHiggsMatched;
-//		tmpParent.AK4matchedJets = ak4JetsHiggsMatched;
-//		tmpParent.daughters = higgsDaughterColection;
-//		higgsInfo.push_back( tmpParent );
-//	}
-//
-//	double numBoostedHiggs = 0;
-//	double numResolvedHiggs = 0;
-//	for( auto & parent : higgsInfo ){
-//		//LogWarning("parent") << parent.genPartId << " size ak8jets " << parent.AK8matchedJets.size() << " size ak4 jets " << parent.AK4matchedJets.size();
-//		if ( parent.AK8matchedJets.size() == 2 ) {
-//			if ( parent.AK8matchedJets[0].pt() ==  parent.AK8matchedJets[1].pt() ) { 
-//				numBoostedHiggs += 1;
-//				histos1D_[ "boostedHiggsMass" ]->Fill( parent.AK8matchedJets[1].userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass") );
-//				histos1D_[ "boostedHiggsPt" ]->Fill( parent.AK8matchedJets[1].pt() );
-//				//LogWarning("matched ak8") << parent.AK8matchedJets[0].pt() << " " << parent.AK8matchedJets[1].pt();
-//			}
-//		}
-//
-//		if ( parent.AK4matchedJets.size() == 2 ) {
-//			if( parent.AK4matchedJets[0].pt() !=  parent.AK4matchedJets[1].pt() ) { 
-//				numResolvedHiggs += parent.AK4matchedJets.size();
-//				TLorentzVector tmpAK4jets1, tmpAK4jets2;
-//				tmpAK4jets1.SetPtEtaPhiE( parent.AK4matchedJets[0].pt(), parent.AK4matchedJets[0].eta(), parent.AK4matchedJets[0].phi(), parent.AK4matchedJets[0].energy() ); 
-//				tmpAK4jets2.SetPtEtaPhiE( parent.AK4matchedJets[1].pt(), parent.AK4matchedJets[1].eta(), parent.AK4matchedJets[1].phi(), parent.AK4matchedJets[1].energy() ); 
-//
-//				//LogWarning("matched ak4") << parent.AK4matchedJets[0].pt() << " " << parent.AK4matchedJets[1].pt();
-//				histos1D_[ "resolvedHiggs1Pt" ]->Fill( parent.AK4matchedJets[0].pt() );
-//				histos1D_[ "resolvedHiggs2Pt" ]->Fill( parent.AK4matchedJets[1].pt() );
-//				histos1D_[ "resolvedHiggsDeltaR" ]->Fill( tmpAK4jets1.DeltaR( tmpAK4jets2 ) );
-//			}
-//		}
-//
-//		for( auto & dau : parent.daughters ) histos1D_[ "HiggsDaughtersPdgId" ]->Fill( dau.pdgId() );
-//		
-//		if ( parent.daughters.size() == 2 ) {
-//			double dau1Pt = parent.daughters[0].pt();
-//			double dau2Pt = parent.daughters[1].pt();
-//			if ( dau1Pt > dau2Pt ) {
-//				histos1D_[ "HiggsDaughters1Pt" ]->Fill( dau1Pt );
-//				histos1D_[ "HiggsDaughters1Eta" ]->Fill( parent.daughters[0].eta() );
-//				histos1D_[ "HiggsDaughters2Pt" ]->Fill( dau2Pt );
-//				histos1D_[ "HiggsDaughters2Eta" ]->Fill( parent.daughters[1].eta() );
-//				histos2D_[ "HiggsDaughters2DPt" ]->Fill( dau1Pt, dau2Pt );
-//			} else {
-//				histos1D_[ "HiggsDaughters1Pt" ]->Fill( dau2Pt );
-//				histos1D_[ "HiggsDaughters1Eta" ]->Fill( parent.daughters[1].eta() );
-//				histos1D_[ "HiggsDaughters2Pt" ]->Fill( dau1Pt );
-//				histos1D_[ "HiggsDaughters2Eta" ]->Fill( parent.daughters[0].eta() );
-//				histos2D_[ "HiggsDaughters2DPt" ]->Fill( dau2Pt, dau1Pt );
-//			}
-//
-//			TLorentzVector tmpStop, tmpDau1, tmpDau2;
-//			tmpDau1.SetPtEtaPhiE( parent.daughters[0].pt(), parent.daughters[0].eta(), parent.daughters[0].phi(), parent.daughters[0].energy() ); 
-//			tmpDau2.SetPtEtaPhiE( parent.daughters[1].pt(), parent.daughters[1].eta(), parent.daughters[1].phi(), parent.daughters[1].energy() ); 
-//			tmpStop = tmpDau1 + tmpDau2;
-//			histos1D_[ "HiggsDaughters12Pt" ]->Fill( tmpStop.Pt() );
-//			histos1D_[ "HiggsDaughters12Eta" ]->Fill( tmpStop.Eta() );
-//			histos1D_[ "HiggsDaughtersDeltaR" ]->Fill( tmpDau1.DeltaR( tmpDau2 ) );
-//
-//		}
-//
-//	}
-//	//LogWarning("count") << numBoostedHiggs << " " << numResolvedHiggs;
-//	
-//	if ( ( numBoostedHiggs==1 ) && ( numResolvedHiggs == 0 ) ) boosted+=1;
-//	else if ( ( numBoostedHiggs==1 ) && ( numResolvedHiggs == 2 ) ) boostedAndResolved+=1;
-//	else if ( ( numBoostedHiggs==0 ) && ( numResolvedHiggs == 2 ) ) resolved+=1;
-//	else noneboostedAndResolved+=1; 
+	////// TOP 
+	vector< fullParentInfo > topInfo; 
+	for( auto & part : p2Collection ) {
+
+		reco::CandidateCollection topDaughterCollection = checkDaughters( part, finalParticlesCollection ); 
+		
+		if ( topDaughterCollection.size() > 2 ) {
+
+			pat::JetCollection ak8JetsTopMatched, ak4JetsTopMatched;
+			//double tmpAK8JetPt = 999, tmpAK4JetPt = 999;
+			//int tmpNumDauAK8 = 0; 
+			for( auto & dau : topDaughterCollection ) {
+				//LogWarning( "daughters") << "Parent " << part.pdgId() << " daughter " << dau.pdgId();
+				pat::Jet tmpTopAK8Jet = checkDeltaR( dau, AK8jets, boostedDistance, histos1D_[ "boostedTopDeltaR" ] );
+				if( tmpTopAK8Jet.pt() > 0 ) ak8JetsTopMatched.push_back( tmpTopAK8Jet );
+				/*if( tmpTopAK8Jet.pt() > 0 ) { 
+					tmpNumDauAK8+=1;
+					if( ( tmpNumDauAK8 > 1 ) && ( tmpTopAK8JetPt == tmpTopAK8Jet.pt() ) ) ak8JetsTopMatched.push_back( tmpTopAK8Jet );
+					tmpTopAK8JetPt = tmpTopAK8Jet.pt();
+				}*/
+
+				pat::Jet tmpTopAK4Jet = checkDeltaR( dau, AK4jets, 0.3, histos1D_[ "resolvedTopDeltaR" ] );
+				if( tmpTopAK4Jet.pt() > 0 ) ak4JetsTopMatched.push_back( tmpTopAK4Jet );
+				/*if( ( tmpTopAK4Jet.pt() > 0 ) && ( tmpTopAK4JetPt != tmpTopAK4Jet.pt() ) ) {
+					//LogWarning("testAK4") << tmpTopAK4JetPt << " " << tmpTopAK4Jet.pt();
+					ak4JetsTopMatched.push_back( tmpTopAK4Jet );
+					tmpTopAK4JetPt = tmpTopAK4Jet.pt();
+				}*/
+
+			}
+			//for( auto & ak8J : ak8JetsTopMatched ) LogWarning("matched AK8") << ak8J.pt();
+			//for( auto & ak4J : ak4JetsTopMatched ) LogWarning("matched AK4") << ak4J.pt();
+
+			TLorentzVector tmpParentP4;
+			tmpParentP4.SetPtEtaPhiE( part.pt(), part.eta(), part.phi(), part.energy() );
+			
+			fullParentInfo tmpParent;
+			tmpParent.genPartP4 = tmpParentP4;
+			tmpParent.genPartId = part.pdgId();
+			tmpParent.AK8matchedJets = ak8JetsTopMatched;
+			tmpParent.AK4matchedJets = ak4JetsTopMatched;
+			tmpParent.daughters = topDaughterCollection;
+			topInfo.push_back( tmpParent );
+		}
+	}
+
+	double numBoostedTop = 0;
+	double numResolvedTop = 0;
+	for( auto & topBoson : topInfo ){
+		//LogWarning("topBoson") << topBoson.genPartId << " size ak8jets " << topBoson.AK8matchedJets.size() << " size ak4 jets " << topBoson.AK4matchedJets.size();
+		if ( topBoson.AK8matchedJets.size() == 3 ) {
+			if ( ( topBoson.AK8matchedJets[0].pt() ==  topBoson.AK8matchedJets[1].pt() ) and ( topBoson.AK8matchedJets[0].pt() ==  topBoson.AK8matchedJets[2].pt() ) ) { 
+				numBoostedTop += 1;
+				histos1D_[ "boostedTopMass" ]->Fill( topBoson.AK8matchedJets[1].userFloat(groomedMass) );
+				histos1D_[ "boostedTopPt" ]->Fill( topBoson.AK8matchedJets[1].pt() );
+				//LogWarning("matched ak8") << topBoson.AK8matchedJets[0].pt() << " " << topBoson.AK8matchedJets[1].pt() << " " << topBoson.AK8matchedJets[2].pt();
+			}
+		}
+
+		if ( topBoson.AK4matchedJets.size() == 3 ) {
+			if( ( topBoson.AK4matchedJets[0].pt() !=  topBoson.AK4matchedJets[1].pt() ) and ( topBoson.AK4matchedJets[0].pt() !=  topBoson.AK4matchedJets[2].pt() ) ) { 
+				numResolvedTop += topBoson.AK4matchedJets.size();
+				TLorentzVector tmpAK4jets1, tmpAK4jets2, tmpAK4jets3;
+				tmpAK4jets1.SetPtEtaPhiE( topBoson.AK4matchedJets[0].pt(), topBoson.AK4matchedJets[0].eta(), topBoson.AK4matchedJets[0].phi(), topBoson.AK4matchedJets[0].energy() ); 
+				tmpAK4jets2.SetPtEtaPhiE( topBoson.AK4matchedJets[1].pt(), topBoson.AK4matchedJets[1].eta(), topBoson.AK4matchedJets[1].phi(), topBoson.AK4matchedJets[1].energy() ); 
+				tmpAK4jets3.SetPtEtaPhiE( topBoson.AK4matchedJets[2].pt(), topBoson.AK4matchedJets[2].eta(), topBoson.AK4matchedJets[2].phi(), topBoson.AK4matchedJets[2].energy() ); 
+
+				//LogWarning("matched ak4") << topBoson.AK4matchedJets[0].pt() << " " << topBoson.AK4matchedJets[1].pt();
+				histos1D_[ "resolvedTop1Pt" ]->Fill( topBoson.AK4matchedJets[0].pt() );
+				histos1D_[ "resolvedTop2Pt" ]->Fill( topBoson.AK4matchedJets[1].pt() );
+				histos1D_[ "resolvedTop3Pt" ]->Fill( topBoson.AK4matchedJets[2].pt() );
+				histos1D_[ "resolvedTopDeltaR" ]->Fill( tmpAK4jets1.DeltaR( tmpAK4jets2 ) );  ///// useless
+			}
+		}
+
+		for( auto & dau : topBoson.daughters ) histos1D_[ "TopDaughtersPdgId" ]->Fill( dau.pdgId() );
+		
+		if ( topBoson.daughters.size() == 3 ) {
+
+			TLorentzVector tmpTop, tmpDau1, tmpDau2, tmpDau3;
+			tmpDau1.SetPtEtaPhiE( topBoson.daughters[0].pt(), topBoson.daughters[0].eta(), topBoson.daughters[0].phi(), topBoson.daughters[0].energy() ); 
+			tmpDau2.SetPtEtaPhiE( topBoson.daughters[1].pt(), topBoson.daughters[1].eta(), topBoson.daughters[1].phi(), topBoson.daughters[1].energy() ); 
+			tmpDau3.SetPtEtaPhiE( topBoson.daughters[2].pt(), topBoson.daughters[2].eta(), topBoson.daughters[2].phi(), topBoson.daughters[2].energy() ); 
+			tmpTop = tmpDau1 + tmpDau2 + tmpDau3;
+			histos1D_[ "TopDaughters12Pt" ]->Fill( tmpTop.Pt() );
+			histos1D_[ "TopDaughters12Eta" ]->Fill( tmpTop.Eta() );
+			histos1D_[ "TopDaughtersDeltaR" ]->Fill( tmpDau1.DeltaR( tmpDau2 ) );
+
+		}
+
+	}
+	//LogWarning("count") << numBoostedTop << " " << numResolvedTop;
+	
+	if ( ( numBoostedTop==1 ) && ( numResolvedTop == 0 ) ) boostedTop+=1;
+	else if ( ( numBoostedTop==1 ) && ( numResolvedTop == 3 ) ) boostedAndResolvedTop+=1;
+	else if ( ( numBoostedTop==0 ) && ( numResolvedTop == 3 ) ) resolvedTop+=1;
+	else noneboostedAndResolvedTop+=1; 
 
 
 }
@@ -459,7 +459,6 @@ void myQuickAnalyzer::beginJob() {
 
 	histos1D_[ "boostedHiggsDeltaR" ] = fileService->make< TH1D >( "boostedHiggsDeltaR", "boostedHiggsDeltaR", 150, 0., 1.5 );
 	histos1D_[ "boostedHiggsDeltaR" ]->SetXTitle( "boosted Higgs #Delta R(jet, partons)" );
-
 	histos1D_[ "resolvedHiggsDeltaR" ] = fileService->make< TH1D >( "resolvedHiggsDeltaR", "resolvedHiggsDeltaR", 150, 0., 1.5 );
 	histos1D_[ "resolvedHiggsDeltaR" ]->SetXTitle( "resolved Higgs #Delta R( jet, parton)" );
 
@@ -493,6 +492,37 @@ void myQuickAnalyzer::beginJob() {
 
 	histos1D_[ "jetHiggsCategories" ] = fileService->make< TH1D >( "jetHiggsCategories", "jetHiggsCategories", 10, 0, 10 );
 
+	histos1D_[ "boostedTopDeltaR" ] = fileService->make< TH1D >( "boostedTopDeltaR", "boostedTopDeltaR", 150, 0., 1.5 );
+	histos1D_[ "boostedTopDeltaR" ]->SetXTitle( "boosted Top #Delta R(jet, partons)" );
+	histos1D_[ "resolvedTopDeltaR" ] = fileService->make< TH1D >( "resolvedTopDeltaR", "resolvedTopDeltaR", 150, 0., 1.5 );
+	histos1D_[ "resolvedTopDeltaR" ]->SetXTitle( "resolved Top #Delta R( jet, parton)" );
+
+	histos1D_[ "TopDaughtersPdgId" ] = fileService->make< TH1D >( "TopDaughtersPdgId", "TopDaughtersPdgId", 61, -30.5, 30.5 );
+	histos1D_[ "TopDaughtersPdgId" ]->SetXTitle( "Top daughters pdgId" );
+
+	histos1D_[ "TopDaughtersDeltaR" ] = fileService->make< TH1D >( "TopDaughtersDeltaR", "TopDaughtersDeltaR", 50, 0, 5 );
+	histos1D_[ "TopDaughtersDeltaR" ]->SetXTitle( "Delta R (b,b) from Top" );
+
+	histos1D_[ "boostedTopMass" ] = fileService->make< TH1D >( "boostedTopMass", "boostedTopMass", 300, 0, 300 );
+	histos1D_[ "boostedTopMass" ]->SetXTitle( "boosted higgs pruned mass" );
+	histos1D_[ "boostedTopPt" ] = fileService->make< TH1D >( "boostedTopPt", "boostedTopPt", 1000, 0, 1000 );
+	histos1D_[ "boostedTopPt" ]->SetXTitle( "boosted higgs pt" );
+
+	histos1D_[ "TopDaughters12Pt" ] = fileService->make< TH1D >( "TopDaughters12Pt", "TopDaughters12Pt", 1000, 0, 1000 );
+	histos1D_[ "TopDaughters12Pt" ]->SetXTitle( "TopCollection daughters 12 Pt" );
+	histos1D_[ "TopDaughters12Eta" ] = fileService->make< TH1D >( "TopDaughters12Eta", "TopDaughters12Eta", 40, -5, 5 );
+	histos1D_[ "TopDaughters12Eta" ]->SetXTitle( "TopCollection daughters 12 Eta" );
+	histos1D_[ "resolvedTop1Pt" ] = fileService->make< TH1D >( "resolvedTop1Pt", "resolvedTop1Pt", 1000, 0, 1000 );
+	histos1D_[ "resolvedTop1Pt" ]->SetXTitle( "resolved higgs 1Pt" );
+	histos1D_[ "resolvedTop2Pt" ] = fileService->make< TH1D >( "resolvedTop2Pt", "resolvedTop2Pt", 1000, 0, 1000 );
+	histos1D_[ "resolvedTop2Pt" ]->SetXTitle( "resolved higgs 2Pt" );
+	histos1D_[ "resolvedTop3Pt" ] = fileService->make< TH1D >( "resolvedTop3Pt", "resolvedTop3Pt", 1000, 0, 1000 );
+	histos1D_[ "resolvedTop3Pt" ]->SetXTitle( "resolved higgs 3Pt" );
+	histos1D_[ "resolvedTopDeltaR" ] = fileService->make< TH1D >( "resolvedTopDeltaR", "resolvedTopDeltaR", 50, 0, 5 );
+	histos1D_[ "resolvedTopDeltaR" ]->SetXTitle( "Delta R (bj,bj) from Top" );
+
+	histos1D_[ "jetTopCategories" ] = fileService->make< TH1D >( "jetTopCategories", "jetTopCategories", 10, 0, 10 );
+
 	///// Sumw2 all the histos
 	for( auto const& histo : histos1D_ ) histos1D_[ histo.first ]->Sumw2();
 	for( auto const& histo : histos2D_ ) histos2D_[ histo.first ]->Sumw2();
@@ -515,6 +545,20 @@ void myQuickAnalyzer::endJob() {
 	histos1D_[ "jetHiggsCategories" ]->SetBinContent( 3, boostedAndResolvedHiggs );
 	histos1D_[ "jetHiggsCategories" ]->SetBinContent( 4, noneboostedAndResolvedHiggs );
 	histos1D_[ "jetHiggsCategories" ]->SetBinContent( 5, totalHiggs );
+
+	double totalTop = 0;
+	totalTop = ( boostedTop + resolvedTop + boostedAndResolvedTop + noneboostedAndResolvedTop );
+	LogWarning( "Top" ) << "boosted AND resolved " << boostedAndResolvedTop/totalTop << " " << boostedAndResolvedTop 
+		<< "\nboosted " << boostedTop/totalTop << " " << boostedTop
+		<< "\nresolved " << resolvedTop/totalTop << " " << resolvedTop
+		<< "\nno Boosted No Resolved " << noneboostedAndResolvedTop/totalTop << " " << noneboostedAndResolvedTop
+		<< "\ntotal " << totalTop;
+
+	histos1D_[ "jetTopCategories" ]->SetBinContent( 1, boostedTop );
+	histos1D_[ "jetTopCategories" ]->SetBinContent( 2, resolvedTop );
+	histos1D_[ "jetTopCategories" ]->SetBinContent( 3, boostedAndResolvedTop );
+	histos1D_[ "jetTopCategories" ]->SetBinContent( 4, noneboostedAndResolvedTop );
+	histos1D_[ "jetTopCategories" ]->SetBinContent( 5, totalTop );
 
 }
 

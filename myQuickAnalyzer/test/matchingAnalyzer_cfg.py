@@ -5,6 +5,12 @@ import sys
 process = cms.Process("Demo")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
+process.load("Configuration.EventContent.EventContent_cff")
+process.load('Configuration.Geometry.GeometryRecoDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+process.GlobalTag.globaltag = '94X_mc2017_realistic_v10'
 
 process.TFileService=cms.Service("TFileService", fileName=cms.string('myQuickAnalysis.root'))
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
@@ -15,6 +21,10 @@ process.source = cms.Source("PoolSource",
     )
 )
 
+from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
+jetToolbox( process, 'ca15', 'jetSequence', 'out', PUMethod='CHS', JETCorrPayload="AK8PFchs", miniAOD=True, addPruning=True, Cut="pt > 150 && abs(eta) < 2.5" )
+
+
 process.selectedPatJetsAK4 = cms.EDFilter("PATJetSelector",
 		src = cms.InputTag("slimmedJets"),
 		cut = cms.string("pt > 30 && abs(eta) < 2.5") )
@@ -23,16 +33,25 @@ process.selectedPatJetsAK8 = cms.EDFilter("PATJetSelector",
 		src = cms.InputTag("slimmedJetsAK8"),
 		cut = cms.string("pt > 200 && abs(eta) < 2.5") )
 
-process.analyzer = cms.EDAnalyzer('myQuickAnalyzer',
+process.analyzerAK8 = cms.EDAnalyzer('myQuickAnalyzer',
 		AK8jets = cms.InputTag( "selectedPatJetsAK8" ),
 		AK4jets = cms.InputTag( "selectedPatJetsAK4" ),
 		genParticles = cms.InputTag( 'prunedGenParticles' ),
 		particle1 = cms.int32( 25 ),
 		particle2 = cms.int32( 6 ),
+		boostedDistance = cms.double( 0.6 ), 
+		groomedMass = cms.string( 'ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass' ),
 )
 
-#from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
-#jetToolbox( process, 'ak8', 'jetSequence', 'out', PUMethod='CHS', miniAOD=True, addPruning=True )
+process.analyzerCA15 = cms.EDAnalyzer('myQuickAnalyzer',
+		AK8jets = cms.InputTag( "selectedPatJetsCA15PFCHS" ),
+		AK4jets = cms.InputTag( "selectedPatJetsAK4" ),
+		genParticles = cms.InputTag( 'prunedGenParticles' ),
+		particle1 = cms.int32( 25 ),
+		particle2 = cms.int32( 6 ),
+		boostedDistance = cms.double( 1.3 ), 
+		groomedMass = cms.string( 'ca15PFJetsCHSPrunedMass' ),
+)
 
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
@@ -47,7 +66,8 @@ process.printTree = cms.EDAnalyzer("ParticleListDrawer",
 process.p = cms.Path(
 	process.selectedPatJetsAK4
 	* process.selectedPatJetsAK8
-	* process.analyzer
+	* process.analyzerAK8
+	* process.analyzerCA15
 	* process.printTree
 )
 #############   Format MessageLogger #################
