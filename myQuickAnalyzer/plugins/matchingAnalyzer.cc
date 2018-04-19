@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    myTTH/myQuickAnalyzer
-// Class:      myQuickAnalyzer
+// Package:    myTTH/matchingAnalyzer
+// Class:      matchingAnalyzer
 // 
-/**\class myQuickAnalyzer myQuickAnalyzer.cc myTTH/myQuickAnalyzer/plugins/myQuickAnalyzer.cc
+/**\class matchingAnalyzer matchingAnalyzer.cc myTTH/matchingAnalyzer/plugins/matchingAnalyzer.cc
 
  Description: [one line class summary]
 
@@ -58,10 +58,10 @@ using namespace std;
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class myQuickAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class matchingAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
    public:
-      explicit myQuickAnalyzer(const edm::ParameterSet&);
-      ~myQuickAnalyzer();
+      explicit matchingAnalyzer(const edm::ParameterSet&);
+      ~matchingAnalyzer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -89,6 +89,9 @@ class myQuickAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  
 		int boostedAndResolvedTop = 0;
 		int noneboostedAndResolvedTop = 0;
 
+		int mixedEvents = 0;
+		int boostedTopAndHiggs = 0;
+
 		std::map< std::string, TH1D* > histos1D_;
 		std::map< std::string, TH2D* > histos2D_;
 };
@@ -112,7 +115,7 @@ typedef struct {
 //
 // constructors and destructor
 //
-myQuickAnalyzer::myQuickAnalyzer(const edm::ParameterSet& iConfig):
+matchingAnalyzer::matchingAnalyzer(const edm::ParameterSet& iConfig):
     AK4jets_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("AK4jets"))),
     AK8jets_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("AK8jets"))),
     genParticles_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles")))
@@ -127,7 +130,7 @@ myQuickAnalyzer::myQuickAnalyzer(const edm::ParameterSet& iConfig):
 }
 
 
-myQuickAnalyzer::~myQuickAnalyzer()
+matchingAnalyzer::~matchingAnalyzer()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -199,7 +202,7 @@ reco::CandidateCollection checkDaughters( reco::Candidate & p1, reco::CandidateC
 
 
 // ------------ method called for each event  ------------
-void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void matchingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 	edm::Handle<pat::JetCollection> AK4jets;
 	iEvent.getByToken(AK4jets_, AK4jets);
@@ -280,12 +283,14 @@ void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 	double numBoostedHiggs = 0;
 	double numResolvedHiggs = 0;
+	double boostedHiggsCandPt = 0;
 	for( auto & higgsBoson : higgsInfo ){
 		//LogWarning("higgsBoson") << higgsBoson.genPartId << " size ak8jets " << higgsBoson.AK8matchedJets.size() << " size ak4 jets " << higgsBoson.AK4matchedJets.size();
 		if ( higgsBoson.AK8matchedJets.size() == 2 ) {
 			if ( higgsBoson.AK8matchedJets[0].pt() ==  higgsBoson.AK8matchedJets[1].pt() ) { 
 				numBoostedHiggs += 1;
 				histos1D_[ "boostedHiggsMass" ]->Fill( higgsBoson.AK8matchedJets[1].userFloat(groomedMass) );
+				boostedHiggsCandPt = higgsBoson.AK8matchedJets[1].pt();
 				histos1D_[ "boostedHiggsPt" ]->Fill( higgsBoson.AK8matchedJets[1].pt() );
 				//LogWarning("matched ak8") << higgsBoson.AK8matchedJets[0].pt() << " " << higgsBoson.AK8matchedJets[1].pt();
 			}
@@ -390,41 +395,43 @@ void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 	double numBoostedTop = 0;
 	double numResolvedTop = 0;
-	for( auto & topBoson : topInfo ){
-		//LogWarning("topBoson") << topBoson.genPartId << " size ak8jets " << topBoson.AK8matchedJets.size() << " size ak4 jets " << topBoson.AK4matchedJets.size();
-		if ( topBoson.AK8matchedJets.size() == 3 ) {
-			if ( ( topBoson.AK8matchedJets[0].pt() ==  topBoson.AK8matchedJets[1].pt() ) and ( topBoson.AK8matchedJets[0].pt() ==  topBoson.AK8matchedJets[2].pt() ) ) { 
+	double boostedTopCandPt = 0;
+	for( auto & topQuark : topInfo ){
+		//LogWarning("topQuark") << topQuark.genPartId << " size ak8jets " << topQuark.AK8matchedJets.size() << " size ak4 jets " << topQuark.AK4matchedJets.size();
+		if ( topQuark.AK8matchedJets.size() == 3 ) {
+			if ( ( topQuark.AK8matchedJets[0].pt() ==  topQuark.AK8matchedJets[1].pt() ) and ( topQuark.AK8matchedJets[0].pt() ==  topQuark.AK8matchedJets[2].pt() ) ) { 
 				numBoostedTop += 1;
-				histos1D_[ "boostedTopMass" ]->Fill( topBoson.AK8matchedJets[1].userFloat(groomedMass) );
-				histos1D_[ "boostedTopPt" ]->Fill( topBoson.AK8matchedJets[1].pt() );
-				//LogWarning("matched ak8") << topBoson.AK8matchedJets[0].pt() << " " << topBoson.AK8matchedJets[1].pt() << " " << topBoson.AK8matchedJets[2].pt();
+				histos1D_[ "boostedTopMass" ]->Fill( topQuark.AK8matchedJets[1].userFloat(groomedMass) );
+				boostedTopCandPt = topQuark.AK8matchedJets[1].pt();
+				histos1D_[ "boostedTopPt" ]->Fill( topQuark.AK8matchedJets[1].pt() );
+				//LogWarning("matched ak8") << topQuark.AK8matchedJets[0].pt() << " " << topQuark.AK8matchedJets[1].pt() << " " << topQuark.AK8matchedJets[2].pt();
 			}
 		}
 
-		if ( topBoson.AK4matchedJets.size() == 3 ) {
-			if( ( topBoson.AK4matchedJets[0].pt() !=  topBoson.AK4matchedJets[1].pt() ) and ( topBoson.AK4matchedJets[0].pt() !=  topBoson.AK4matchedJets[2].pt() ) ) { 
-				numResolvedTop += topBoson.AK4matchedJets.size();
+		if ( topQuark.AK4matchedJets.size() == 3 ) {
+			if( ( topQuark.AK4matchedJets[0].pt() !=  topQuark.AK4matchedJets[1].pt() ) and ( topQuark.AK4matchedJets[0].pt() !=  topQuark.AK4matchedJets[2].pt() ) ) { 
+				numResolvedTop += topQuark.AK4matchedJets.size();
 				TLorentzVector tmpAK4jets1, tmpAK4jets2, tmpAK4jets3;
-				tmpAK4jets1.SetPtEtaPhiE( topBoson.AK4matchedJets[0].pt(), topBoson.AK4matchedJets[0].eta(), topBoson.AK4matchedJets[0].phi(), topBoson.AK4matchedJets[0].energy() ); 
-				tmpAK4jets2.SetPtEtaPhiE( topBoson.AK4matchedJets[1].pt(), topBoson.AK4matchedJets[1].eta(), topBoson.AK4matchedJets[1].phi(), topBoson.AK4matchedJets[1].energy() ); 
-				tmpAK4jets3.SetPtEtaPhiE( topBoson.AK4matchedJets[2].pt(), topBoson.AK4matchedJets[2].eta(), topBoson.AK4matchedJets[2].phi(), topBoson.AK4matchedJets[2].energy() ); 
+				tmpAK4jets1.SetPtEtaPhiE( topQuark.AK4matchedJets[0].pt(), topQuark.AK4matchedJets[0].eta(), topQuark.AK4matchedJets[0].phi(), topQuark.AK4matchedJets[0].energy() ); 
+				tmpAK4jets2.SetPtEtaPhiE( topQuark.AK4matchedJets[1].pt(), topQuark.AK4matchedJets[1].eta(), topQuark.AK4matchedJets[1].phi(), topQuark.AK4matchedJets[1].energy() ); 
+				tmpAK4jets3.SetPtEtaPhiE( topQuark.AK4matchedJets[2].pt(), topQuark.AK4matchedJets[2].eta(), topQuark.AK4matchedJets[2].phi(), topQuark.AK4matchedJets[2].energy() ); 
 
-				//LogWarning("matched ak4") << topBoson.AK4matchedJets[0].pt() << " " << topBoson.AK4matchedJets[1].pt();
-				histos1D_[ "resolvedTop1Pt" ]->Fill( topBoson.AK4matchedJets[0].pt() );
-				histos1D_[ "resolvedTop2Pt" ]->Fill( topBoson.AK4matchedJets[1].pt() );
-				histos1D_[ "resolvedTop3Pt" ]->Fill( topBoson.AK4matchedJets[2].pt() );
+				//LogWarning("matched ak4") << topQuark.AK4matchedJets[0].pt() << " " << topQuark.AK4matchedJets[1].pt();
+				histos1D_[ "resolvedTop1Pt" ]->Fill( topQuark.AK4matchedJets[0].pt() );
+				histos1D_[ "resolvedTop2Pt" ]->Fill( topQuark.AK4matchedJets[1].pt() );
+				histos1D_[ "resolvedTop3Pt" ]->Fill( topQuark.AK4matchedJets[2].pt() );
 				histos1D_[ "resolvedTopDeltaR" ]->Fill( tmpAK4jets1.DeltaR( tmpAK4jets2 ) );  ///// useless
 			}
 		}
 
-		for( auto & dau : topBoson.daughters ) histos1D_[ "TopDaughtersPdgId" ]->Fill( dau.pdgId() );
+		for( auto & dau : topQuark.daughters ) histos1D_[ "TopDaughtersPdgId" ]->Fill( dau.pdgId() );
 		
-		if ( topBoson.daughters.size() == 3 ) {
+		if ( topQuark.daughters.size() == 3 ) {
 
 			TLorentzVector tmpTop, tmpDau1, tmpDau2, tmpDau3;
-			tmpDau1.SetPtEtaPhiE( topBoson.daughters[0].pt(), topBoson.daughters[0].eta(), topBoson.daughters[0].phi(), topBoson.daughters[0].energy() ); 
-			tmpDau2.SetPtEtaPhiE( topBoson.daughters[1].pt(), topBoson.daughters[1].eta(), topBoson.daughters[1].phi(), topBoson.daughters[1].energy() ); 
-			tmpDau3.SetPtEtaPhiE( topBoson.daughters[2].pt(), topBoson.daughters[2].eta(), topBoson.daughters[2].phi(), topBoson.daughters[2].energy() ); 
+			tmpDau1.SetPtEtaPhiE( topQuark.daughters[0].pt(), topQuark.daughters[0].eta(), topQuark.daughters[0].phi(), topQuark.daughters[0].energy() ); 
+			tmpDau2.SetPtEtaPhiE( topQuark.daughters[1].pt(), topQuark.daughters[1].eta(), topQuark.daughters[1].phi(), topQuark.daughters[1].energy() ); 
+			tmpDau3.SetPtEtaPhiE( topQuark.daughters[2].pt(), topQuark.daughters[2].eta(), topQuark.daughters[2].phi(), topQuark.daughters[2].energy() ); 
 			tmpTop = tmpDau1 + tmpDau2 + tmpDau3;
 			histos1D_[ "TopDaughters12Pt" ]->Fill( tmpTop.Pt() );
 			histos1D_[ "TopDaughters12Eta" ]->Fill( tmpTop.Eta() );
@@ -440,12 +447,22 @@ void myQuickAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	else if ( ( numBoostedTop==0 ) && ( numResolvedTop == 3 ) ) resolvedTop+=1;
 	else noneboostedAndResolvedTop+=1; 
 
+	/// Compare boosted top and higgs
+	if ( ( numBoostedTop==1 ) and ( numBoostedHiggs==1 ) ) {
+		//LogWarning("bingo") << boostedHiggsCandPt << " " << boostedTopCandPt;
+		if ( boostedHiggsCandPt == boostedTopCandPt ) { 
+			//LogWarning("bingo") << "yes";
+			mixedEvents+=1;
+			//LogWarning("bingo") << iEvent.eventAuxiliary().run() << ":" << iEvent.eventAuxiliary().luminosityBlock() << ":" << iEvent.eventAuxiliary().event() ; 
+		} else boostedTopAndHiggs+=1;
+	}
+
 
 }
 
 
 // ------------ method called once each job just before starting event loop  ------------
-void myQuickAnalyzer::beginJob() {
+void matchingAnalyzer::beginJob() {
 
 	edm::Service< TFileService > fileService;
 
@@ -523,6 +540,8 @@ void myQuickAnalyzer::beginJob() {
 
 	histos1D_[ "jetTopCategories" ] = fileService->make< TH1D >( "jetTopCategories", "jetTopCategories", 10, 0, 10 );
 
+	histos1D_[ "mixEvents" ] = fileService->make< TH1D >( "mixEvents", "mixEvents", 10, 0, 10 );
+
 	///// Sumw2 all the histos
 	for( auto const& histo : histos1D_ ) histos1D_[ histo.first ]->Sumw2();
 	for( auto const& histo : histos2D_ ) histos2D_[ histo.first ]->Sumw2();
@@ -530,7 +549,7 @@ void myQuickAnalyzer::beginJob() {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void myQuickAnalyzer::endJob() {
+void matchingAnalyzer::endJob() {
 
 	double totalHiggs = 0;
 	totalHiggs = ( boostedHiggs + resolvedHiggs + boostedAndResolvedHiggs + noneboostedAndResolvedHiggs );
@@ -560,11 +579,14 @@ void myQuickAnalyzer::endJob() {
 	histos1D_[ "jetTopCategories" ]->SetBinContent( 4, noneboostedAndResolvedTop );
 	histos1D_[ "jetTopCategories" ]->SetBinContent( 5, totalTop );
 
+	histos1D_[ "mixEvents" ]->SetBinContent( 1, mixedEvents );
+	histos1D_[ "mixEvents" ]->SetBinContent( 2, boostedTopAndHiggs );
+
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-myQuickAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+matchingAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
 //The following says we do not know what parameters are allowed so do no validation
 // Please change this to state exactly what you do use, even if it is no parameters
 edm::ParameterSetDescription desc;
@@ -573,4 +595,4 @@ descriptions.addDefault(desc);
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(myQuickAnalyzer);
+DEFINE_FWK_MODULE(matchingAnalyzer);

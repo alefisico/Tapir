@@ -13,7 +13,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.GlobalTag.globaltag = '94X_mc2017_realistic_v10'
 
 process.TFileService=cms.Service("TFileService", fileName=cms.string('myQuickAnalysis.root'))
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -33,7 +33,7 @@ process.selectedPatJetsAK8 = cms.EDFilter("PATJetSelector",
 		src = cms.InputTag("slimmedJetsAK8"),
 		cut = cms.string("pt > 200 && abs(eta) < 2.5") )
 
-process.analyzerAK8 = cms.EDAnalyzer('myQuickAnalyzer',
+process.analyzerAK8 = cms.EDAnalyzer('matchingAnalyzer',
 		AK8jets = cms.InputTag( "selectedPatJetsAK8" ),
 		AK4jets = cms.InputTag( "selectedPatJetsAK4" ),
 		genParticles = cms.InputTag( 'prunedGenParticles' ),
@@ -43,7 +43,7 @@ process.analyzerAK8 = cms.EDAnalyzer('myQuickAnalyzer',
 		groomedMass = cms.string( 'ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass' ),
 )
 
-process.analyzerCA15 = cms.EDAnalyzer('myQuickAnalyzer',
+process.analyzerCA15 = cms.EDAnalyzer('matchingAnalyzer',
 		AK8jets = cms.InputTag( "selectedPatJetsCA15PFCHS" ),
 		AK4jets = cms.InputTag( "selectedPatJetsAK4" ),
 		genParticles = cms.InputTag( 'prunedGenParticles' ),
