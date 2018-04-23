@@ -12,8 +12,8 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.GlobalTag.globaltag = '94X_mc2017_realistic_v10'
 
-process.TFileService=cms.Service("TFileService", fileName=cms.string('myQuickAnalysis.root'))
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
+process.TFileService=cms.Service("TFileService", fileName=cms.string('matchingAnalyzer.root'))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
