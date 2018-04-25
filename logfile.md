@@ -312,17 +312,9 @@ MEIntegratorStandalone=3587b02
 CMSSW=050bb6b
 
 
-Apr12_t1
+Nov30_ttbb
 -------------
-tthbb13=a0fdae35
+tthbb13=ccf814d
 CommonClassifier=a10a9df
-MEIntegratorStandalone=4a1ce78
-CMSSW=41220f99aff
-
-
-Apr13_t2
--------------
-tthbb13=e35b403b
-CommonClassifier=a10a9df
-MEIntegratorStandalone=4a1ce78
-CMSSW=41220f99aff
+MEIntegratorStandalone=3587b02
+CMSSW=f3408dc
