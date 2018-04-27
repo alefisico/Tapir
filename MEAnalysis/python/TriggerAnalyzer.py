@@ -66,7 +66,6 @@ class TriggerAnalyzer(FilterAnalyzer):
                     if not self.setOnce:
                         LOG_MODULE_NAME.warning("Unsupported alternate logic expression. Falling back to OR!")
                     pathBit = pathBit or bool(bit)
-                print name, bit
                 if "trigger" in self.conf.general["verbosity"]:
                     print "[trigger]", name, bit
                 if (bit == 1):

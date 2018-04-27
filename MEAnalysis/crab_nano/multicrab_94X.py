@@ -235,7 +235,7 @@ for k in datasets.keys():
 workflow_datasets["data_leptonic"] = {}
 for k in datasets.keys():
     # Ignore hadronic
-    if k.startswith("JetHT"):
+    if k.startswith("JetHT") or k.startswith("BTagCSV"):
         continue
     
     if "data" in datasets[k]["script"]:

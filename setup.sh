@@ -1,3 +1,4 @@
+#when updating this file, don't forget to update also .gitlab-ci.yml
 export SCRAM_ARCH=slc6_amd64_gcc630
 
 cmsrel CMSSW_9_4_5_cand1
@@ -18,11 +19,10 @@ git cms-merge-topic kschweiger:BoostedMiniAODReBaseMasterApr7
 
 
 git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
-#Until nanoAOD tools RP#68 is merged:
-cd PhysicsTools/NanoAODTools
-git remote add korbinian-nanoTools https://github.com/kschweiger/nanoAOD-tools.git
-git fetch korbinian-nanoTools
-git cherry-pick 1875f7198e87e25626e3c10341e44ca18a33ae77
+#If need some additional patches on nanoAOD-tools, do this:
+#cd PhysicsTools/NanoAODTools
+#git remote add korbinian-nanoTools https://github.com/kschweiger/nanoAOD-tools.git
+#git fetch korbinian-nanoTools
 cd $CMSSW_BASE/src
 
 #get the TTH code
