@@ -262,7 +262,9 @@ def createEvent(
             event.topPTweightUp = topPTreweightUp(event.genTopLep_pt, event.genTopHad_pt)
             event.topPTweightDown = topPTreweightDown(event.genTopLep_pt, event.genTopHad_pt)
     event.leps_pdgId = [x.pdgId for x in event.leptons]
+    
     event.triggerPath = triggerPath(event)
+
     event.btag_LR_4b_2b_btagCSV_logit = logit(event.btag_LR_4b_2b_btagCSV)
     any_passes = applyCuts(event, matched_processes)
    
@@ -745,7 +747,7 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
     else:
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8"
         skip_events = 0
         max_events = 10000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")

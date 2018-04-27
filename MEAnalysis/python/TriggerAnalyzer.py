@@ -48,8 +48,9 @@ class TriggerAnalyzer(FilterAnalyzer):
                     logicexp, name = name
                 else:
                     logicexp = None
-                bit = int(event.input.__getattr__(name, -1))
-                setattr(event, name, bit)                
+                #NB: bool(-1) -> True, therefore, we should NOT use -1 for a missing trigger
+                bit = bool(event.input.__getattr__(name, 0))
+                setattr(event, name, bit)
                 event.trigvec += [bit == 1]
                 if logicexp is None:
                     pathBit = pathBit or bool(bit)
@@ -65,7 +66,7 @@ class TriggerAnalyzer(FilterAnalyzer):
                     if not self.setOnce:
                         LOG_MODULE_NAME.warning("Unsupported alternate logic expression. Falling back to OR!")
                     pathBit = pathBit or bool(bit)
-                #print name, bit
+                print name, bit
                 if "trigger" in self.conf.general["verbosity"]:
                     print "[trigger]", name, bit
                 if (bit == 1):
