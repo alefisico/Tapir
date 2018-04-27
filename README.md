@@ -149,12 +149,14 @@ The currently used samples are listed below. Generally, they are stored at T3_CH
 |-----------------|----------|
 | [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas) | no boosted or hadronic triggers |
 | [nano_05Feb2018](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/nano_05Feb2018) | nanoAODv1, 2016 datasets |
+| [Apr16](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | 2017 datasets, no btag shape scale factor(step1) |
 
 ## tthbb13
 
-| production name | base NanoAOD | comments |
+| production name | base NanoAOD run | comments |
 |-----------------|--------------|----------|
 | [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26) | NanoCrabProdXmas | |
+| [Apr16](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | Apr16 | no trigger |
 |-----------------|--------------|----------|
 | [NanoBoostedMEM_Mar15](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoBoostedMEM_Mar15) | RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1 | postprocessing,MEM,Boosted |
 
