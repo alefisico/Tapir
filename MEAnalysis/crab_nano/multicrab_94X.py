@@ -445,7 +445,7 @@ if __name__ == '__main__':
 
     config.Data.inputDBS = 'global'
     config.Data.splitting = 'LumiBased'
-    config.Data.publication = True
+    config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
     

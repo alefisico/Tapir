@@ -1,7 +1,7 @@
 #!/bin/bash
 
 exitCode=$1
-cat log
+#cat log
 
 if [ $exitCode -eq 0 ]; then
 echo "command succeeded"
