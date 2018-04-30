@@ -145,12 +145,19 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.is_dl = *(this->is_dl);
     event.is_fh = *(this->is_fh);
 
-    event.HLT_ttH_SL_mu = *(this->HLT_ttH_SL_mu);
-    event.HLT_ttH_SL_el = *(this->HLT_ttH_SL_el);
-    event.HLT_ttH_DL_mumu = *(this->HLT_ttH_DL_mumu);
-    event.HLT_ttH_DL_elmu = *(this->HLT_ttH_DL_elmu);
-    event.HLT_ttH_DL_elel = *(this->HLT_ttH_DL_elel);
-    event.HLT_ttH_FH = *(this->HLT_ttH_FH);
+    //Disabled in Apr16
+    //event.HLT_ttH_SL_mu = *(this->HLT_ttH_SL_mu);
+    //event.HLT_ttH_SL_el = *(this->HLT_ttH_SL_el);
+    //event.HLT_ttH_DL_mumu = *(this->HLT_ttH_DL_mumu);
+    //event.HLT_ttH_DL_elmu = *(this->HLT_ttH_DL_elmu);
+    //event.HLT_ttH_DL_elel = *(this->HLT_ttH_DL_elel);
+    //event.HLT_ttH_FH = *(this->HLT_ttH_FH);
+    event.HLT_ttH_SL_mu = 1;
+    event.HLT_ttH_SL_el = 1;
+    event.HLT_ttH_DL_mumu = 1;
+    event.HLT_ttH_DL_elmu = 1;
+    event.HLT_ttH_DL_elel = 1;
+    event.HLT_ttH_FH = 1;
     
     event.numJets = *(this->numJets);
     event.nBCSVM = *(this->nBCSVM);

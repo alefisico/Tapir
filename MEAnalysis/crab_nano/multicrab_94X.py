@@ -5,7 +5,9 @@ import json
 
 from splitLumi import getLumiListInFiles, chunks 
 from FWCore.PythonUtilities.LumiList import LumiList
-das_client = "/afs/cern.ch/user/v/valya/public/das_client.py"
+
+#the golden json file for data
+json_file = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
 
 #Each time you call multicrab.py, you choose to submit jobs from one of these workflows
 workflows = [
@@ -21,8 +23,6 @@ workflows = [
     "pilot", #ttH sample only, with no MEM
     "signal", #signal sample with common config
     "testing", #single-lumi jobs, a few samples
-    "localtesting", #run combined jobs locally
-    "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
     "testall",#Test all samples w/ small nJobs and no ME
@@ -39,8 +39,6 @@ parser.add_argument('--tag', action="store", required=True, help="the version ta
 parser.add_argument('--dataset', action="store", required=False, help="submit only matching datasets (shortname)", default="*") 
 parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")#Never tested it. Use with caution
 args = parser.parse_args()
-
-localtesting = "localtesting" in args.workflow
 
 #list of configurations that we are using, should be in TTH/MEAnalysis/python/
 me_cfgs = {
@@ -235,7 +233,7 @@ for k in datasets.keys():
 workflow_datasets["data_leptonic"] = {}
 for k in datasets.keys():
     # Ignore hadronic
-    if k.startswith("JetHT"):
+    if k.startswith("JetHT") or k.startswith("BTagCSV"):
         continue
     
     if "data" in datasets[k]["script"]:
@@ -292,7 +290,7 @@ for k in datasets.keys():
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
         D["perjob"] = 75
         D["runtime"] = 24
-        D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
+        D["json"] = json_file 
         workflow_datasets["hadronic_nome"][k] = D
 
 workflow_datasets["hadronic_nome_testing"] = {}
@@ -319,7 +317,7 @@ for k in [ "SingleElectron-Run2017D-17Nov2017-v1",
     D["maxlumis"] = 1
     D["runtime"] = 4
     if not D["isMC"]:
-        D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
+        D["json"] = json_file
     workflow_datasets["testall"][k] = D
     
 #Pilot job for updating transfer functions, retraining BLR
@@ -335,15 +333,15 @@ workflow_datasets["testing"] = {}
 
 for k in [
     "ttHTobb",
-    #"TTbar_inc",
-    #"SingleMuon-Run2016H-03Feb2017_ver3-v1"
+    "SingleElectron-Run2017D-17Nov2017-v1"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 4
     D["perjob"] = 2
-    if "data" in D["script"]:
-        D["maxlumis"] = 4
-        D["perjob"] = 2
+    if not D["isMC"]:
+        D["maxlumis"] = 50
+        D["perjob"] = 25
+        D["json"] = json_file
     D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
@@ -360,18 +358,6 @@ datasets_local = {
         "script": 'heppy_crab_script_data.sh'
     }
 }
-
-workflow_datasets["localtesting"] = {}
-for k in ["mc", "data"]:
-    D = deepcopy(datasets_local[k])
-    D["mem_cfg"] = "cfg_noME.py"
-    workflow_datasets["localtesting"][k] = D
-
-workflow_datasets["localtesting_withme"] = {}
-for k in ["mc", "data"]:
-    D = deepcopy(datasets_local[k])
-    D["mem_cfg"] = me_cfgs["leptonic"]
-    workflow_datasets["localtesting_withme"][k] = D
 
 workflow_datasets["testing_withme"] = {}
 for k in ["TTbar_had","TTbar_sl1","TTbar_dl1"]:
@@ -408,49 +394,6 @@ if __name__ == '__main__':
         res = crabCommand('submit', config = config)
         with open(config.General.workArea + "/crab_" + config.General.requestName + "/crab_config.py", "w") as fi:
             fi.write(config.pythonise_())
-
-    def localsubmit(config, dname, opts):
-        TMPDIR = "/scratch/{0}/crab_work/{1}/crab_{2}".format(os.environ["USER"], args.tag, dname)
-        CMSSW_VERSION = "CMSSW_9_4_1"
-        workdir = os.path.join(TMPDIR, CMSSW_VERSION, "work")
-        try: 
-            shutil.rmtree(TMPDIR)
-        except Exception as e:
-            pass
-        os.makedirs(TMPDIR)
-        os.system("cd {0}".format(TMPDIR))
-        pwd = os.getcwd() 
-        os.chdir(TMPDIR)
-        os.system("scramv1 project CMSSW {0}".format(CMSSW_VERSION))
-        os.makedirs(workdir)
-        os.chdir(pwd)
-        for inf in config.JobType.inputFiles + [config.JobType.scriptExe, 'PSet_local.py']:
-            shutil.copy(inf, os.path.join(workdir, os.path.basename(inf)))
-        os.system("cp -r $CMSSW_BASE/lib {0}/".format(workdir)) 
-        os.system("mv {0}/PSet_local.py {0}/PSet.py".format(workdir)) 
-        os.system("cp {0} {1}/x509_proxy".format(os.environ["X509_USER_PROXY"], workdir)) 
-        os.system("cp -r $CMSSW_BASE/lib/slc*/proclib {0}/lib/slc*/".format(workdir)) 
-        os.system('find $CMSSW_BASE/src/ -path "*/data/*" -type f | sed -s "s|$CMSSW_BASE/||" > files')
-        os.system('cp files $CMSSW_BASE/; cd $CMSSW_BASE; for f in `cat files`; do cp --parents $f {0}/; done'.format(workdir))
-        runfile = open(workdir+"/run.sh", "w")
-        runfile.write(
-            """
-            #!/bin/bash
-            source /cvmfs/cms.cern.ch/cmsset_default.sh
-            scram b ProjectRename
-            eval `scramv1 runtime -sh`
-            scram b
-            env
-            ./{0} 1 {1}
-            """.format(config.JobType.scriptExe, " ".join(config.JobType.scriptArgs)).strip() + '\n'
-        )
-        runfile.close()
-        os.system('chmod +x {0}/run.sh'.format(workdir))
-        os.system('cd {0}/{1};eval `scram runtime -sh`;scram b;'.format(TMPDIR, CMSSW_VERSION))
-        archive_name = "_".join([dname, args.workflow, args.tag])
-        os.system('cd {0};tar zcfv job_{1}.tar.gz {2} > {1}.log'.format(TMPDIR, archive_name, CMSSW_VERSION))
-        os.system("cp {0}/job_{1}.tar.gz ./".format(TMPDIR, archive_name))
-        #os.system("cp -r $CMSSW_BASE/src {0}/".format(workdir)) 
 
     from CRABClient.UserUtilities import config
     config = config()
@@ -531,34 +474,30 @@ if __name__ == '__main__':
         mem_cfg = sel_datasets[sample]["mem_cfg"]
         config.JobType.scriptExe = sel_datasets[sample]["script"]
         
-        if not localtesting:
-            dataset = sel_datasets[sample]["ds"]
-            nlumis = sel_datasets[sample]["maxlumis"]
-            perjob = sel_datasets[sample]["perjob"]
-            runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
+        dataset = sel_datasets[sample]["ds"]
+        nlumis = sel_datasets[sample]["maxlumis"]
+        perjob = sel_datasets[sample]["perjob"]
+        runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
 
-            config.JobType.maxJobRuntimeMin = runtime_min
-            if args.recovery:
-		config.General.requestName = submitname
-	    else:
-		config.General.requestName = sample + "_" + submitname
-            config.Data.inputDataset = dataset
-            config.Data.unitsPerJob = perjob
-            config.Data.totalUnits = nlumis
-            config.Data.outputDatasetTag = submitname
-            try:
-                config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
-            except Exception as e:
-                config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
+        config.JobType.maxJobRuntimeMin = runtime_min
+        if args.recovery:
+	    config.General.requestName = submitname
+	else:
+	    config.General.requestName = sample + "_" + submitname
+        config.Data.inputDataset = dataset
+        config.Data.unitsPerJob = perjob
+        config.Data.totalUnits = nlumis
+        config.Data.outputDatasetTag = submitname
+        try:
+            config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
+        except Exception as e:
+            config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
 
         config.JobType.scriptArgs = ['ME_CONF={0}'.format(mem_cfg)]
         print  config.JobType.scriptArgs
         
-        if localtesting:
-            localsubmit(config, sample, sel_datasets[sample])
-        else:
-            try:
-                submit(config)
-            except Exception as e:
-                print e
-                print "skipping"
+        try:
+            submit(config)
+        except Exception as e:
+            print e
+            print "skipping"

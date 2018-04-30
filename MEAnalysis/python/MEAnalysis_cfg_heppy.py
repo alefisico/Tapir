@@ -216,6 +216,7 @@ class Conf:
             "CSVM": ("btagCSV", 0.8838),
             "CSVT": ("btagCSV", 0.9693),
 
+            #Note: these working points are currently NOT correct
             "DeepCSVL": ("btagDeepCSV", 0.1522),
             "DeepCSVM": ("btagDeepCSV", 0.4641),
             "DeepCSVT": ("btagDeepCSV", 0.8001),
@@ -244,7 +245,7 @@ class Conf:
     }
 
     general = {
-        "passall": False,
+        "passall": True,
         "boosted": False,
         "QGLtoDo": {
          #3:[(3,0)] => "evalute qg LR of 3q vs 0q(+3g), considering only light jets, in events with 3 b-jets"

@@ -116,7 +116,7 @@ class BufferedChain( object ):
         """
         All functions of the wrapped TChain are made available
         """
-        return getattr(self.chain, attr)
+        return self.chain.__getattr__(attr, defval)
 
     def __len__(self):
         return int(self.chain.GetEntries())
@@ -614,6 +614,6 @@ if __name__ == "__main__":
         files = []
     print an
     looper_dir, files = main(an, sample_name=args.sample, numEvents=args.numEvents, files=files, loglevel = args.loglevel)
-
-    import TTH.MEAnalysis.counts as counts
-    counts.main(files, "{0}/tree.root".format(looper_dir))
+#
+#    import TTH.MEAnalysis.counts as counts
+#    counts.main(files, "{0}/tree.root".format(looper_dir))

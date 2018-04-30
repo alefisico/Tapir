@@ -297,12 +297,13 @@ public:
     TTreeReaderValue<int> is_dl;
     TTreeReaderValue<int> is_fh;
     
-    TTreeReaderValue<int> HLT_ttH_SL_mu;
-    TTreeReaderValue<int> HLT_ttH_SL_el;
-    TTreeReaderValue<int> HLT_ttH_DL_elmu;
-    TTreeReaderValue<int> HLT_ttH_DL_elel;
-    TTreeReaderValue<int> HLT_ttH_DL_mumu;
-    TTreeReaderValue<int> HLT_ttH_FH;
+    //Disabled, as in Apr16 trees HLT is not present
+    //TTreeReaderValue<int> HLT_ttH_SL_mu;
+    //TTreeReaderValue<int> HLT_ttH_SL_el;
+    //TTreeReaderValue<int> HLT_ttH_DL_elmu;
+    //TTreeReaderValue<int> HLT_ttH_DL_elel;
+    //TTreeReaderValue<int> HLT_ttH_DL_mumu;
+    //TTreeReaderValue<int> HLT_ttH_FH;
 
     TTreeReaderValue<int> numJets;
     TTreeReaderValue<int> nBCSVM;
@@ -345,13 +346,14 @@ public:
         is_sl(reader, "is_sl"),
         is_dl(reader, "is_dl"),
         is_fh(reader, "is_fh"),
-        
-        HLT_ttH_SL_mu(reader, "HLT_ttH_SL_mu"),
-        HLT_ttH_SL_el(reader, "HLT_ttH_SL_el"),
-        HLT_ttH_DL_elmu(reader, "HLT_ttH_DL_elmu"),
-        HLT_ttH_DL_elel(reader, "HLT_ttH_DL_elel"),
-        HLT_ttH_DL_mumu(reader, "HLT_ttH_DL_mumu"),
-        HLT_ttH_FH(reader, "HLT_ttH_FH"),
+       
+        //Disabled in Apr16
+        //HLT_ttH_SL_mu(reader, "HLT_ttH_SL_mu"),
+        //HLT_ttH_SL_el(reader, "HLT_ttH_SL_el"),
+        //HLT_ttH_DL_elmu(reader, "HLT_ttH_DL_elmu"),
+        //HLT_ttH_DL_elel(reader, "HLT_ttH_DL_elel"),
+        //HLT_ttH_DL_mumu(reader, "HLT_ttH_DL_mumu"),
+        //HLT_ttH_FH(reader, "HLT_ttH_FH"),
         
         numJets(reader, "numJets"),
         nBCSVM(reader, "nBCSVM"),
