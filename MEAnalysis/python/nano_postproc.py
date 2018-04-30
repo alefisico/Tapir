@@ -2,6 +2,8 @@ import os
 from importlib import import_module
 import sys
 
+import ROOT
+
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from TTH.MEAnalysis.samples_base import getSitePrefix
 
@@ -18,7 +20,11 @@ def main(outdir = "./", _input = None, asFriend = True, _era = "94Xv1", runAll =
         nano_cfg = NanoConfig(_era, jec = True, btag=True, pu=True)
     else:
         nano_cfg = NanoConfig(_era, btag=True, pu=True)
-    print nano_cfg.modules
+    for inf in infiles:
+        tf = ROOT.TFile.Open(inf)
+        if not tf.Get("Events"):
+            raise Exception("Couldn't find TTree 'Events' in file, is it a nanoAOD file? Currently, the PostProcessor doesn't know how to read the tree from a subfolder.")
+
     p=PostProcessor(
         outdir, infiles,
         cut=nano_cfg.cuts, branchsel=nano_cfg.branchsel, modules=nano_cfg.modules,
