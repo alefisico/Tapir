@@ -25,7 +25,15 @@
         <InputSourceClass>PoolSource</InputSourceClass>
         <EventsRead>46448</EventsRead>
         <Runs>
-        
+        <Run ID="1">
+            <LumiSection ID="5245"/>
+                <LumiSection ID="5246"/>
+                <LumiSection ID="5247"/>
+                <LumiSection ID="5250"/>
+                <LumiSection ID="5251"/>
+                <LumiSection ID="5252"/>
+                <LumiSection ID="5253"/>
+                </Run>
         </Runs>
         </InputFile>
         
@@ -33,9 +41,17 @@
     <LFN></LFN>
     <PFN>tree.root</PFN>
     <Catalog></Catalog>
-    <ModuleLabel>HEPPY</ModuleLabel>
+    <ModuleLabel>NANO</ModuleLabel>
     <Runs>
-    
+    <Run ID="1">
+        <LumiSection ID="5245"/>
+            <LumiSection ID="5246"/>
+            <LumiSection ID="5247"/>
+            <LumiSection ID="5250"/>
+            <LumiSection ID="5251"/>
+            <LumiSection ID="5252"/>
+            <LumiSection ID="5253"/>
+            </Run>
     </Runs>
     <GUID></GUID>
     <OutputModuleClass>PoolOutputModule</OutputModuleClass>

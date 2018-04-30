@@ -35,21 +35,14 @@ crabFiles=PSet.process.source.fileNames #need for FWJR
 crabFiles_pfn = copy.deepcopy(PSet.process.source.fileNames)
 
 fn.convertLFN(crabFiles,crabFiles_pfn)
-"""
-### setup crab info
-handle = open("heppy_config.py", 'r')
-cfo = imp.load_source("heppy_config", "heppy_config.py", handle)
-config = cfo.config
 
 #Setting lumis in file
 lumisToProcess = None
 lumidict = {}
 if hasattr(PSet.process.source, "lumisToProcess"):
     lumisToProcess = PSet.process.source.lumisToProcess
-    config.preprocessor.options["lumisToProcess"] = PSet.process.source.lumisToProcess
     lumidict = fn.getLumisProcessed(lumisToProcess)
-handle.close()
-"""
+
 os.getcwd()
 ### tthbb13 code
 if not "--nostep2" in args:
@@ -113,8 +106,8 @@ assert(fn.getEntries("Output_tth/tree.root", "tree") == fn.getEntries("tree.root
 
 #Now write the FWKJobReport
 report=open('./FrameworkJobReport.xml', 'w+')
-#report.write(fn.getFJR(lumidict, crabFiles, crabFiles_pfn, "tree.root"))
-report.write(fn.getFJR({}, crabFiles, crabFiles_pfn, "tree.root"))
+report.write(fn.getFJR(lumidict, crabFiles, crabFiles_pfn, "tree.root"))
+#report.write(fn.getFJR({}, crabFiles, crabFiles_pfn, "tree.root"))
 report.close()
 print "timeto_totalJob ",(time.time()-t0)
 dumpfile.close()
