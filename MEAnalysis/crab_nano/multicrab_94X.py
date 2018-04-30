@@ -128,8 +128,8 @@ for k in [
         "ttHTobb",
         #"ttHToNonbb",
         "TTbar_had",
-        "TTbar_sl1",#"TTbar_sl2",
-        "TTbar_dl1",# "TTbar_dl2",
+        "TTbar_sl1",
+        "TTbar_dl1",
         #"ttbb",
         #"TTbar_isr_up",
         #"TTbar_isr_down1",
@@ -171,8 +171,8 @@ for k in [
         "ttHToNonbb",
         "TTbar_had",
         #"ttbb",
-        "TTbar_sl1","TTbar_sl2",
-        "TTbar_dl1", "TTbar_dl2",
+        "TTbar_sl1",
+        "TTbar_dl1",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_memcheck.py"
@@ -187,7 +187,7 @@ for k in [
     workflow_datasets["memcheck2"][k] = D
 
 workflow_datasets["signal"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1","TTbar_sl2"]:
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1",]:
     D = deepcopy(datasets[k])
     workflow_datasets["signal"][k] = D
 
@@ -196,8 +196,8 @@ for k in [
         "ttHTobb",
         "ttHToNonbb",
         "TTbar_had",
-        "TTbar_sl1","TTbar_sl2",
-        "TTbar_dl1", "TTbar_dl2",
+        "TTbar_sl1",
+        "TTbar_dl1",
         #"ww1", "ww2",
         #"wz1", "wz2",
         #"zz1", "zz2",
@@ -273,7 +273,7 @@ for k in datasets.keys():
 
 workflow_datasets["allmc_nome"] = {}
 for k in datasets.keys():
-    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_sl2", "TTbar_dl1","TTbar_dl2"] :
+    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_dl1",] :
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome"]
         workflow_datasets["allmc_nome"][k] = D
@@ -339,8 +339,8 @@ for k in [
     D["maxlumis"] = 4
     D["perjob"] = 2
     if not D["isMC"]:
-        D["maxlumis"] = 50
-        D["perjob"] = 25
+        D["maxlumis"] = 10
+        D["perjob"] = 5
         D["json"] = json_file
     D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"

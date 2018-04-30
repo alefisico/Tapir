@@ -8,8 +8,6 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
-elif "--local" in sys.argv:
-    import PSet_local as PSet
 
 if "--isMC" in sys.argv:
     isMC = True
@@ -116,7 +114,7 @@ assert(fn.getEntries("Output_tth/tree.root", "tree") == fn.getEntries("tree.root
 #Now write the FWKJobReport
 report=open('./FrameworkJobReport.xml', 'w+')
 #report.write(fn.getFJR(lumidict, crabFiles, crabFiles_pfn, "tree.root"))
-#report.write(fn.getFJR({}, crabFiles, crabFiles_pfn, "tree.root"))
+report.write(fn.getFJR({}, crabFiles, crabFiles_pfn, "tree.root"))
 report.close()
 print "timeto_totalJob ",(time.time()-t0)
 dumpfile.close()

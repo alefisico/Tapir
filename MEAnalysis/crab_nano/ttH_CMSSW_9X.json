@@ -1,6 +1,6 @@
 {
     "ttHToNonbb": {
-        "ds": "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
+        "ds": "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         "maxlumis": -1,
         "mem_cfg": "cfg_noME.py",
         "perjob": 20,
@@ -9,7 +9,7 @@
         "isNANOAOD" : False
     },
     "ttHTobb": {
-        "ds": "/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
+        "ds": "/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         "maxlumis": -1,
         "mem_cfg": "cfg_noME.py",
         "perjob": 50,
