@@ -54,47 +54,47 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/DoubleEG/Run2017B-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017C-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017D-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017E-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017F-17Nov2017-v1/MINIAOD",
+    "/MuonEG/Run2017B-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017C-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017D-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017E-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017F-31Mar2018-v1/MINIAOD",
+
+    "/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD",
     
-    "/DoubleMuon/Run2017B-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017C-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017D-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017E-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017F-17Nov2017-v1/MINIAOD",
+    "/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/MuonEG/Run2017B-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017C-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017D-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017E-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017F-17Nov2017-v1/MINIAOD",
-   
-    "/SingleMuon/Run2017B-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017C-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017D-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017E-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017F-17Nov2017-v1/MINIAOD",
-   
-    "/SingleElectron/Run2017B-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017C-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017D-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017E-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017F-17Nov2017-v1/MINIAOD",
+    "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/JetHT/Run2017F-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017E-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017D-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017C-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017B-17Nov2017-v1/MINIAOD",
+    "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/BTagCSV/Run2017F-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017E-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017D-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017C-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017B-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017B-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017C-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017D-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017E-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017F-31Mar2018-v1/MINIAOD",
+
+    "/BTagCSV/Run2017B-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017C-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017D-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017E-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017F-31Mar2018-v1/MINIAOD",
 ]
 
 #all available datasets.
@@ -302,10 +302,10 @@ for k in  workflow_datasets["hadronic_nome"].keys():
 
 
 workflow_datasets["testall"] = {}
-for k in [ "SingleElectron-Run2017D-17Nov2017-v1",
-           "JetHT-Run2017D-17Nov2017-v1",
-           "BTagCSV-Run2017D-17Nov2017-v1",
-           "MuonEG-Run2017D-17Nov2017-v1",
+for k in [ "SingleElectron-Run2017F-31Mar2018-v1",
+           "MuonEG-Run2017F-31Mar2018-v1",
+           "JetHT-Run2017B-31Mar2018-v1",
+           "BTagCSV-Run2017B-31Mar2018-v1",
            "TTbar_had",
            "TTbar_sl1",
            "ttHTobb",
@@ -332,8 +332,8 @@ workflow_datasets["pilot"][pilot_name] = D
 workflow_datasets["testing"] = {}
 
 for k in [
+    "SingleElectron-Run2017F-31Mar2018-v1",
     "ttHTobb",
-    "SingleElectron-Run2017D-17Nov2017-v1"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 4
