@@ -25,17 +25,17 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( int(os.environ["MAX_EVENTS"]) )
+    input = cms.untracked.int32( 200 ),
 )
 
 # Input source
 process.source = cms.Source("LHESource",
-	fileNames = cms.untracked.vstring( os.environ["FILE_NAMES"] ),
-		#[ 
-		#'root://t3dcachedb03.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/NLOPS_ttbb/sample0001/pwgevents-0001.lhe',
-		#'root://t3dcachedb03.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/NLOPS_ttbb/sample0001/pwgevents-0002.lhe',
-		#]),
-	skipEvents=cms.untracked.uint32(int(os.environ["SKIP_EVENTS"])),
+	fileNames = cms.untracked.vstring( 
+		[ 
+		#'srm://storage01.lcg.cscs.ch:8443/srm/managerv2?SFN=/pnfs/lcg.cscs.ch/cms/trivcat/store/user/algomez/pwgevents-0001.lhe',
+		#'srm://storage01.lcg.cscs.ch:8443/srm/managerv2?SFN=/pnfs/lcg.cscs.ch/cms/trivcat/store/user/algomez/pwgevents-0002.lhe',
+		'file:sample001.lhe',
+		]),
 )
 
 process.options = cms.untracked.PSet(
@@ -54,7 +54,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.RAWSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('file:HIG-RunIISummer15wmLHEGS.root'),
+    fileName = cms.untracked.string('file:ttbbNewMC_HIG-RunIISummer15wmLHEGS-00482.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('GEN-SIM')
