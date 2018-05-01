@@ -175,7 +175,7 @@ def getFJR(lumidict, inputfiles_lfn, inputfiles_pfn, outputfile):
     <LFN></LFN>
     <PFN>%s</PFN>
     <Catalog></Catalog>
-    <ModuleLabel>HEPPY</ModuleLabel>
+    <ModuleLabel>NANO</ModuleLabel>
     <Runs>
     """ % (outputfile)
     for run, lumis in lumidict.items():

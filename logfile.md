@@ -318,3 +318,11 @@ tthbb13=ccf814d
 CommonClassifier=a10a9df
 MEIntegratorStandalone=3587b02
 CMSSW=f3408dc
+
+
+Apr30_v1
+-------------
+tthbb13=895f34c6
+CommonClassifier=a10a9df
+MEIntegratorStandalone=7566e96
+CMSSW=41220f99aff

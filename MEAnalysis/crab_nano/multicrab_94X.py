@@ -54,47 +54,47 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/DoubleEG/Run2017B-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017C-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017D-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017E-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017F-17Nov2017-v1/MINIAOD",
+    "/MuonEG/Run2017B-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017C-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017D-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017E-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017F-31Mar2018-v1/MINIAOD",
+
+    "/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD",
     
-    "/DoubleMuon/Run2017B-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017C-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017D-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017E-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017F-17Nov2017-v1/MINIAOD",
+    "/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/MuonEG/Run2017B-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017C-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017D-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017E-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017F-17Nov2017-v1/MINIAOD",
-   
-    "/SingleMuon/Run2017B-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017C-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017D-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017E-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017F-17Nov2017-v1/MINIAOD",
-   
-    "/SingleElectron/Run2017B-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017C-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017D-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017E-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017F-17Nov2017-v1/MINIAOD",
+    "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/JetHT/Run2017F-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017E-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017D-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017C-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017B-17Nov2017-v1/MINIAOD",
+    "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/BTagCSV/Run2017F-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017E-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017D-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017C-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017B-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017B-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017C-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017D-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017E-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017F-31Mar2018-v1/MINIAOD",
+
+    "/BTagCSV/Run2017B-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017C-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017D-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017E-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017F-31Mar2018-v1/MINIAOD",
 ]
 
 #all available datasets.
@@ -127,9 +127,9 @@ workflow_datasets["leptonic"] = {}
 for k in [
         "ttHTobb",
         #"ttHToNonbb",
-        "TTbar_had",
-        "TTbar_sl1",#"TTbar_sl2",
-        "TTbar_dl1",# "TTbar_dl2",
+        #"TTbar_had",
+        "TTbar_sl1",
+        "TTbar_dl1",
         #"ttbb",
         #"TTbar_isr_up",
         #"TTbar_isr_down1",
@@ -171,8 +171,8 @@ for k in [
         "ttHToNonbb",
         "TTbar_had",
         #"ttbb",
-        "TTbar_sl1","TTbar_sl2",
-        "TTbar_dl1", "TTbar_dl2",
+        "TTbar_sl1",
+        "TTbar_dl1",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_memcheck.py"
@@ -187,7 +187,7 @@ for k in [
     workflow_datasets["memcheck2"][k] = D
 
 workflow_datasets["signal"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1","TTbar_sl2"]:
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1",]:
     D = deepcopy(datasets[k])
     workflow_datasets["signal"][k] = D
 
@@ -196,8 +196,8 @@ for k in [
         "ttHTobb",
         "ttHToNonbb",
         "TTbar_had",
-        "TTbar_sl1","TTbar_sl2",
-        "TTbar_dl1", "TTbar_dl2",
+        "TTbar_sl1",
+        "TTbar_dl1",
         #"ww1", "ww2",
         #"wz1", "wz2",
         #"zz1", "zz2",
@@ -273,7 +273,7 @@ for k in datasets.keys():
 
 workflow_datasets["allmc_nome"] = {}
 for k in datasets.keys():
-    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_sl2", "TTbar_dl1","TTbar_dl2"] :
+    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_dl1",] :
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome"]
         workflow_datasets["allmc_nome"][k] = D
@@ -302,10 +302,10 @@ for k in  workflow_datasets["hadronic_nome"].keys():
 
 
 workflow_datasets["testall"] = {}
-for k in [ "SingleElectron-Run2017D-17Nov2017-v1",
-           "JetHT-Run2017D-17Nov2017-v1",
-           "BTagCSV-Run2017D-17Nov2017-v1",
-           "MuonEG-Run2017D-17Nov2017-v1",
+for k in [ "SingleElectron-Run2017F-31Mar2018-v1",
+           "MuonEG-Run2017F-31Mar2018-v1",
+           "JetHT-Run2017B-31Mar2018-v1",
+           "BTagCSV-Run2017B-31Mar2018-v1",
            "TTbar_had",
            "TTbar_sl1",
            "ttHTobb",
@@ -332,15 +332,15 @@ workflow_datasets["pilot"][pilot_name] = D
 workflow_datasets["testing"] = {}
 
 for k in [
+    "SingleElectron-Run2017F-31Mar2018-v1",
     "ttHTobb",
-    "SingleElectron-Run2017D-17Nov2017-v1"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 4
     D["perjob"] = 2
     if not D["isMC"]:
-        D["maxlumis"] = 50
-        D["perjob"] = 25
+        D["maxlumis"] = 10
+        D["perjob"] = 5
         D["json"] = json_file
     D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"
