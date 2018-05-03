@@ -175,7 +175,7 @@ class JetAnalyzer(FilterAnalyzer):
                     logging.info(syst+" invokes catChange from (j,b): {0},{1} to {2},{3}".format(nj_nominal,nt_nominal,nj,nt))
                     if not pass_nominal:
                         logging.debug("   --> nominal did not pass")
-                    event.catChange = deepcopy( evdict[syst] ) #requires change in sparsinator.py
+                    event.catChange = deepcopy( evdict[syst] ) #requires change in BufferedTree class
                     event.catChange.systematic = "CatChange"
                     event.catChange.changes_jet_category = False
                     if syst.rfind("Up") == (len(syst)-2):

@@ -16,7 +16,7 @@ triggerTable = {
         "HLT_Ele28_eta2p1_WPTight_Gsf_HT150",
     ],
     "ttH_SL_mu" : [
-        "HLT_IsoMu24_2p1",
+        "HLT_IsoMu24_eta2p1",
         "HLT_IsoMu27",
     ],
     "ttH_DL_mumu" : [
@@ -34,23 +34,23 @@ triggerTable = {
         "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",
         "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
     ],
-#    "ttH_FH" : [
-#        "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
-#        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0",
-#        "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
-#    ],
-#    "ttH_FH:JetHT" : [
-#        "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
-#        "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
-#        ("and","!HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0")
-#    ],
-#    "ttH_FH:BTagCSV" : [
-#        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0"
-#    ],
-#    "ttH_FH_prescaled" : [
-#        "HLT_PFHT450_SixJet40_v*",
-#        "HLT_PFHT400_SixJet30_v*",
-#    ],
+   "ttH_FH" : [
+       "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
+       "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0",
+       "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
+   ],
+   "ttH_FH:JetHT" : [
+       "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
+       "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
+       ("and not","HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0")
+   ],
+   "ttH_FH:BTagCSV" : [
+       "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0"
+   ],
+#   "ttH_FH_prescaled" : [
+#       "HLT_PFHT450_SixJet40_v",
+#       "HLT_PFHT400_SixJet30_v",
+#   ],
 }
 
 
