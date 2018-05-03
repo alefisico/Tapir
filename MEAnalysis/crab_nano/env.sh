@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "heppy_crab_script_pre.sh"
 
-tar xvzf python.tar.gz --directory $CMSSW_BASE 
+tar xvzf python.tar.gz --directory $CMSSW_BASE
 tar xzf data.tar.gz --directory $CMSSW_BASE/src/TTH/MEAnalysis
 echo "VOMS"
 voms-proxy-info -all
