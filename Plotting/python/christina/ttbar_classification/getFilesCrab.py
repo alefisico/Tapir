@@ -1,6 +1,7 @@
 import os
 import os.path
 import argparse
+import ROOT
 
 def makeDatacards(fpath, opath, prefix):
 
@@ -21,11 +22,18 @@ def makeDatacards(fpath, opath, prefix):
         print ("[" + d + "]")
         dataset.write("[" + d + "]\n")
 
-        for dirpath, dirnames, filenames in os.walk(fpath+"/"+d):
+        for dirpath, dirnames, filenames in os.walk(fpath+d):
             for filename in [f for f in filenames if f.endswith(".root")]:
                 cf = os.path.join(dirpath, filename)
-                print prefix + cf[1:]
-                dataset.write(prefix + cf[1:] + "\n")
+                rootfile = prefix +cf
+
+                # get number of entries
+                rf = ROOT.TFile.Open(rootfile)
+                tree = rf.Get("tree")
+                nevt = tree.GetEntries()  
+              
+                print prefix + cf + " = %i" % nevt
+                dataset.write(prefix + cf + " = %i\n" % nevt)
 
 if __name__ == "__main__":
 
