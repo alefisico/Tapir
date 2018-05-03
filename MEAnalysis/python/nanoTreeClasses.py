@@ -236,13 +236,13 @@ class Jet:
         if not MC:
             self.pt = tree.Jet_pt[n];
         else:
-            self.pt = tree.Jet_pt[n]
-            self.corr_JER = 0.0
-            #self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
-            #self.corr_JER = tree.Jet_pt_nom[n]/tree.Jet_pt[n];
+            #self.pt = tree.Jet_pt[n]
+            #self.corr_JER = 0.0
+            self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
+            self.corr_JER = tree.Jet_pt_nom[n]/tree.Jet_pt[n];
 
-            #self.pt_corr_JERUp = tree.Jet_pt_jerUp[n]
-            #self.pt_corr_JERDown = tree.Jet_pt_jerDown[n]
+            self.pt_corr_JERUp = tree.Jet_pt_jerUp[n]
+            self.pt_corr_JERDown = tree.Jet_pt_jerDown[n]
 
             #self.pt_corr_AbsoluteStatUp = tree.Jet_pt_jesAbsoluteStatUp[n]
             #self.pt_corr_AbsoluteScaleUp = tree.Jet_pt_jesAbsoluteScaleUp[n]
@@ -279,7 +279,7 @@ class Jet:
             #self.pt_corr_SubTotalScaleUp = tree.Jet_pt_jesSubTotalScaleUp[n]
             #self.pt_corr_SubTotalAbsoluteUp = tree.Jet_pt_jesSubTotalAbsoluteUp[n]
             #self.pt_corr_SubTotalMCUp = tree.Jet_pt_jesSubTotalMCUp[n]
-            #self.pt_corr_TotalUp = tree.Jet_pt_jesTotalUp[n]
+            self.pt_corr_TotalUp = tree.Jet_pt_jesTotalUp[n]
             #self.pt_corr_TotalNoFlavorUp = tree.Jet_pt_jesTotalNoFlavorUp[n]
             #self.pt_corr_TotalNoTimeUp = tree.Jet_pt_jesTotalNoTimeUp[n]
             #self.pt_corr_TotalNoFlavorNoTimeUp = tree.Jet_pt_jesTotalNoFlavorNoTimeUp[n]
@@ -334,7 +334,7 @@ class Jet:
             #self.pt_corr_SubTotalScaleDown = tree.Jet_pt_jesSubTotalScaleDown[n]
             #self.pt_corr_SubTotalAbsoluteDown = tree.Jet_pt_jesSubTotalAbsoluteDown[n]
             #self.pt_corr_SubTotalMCDown = tree.Jet_pt_jesSubTotalMCDown[n]
-            #self.pt_corr_TotalDown = tree.Jet_pt_jesTotalDown[n]
+            self.pt_corr_TotalDown = tree.Jet_pt_jesTotalDown[n]
             #self.pt_corr_TotalNoFlavorDown = tree.Jet_pt_jesTotalNoFlavorDown[n]
             #self.pt_corr_TotalNoTimeDown = tree.Jet_pt_jesTotalNoTimeDown[n]
             #self.pt_corr_TotalNoFlavorNoTimeDown = tree.Jet_pt_jesTotalNoFlavorNoTimeDown[n]

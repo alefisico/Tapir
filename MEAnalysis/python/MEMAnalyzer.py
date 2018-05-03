@@ -467,8 +467,7 @@ class MEAnalyzer(FilterAnalyzer):
                             old_pt = jet.pt
                             old_corr = jet.corr
                             for fc in self.conf.mem["jet_corrections"]:
-                                new_corr = getattr(jet, "corr_" + fc)
-                                new_pt = new_corr * old_pt / old_corr
+                                new_pt =  getattr(jet, "pt_corr_" + fc)
                                 delta_pt = (new_pt - old_pt)
                                 dw[fc] += r.grad.at(ijet) * delta_pt
                     r.dw = dw
