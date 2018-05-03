@@ -50,6 +50,8 @@ class BufferedTree:
                 val = getattr(self.__dict__["tree"], attr)
                 self.__dict__["buf"][attr] = val
                 return val
+        elif attr == "__deepcopy__":
+            return getattr(self, attr)
         else:
             if not (defval is None):
                 return defval
