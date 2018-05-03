@@ -748,6 +748,7 @@ if __name__ == "__main__":
         file_names = analysis.get_sample(sample).file_names
     else:
         sample = "ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8"
+        #sample = "SingleMuon"
         skip_events = 0
         max_events = 10000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
