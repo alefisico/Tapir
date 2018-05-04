@@ -29,7 +29,7 @@ def makeDatacards(fpath, opath, prefix):
 
                 # get number of entries
                 rf = ROOT.TFile.Open(rootfile)
-                tree = rf.Get("tree")
+                tree = rf.Get("nanoAOD/Events")
                 nevt = tree.GetEntries()  
               
                 print prefix + cf + " = %i" % nevt
