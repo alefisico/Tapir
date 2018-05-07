@@ -652,6 +652,31 @@ def getTreeProducer(conf):
 
         ("genWeight",            float,    "Generator weight", lambda ev: ev.input.genWeight),
 
+        ("btagWeight",            float,    "per event btag weight", lambda ev: ev.btagSF),
+        ("btagWeightUp",            float,    "", lambda ev: ev.btagSF_up),
+        ("btagWeightDown",            float,    "", lambda ev: ev.btagSF_down),
+
+        ("btagWeight_shape",            float,    "per event btag weight (shape)", lambda ev: ev.btagSF_shape),
+        ("btagWeight_shapeJESUp",            float,    "", lambda ev: ev.btagSF_shape_up_jes),
+        ("btagWeight_shapeJESDown",            float,    "", lambda ev: ev.btagSF_shape_down_jes),
+        ("btagWeight_shapeLFUp",            float,    "", lambda ev: ev.btagSF_shape_up_lf),
+        ("btagWeight_shapeLFDown",            float,    "", lambda ev: ev.btagSF_shape_down_lf),
+        ("btagWeight_shapeHFUp",            float,    "", lambda ev: ev.btagSF_shape_up_hf),
+        ("btagWeight_shapeHFDown",            float,    "", lambda ev: ev.btagSF_shape_down_hf),
+        ("btagWeight_shapeHFSTATS1Up",            float,    "", lambda ev: ev.btagSF_shape_up_hfstats1),
+        ("btagWeight_shapeHFSTATS1Down",            float,    "", lambda ev: ev.btagSF_shape_down_hfstats1),
+        ("btagWeight_shapeHFSTATS2Up",            float,    "", lambda ev: ev.btagSF_shape_up_hfstats2),
+        ("btagWeight_shapeHFSTATS2Down",            float,    "", lambda ev: ev.btagSF_shape_down_hfstats2),
+        ("btagWeight_shapeLFSTATS1Up",            float,    "", lambda ev: ev.btagSF_shape_up_lfstats1),
+        ("btagWeight_shapeLFSTATS1Down",            float,    "", lambda ev: ev.btagSF_shape_down_lfstats1),
+        ("btagWeight_shapeLFSTATS2Up",            float,    "", lambda ev: ev.btagSF_shape_up_lfstats2),
+        ("btagWeight_shapeLFSTATS2Down",            float,    "", lambda ev: ev.btagSF_shape_down_lfstats2),
+        ("btagWeight_shapeCFERR1Up",            float,    "", lambda ev: ev.btagSF_shape_up_cferr1),
+        ("btagWeight_shapeCFERR1Down",            float,    "", lambda ev: ev.btagSF_shape_down_cferr1),
+        ("btagWeight_shapeCFERR2Up",            float,    "", lambda ev: ev.btagSF_shape_up_cferr2),
+        ("btagWeight_shapeCFERR2Down",            float,    "", lambda ev: ev.btagSF_shape_down_cferr2),
+
+
         ("tth_rho_px_gen",  float,  ""),
         ("tth_rho_py_gen",  float,  ""),
         ("tth_rho_px_reco",  float,  ""),

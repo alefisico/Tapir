@@ -208,6 +208,21 @@ class Muon:
     @staticmethod
     def make_array(input, MC = False):
         return [Muon(input, i, MC) for i in range(input.nMuon)]
+
+class GenPart:
+    def __init__(self, tree, n, MC):
+        self.genPartIdxMother = tree.GenPart_genPartIdxMother[n]
+        self.pdgId = tree.GenPart_pdgId[n]
+        
+        self.pt = tree.GenPart_pt[n]
+        self.eta = tree.GenPart_eta[n]
+        self.phi = tree.GenPart_phi[n]
+        self.mass = tree.GenPart_mass[n]
+        pass
+    @staticmethod   
+    def make_array(input, MC = True):
+        return [GenPart(input, i, MC) for i in range(input.nGenPart)]
+
 class Jet:
     def __init__(self, tree, n, MC):
         self.jetId = tree.Jet_jetId[n];
@@ -240,6 +255,30 @@ class Jet:
             #self.corr_JER = 0.0
             self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
             self.corr_JER = tree.Jet_pt_nom[n]/tree.Jet_pt[n];
+
+            # btag Weights
+            self.btagSF = tree.Jet_btagSF[n]
+            self.btagSF_up = tree.Jet_btagSF_up[n]
+            self.btagSF_down = tree.Jet_btagSF_down[n]
+            self.btagSF_shape = tree.Jet_btagSF_shape[n]
+            self.btagSF_shape_up_jes = tree.Jet_btagSF_shape_up_jes[n]
+            self.btagSF_shape_down_jes = tree.Jet_btagSF_shape_down_jes[n]
+            self.btagSF_shape_up_lf = tree.Jet_btagSF_shape_up_lf[n]
+            self.btagSF_shape_down_lf = tree.Jet_btagSF_shape_down_lf[n]
+            self.btagSF_shape_up_hf = tree.Jet_btagSF_shape_up_hf[n]
+            self.btagSF_shape_down_hf = tree.Jet_btagSF_shape_down_hf[n]
+            self.btagSF_shape_up_hfstats1 = tree.Jet_btagSF_shape_up_hfstats1[n]
+            self.btagSF_shape_down_hfstats1 = tree.Jet_btagSF_shape_down_hfstats1[n]
+            self.btagSF_shape_up_hfstats2 = tree.Jet_btagSF_shape_up_hfstats2[n]
+            self.btagSF_shape_down_hfstats2 = tree.Jet_btagSF_shape_down_hfstats2[n]
+            self.btagSF_shape_up_lfstats1 = tree.Jet_btagSF_shape_up_lfstats1[n]
+            self.btagSF_shape_down_lfstats1 = tree.Jet_btagSF_shape_down_lfstats1[n]
+            self.btagSF_shape_up_lfstats2 = tree.Jet_btagSF_shape_up_lfstats2[n]
+            self.btagSF_shape_down_lfstats2 = tree.Jet_btagSF_shape_down_lfstats2[n]
+            self.btagSF_shape_up_cferr1 = tree.Jet_btagSF_shape_up_cferr1[n]
+            self.btagSF_shape_down_cferr1 = tree.Jet_btagSF_shape_down_cferr1[n]
+            self.btagSF_shape_up_cferr2 = tree.Jet_btagSF_shape_up_cferr2[n]
+            self.btagSF_shape_down_cferr2 = tree.Jet_btagSF_shape_down_cferr2[n]
 
             self.pt_corr_JERUp = tree.Jet_pt_jerUp[n]
             self.pt_corr_JERDown = tree.Jet_pt_jerDown[n]
