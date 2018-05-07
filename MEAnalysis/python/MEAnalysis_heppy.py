@@ -256,7 +256,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #Recompute pileup weight
+    #As an option, we can recompute pileup weight
     puweight_ana = cfg.Analyzer(
         MECoreAnalyzers.PUWeightAnalyzer,
         'puweight',
@@ -432,9 +432,10 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             # prefilter,
             evs,
 
-            #After this, the event has been created
+            #After this, the event object has been created
             lumilist_ana,
-            puweight_ana,
+
+            #puweight_ana, #possible to recompute the PU weight on the fly by uncommenting
             gentth_pre,
             pvana,
             trigger,

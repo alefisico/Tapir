@@ -58,6 +58,7 @@ class EventAnalyzer(Analyzer):
 
 
         
+        event.puWeight = getattr(event.input, "puWeight", None)
         #event.puWeightUp = getattr(event.input, "puWeightUp", None)
         #event.puWeightDown = getattr(event.input, "puWeightDown", None)
         #event.triggerEmulationWeight = getattr(event.input, "triggerEmulationWeight", None)
