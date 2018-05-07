@@ -148,10 +148,19 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
                 else:
                     add_rad.SetPtEtaPhiM(event.GenParticle[p[0]].pt, event.GenParticle[p[0]].eta, event.GenParticle[p[0]].phi, event.GenParticle[p[0]].mass)
                               
-            
+           
+ 
             # call MEM scattering to get the probability for hypo = TTH and hypo = TTBB
+            prob = {}
             # TTH
-            hypo = MEM.Hypothesis.TTH
-            prob_1 = self.integrator.scattering(top, atop, bottom, abottom, add_rad, ROOT.Double(x1.E()), ROOT.Double(x2.E()))
+            self.integrator.set_hypo(MEM.Hypothesis.TTH)
+            prob["ttHbb"] = self.integrator.scattering(top, atop, bottom, abottom, add_rad, ROOT.Double(x1.E()), ROOT.Double(x2.E()))
+            self.integrator.set_hypo(MEM.Hypothesis.TTBB)
+            prob["ttbb"] = self.integrator.scattering(top, atop, bottom, abottom, add_rad, ROOT.Double(x1.E()), ROOT.Double(x2.E()))
+            print prob
+
+            r = prob["ttHbb"]/prob["ttbb"]
+            print r
+
 
         return True        
