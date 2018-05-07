@@ -303,6 +303,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'jets',
         _conf = python_conf
     )
+    
+    btagweight = cfg.Analyzer(
+        MECoreAnalyzers.BtagWeightAnalyzer,
+        'btagweight',
+        _conf = python_conf
+    )
+
     counter_jet = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter_jet',
@@ -443,6 +450,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             leps,
             counter_lep,
             jets,
+            btagweight,
             counter_jet,
             btaglr,
             counter_blr,
@@ -480,6 +488,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             leps,
             counter_lep,
             jets,
+            btagweight,
             counter_jet,
             btaglr,
             counter_blr,
