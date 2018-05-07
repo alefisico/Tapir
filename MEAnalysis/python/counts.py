@@ -41,6 +41,9 @@ def main(filenames, ofname):
         tfiles += [tf]
 
         run_tree = tf.Get("Runs")
+        if not run_tree:
+            run_tree = tf.Get("nanoAOD/Runs")
+
         tree_list.Add(run_tree)
 
     of.cd()

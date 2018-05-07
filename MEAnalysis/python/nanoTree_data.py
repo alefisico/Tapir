@@ -6,7 +6,7 @@ class EventAnalyzer(Analyzer):
         super(EventAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
     def process(self, event):
         event.lumi = getattr(event.input, "luminosityBlock", None)
-    	event.evt = getattr(event.input, "event", None)
+        event.evt = getattr(event.input, "event", None)
 
         event.Electron = nanoTreeClasses.Electron.make_array(event.input)
         event.Muon = nanoTreeClasses.Muon.make_array(event.input)
@@ -29,6 +29,6 @@ class EventAnalyzer(Analyzer):
         """
         #event.json = getattr(event.input, "json", None)
         #event.json_silver = getattr(event.input, "json_silver", None)
-        #event.nPVs = getattr(event.input, "nPVs", None)
+        event.nPVs = getattr(event.input, "PV_npvs")
         #event.bx = getattr(event.input, "bx", None)
         #event.rho = getattr(event.input, "rho", None)

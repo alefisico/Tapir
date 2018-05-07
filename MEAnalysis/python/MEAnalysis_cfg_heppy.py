@@ -88,7 +88,7 @@ factorizedJetCorrections = ["JER","Total"]
 
 def el_baseline_loose(el):
     sca = abs(el.etaSc)
-    ret = ( el.eleCutId == 2 and
+    ret = ( el.eleCutId >= 2 and
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
     )
@@ -97,7 +97,7 @@ def el_baseline_loose(el):
 
 def el_baseline_medium(el):
     sca = abs(el.etaSc)
-    ret = ( el.eleCutId == 3 and
+    ret = ( el.eleCutId >= 3 and
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
     )
@@ -106,10 +106,10 @@ def el_baseline_medium(el):
 
 def el_baseline_tight(el):
     
-    # Taken from https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#22-electron
-    #  --> Usage of VID tools. Should also contain isolation cut
+    # Taken from https://gitlab.cern.ch/ttH/reference/blob/ICHEP18/definitions/ICHEP18.md#22-electron
     sca = abs(el.etaSc)
-    ret = ( el.eleCutId == 4 and
+
+    ret = ( el.eleCutId >= 4 and #tight ID as per nanoAOD bitmap mapper
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
     )
@@ -148,7 +148,6 @@ class Conf:
                 "idcut": mu_baseline_tight,
             },
             "isotype": "PFIso04_all", #pfRelIso - delta-beta, relIso - rho
-            "debug" : print_mu
         },
 
         "el": {
@@ -168,7 +167,6 @@ class Conf:
             },
             #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff
             "isotype": "relIso03", #KS: changed for nanoAOD.
-            "debug" : print_el
         },
         "DL": {
             "pt_leading": 25,
@@ -336,7 +334,7 @@ class Conf:
 
         #Actually run the ME calculation
         #If False, all ME values will be 0
-        "calcME": True,
+        "calcME": False,
         "n_integration_points_mult": 1.0,
         "factorized_sources": factorizedJetCorrections,
         #compute MEM variations for these sources in the nominal case

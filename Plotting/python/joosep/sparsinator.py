@@ -342,6 +342,7 @@ def createEvent(
                 l4p(event.met_pt, 0, event.met_phi, 0),
             )
             event.common_bdt = ret_bdt
+
     return event
 
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1, outfilter=None):
@@ -657,8 +658,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     event.weights[syst_pairs["CMS_ttH_CSV"]] = w
 
                 #make sure data event is in golden JSON
-                if schema == "data" and not event.json:
-                    continue
+                #note: nanoAOD data is already pre-selected with the json specified in multicrab_94X.py
+                #if schema == "data" and not event.json:
+                #    continue
                 
                 if not pass_METfilter(event, schema):
                     print("Event {0}:{1}:{2} failed MET filter".format(event.run, event.lumi, event.evt))
