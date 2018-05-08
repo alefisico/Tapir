@@ -57,9 +57,12 @@ This will call
 python $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_heppy.py MEAnalysis/data/default.cfg --sample SAMPLE_NAME
 ~~~
 
+Steps 1-2 can be run together on the grid using crab, see `MEAnalysis/crab_nano/multicrab_94X.py`.
+To produce the subsequent `.txt` files used for local running, see the script `Plotting/python/christina/ttbar_classification/getFilesCrab.py`.
+
 ## Step3 (optional): skim with `projectSkim`
 
-When some of the samples are done, you can produce smallish (<10GB) skims of the files using local batch jobs.
+When some of the samples are done, you can produce smallish (<10GB) skims of the files using local batch jobs. These can be used for direct analysis by hand.
 
 ~~~
 $ cd TTH/MEAnalysis/gc
