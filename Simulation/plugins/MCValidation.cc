@@ -427,6 +427,9 @@ void MCValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	} else dilepton = false;//LogWarning("test") << selectedMuons.size() << " " << selectedElectrons.size();
 	//LogWarning("dilepton") << dilepton;
 	
+	if (dilepton) {
+	}
+	
 
 }
 
