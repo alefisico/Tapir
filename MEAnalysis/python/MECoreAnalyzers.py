@@ -20,3 +20,5 @@ from TTH.MEAnalysis.MVAVarAnalyzer import MVAVarAnalyzer
 from TTH.MEAnalysis.BTagRandomizerAnalyzer import BTagRandomizerAnalyzer
 from TTH.MEAnalysis.TreeVarAnalyzer import TreeVarAnalyzer
 from TTH.MEAnalysis.CommonClassifierAnalyzer import CommonClassifierAnalyzer
+from TTH.MEAnalysis.BtagWeightAnalyzer import BtagWeightAnalyzer
+from TTH.MEAnalysis.JointLikelihoodAnalyzer import JointLikelihoodAnalyzer

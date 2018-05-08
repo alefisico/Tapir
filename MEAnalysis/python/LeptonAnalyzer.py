@@ -1,6 +1,10 @@
+import logging
+
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 import ROOT
 from TTH.MEAnalysis.vhbb_utils import lvec, autolog
+
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 class LeptonAnalyzer(FilterAnalyzer):
     """
@@ -27,42 +31,25 @@ class LeptonAnalyzer(FilterAnalyzer):
 
     def process(self, event):
 
-        #event.mu = filter(
-        #    lambda x: abs(x.pdgId) == 13,
-        #    event.selLeptons,
-        #)
         event.mu = event.Muon
+        LOG_MODULE_NAME.debug("nanoAOD muons: " + str([(x.pt, x.eta, x.phi, x.tightId) for x in event.mu]))
 
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("input muons: ", len(event.mu))
-            for it in event.mu:
-                (self.conf.leptons["mu"]["debug"])(it)
-
-        #event.el = filter(
-        #    lambda x: abs(x.pdgId) == 11,
-        #    event.selLeptons,
-        #)
         event.el = event.Electron
-        
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("input electrons: ", len(event.el))
-            for it in event.el:
-                (self.conf.leptons["el"]["debug"])(it)
+        LOG_MODULE_NAME.debug("nanoAOD electrons: " + str([(x.pt, x.eta, x.phi, x.eleCutId) for x in event.el]))
 
         for id_type in ["SL", "DL", "veto"]:
             sumleps = []
             for lep_flavour in ["mu", "el"]:
+
+                #get the lepton cuts from the configuration
                 lepcuts = self.conf.leptons[lep_flavour][id_type]
                 incoll = getattr(event, lep_flavour)
                 
                 #The isolation type and cut value to be used
                 isotype = self.conf.leptons[lep_flavour]["isotype"]
                 isocut = lepcuts.get("iso", None)
-
-                if "debug" in self.conf.general["verbosity"]:
-                    autolog("input collection", id_type, lep_flavour)
-                    for lep in incoll:
-                        autolog(lep.pt, lep.eta, lep.pdgId)
+                
+                LOG_MODULE_NAME.debug("before pt,eta: id_type={0} lep_flavour={1} Nleps={2} incoll={3}".format(id_type, lep_flavour, len(incoll), str([[x.pt, x.eta, x.pdgId] for x in incoll])))
 
                 #Filter leptons by pt and eta
                 leps = filter(
@@ -71,12 +58,7 @@ class LeptonAnalyzer(FilterAnalyzer):
                         and abs(x.eta) < lepcuts["eta"]
                     ), incoll
                 )
-
-
-                if "debug" in self.conf.general["verbosity"]:
-                    autolog("after eta")
-                    for lep in leps:
-                        autolog(lep.pt, lep.eta, lep.pdgId)
+                LOG_MODULE_NAME.debug("after pt,eta: id_type={0} lep_flavour={1} Nleps={2} leps={3}".format(id_type, lep_flavour, len(leps), str([[x.pt, x.eta, x.pdgId] for x in leps])))
 
                 #Apply isolation cut
                 for lep in leps:
@@ -93,26 +75,27 @@ class LeptonAnalyzer(FilterAnalyzer):
                         leps = filter(
                             lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
                         )
-                
-                if "debug" in self.conf.general["verbosity"]:
-                    autolog("after iso", isotype)
-                    for lep in leps:
-                        autolog(lep.pt, lep.eta, lep.pdgId)
+                LOG_MODULE_NAME.debug("after iso: id_type={0} lep_flavour={1} Nleps={2} leps={3}".format(id_type, lep_flavour, len(leps), str([[x.pt, x.eta, x.pdgId, x.iso] for x in leps])))
                 
                 #Apply ID cut 
                 leps = filter(lepcuts["idcut"], leps)
-                if "debug" in self.conf.general["verbosity"]:
-                    autolog("after id")
-                    for lep in leps:
-                        autolog(lep.pt, lep.eta, lep.pdgId)
+                LOG_MODULE_NAME.debug("after ID: id_type={0} lep_flavour={1} Nleps={2} leps={3}".format(id_type, lep_flavour, len(leps), str([[x.pt, x.eta, x.pdgId, x.iso] for x in leps])))
 
+                #add to the vector of all the leptons
                 sumleps += leps
                 lepname = lep_flavour + "_" + id_type
+
                 setattr(event, lepname, leps)
                 setattr(event, "n_"+  lepname, len(leps))
+                LOG_MODULE_NAME.debug(lepname + " " + str([(x.pt, x.eta, x.pdgId) for x in leps]))
             #end of lep_flavour loop
+            
             setattr(event, "lep_{0}".format(id_type), sumleps)
             setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
+            LOG_MODULE_NAME.debug("lep_{0}".format(id_type) + " " + str([(x.pt, x.eta, x.pdgId) for x in sumleps]))
+        # end of lepton type loop (SL, DL, veto)
+        
+
         #end of id_type loop
         event.lep_SL = sorted(event.lep_SL, key=lambda x: x.pt, reverse=True)
         event.lep_DL = sorted(event.lep_DL, key=lambda x: x.pt, reverse=True)
@@ -123,40 +106,22 @@ class LeptonAnalyzer(FilterAnalyzer):
         for lep in event.lep_DL:
             if len(lep_DL_afterpt) == 0:
                 ptcut = self.conf.leptons["DL"]["pt_leading"]
-            else: 
+            else:
                 ptcut = self.conf.leptons["DL"]["pt_subleading"]
             if lep.pt > ptcut:
                 lep_DL_afterpt += [lep]
         event.lep_DL = lep_DL_afterpt
         event.n_lep_DL = len(event.lep_DL)
-
-        if "debug" in self.conf.general["verbosity"]:
-            for lep in event.lep_SL + event.lep_DL + event.lep_veto:
-                if lep in event.mu:
-                    f = self.conf.leptons["mu"]["debug"]
-                elif lep in event.el:
-                    f = self.conf.leptons["el"]["debug"]
-                else:
-                    f = lambda x: x
-                prefix = ""
-                if lep in event.lep_SL:
-                    prefix += "SL "
-                if lep in event.lep_DL:
-                    prefix += "DL "
-                if lep in event.lep_DL:
-                    prefix += "veto "
-                autolog(prefix)
-                f(lep)
-            autolog("n_lep_tight={0}, n_lep_loose={1}, n_lep_tight_veto={2}".format(
-                event.n_lep_SL, event.n_lep_DL, event.n_lep_veto)
-            )
+        LOG_MODULE_NAME.debug("after two-stage DL pt: Nleps={0} leps={1}".format(len(event.lep_DL), str([[x.pt, x.eta, x.pdgId] for x in event.lep_DL])))
 
         event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
         event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
         event.is_fh = (event.n_lep_veto == 0)
-        if "debug" in self.conf.general["verbosity"]:
-            autolog("is_sl, is_dl, is_fh", event.is_sl, event.is_dl, event.is_fh)
+        LOG_MODULE_NAME.debug("is_sl={0} is_dl={1} is_fh={2}".format(event.is_sl, event.is_dl, event.is_fh))
         
+        if len(event.genTopLep) == 2 and tuple([abs(x.pdgId) for x in event.GenLep]) == (11, 11) and len(event.el) == 2:
+            LOG_MODULE_NAME.debug("event {0} should pass elel".format(event.id_triplet))
+
         #Calculate di-lepton system momentum
         event.dilepton_p4 = ROOT.TLorentzVector()
         if event.is_sl:
