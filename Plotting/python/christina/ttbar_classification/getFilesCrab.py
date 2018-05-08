@@ -4,6 +4,10 @@ import argparse
 import ROOT
 
 def makeDatacards(fpath, opath, prefix):
+   
+    #need /-terminated string
+    if not fpath.endswith("/"):
+        fpath += "/"
 
     dirs = os.listdir(fpath)
     tag = os.path.split(os.path.dirname(fpath))[1]
@@ -37,10 +41,10 @@ def makeDatacards(fpath, opath, prefix):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="collect crab_nano output and make datacards")
-    parser.add_argument("--path", required=True, help="path of crab output", type=str)
-    parser.add_argument("--outpath", default="/mnt/t3nfs01/data01/shome/creissel/tth/2017/sw/CMSSW_9_4_5_cand1/src/TTH/MEAnalysis/gc/datasets", help="path to store datasets", type=str)                     
-    parser.add_argument("--prefix", default="root://t3dcachedb03.psi.ch", help="prefix to add to rootfiles", type=str)
+    parser = argparse.ArgumentParser(description="collect crab_nano output and make dataset .txt files")
+    parser.add_argument("--path", required=True, help="path of crab output, e.g. /pnfs/psi.ch/cms/trivcat/store/user/algomez/tth/May08_t1/", type=str)
+    parser.add_argument("--outpath", default="/mnt/t3nfs01/data01/shome/creissel/tth/2017/sw/CMSSW_9_4_5_cand1/src/TTH/MEAnalysis/gc/datasets", help="path to store dataset .txt files", type=str)
+    parser.add_argument("--prefix", default="root://t3dcachedb.psi.ch", help="server prefix to add to rootfiles", type=str)
     args = parser.parse_args()
 
     makeDatacards(args.path, args.outpath, args.prefix)
