@@ -118,9 +118,6 @@ class LeptonAnalyzer(FilterAnalyzer):
         event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
         event.is_fh = (event.n_lep_veto == 0)
         LOG_MODULE_NAME.debug("is_sl={0} is_dl={1} is_fh={2}".format(event.is_sl, event.is_dl, event.is_fh))
-        
-        if len(event.genTopLep) == 2 and tuple([abs(x.pdgId) for x in event.GenLep]) == (11, 11) and len(event.el) == 2:
-            LOG_MODULE_NAME.debug("event {0} should pass elel".format(event.id_triplet))
 
         #Calculate di-lepton system momentum
         event.dilepton_p4 = ROOT.TLorentzVector()
