@@ -11,7 +11,8 @@ if __name__ == "__main__":
         '--sample',
         action="store",
         help="Sample to process",
-        required=True,
+        required=False,
+        default="ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8"
     )
     parser.add_argument(
         '--analysis_cfg',
@@ -32,6 +33,7 @@ if __name__ == "__main__":
     files = sample.file_names_step1[:1]
 
     #replace local SE access with remote SE access
-    files = [fi.replace("root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/", "root://t3se.psi.ch//") for fi in files]
+    if args.sample == "ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8":
+        files = ["root://cms-xrd-global.cern.ch//store/mc/RunIIFall17NanoAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/10000/18C1BD10-B842-E811-87AA-6CC2173D6B10.root"]
     main(outdir="./", _input=files)
 
