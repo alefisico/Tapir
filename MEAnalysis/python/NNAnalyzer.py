@@ -24,9 +24,12 @@ class NNAnalyzer(FilterAnalyzer):
 
             # make header for file
             for o in ["leptons", "jets", "met"]:
-                for var in self.var[o][1]:
-                    for i in range(self.var[o][0]):
-                        self.output.write(o + "_" + var + "_" + str(i) + " ")
+                    for var in self.var[o][1]:
+                        if self.var[o][0] > 0:
+                            for i in range(self.var[o][0]):
+                                self.output.write(o + "_" + var + "_" + str(i) + " ")
+                        else:
+                            self.output.write(o + "_" + var + " ")
 
             self.output.write("JLR\n")
 
