@@ -9,6 +9,8 @@ class BtagWeightAnalyzer(FilterAnalyzer):
         super(FilterAnalyzer, self).beginLoop(setup)
 
     def btagWeight(self, jets_btagSF):
+        if len(jets_btagSF) == 0:
+            return 1.0
         return reduce(lambda x,y : x*y, jets_btagSF)
             
     def process(self, event):
