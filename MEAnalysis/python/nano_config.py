@@ -49,7 +49,7 @@ class NanoConfig:
             ]
         if pu:
             imports += [
-                ('PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer','puWeight')
+                ('PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer','puAutoWeight')
             ]
 
         self.json = None #Intended use: Skimming
