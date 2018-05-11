@@ -394,6 +394,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
+    # computes input for NN (training or prediction)
+    NN_ana = cfg.Analyzer(
+        MECoreAnalyzers.NNAnalyzer,
+        'NN_input',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
 
     gentth_pre = cfg.Analyzer(
         MECoreAnalyzers.GenTTHAnalyzerPre,
@@ -470,6 +477,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             #multiclass_analyzer,
             mem_analyzer,
             jointlikelihood_ana,
+            NN_ana,
             mva,
             treevar,
 
