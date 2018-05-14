@@ -15,6 +15,8 @@ class BtagWeightAnalyzer(FilterAnalyzer):
             
     def process(self, event):
 
+        jets = event.systResults["nominal"].good_jets
+
         if self.cfg_comp.isMC:
 
             syst = ["jes", "lf", "hf", "hfstats1", "hfstats2", "lfstats1", "lfstats2", "cferr1", "cferr2"]
@@ -26,8 +28,8 @@ class BtagWeightAnalyzer(FilterAnalyzer):
                     btagSF.append("btagSF_shape_" + i + "_" + s)
 
             for b in btagSF:
-                numJet = len(event.Jet)
-                jetsbtagSF = [getattr(event.Jet[i], b) for i in range(numJet)]
+                numJet = len(jets)
+                jetsbtagSF = [getattr(jets[i], b) for i in range(numJet)]
                 setattr(event, b, self.btagWeight(jetsbtagSF))
 
         return True
