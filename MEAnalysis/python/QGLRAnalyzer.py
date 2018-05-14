@@ -114,7 +114,7 @@ class QGLRAnalyzer(FilterAnalyzer):
         maxLikelihood = {}
         for nB in toDo:
             jets_for_qg_lr = getattr(event,"buntagged_jets_maxLikelihood_%sb"%nB)[:]
-            print "jets_for_qg_lr", len(jets_for_qg_lr)
+            #print "jets_for_qg_lr", len(jets_for_qg_lr)
             if len(jets_for_qg_lr) > 8:
                 print "WARNING! Event with crazy amount of jets, keeping first 8 only to reduce computing time"
                 jets_for_qg_lr = jets_for_qg_lr[:10]

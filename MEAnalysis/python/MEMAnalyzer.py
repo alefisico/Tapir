@@ -488,7 +488,7 @@ class MEAnalyzer(FilterAnalyzer):
                     skipped += [confname]
                     r = MEM.MEMOutput()
                     event.res[(hypo, confname)] = r
-            LOG_MODULE_NAME.info("skipped confs {0}".format(skipped))
+            LOG_MODULE_NAME.debug("skipped confs {0}".format(skipped))
 
         #Add MEM results to event
         for key in self.memkeysToRun:

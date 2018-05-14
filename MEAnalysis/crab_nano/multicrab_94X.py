@@ -336,11 +336,11 @@ for k in [
     "ttHTobb",
     ]:
     D = deepcopy(datasets[k])
-    D["maxlumis"] = 4
+    D["maxlumis"] = 20
     D["perjob"] = 2
     if not D["isMC"]:
-        D["maxlumis"] = 10
-        D["perjob"] = 5
+        D["maxlumis"] = 20
+        D["perjob"] = 2
         D["json"] = json_file
     D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"
@@ -449,10 +449,11 @@ if __name__ == '__main__':
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
     
-    #config.Site.whitelist = ["T2_US_Vanderbilt"]
+    #config.Site.whitelist = ["T2_CH_CSCS"]
     config.Site.blacklist = [
         "T3_UK_London_QMUL",
-    ] 
+        "T2_CH_CSCS_HPC", #added on May 9 2018 due to PSet hash errors that only seem to occur on T2_CH_CSCS_HPC
+    ]
 
     config.Site.storageSite = "T3_CH_PSI"
 

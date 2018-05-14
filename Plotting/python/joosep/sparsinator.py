@@ -303,8 +303,10 @@ def createEvent(
         #        "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
         #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         #    ]}
-        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
-        #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
+
+        #pu weight and btag weight need fixing, May 11, 2018
+        #event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
+        event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
@@ -566,7 +568,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     "use of postprocessing".format(file_name)
                 )
             else:
-                fn_base = os.path.basename(file_name).replace(".root", "")
+                #fix typo
+                fn_base = os.path.basename(file_name).replace("_out.root", "_postproccesing.root")
                 fns_postproc = [fn for fn in sample.file_names_postproc if fn_base in fn]
                 if len(fns_postproc) != 1:
                     raise Exception("Expected exactly one matching postprocessing file but got {0}".format(fns_postproc))
@@ -600,6 +603,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         tfile_postproc = None
         ttree_postproc = None
         if file_name_postproc:
+            LOG_MODULE_NAME.info("opening postprocessing file {0}".format(file_name_postproc))
             tfile_postproc = ROOT.TFile.Open(file_name_postproc)
             ttree_postproc = tfile_postproc.Get("Friends")
             if ttree_postproc.GetEntries() != events.reader.GetEntries(True):
@@ -649,6 +653,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     continue
                 
                 if ttree_postproc:
+                    LOG_MODULE_NAME.debug("replacing pu weight {0} with postprocessing {1}".format(
+                        event.weights[syst_pairs["CMS_pu"]],
+                        ttree_postproc.puWeight
+                    ))
                     event.weights[syst_pairs["CMS_pu"]] = ttree_postproc.puWeight
                     w = reduce(
                         lambda x,y: x*y,
@@ -735,7 +743,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     if os.environ.has_key("FILE_NAMES"):
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])

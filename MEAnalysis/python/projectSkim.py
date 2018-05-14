@@ -23,6 +23,7 @@ if "all" in datatypes:
 tt.SetBranchStatus("is_*", True)
 tt.SetBranchStatus("numJets*", True)
 tt.SetBranchStatus("nB*", True)
+tt.SetBranchStatus("passPV*", True)
 if "mem" in datatypes:
     tt.SetBranchStatus("mem_*", True)
     tt.SetBranchStatus("nMatch*", True)
@@ -50,9 +51,10 @@ if "kinematics" in datatypes:
     tt.SetBranchStatus("HLT*", True)
     tt.SetBranchStatus("nPVs*", True)
 
-#tt.SetBranchStatus("run", True)
-#tt.SetBranchStatus("lumi", True)
-#tt.SetBranchStatus("evt", True)
+tt.SetBranchStatus("run", True)
+tt.SetBranchStatus("lumi", True)
+tt.SetBranchStatus("evt", True)
+tt.SetBranchStatus("json", True)
 #tt.SetBranchStatus("cat", True)
 #tt.SetBranchStatus("ht", True)
 #tt.SetBranchStatus("isotropy", True)
