@@ -14,7 +14,7 @@ class NNAnalyzer(FilterAnalyzer):
         #self.obj = {"good_leptons":2, "good_jets":10}
         #self.obj = {"good_leptons":(2, ["pt", "eta", "phi", "mass"]), "MET": (1, ["pt", "sumEt", "phi"])}
         #self.obj_var = ["pt", "eta", "phi", "mass"]
-        self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass"]), "met":(0, ["pt", "phi", "sumEt"])}
+        self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "Wmass", "ht30"])}
 
         self.training = True
 
@@ -23,11 +23,16 @@ class NNAnalyzer(FilterAnalyzer):
             self.output = open("training.csv", "w")
 
             # make header for file
-            for o in ["leptons", "jets", "met"]:
-                    for var in self.var[o][1]:
-                        if self.var[o][0] > 0:
-                            for i in range(self.var[o][0]):
-                                self.output.write(o + "_" + var + "_" + str(i) + " ")
+            for o in ["leptons", "jets", "met", "high_level_var"]:
+                if o == "leptons" or o == "jets":
+                    self.output.write("num_" + o + " ")
+                for var in self.var[o][1]:
+                    if self.var[o][0] > 0:
+                        for i in range(self.var[o][0]):
+                            self.output.write(o + "_" + var + "_" + str(i) + " ")
+                    else:
+                        if o == "high_level_var":
+                            self.output.write(var + " ")
                         else:
                             self.output.write(o + "_" + var + " ")
 
@@ -41,16 +46,18 @@ class NNAnalyzer(FilterAnalyzer):
         #pdb.set_trace()
 
         # Leptons
+        features.append(len(getattr(event.systResults["nominal"], "good_leptons")))
         for var in self.var["leptons"][1]:
             for i in range(self.var["leptons"][0]):
-                if i in range(len(getattr(event, "good_leptons"))):
-                    io = getattr(event, "good_leptons")[i]
+                if i in range(len(getattr(event.systResults["nominal"], "good_leptons"))):
+                    io = event.systResults["nominal"].good_leptons[i]
                     features.append(getattr(io,var))
                 else:
                     features.append(0.)
 
         # Jets
         # check if training because otherwise also systematics have to be evaluated
+        features.append(len(event.systResults["nominal"].good_jets))
         if self.training == True:
             for var in self.var["jets"][1]:
                 for i in range(self.var["jets"][0]):
@@ -62,9 +69,13 @@ class NNAnalyzer(FilterAnalyzer):
 
         # MET
         for var in self.var["met"][1]:
-            io = getattr(event, "met")
+            io = getattr(event.systResults["nominal"], "met")
             features.append(getattr(io,var))
 
+        # high level variables
+        for var in self.var["high_level_var"][1]:
+            io = getattr(event.systResults["nominal"], var)
+            features.append(float(io))
 
         # target: joint likelihood ratio
         if self.training == True:
