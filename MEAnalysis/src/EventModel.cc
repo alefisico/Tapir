@@ -84,8 +84,8 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
     event.nBCSVM = nBCSVM.GetValue(syst_id);
 
     event.weights[std::make_pair(Systematic::gen, Systematic::None)] = (*genWeight);
-    event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = 1.0;
-    event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = 1.0;
+    event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = (*btagWeight_shape);
+    event.weights[std::make_pair(Systematic::CMS_pu, Systematic::None)] = (*puWeight);
 
     if (Systematic::is_nominal(syst_id)) {
 
@@ -99,7 +99,7 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
         //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Up)] = (*btagWeightCSV_CSVlfstats1Up);
         //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Up)] = (*btagWeightCSV_CSVlfstats2Up);
 
-        //event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Up)] = (*puWeightUp);
+        event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Up)] = (*puWeightUp);
 
         //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Down)] = (*btagWeightCSV_CSVcferr1Down);
         //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Down)] = (*btagWeightCSV_CSVcferr2Down);
@@ -111,7 +111,7 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
         //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Down)] = (*btagWeightCSV_CSVlfstats1Down);
         //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Down)] = (*btagWeightCSV_CSVlfstats2Down);
 
-        //event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Down)] = (*puWeightDown);
+        event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Down)] = (*puWeightDown);
     }
 
     if (Systematic::is_jec(syst_id) || Systematic::is_jer(syst_id)) {

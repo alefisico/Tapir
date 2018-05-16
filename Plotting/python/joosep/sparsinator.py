@@ -304,7 +304,11 @@ def createEvent(
         #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         #    ]}
 
-        #pu weight and btag weight need fixing, May 11, 2018
+        LOG_MODULE_NAME.debug("pu={0} gen={1} btag={2}".format(
+            event.weights.at(syst_pairs["CMS_pu"]),
+            event.weights.at(syst_pairs["gen"]),
+            event.weights.at(syst_pairs["CMS_ttH_CSV"]))
+        )
         #event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
         event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
@@ -743,7 +747,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     if os.environ.has_key("FILE_NAMES"):
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])

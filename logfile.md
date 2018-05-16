@@ -342,3 +342,11 @@ tthbb13=4963733a
 CommonClassifier=a10a9df
 MEIntegratorStandalone=7566e96
 CMSSW=41220f99aff
+
+
+May14_v1
+-------------
+tthbb13=803c4d5f
+CommonClassifier=a10a9df
+MEIntegratorStandalone=ab31bb6
+CMSSW=41220f99aff

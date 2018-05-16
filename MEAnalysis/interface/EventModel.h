@@ -401,17 +401,17 @@ public:
     TTreeReaderValue<T> genTopLep_pt;
     
     TTreeReaderValue<T> genWeight;
-    //TTreeReaderValue<T> puWeight;
-    //TTreeReaderValue<T> btagWeightCSV;
+    TTreeReaderValue<T> puWeight;
+    TTreeReaderValue<T> btagWeight_shape;
     
     TreeDescriptionMCSystematic(TFile* file, SampleDescription sample) :
         TreeDescription<T>(file, sample),
         ttCls(TreeDescription<T>::reader, "ttCls"),
         genTopHad_pt(TreeDescription<T>::reader, "genTopHad_pt"),
         genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt"),
-        genWeight(TreeDescription<T>::reader, "genWeight")
-        //puWeight(TreeDescription<T>::reader, "puWeight"),
-        //btagWeightCSV(TreeDescription<T>::reader, "btagWeightCSV")
+        genWeight(TreeDescription<T>::reader, "genWeight"),
+        puWeight(TreeDescription<T>::reader, "puWeight"),
+        btagWeight_shape(TreeDescription<T>::reader, "btagWeight_shape")
     {}
     
     ~TreeDescriptionMCSystematic() {}
@@ -442,11 +442,11 @@ public:
 
     TTreeReaderValue<T> genWeight;
     
-    //TTreeReaderValue<T> puWeight;
-    //TTreeReaderValue<T> puWeightUp;
-    //TTreeReaderValue<T> puWeightDown;
+    TTreeReaderValue<T> puWeight;
+    TTreeReaderValue<T> puWeightUp;
+    TTreeReaderValue<T> puWeightDown;
     
-    //TTreeReaderValue<T> btagWeightCSV;
+    TTreeReaderValue<T> btagWeight_shape;
     //TTreeReaderValue<T> btagWeightCSV_CSVcferr1Up;
     //TTreeReaderValue<T> btagWeightCSV_CSVcferr2Up;
     //TTreeReaderValue<T> btagWeightCSV_CSVhfUp;
@@ -488,13 +488,13 @@ public:
         mem_SL_1w2h2t_p(TreeDescription<T>::reader, "mem_SL_1w2h2t_p"),
         mem_SL_2w2h2t_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_p"),
 
-        genWeight(TreeDescription<T>::reader, "genWeight")
+        genWeight(TreeDescription<T>::reader, "genWeight"),
         
-        //puWeight(TreeDescription<T>::reader, "puWeight"),
-        //puWeightUp(TreeDescription<T>::reader, "puWeightUp"),
-        //puWeightDown(TreeDescription<T>::reader, "puWeightDown"),
+        puWeight(TreeDescription<T>::reader, "puWeight"),
+        puWeightUp(TreeDescription<T>::reader, "puWeightUp"),
+        puWeightDown(TreeDescription<T>::reader, "puWeightDown"),
 
-        //btagWeightCSV(TreeDescription<T>::reader, "btagWeightCSV"),
+        btagWeight_shape(TreeDescription<T>::reader, "btagWeight_shape")
 
         //btagWeightCSV_CSVcferr1Up(TreeDescription<T>::reader, "btagWeightCSV_up_cferr1"),
         //btagWeightCSV_CSVcferr2Up(TreeDescription<T>::reader, "btagWeightCSV_up_cferr2"),
