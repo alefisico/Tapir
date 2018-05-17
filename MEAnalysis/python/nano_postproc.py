@@ -10,7 +10,7 @@ from TTH.MEAnalysis.samples_base import getSitePrefix
 from TTH.MEAnalysis.nano_config import NanoConfig
 
 
-def main(outdir = "./", _input = None, asFriend = True, _era = "94Xv1", runAll = False):
+def main(outdir = "./", _input = None, asFriend = True, _era = "94Xv1", runAll = False, skipEvents=None, maxEvents=None):
     if _input is None:
         infiles = map(getSitePrefix, os.environ["FILE_NAMES"].split())
     else:
@@ -22,15 +22,23 @@ def main(outdir = "./", _input = None, asFriend = True, _era = "94Xv1", runAll =
         nano_cfg = NanoConfig(_era, btag=True, pu=True)
     for inf in infiles:
         tf = ROOT.TFile.Open(inf)
-        if not tf.Get("Events"):
-            raise Exception("Couldn't find TTree 'Events' in file, is it a nanoAOD file? Currently, the PostProcessor doesn't know how to read the tree from a subfolder.")
+#        if not tf.Get("Events"):
+#            raise Exception("Couldn't find TTree 'Events' in file, is it a nanoAOD file? Currently, the PostProcessor doesn't know how to read the tree from a subfolder.")
+
+    eventRange = None
+    if skipEvents>=0 and maxEvents>=0:
+        eventRange = xrange(skipEvents, skipEvents + maxEvents)
 
     p=PostProcessor(
         outdir, infiles,
         cut=nano_cfg.cuts, branchsel=nano_cfg.branchsel, modules=nano_cfg.modules,
         compression="LZMA:9", friend=asFriend, postfix="_postprocessed",
-        jsonInput=None, noOut=False, justcount=False
+        jsonInput=None, noOut=False, justcount=False,
+        #needs a patch to NanoAODTools
+        #treename="nanoAOD/Events", eventRange=eventRange
     )
+    for module in p.modules:
+        module.treename = "nanoAOD/Events"
     p.run()
 
 if __name__ == "__main__":
@@ -55,6 +63,20 @@ if __name__ == "__main__":
         type = str,
         default = "./",
     )
+    argumentparser.add_argument(
+        "--skipEvents",
+        action = "store",
+        help = "Number of events to skip",
+        type = int,
+        default = 0,
+    )
+    argumentparser.add_argument(
+        "--maxEvents",
+        action = "store",
+        help = "Number of events to process",
+        type = int,
+        default = -1,
+    )
 
     argumentparser.add_argument(
         "--era",
@@ -62,7 +84,7 @@ if __name__ == "__main__":
         help = "Era. Defailt: 94Xv1",
         choices = ["80X", "92X", "94Xv1", "94Xv2"],
         type = str,
-        default = "94Xv1",
+        default = "94Xv2",
     )
     
     argumentparser.add_argument(
@@ -82,4 +104,4 @@ if __name__ == "__main__":
     args = argumentparser.parse_args()
     #
     ##############################################################################################################
-    main(args.outputdir, args.input, args.noFriend, args.era, args.runAllModules)
+    main(args.outputdir, args.input, args.noFriend, args.era, args.runAllModules, args.skipEvents, args.maxEvents)

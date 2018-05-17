@@ -40,7 +40,7 @@ syst_pairs = OrderedDict([
         getattr(ROOT.TTH_MEAnalysis.Systematic, d if d != "" else "None")
     ))
     for x in [
-        #"CMS_scale_j",
+        "CMS_scale_j",
         "CMS_res_j",
         "CMS_scaleSubTotalPileUp_j",
         "CMS_scaleAbsoluteStat_j",
@@ -289,6 +289,7 @@ def createEvent(
 
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
+        event.lepton_weight = 1.0
         #event.lepton_weight = calc_lepton_SF(event)
         #if syst == "nominal":
         #    event.lepton_weights_syst = {w: calc_lepton_SF(event, w) for w in [
@@ -303,6 +304,12 @@ def createEvent(
         #        "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
         #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         #    ]}
+
+        LOG_MODULE_NAME.debug("pu={0} gen={1} btag={2}".format(
+            event.weights.at(syst_pairs["CMS_pu"]),
+            event.weights.at(syst_pairs["gen"]),
+            event.weights.at(syst_pairs["CMS_ttH_CSV"]))
+        )
         event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
         #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
@@ -441,9 +448,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("unweighted", lambda ev: 1.0),
-                #("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
-                #("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
-                #("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
+                ("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
+                ("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
+                ("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
         ]
 
         #for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
@@ -566,7 +573,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     "use of postprocessing".format(file_name)
                 )
             else:
-                fn_base = os.path.basename(file_name).replace(".root", "")
+                #fix typo
+                fn_base = os.path.basename(file_name).replace("_out.root", "_postproccesing.root")
                 fns_postproc = [fn for fn in sample.file_names_postproc if fn_base in fn]
                 if len(fns_postproc) != 1:
                     raise Exception("Expected exactly one matching postprocessing file but got {0}".format(fns_postproc))
@@ -600,6 +608,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         tfile_postproc = None
         ttree_postproc = None
         if file_name_postproc:
+            LOG_MODULE_NAME.info("opening postprocessing file {0}".format(file_name_postproc))
             tfile_postproc = ROOT.TFile.Open(file_name_postproc)
             ttree_postproc = tfile_postproc.Get("Friends")
             if ttree_postproc.GetEntries() != events.reader.GetEntries(True):
@@ -649,6 +658,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     continue
                 
                 if ttree_postproc:
+                    LOG_MODULE_NAME.debug("replacing pu weight {0} with postprocessing {1}".format(
+                        event.weights[syst_pairs["CMS_pu"]],
+                        ttree_postproc.puWeight
+                    ))
                     event.weights[syst_pairs["CMS_pu"]] = ttree_postproc.puWeight
                     w = reduce(
                         lambda x,y: x*y,

@@ -206,3 +206,16 @@ In file included from /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/incl
 ~~~
 
 This means that the base CMSSW release for nanoAOD has been updated, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Recipe_for_CMSSW_9_4_X_and_the_c 
+
+## Installing newer matplotlib
+
+~~~
+pip install --no-deps -I --prefix $CMSSW_BASE/piplibs matplotlib kiwisolver
+cd $CMSSW_BASE/piplibs
+wget http://www.qhull.org/download/qhull-2015-src-7.2.0.tgz
+tar xf qhull-2015-src-7.2.0.tgz
+cd qhull-2015.2
+make
+cd $CMSSW_BASE
+LD_PRELOAD=$CMSSW_BASE/piplibs/qhull-2015.2/lib/libqhull_r.so PYTHONPATH=$CMSSW_BASE/piplibs/lib/python2.7/site-packages/:$PYTHONPATH python ../Plotting/python/joosep/controlPlot.py ~/tth/gc/sparse/May16.root
+~~~
