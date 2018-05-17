@@ -89,28 +89,27 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
 
     if (Systematic::is_nominal(syst_id)) {
 
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Up)] = (*btagWeightCSV_CSVcferr1Up);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Up)] = (*btagWeightCSV_CSVcferr2Up);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Up)] = (*btagWeightCSV_CSVhfUp);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Up)] = (*btagWeightCSV_CSVhfstats1Up);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Up)] = (*btagWeightCSV_CSVhfstats2Up);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Up)] = (*btagWeightCSV_CSVjesUp);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Up)] = (*btagWeightCSV_CSVlfUp);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Up)] = (*btagWeightCSV_CSVlfstats1Up);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Up)] = (*btagWeightCSV_CSVlfstats2Up);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Up)] = (*btagWeight_shape_cferr1Up);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Up)] = (*btagWeight_shape_cferr2Up);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Up)] = (*btagWeight_shape_hfUp);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Up)] = (*btagWeight_shape_hfstats1Up);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Up)] = (*btagWeight_shape_hfstats2Up);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Up)] = (*btagWeight_shape_jesUp);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Up)] = (*btagWeight_shape_lfUp);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Up)] = (*btagWeight_shape_lfstats1Up);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Up)] = (*btagWeight_shape_lfstats2Up);
 
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Down)] = (*btagWeight_shape_cferr1Down);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Down)] = (*btagWeight_shape_cferr2Down);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Down)] = (*btagWeight_shape_hfDown);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Down)] = (*btagWeight_shape_hfstats1Down);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Down)] = (*btagWeight_shape_hfstats2Down);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Down)] = (*btagWeight_shape_jesDown);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Down)] = (*btagWeight_shape_lfDown);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Down)] = (*btagWeight_shape_lfstats1Down);
+        event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Down)] = (*btagWeight_shape_lfstats2Down);
+        
         event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Up)] = (*puWeightUp);
-
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr1, Systematic::Down)] = (*btagWeightCSV_CSVcferr1Down);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVcferr2, Systematic::Down)] = (*btagWeightCSV_CSVcferr2Down);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhf, Systematic::Down)] = (*btagWeightCSV_CSVhfDown);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats1, Systematic::Down)] = (*btagWeightCSV_CSVhfstats1Down);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVhfstats2, Systematic::Down)] = (*btagWeightCSV_CSVhfstats2Down);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVjes, Systematic::Down)] = (*btagWeightCSV_CSVjesDown);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlf, Systematic::Down)] = (*btagWeightCSV_CSVlfDown);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats1, Systematic::Down)] = (*btagWeightCSV_CSVlfstats1Down);
-        //event.weights[std::make_pair(Systematic::CMS_ttH_CSVlfstats2, Systematic::Down)] = (*btagWeightCSV_CSVlfstats2Down);
-
         event.weights[std::make_pair(Systematic::CMS_pu, Systematic::Down)] = (*puWeightDown);
     }
 
@@ -217,21 +216,12 @@ std::vector<Jet> TreeDescriptionMC<T>::build_jets(Systematic::SystId syst_id) {
     for (auto njet=0; njet < *(this->njets); njet++) {
         TLorentzVector lv;
 
-        double corr = 1.0;
-        double base_corr = 1.0;
-        
-        
-        //if (Systematic::is_jec(syst_id)) {
-        //    auto* correction_branch = get_correction_branch(syst_id);
-        //    corr = (*correction_branch)[njet];
-        //    base_corr = this->jets_corr_JEC[njet];
-        //} else if (Systematic::is_jer(syst_id)) {
-        //    auto* correction_branch = get_correction_branch(syst_id);
-        //    corr = (*correction_branch)[njet];
-        //    base_corr = this->jets_corr_JER[njet];
-        //}
+        double pt = this->jets_pt[njet];
+        if (Systematic::is_jec(syst_id) || Systematic::is_jer(syst_id)) {
+            pt = (*get_correction_branch(syst_id))[njet];
+        }
 
-        lv.SetPtEtaPhiM(this->jets_pt[njet] * corr/base_corr, this->jets_eta[njet], this->jets_phi[njet], this->jets_mass[njet]);
+        lv.SetPtEtaPhiM(pt, this->jets_eta[njet], this->jets_phi[njet], this->jets_mass[njet]);
         Jet jet(lv, this->jets_btagCSV[njet]);
         jets.push_back(jet);
     }
@@ -240,7 +230,7 @@ std::vector<Jet> TreeDescriptionMC<T>::build_jets(Systematic::SystId syst_id) {
 
 template <typename T>
 TTreeReaderArray<T>* TreeDescriptionMC<T>::get_correction_branch(Systematic::SystId syst_id) {
-    return this->jets_corr.GetValue(syst_id);
+    return this->jets_pt_corr.GetValue(syst_id);
 }
 
 template class TreeDescription<float>;

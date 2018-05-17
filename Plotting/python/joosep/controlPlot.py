@@ -40,40 +40,40 @@ procs_names = [
     ("ttbarPlus2B", "tt+2b"),
     ("ttbarPlusB", "tt+b"),
     ("ttbarPlusCCbar", "tt+cc"),
-    ("diboson", "diboson"),
-    ("stop", "single top"),
-    ("ttv", "tt+V"),
-    ("wjets", "w+jets"),
-    ("dy", "dy")
+#    ("diboson", "diboson"),
+#    ("stop", "single top"),
+#    ("ttv", "tt+V"),
+#    ("wjets", "w+jets"),
+#    ("dy", "dy")
 ]
 
 procs = [x[0] for x in procs_names]
 
 syst_pairs = []
 syst_pairs.extend([
-    ("__CMS_puUp", "__CMS_puDown"),
+#    ("__CMS_puUp", "__CMS_puDown"),
 #    ("__CMS_scale_jUp", "__CMS_scale_jDown"),
-    ("__CMS_scaleFlavorQCD_jUp", "__CMS_scaleFlavorQCD_jDown"),
-    ("__CMS_res_jUp", "__CMS_res_jDown"),
-    ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
-    ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
-    ("__CMS_ttH_CSVhfUp", "__CMS_ttH_CSVhfDown"),
-    ("__CMS_ttH_CSVhfstats1Up", "__CMS_ttH_CSVhfstats1Down"),
-    ("__CMS_ttH_CSVhfstats2Up", "__CMS_ttH_CSVhfstats2Down"),
-    ("__CMS_ttH_CSVjesUp", "__CMS_ttH_CSVjesDown"),
-    ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
-    ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
-    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down"),
-    ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
-    ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
-    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
-    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
-    ("__CMS_ttH_scaleMEUp", "__CMS_ttH_scaleMEDown"),
-    ("__CMS_effTrigger_eUp", "__CMS_effTrigger_eDown"),
-    ("__CMS_effTrigger_mUp", "__CMS_effTrigger_mDown"),
-    ("__CMS_effTrigger_eeUp", "__CMS_effTrigger_emDown"),
-    ("__CMS_effTrigger_mmUp", "__CMS_effTrigger_mmDown"),
-    ("__CMS_effTrigger_emUp", "__CMS_effTrigger_emDown"),
+#    ("__CMS_scaleFlavorQCD_jUp", "__CMS_scaleFlavorQCD_jDown"),
+#    ("__CMS_res_jUp", "__CMS_res_jDown"),
+#    ("__CMS_ttH_CSVcferr1Up", "__CMS_ttH_CSVcferr1Down"),
+#    ("__CMS_ttH_CSVcferr2Up", "__CMS_ttH_CSVcferr2Down"),
+#    ("__CMS_ttH_CSVhfUp", "__CMS_ttH_CSVhfDown"),
+#    ("__CMS_ttH_CSVhfstats1Up", "__CMS_ttH_CSVhfstats1Down"),
+#    ("__CMS_ttH_CSVhfstats2Up", "__CMS_ttH_CSVhfstats2Down"),
+#    ("__CMS_ttH_CSVjesUp", "__CMS_ttH_CSVjesDown"),
+#    ("__CMS_ttH_CSVlfUp", "__CMS_ttH_CSVlfDown"),
+#    ("__CMS_ttH_CSVlfstats1Up", "__CMS_ttH_CSVlfstats1Down"),
+#    ("__CMS_ttH_CSVlfstats2Up", "__CMS_ttH_CSVlfstats2Down"),
+#    ("__CMS_ttjetsisrUp", "__CMS_ttjetsisrDown"),
+#    ("__CMS_ttjetsfsrUp", "__CMS_ttjetsfsrDown"),
+#    ("__CMS_ttjetstuneUp", "__CMS_ttjetstuneDown"),
+#    ("__CMS_ttjetshdampUp", "__CMS_ttjetshdampDown"),
+#    ("__CMS_ttH_scaleMEUp", "__CMS_ttH_scaleMEDown"),
+#    ("__CMS_effTrigger_eUp", "__CMS_effTrigger_eDown"),
+#    ("__CMS_effTrigger_mUp", "__CMS_effTrigger_mDown"),
+#    ("__CMS_effTrigger_eeUp", "__CMS_effTrigger_emDown"),
+#    ("__CMS_effTrigger_mmUp", "__CMS_effTrigger_mmDown"),
+#    ("__CMS_effTrigger_emUp", "__CMS_effTrigger_emDown"),
 ])
 
 #optional function f: TH1D -> TH1D to blind data
@@ -254,7 +254,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "colors": plotlib.colors,
         "do_legend": True,
         "show_overflow": True,
-        "title_extended": r"      35.9 $\mathrm{fb}^{-1}$ (13 TeV)",
+        "title_extended": r" 2017 pp 41.3 $\mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,
         "do_syst": False,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
@@ -292,8 +292,8 @@ if __name__ == "__main__":
         ("dl_jge4_tge2", simple_vars),
 #        ("sl_jge6_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
 #        ("dl_jge4_t3", ["jetsByPt_0_pt", "btag_LR_4b_2b_btagCSV_logit"]),
-        ("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
-        ("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
+#        ("sl_jge6_tge4", ["jetsByPt_0_pt", "mem_SL_2w2h2t_p"]),
+#        ("dl_jge4_tge4", ["jetsByPt_0_pt", "mem_DL_0w2h2t_p"]),
     ]
 
     args = []

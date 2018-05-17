@@ -40,7 +40,7 @@ syst_pairs = OrderedDict([
         getattr(ROOT.TTH_MEAnalysis.Systematic, d if d != "" else "None")
     ))
     for x in [
-        #"CMS_scale_j",
+        "CMS_scale_j",
         "CMS_res_j",
         "CMS_scaleSubTotalPileUp_j",
         "CMS_scaleAbsoluteStat_j",
@@ -289,6 +289,7 @@ def createEvent(
 
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
+        event.lepton_weight = 1.0
         #event.lepton_weight = calc_lepton_SF(event)
         #if syst == "nominal":
         #    event.lepton_weights_syst = {w: calc_lepton_SF(event, w) for w in [
@@ -309,8 +310,8 @@ def createEvent(
             event.weights.at(syst_pairs["gen"]),
             event.weights.at(syst_pairs["CMS_ttH_CSV"]))
         )
-        #event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
-        event.weight_nominal *= event.weights.at(syst_pairs["gen"])
+        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
+        #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
@@ -447,9 +448,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("unweighted", lambda ev: 1.0),
-                #("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
-                #("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
-                #("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
+                ("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
+                ("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
+                ("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
         ]
 
         #for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
