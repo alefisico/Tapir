@@ -256,7 +256,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "show_overflow": True,
         "title_extended": r" 2017 pp 41.3 $\mathrm{fb}^{-1}$ (13 TeV)",
         "systematics": syst_pairs,
-        "do_syst": False,
+        "do_syst": True,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
     }
     if variable in ["numJets", "nBCSVM"]:
@@ -309,7 +309,7 @@ if __name__ == "__main__":
     ]
 
     for arg in args:
-        arg["do_syst"] = False
+        arg["do_syst"] = True
         arg["do_tex"] = False
         if "numJets" in arg["histname"]:
             arg["do_log"] = True

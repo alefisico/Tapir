@@ -33,7 +33,9 @@ def main(outdir = "./", _input = None, asFriend = True, _era = "94Xv1", runAll =
         outdir, infiles,
         cut=nano_cfg.cuts, branchsel=nano_cfg.branchsel, modules=nano_cfg.modules,
         compression="LZMA:9", friend=asFriend, postfix="_postprocessed",
-        jsonInput=None, noOut=False, justcount=False, treename="nanoAOD/Events", eventRange=eventRange
+        jsonInput=None, noOut=False, justcount=False,
+        #needs a patch to NanoAODTools
+        #treename="nanoAOD/Events", eventRange=eventRange
     )
     for module in p.modules:
         module.treename = "nanoAOD/Events"
