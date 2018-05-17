@@ -34,7 +34,7 @@ process.source = cms.Source("LHESource",
 		[ 
 		#'srm://storage01.lcg.cscs.ch:8443/srm/managerv2?SFN=/pnfs/lcg.cscs.ch/cms/trivcat/store/user/algomez/pwgevents-0001.lhe',
 		#'srm://storage01.lcg.cscs.ch:8443/srm/managerv2?SFN=/pnfs/lcg.cscs.ch/cms/trivcat/store/user/algomez/pwgevents-0002.lhe',
-		'file:sample001.lhe',
+		'file:semileptonicttbar_NLOPS.lhe',
 		]),
 )
 
