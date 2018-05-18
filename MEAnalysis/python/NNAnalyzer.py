@@ -11,10 +11,8 @@ class NNAnalyzer(FilterAnalyzer):
         super(FilterAnalyzer, self).beginLoop(setup)
 
         # define the objects and variables for training/ predictions
-        #self.obj = {"good_leptons":2, "good_jets":10}
-        #self.obj = {"good_leptons":(2, ["pt", "eta", "phi", "mass"]), "MET": (1, ["pt", "sumEt", "phi"])}
-        #self.obj_var = ["pt", "eta", "phi", "mass"]
-        self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "Wmass", "ht30"])}
+        #self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "Wmass", "ht30"])}
+        self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "ht30"])}
 
         self.training = True
 
