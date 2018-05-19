@@ -1,8 +1,8 @@
 #when updating this file, don't forget to update also .gitlab-ci.yml
 export SCRAM_ARCH=slc6_amd64_gcc630
 
-cmsrel CMSSW_9_4_5_cand1
-cd CMSSW_9_4_5_cand1/src/
+cmsrel CMSSW_9_4_6_patch1
+cd CMSSW_9_4_6_patch1/src/
 eval `scramv1 runtime -sh`
 cmsenv 
 git cms-init
@@ -15,7 +15,7 @@ sed -i s/triggers=triggers/triggers=triggers,\ **kwargs/g PhysicsTools/HeppyCore
 
 #merge rebased version of mmeinhard:BoostedNanoAOD
 #inlcudes nanoAOD/master from April 7
-git cms-merge-topic kschweiger:BoostedMiniAODReBaseMasterApr7 
+git cms-merge-topic kschweiger:BoostedMiniAODReBaseMasterMay19
 
 
 git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
