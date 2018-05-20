@@ -38,7 +38,13 @@ def convertLFN(crabFiles,crabFiles_pfn):
         else:
             print "data is not local" 
             crabFiles_pfn[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
-
+        f = ROOT.TFile.Open(crabFiles_pfn[i])
+        try:
+            f.IsZombie()
+        except ReferenceError:
+            print "ReferneceError for pfn path. Replacing with xrd path"
+            crabFiles_pfn[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
+        del f
 
 def getLumisProcessed(vlumiblock): 
     lumidict = {}

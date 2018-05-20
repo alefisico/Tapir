@@ -13,5 +13,7 @@ tail -n10 log
 python mem_crab_script.py $@  --isMC >> log 2>&1
 EXITCODE=$?
 echo Finished_tthbb13 $EXITCODE
-tail -n10 log
+head -n 70 log
+echo "=== SNIP ==="
+tail -n 70 log
 ./post.sh $EXITCODE
