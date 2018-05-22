@@ -264,14 +264,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #compute per event btag weight
-    btagweight_ana = cfg.Analyzer(
-        MECoreAnalyzers.BtagWeightAnalyzer,
-        'btagweight',
-        _conf = python_conf,
-        _analysis_conf = analysis_cfg,
-    )
-
     #fills the passPV flag 
     pvana = cfg.Analyzer(
         MECoreAnalyzers.PrimaryVertexAnalyzer,
@@ -464,8 +456,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
 
             #After this, the event object has been created
             lumilist_ana,
-            puweight_ana,
-            btagweight_ana,
             #puweight_ana, #possible to recompute the PU weight on the fly by uncommenting
             gentth_pre,
             pvana,
