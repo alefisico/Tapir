@@ -1,12 +1,9 @@
 [submodule "MEIntegratorStandalone"]
 	path = MEIntegratorStandalone
-	url = https://gitlab.cern.ch/jpata/MEIntegratorStandalone.git
+	url = https://gitlab.cern.ch/Zurich_ttH/MEIntegratorStandalone.git
 [submodule "CommonClassifier"]
 	path = CommonClassifier
 	url = https://gitlab.cern.ch/ttH/CommonClassifier.git
-[submodule "GenLevel"]
-	path = GenLevel
-	url = https://gitlab.cern.ch/jpata/ttH-Hbb-GenLevel.git
 [submodule "RecoLikelihoodReconstruction"]
 	path = RecoLikelihoodReconstruction
 	url = https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git

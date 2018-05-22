@@ -8,7 +8,6 @@ cmsenv
 git cms-init
 
 #As long as this is the only change to heppy, it not worth dealing w/ merge conflicts in cmssw 
-#Was git cms-merge-topic jpata:heppy_fixes
 git cms-addpkg PhysicsTools/HeppyCore
 sed -i s/json=None/json=None,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
 sed -i s/triggers=triggers/triggers=triggers,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
@@ -26,7 +25,7 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 cd $CMSSW_BASE/src
 
 #get the TTH code
-git clone ssh://git@gitlab.cern.ch:7999/jpata/tthbb13.git TTH --branch SwitchNanoAOD
+git clone ssh://git@gitlab.cern.ch:7999/Zurich_ttH/tthbb13.git TTH --branch SwitchNanoAOD
 cd $CMSSW_BASE/src/TTH
 
 git submodule update --init --recursive
