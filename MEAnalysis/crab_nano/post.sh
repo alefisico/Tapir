@@ -1,7 +1,7 @@
 #!/bin/bash
 
 exitCode=$1
-cat log
+#cat log
 
 if [ $exitCode -eq 0 ]; then
 echo "command succeeded"
@@ -22,7 +22,9 @@ EOF
 fi
 
 cat FrameworkJobReport.xml
+echo "======================= CMSRUN CONFIG =========================="
+head -n 50 runConfig_NANO.py
 echo "======================== CMSRUN LOG ============================"
-head -n 500 Output/cmsRun.log 
+head -n 300 Output/cmsRun.log 
 echo "=== SNIP ==="
-tail -n 500 Output/cmsRun.log 
+tail -n 300 Output/cmsRun.log 

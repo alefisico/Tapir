@@ -10,12 +10,8 @@ import PSet
 args = sys.argv
 if "--test" in sys.argv:
     import PSet_test as PSet
-elif "--local" in sys.argv:
-    import PSet_local as PSet
-    print PSet
 
 print PSet.__dict__["process"].dumpPython()
-
 
 
 if "--isMC" in sys.argv:
@@ -23,7 +19,7 @@ if "--isMC" in sys.argv:
 elif "--isData" in sys.argv:
     isMC = False
 else:
-    print "No MC flag in scirpt --> falling back to isMC = True"
+    print "No MC flag in script --> falling back to isMC = True"
     isMC = True
     
 import copy
@@ -32,7 +28,7 @@ import json
 #Create the NanoAOD postprocessing configuration
 from TTH.MEAnalysis.nano_config import NanoConfig
 #TODO: Make the era sys.argv so it is set depending on the sample
-nanoCFG = NanoConfig("94Xv1", jec=isMC, pu=isMC, btag=isMC)
+nanoCFG = NanoConfig("94Xv2", jec=isMC, pu=isMC, btag=isMC)
 
 import heppy_crab_functions as fn
 
@@ -84,13 +80,14 @@ os.system("mkdir Output")
 ### nanoAOD code
 if not "--nostep1" in args:
     #Building cmsDriver.py command
-    if len(crabFiles_pfn.value()) == 1:
-        filename = crabFiles_pfn.value()[0]
+    #cmsRun handles LFN files. So we give it those
+    if len(crabFiles.value()) == 1:
+        filename = crabFiles.value()[0]
     else:
         filename = ""
-        for infile in crabFiles_pfn.value():
+        for infile in crabFiles.value():
             filename += infile+','
-        filename = filename[:-1]
+        filename = filename[:-1] #remove tailing ,
     driverCommand = "cmsDriver.py {0} --fileout=Output/nanoAOD.root --no_exec -s NANO --filein {1} -n {2}" .format("runConfig",filename, crabMaxEvents)
     if VLuminosityBlockRange is not None:
         driverCommand = "{0}  --lumiToProcess={1}".format(driverCommand, lumiJSON)

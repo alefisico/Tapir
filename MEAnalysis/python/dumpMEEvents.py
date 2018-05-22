@@ -4,27 +4,24 @@ import math
 from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 
-if __name__ == "__main__":
-    analysis_cfg = analysisFromConfig(sys.argv[1])
-
-    prefix, sample_name = get_prefix_sample(os.environ["DATASETPATH"])
-    FILE_NAMES = os.environ["FILE_NAMES"].split()
-    an_sample = analysis_cfg.get_sample(sample_name)
+def main(sample, file_names):
     
     ch = ROOT.TChain("tree")
-    for fi in FILE_NAMES:
+    for fi in file_names:
         ch.AddFile(getSitePrefix(fi))
     
     for ev in ch:
+
+        #apply semileptonic fully matched selection
         if not (ev.is_sl and ev.numJets==6 and ev.nBCSVM==4 and ev.nMatch_wq_btag==2 and ev.nMatch_tb_btag==2):
             continue
 
-        #choose tt+bb, 2b, b
-        if "ttjets" in an_sample.tags:
+        #for background, choose tt+bb, 2b, b
+        if "ttjets" in sample.tags:
             if not (ev.ttCls >= 50):
                 continue
-        #choose fully matched events
-        elif "tth" in an_sample.tags:
+        #for signal, choose fully matched events
+        elif "tth" in sample.tags:
             if not (ev.nMatch_hb_btag == 2):
                 continue
     
@@ -92,3 +89,12 @@ if __name__ == "__main__":
             }
         }
         print json.dumps(event)
+
+if __name__ == "__main__":
+    analysis_cfg = analysisFromConfig(sys.argv[1])
+
+    prefix, sample_name = get_prefix_sample(os.environ["DATASETPATH"])
+    file_names = os.environ["FILE_NAMES"].split()
+    sample = analysis_cfg.get_sample(sample_name)
+    
+    main(sample, file_names)

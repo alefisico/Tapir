@@ -467,8 +467,7 @@ class MEAnalyzer(FilterAnalyzer):
                             old_pt = jet.pt
                             old_corr = jet.corr
                             for fc in self.conf.mem["jet_corrections"]:
-                                new_corr = getattr(jet, "corr_" + fc)
-                                new_pt = new_corr * old_pt / old_corr
+                                new_pt =  getattr(jet, "pt_corr_" + fc)
                                 delta_pt = (new_pt - old_pt)
                                 dw[fc] += r.grad.at(ijet) * delta_pt
                     r.dw = dw
@@ -489,7 +488,7 @@ class MEAnalyzer(FilterAnalyzer):
                     skipped += [confname]
                     r = MEM.MEMOutput()
                     event.res[(hypo, confname)] = r
-            LOG_MODULE_NAME.info("skipped confs {0}".format(skipped))
+            LOG_MODULE_NAME.debug("skipped confs {0}".format(skipped))
 
         #Add MEM results to event
         for key in self.memkeysToRun:

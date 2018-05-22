@@ -33,7 +33,7 @@ class Electron:
         self.DPhi = -99#tree.Electron_DPhi[n];#KS: Not in nanoAOD. Please check this var.
         self.hoe = tree.Electron_hoe[n];
         #Disabled until new nanoAOD
-        #self.mvaFall17Iso = tree.Electron_mvaFall17Iso[n];
+        self.mvaFall17Iso = tree.Electron_mvaFall17Iso[n];
         self.eleCutId = tree.Electron_cutBased[n]; #https://github.com/cms-nanoAOD/cmssw/blob/master/PhysicsTools/NanoAOD/python/electrons_cff.py#L187
         self.jetIdx = tree.Electron_jetIdx[n];
         self.etaSc = tree.Electron_deltaEtaSC[n] + tree.Electron_eta[n];
@@ -251,8 +251,6 @@ class Jet:
         if not MC:
             self.pt = tree.Jet_pt[n];
         else:
-            self.pt = tree.Jet_pt[n]
-            self.corr_JER = 0.0
 
             # btag Weights
             self.btagSF = tree.Jet_btagSF[n]
@@ -278,11 +276,8 @@ class Jet:
             self.btagSF_shape_up_cferr2 = tree.Jet_btagSF_shape_up_cferr2[n]
             self.btagSF_shape_down_cferr2 = tree.Jet_btagSF_shape_down_cferr2[n]
 
-            #self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
-            #self.corr_JER = tree.Jet_pt_nom[n]/tree.Jet_pt[n];
-
-            #self.pt_corr_JERUp = tree.Jet_pt_jerUp[n]
-            #self.pt_corr_JERDown = tree.Jet_pt_jerDown[n]
+            self.pt_corr_JERUp = tree.Jet_pt_jerUp[n]
+            self.pt_corr_JERDown = tree.Jet_pt_jerDown[n]
 
             #self.pt_corr_AbsoluteStatUp = tree.Jet_pt_jesAbsoluteStatUp[n]
             #self.pt_corr_AbsoluteScaleUp = tree.Jet_pt_jesAbsoluteScaleUp[n]
@@ -319,7 +314,7 @@ class Jet:
             #self.pt_corr_SubTotalScaleUp = tree.Jet_pt_jesSubTotalScaleUp[n]
             #self.pt_corr_SubTotalAbsoluteUp = tree.Jet_pt_jesSubTotalAbsoluteUp[n]
             #self.pt_corr_SubTotalMCUp = tree.Jet_pt_jesSubTotalMCUp[n]
-            #self.pt_corr_TotalUp = tree.Jet_pt_jesTotalUp[n]
+            self.pt_corr_TotalUp = tree.Jet_pt_jesTotalUp[n]
             #self.pt_corr_TotalNoFlavorUp = tree.Jet_pt_jesTotalNoFlavorUp[n]
             #self.pt_corr_TotalNoTimeUp = tree.Jet_pt_jesTotalNoTimeUp[n]
             #self.pt_corr_TotalNoFlavorNoTimeUp = tree.Jet_pt_jesTotalNoFlavorNoTimeUp[n]
@@ -374,7 +369,7 @@ class Jet:
             #self.pt_corr_SubTotalScaleDown = tree.Jet_pt_jesSubTotalScaleDown[n]
             #self.pt_corr_SubTotalAbsoluteDown = tree.Jet_pt_jesSubTotalAbsoluteDown[n]
             #self.pt_corr_SubTotalMCDown = tree.Jet_pt_jesSubTotalMCDown[n]
-            #self.pt_corr_TotalDown = tree.Jet_pt_jesTotalDown[n]
+            self.pt_corr_TotalDown = tree.Jet_pt_jesTotalDown[n]
             #self.pt_corr_TotalNoFlavorDown = tree.Jet_pt_jesTotalNoFlavorDown[n]
             #self.pt_corr_TotalNoTimeDown = tree.Jet_pt_jesTotalNoTimeDown[n]
             #self.pt_corr_TotalNoFlavorNoTimeDown = tree.Jet_pt_jesTotalNoFlavorNoTimeDown[n]

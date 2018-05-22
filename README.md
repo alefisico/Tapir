@@ -57,9 +57,12 @@ This will call
 python $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_heppy.py MEAnalysis/data/default.cfg --sample SAMPLE_NAME
 ~~~
 
+Steps 1-2 can be run together on the grid using crab, see `MEAnalysis/crab_nano/multicrab_94X.py`.
+To produce the subsequent `.txt` files used for local running, see the script `Plotting/python/christina/ttbar_classification/getFilesCrab.py`.
+
 ## Step3 (optional): skim with `projectSkim`
 
-When some of the samples are done, you can produce smallish (<10GB) skims of the files using local batch jobs.
+When some of the samples are done, you can produce smallish (<10GB) skims of the files using local batch jobs. These can be used for direct analysis by hand.
 
 ~~~
 $ cd TTH/MEAnalysis/gc
@@ -143,21 +146,25 @@ qdel -u $USER
 
 The currently used samples are listed below. Generally, they are stored at T3_CH_PSI.
 
-## NanoAOD
+## NanoAOD (step1)
 
 | production name | comments |
 |-----------------|----------|
 | [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas) | no boosted or hadronic triggers |
 | [nano_05Feb2018](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/nano_05Feb2018) | nanoAODv1, 2016 datasets |
+| [Apr16](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | 2017 datasets, no btag shape scale factor(step1) |
+| [May1](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May21) | data, relatively complete |
+| [May2](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May2) | MC |
 
-## tthbb13
+## tthbb13 (step2)
 
-| production name | base NanoAOD | comments |
+| production name | base NanoAOD run | comments |
 |-----------------|--------------|----------|
 | [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26) | NanoCrabProdXmas | |
-|-----------------|--------------|----------|
+| [Apr16](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | Apr16 | no trigger |
 | [NanoBoostedMEM_Mar15](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoBoostedMEM_Mar15) | RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1 | postprocessing,MEM,Boosted |
-
+| [May1](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May21) | May1 | data, no nPVs |
+| [May2](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May2) | May2 | MC, no btagSF, wrong lepton veto criteria |
 
 # Misc
 
@@ -199,3 +206,16 @@ In file included from /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/incl
 ~~~
 
 This means that the base CMSSW release for nanoAOD has been updated, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Recipe_for_CMSSW_9_4_X_and_the_c 
+
+## Installing newer matplotlib
+
+~~~
+pip install --no-deps -I --prefix $CMSSW_BASE/piplibs matplotlib kiwisolver
+cd $CMSSW_BASE/piplibs
+wget http://www.qhull.org/download/qhull-2015-src-7.2.0.tgz
+tar xf qhull-2015-src-7.2.0.tgz
+cd qhull-2015.2
+make
+cd $CMSSW_BASE
+LD_PRELOAD=$CMSSW_BASE/piplibs/qhull-2015.2/lib/libqhull_r.so PYTHONPATH=$CMSSW_BASE/piplibs/lib/python2.7/site-packages/:$PYTHONPATH python ../Plotting/python/joosep/controlPlot.py ~/tth/gc/sparse/May16.root
+~~~

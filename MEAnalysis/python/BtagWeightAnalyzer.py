@@ -9,9 +9,13 @@ class BtagWeightAnalyzer(FilterAnalyzer):
         super(FilterAnalyzer, self).beginLoop(setup)
 
     def btagWeight(self, jets_btagSF):
+        if len(jets_btagSF) == 0:
+            return 1.0
         return reduce(lambda x,y : x*y, jets_btagSF)
             
     def process(self, event):
+
+        jets = event.systResults["nominal"].good_jets
 
         if self.cfg_comp.isMC:
 
@@ -24,8 +28,8 @@ class BtagWeightAnalyzer(FilterAnalyzer):
                     btagSF.append("btagSF_shape_" + i + "_" + s)
 
             for b in btagSF:
-                numJet = len(event.Jet)
-                jetsbtagSF = [getattr(event.Jet[i], b) for i in range(numJet)]
+                numJet = len(jets)
+                jetsbtagSF = [getattr(jets[i], b) for i in range(numJet)]
                 setattr(event, b, self.btagWeight(jetsbtagSF))
 
         return True

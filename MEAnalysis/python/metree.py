@@ -680,7 +680,6 @@ def getTreeProducer(conf):
         ("prob_ttbb",            float,    "squared matrix element for hypo ttbb", lambda ev: ev.prob_ttbb),
         ("JointLikelihoodRatio",            float,    "joint likelihood ratio", lambda ev: ev.jointlikelihood),
 
-
         ("tth_rho_px_gen",  float,  ""),
         ("tth_rho_py_gen",  float,  ""),
         ("tth_rho_px_reco",  float,  ""),

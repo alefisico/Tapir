@@ -50,6 +50,8 @@ class BufferedTree:
                 val = getattr(self.__dict__["tree"], attr)
                 self.__dict__["buf"][attr] = val
                 return val
+        elif attr == "__deepcopy__":
+            return getattr(self, attr)
         else:
             if not (defval is None):
                 return defval
@@ -116,7 +118,7 @@ class BufferedChain( object ):
         """
         All functions of the wrapped TChain are made available
         """
-        return getattr(self.chain, attr)
+        return self.chain.__getattr__(attr, defval)
 
     def __len__(self):
         return int(self.chain.GetEntries())
@@ -254,7 +256,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #Recompute pileup weight
+    #As an option, we can recompute pileup weight
     puweight_ana = cfg.Analyzer(
         MECoreAnalyzers.PUWeightAnalyzer,
         'puweight',
@@ -309,6 +311,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'jets',
         _conf = python_conf
     )
+    
+    btagweight = cfg.Analyzer(
+        MECoreAnalyzers.BtagWeightAnalyzer,
+        'btagweight',
+        _conf = python_conf
+    )
+
     counter_jet = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter_jet',
@@ -453,10 +462,11 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             # prefilter,
             evs,
 
-            #After this, the event has been created
+            #After this, the event object has been created
             lumilist_ana,
             puweight_ana,
             btagweight_ana,
+            #puweight_ana, #possible to recompute the PU weight on the fly by uncommenting
             gentth_pre,
             pvana,
             trigger,
@@ -464,6 +474,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             leps,
             counter_lep,
             jets,
+            btagweight,
             counter_jet,
             btaglr,
             counter_blr,
@@ -503,6 +514,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             leps,
             counter_lep,
             jets,
+            btagweight,
             counter_jet,
             btaglr,
             counter_blr,
@@ -641,5 +653,5 @@ if __name__ == "__main__":
     print an
     looper_dir, files = main(an, sample_name=args.sample, numEvents=args.numEvents, files=files, loglevel = args.loglevel)
 
-    #import TTH.MEAnalysis.counts as counts
-    #counts.main(files, "{0}/tree.root".format(looper_dir))
+#    import TTH.MEAnalysis.counts as counts
+#    counts.main(files, "{0}/tree.root".format(looper_dir))

@@ -106,6 +106,9 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
         super(EventIDFilterAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
+        
+        event.id_triplet = (event.input.run, event.input.luminosityBlock, event.input.event)
+        LOG_MODULE_NAME.debug("processing event {0}".format(event.id_triplet))
 
         passes = True
         if not self.event_whitelist is None:

@@ -5,7 +5,9 @@ import json
 
 from splitLumi import getLumiListInFiles, chunks 
 from FWCore.PythonUtilities.LumiList import LumiList
-das_client = "/afs/cern.ch/user/v/valya/public/das_client.py"
+
+#the golden json file for data
+json_file = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
 
 #Each time you call multicrab.py, you choose to submit jobs from one of these workflows
 workflows = [
@@ -15,13 +17,12 @@ workflows = [
     "leptonic", #ttH with SL/DL decays
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
+    "hadronic_nome",
     "hadronic_nome_testing", #ttH with FH decays data + MC
     "QCD_nome", #QCD samples without MEM
     "pilot", #ttH sample only, with no MEM
     "signal", #signal sample with common config
     "testing", #single-lumi jobs, a few samples
-    "localtesting", #run combined jobs locally
-    "localtesting_withme", #run combined jobs locally
     "testing_withme", #single-lumi jobs, a few samples
     "allmc_nome", # SL, DL and FH, no matrix element
     "testall",#Test all samples w/ small nJobs and no ME
@@ -39,8 +40,6 @@ parser.add_argument('--dataset', action="store", required=False, help="submit on
 parser.add_argument('--recovery', action="store", required=False, help="the patand json_filename of the job to recover", default="")#Never tested it. Use with caution
 args = parser.parse_args()
 
-localtesting = "localtesting" in args.workflow
-
 #list of configurations that we are using, should be in TTH/MEAnalysis/python/
 me_cfgs = {
     "default": "MEAnalysis_cfg_heppy.py",
@@ -55,47 +54,47 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/DoubleEG/Run2017B-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017C-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017D-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017E-17Nov2017-v1/MINIAOD",
-    "/DoubleEG/Run2017F-17Nov2017-v1/MINIAOD",
+    "/MuonEG/Run2017B-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017C-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017D-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017E-31Mar2018-v1/MINIAOD",
+    "/MuonEG/Run2017F-31Mar2018-v1/MINIAOD",
+
+    "/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+    "/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD",
     
-    "/DoubleMuon/Run2017B-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017C-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017D-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017E-17Nov2017-v1/MINIAOD",
-    "/DoubleMuon/Run2017F-17Nov2017-v1/MINIAOD",
+    "/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD",
+    "/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/MuonEG/Run2017B-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017C-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017D-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017E-17Nov2017-v1/MINIAOD",
-    "/MuonEG/Run2017F-17Nov2017-v1/MINIAOD",
-   
-    "/SingleMuon/Run2017B-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017C-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017D-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017E-17Nov2017-v1/MINIAOD",
-    "/SingleMuon/Run2017F-17Nov2017-v1/MINIAOD",
-   
-    "/SingleElectron/Run2017B-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017C-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017D-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017E-17Nov2017-v1/MINIAOD",
-    "/SingleElectron/Run2017F-17Nov2017-v1/MINIAOD",
+    "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
+    "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/JetHT/Run2017F-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017E-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017D-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017C-17Nov2017-v1/MINIAOD",
-    "/JetHT/Run2017B-17Nov2017-v1/MINIAOD",
+    "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+    "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
 
-    "/BTagCSV/Run2017F-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017E-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017D-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017C-17Nov2017-v1/MINIAOD",
-    "/BTagCSV/Run2017B-17Nov2017-v1/MINIAOD",
+    "/JetHT/Run2017B-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017C-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017D-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017E-31Mar2018-v1/MINIAOD",
+    "/JetHT/Run2017F-31Mar2018-v1/MINIAOD",
+
+    "/BTagCSV/Run2017B-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017C-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017D-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017E-31Mar2018-v1/MINIAOD",
+    "/BTagCSV/Run2017F-31Mar2018-v1/MINIAOD",
 ]
 
 #all available datasets.
@@ -128,9 +127,9 @@ workflow_datasets["leptonic"] = {}
 for k in [
         "ttHTobb",
         #"ttHToNonbb",
-        "TTbar_had",
-        "TTbar_sl1",#"TTbar_sl2",
-        "TTbar_dl1",# "TTbar_dl2",
+        #"TTbar_had",
+        "TTbar_sl1",
+        "TTbar_dl1",
         #"ttbb",
         #"TTbar_isr_up",
         #"TTbar_isr_down1",
@@ -172,8 +171,8 @@ for k in [
         "ttHToNonbb",
         "TTbar_had",
         #"ttbb",
-        "TTbar_sl1","TTbar_sl2",
-        "TTbar_dl1", "TTbar_dl2",
+        "TTbar_sl1",
+        "TTbar_dl1",
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_memcheck.py"
@@ -188,7 +187,7 @@ for k in [
     workflow_datasets["memcheck2"][k] = D
 
 workflow_datasets["signal"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1","TTbar_sl2"]:
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1",]:
     D = deepcopy(datasets[k])
     workflow_datasets["signal"][k] = D
 
@@ -197,8 +196,8 @@ for k in [
         "ttHTobb",
         "ttHToNonbb",
         "TTbar_had",
-        "TTbar_sl1","TTbar_sl2",
-        "TTbar_dl1", "TTbar_dl2",
+        "TTbar_sl1",
+        "TTbar_dl1",
         #"ww1", "ww2",
         #"wz1", "wz2",
         #"zz1", "zz2",
@@ -234,7 +233,7 @@ for k in datasets.keys():
 workflow_datasets["data_leptonic"] = {}
 for k in datasets.keys():
     # Ignore hadronic
-    if k.startswith("JetHT"):
+    if k.startswith("JetHT") or k.startswith("BTagCSV"):
         continue
     
     if "data" in datasets[k]["script"]:
@@ -274,7 +273,7 @@ for k in datasets.keys():
 
 workflow_datasets["allmc_nome"] = {}
 for k in datasets.keys():
-    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_sl2", "TTbar_dl1","TTbar_dl2"] :
+    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_dl1",] :
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome"]
         workflow_datasets["allmc_nome"][k] = D
@@ -286,26 +285,27 @@ for k in datasets.keys():
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
         workflow_datasets["hadronic_nome"][k] = D
-    if "BTagCSV" in k or "JetHT" in k:
+    if ("BTagCSV" in k or "JetHT" in k) and "Run2017C" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
-        D["perjob"] = 70
+        D["perjob"] = 75
         D["runtime"] = 24
+        D["json"] = json_file 
         workflow_datasets["hadronic_nome"][k] = D
 
 workflow_datasets["hadronic_nome_testing"] = {}
 for k in  workflow_datasets["hadronic_nome"].keys():
     D = deepcopy(workflow_datasets["hadronic_nome"][k])
-    D["maxlumis"] = 10
+    D["maxlumis"] = 2
     D["runtime"] = 1
     workflow_datasets["hadronic_nome_testing"][k] = D
 
 
 workflow_datasets["testall"] = {}
-for k in [ "SingleElectron-Run2017E-17Nov2017-v1",
-           "JetHT-Run2017E-17Nov2017-v1",
-           "BTagCSV-Run2017E-17Nov2017-v1",
-           "MuonEG-Run2017E-17Nov2017-v1",
+for k in [ "SingleElectron-Run2017F-31Mar2018-v1",
+           "MuonEG-Run2017F-31Mar2018-v1",
+           "JetHT-Run2017B-31Mar2018-v1",
+           "BTagCSV-Run2017B-31Mar2018-v1",
            "TTbar_had",
            "TTbar_sl1",
            "ttHTobb",
@@ -313,11 +313,11 @@ for k in [ "SingleElectron-Run2017E-17Nov2017-v1",
 ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = me_cfgs["nometesting"]
-    D["perjob"] = 2
-    D["maxlumis"] = 20
+    D["perjob"] = 1
+    D["maxlumis"] = 1
     D["runtime"] = 4
     if not D["isMC"]:
-        D["json"] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
+        D["json"] = json_file
     workflow_datasets["testall"][k] = D
     
 #Pilot job for updating transfer functions, retraining BLR
@@ -332,16 +332,16 @@ workflow_datasets["pilot"][pilot_name] = D
 workflow_datasets["testing"] = {}
 
 for k in [
+    "SingleElectron-Run2017F-31Mar2018-v1",
     "ttHTobb",
-    #"TTbar_inc",
-    #"SingleMuon-Run2016H-03Feb2017_ver3-v1"
     ]:
     D = deepcopy(datasets[k])
-    D["maxlumis"] = 4
+    D["maxlumis"] = 20
     D["perjob"] = 2
-    if "data" in D["script"]:
-        D["maxlumis"] = 4
+    if not D["isMC"]:
+        D["maxlumis"] = 20
         D["perjob"] = 2
+        D["json"] = json_file
     D["runtime"] = 2
     D["mem_cfg"] = "cfg_noME.py"
     workflow_datasets["testing"][k] = D
@@ -358,18 +358,6 @@ datasets_local = {
         "script": 'heppy_crab_script_data.sh'
     }
 }
-
-workflow_datasets["localtesting"] = {}
-for k in ["mc", "data"]:
-    D = deepcopy(datasets_local[k])
-    D["mem_cfg"] = "cfg_noME.py"
-    workflow_datasets["localtesting"][k] = D
-
-workflow_datasets["localtesting_withme"] = {}
-for k in ["mc", "data"]:
-    D = deepcopy(datasets_local[k])
-    D["mem_cfg"] = me_cfgs["leptonic"]
-    workflow_datasets["localtesting_withme"][k] = D
 
 workflow_datasets["testing_withme"] = {}
 for k in ["TTbar_had","TTbar_sl1","TTbar_dl1"]:
@@ -396,17 +384,8 @@ for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2
 
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
-"""
-TODO: Chekc if DS is nanoAOD to change workflow
-#Check if Dataset are nanoAOD
-nanoFlag = None
-for datasetKey in sel_datasets:
-    isNANOAOD = workflow_datasets[args.workflow][datasetKey]["isNANOAOD"]
-    if nanoFlag is None:
-        nanoFlag = isNANOAOD
-    if not(nanoFlag and isNANOAOD):
-        exit() 
-"""
+print sel_datasets
+raw_input("Press ret to start")
 if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
     from CRABClient.UserUtilities import getUsernameFromSiteDB
@@ -415,49 +394,6 @@ if __name__ == '__main__':
         res = crabCommand('submit', config = config)
         with open(config.General.workArea + "/crab_" + config.General.requestName + "/crab_config.py", "w") as fi:
             fi.write(config.pythonise_())
-
-    def localsubmit(config, dname, opts):
-        TMPDIR = "/scratch/{0}/crab_work/{1}/crab_{2}".format(os.environ["USER"], args.tag, dname)
-        CMSSW_VERSION = "CMSSW_9_4_1"
-        workdir = os.path.join(TMPDIR, CMSSW_VERSION, "work")
-        try: 
-            shutil.rmtree(TMPDIR)
-        except Exception as e:
-            pass
-        os.makedirs(TMPDIR)
-        os.system("cd {0}".format(TMPDIR))
-        pwd = os.getcwd() 
-        os.chdir(TMPDIR)
-        os.system("scramv1 project CMSSW {0}".format(CMSSW_VERSION))
-        os.makedirs(workdir)
-        os.chdir(pwd)
-        for inf in config.JobType.inputFiles + [config.JobType.scriptExe, 'PSet_local.py']:
-            shutil.copy(inf, os.path.join(workdir, os.path.basename(inf)))
-        os.system("cp -r $CMSSW_BASE/lib {0}/".format(workdir)) 
-        os.system("mv {0}/PSet_local.py {0}/PSet.py".format(workdir)) 
-        os.system("cp {0} {1}/x509_proxy".format(os.environ["X509_USER_PROXY"], workdir)) 
-        os.system("cp -r $CMSSW_BASE/lib/slc*/proclib {0}/lib/slc*/".format(workdir)) 
-        os.system('find $CMSSW_BASE/src/ -path "*/data/*" -type f | sed -s "s|$CMSSW_BASE/||" > files')
-        os.system('cp files $CMSSW_BASE/; cd $CMSSW_BASE; for f in `cat files`; do cp --parents $f {0}/; done'.format(workdir))
-        runfile = open(workdir+"/run.sh", "w")
-        runfile.write(
-            """
-            #!/bin/bash
-            source /cvmfs/cms.cern.ch/cmsset_default.sh
-            scram b ProjectRename
-            eval `scramv1 runtime -sh`
-            scram b
-            env
-            ./{0} 1 {1}
-            """.format(config.JobType.scriptExe, " ".join(config.JobType.scriptArgs)).strip() + '\n'
-        )
-        runfile.close()
-        os.system('chmod +x {0}/run.sh'.format(workdir))
-        os.system('cd {0}/{1};eval `scram runtime -sh`;scram b;'.format(TMPDIR, CMSSW_VERSION))
-        archive_name = "_".join([dname, args.workflow, args.tag])
-        os.system('cd {0};tar zcfv job_{1}.tar.gz {2} > {1}.log'.format(TMPDIR, archive_name, CMSSW_VERSION))
-        os.system("cp {0}/job_{1}.tar.gz ./".format(TMPDIR, archive_name))
-        #os.system("cp -r $CMSSW_BASE/src {0}/".format(workdir)) 
 
     from CRABClient.UserUtilities import config
     config = config()
@@ -513,8 +449,11 @@ if __name__ == '__main__':
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
     
-    #config.Site.whitelist = ["T2_CH_CSCS", "T1_US_FNAL", "T2_DE_DESY", "T1_DE_KIT"]
-   # config.Site.blacklist = ["T2_US_UCSD", "T3_UK_London_RHUL", "T3_UK_London_QMUL"]
+    #config.Site.whitelist = ["T2_CH_CSCS"]
+    config.Site.blacklist = [
+        "T3_UK_London_QMUL",
+        "T2_CH_CSCS_HPC", #added on May 9 2018 due to PSet hash errors that only seem to occur on T2_CH_CSCS_HPC
+    ]
 
     config.Site.storageSite = "T3_CH_PSI"
 
@@ -536,34 +475,30 @@ if __name__ == '__main__':
         mem_cfg = sel_datasets[sample]["mem_cfg"]
         config.JobType.scriptExe = sel_datasets[sample]["script"]
         
-        if not localtesting:
-            dataset = sel_datasets[sample]["ds"]
-            nlumis = sel_datasets[sample]["maxlumis"]
-            perjob = sel_datasets[sample]["perjob"]
-            runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
+        dataset = sel_datasets[sample]["ds"]
+        nlumis = sel_datasets[sample]["maxlumis"]
+        perjob = sel_datasets[sample]["perjob"]
+        runtime_min = int(sel_datasets[sample].get("runtime_min", sel_datasets[sample]["runtime"]*60))
 
-            config.JobType.maxJobRuntimeMin = runtime_min
-            if args.recovery:
-		config.General.requestName = submitname
-	    else:
-		config.General.requestName = sample + "_" + submitname
-            config.Data.inputDataset = dataset
-            config.Data.unitsPerJob = perjob
-            config.Data.totalUnits = nlumis
-            config.Data.outputDatasetTag = submitname
-            try:
-                config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
-            except Exception as e:
-                config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
+        config.JobType.maxJobRuntimeMin = runtime_min
+        if args.recovery:
+	    config.General.requestName = submitname
+	else:
+	    config.General.requestName = sample + "_" + submitname
+        config.Data.inputDataset = dataset
+        config.Data.unitsPerJob = perjob
+        config.Data.totalUnits = nlumis
+        config.Data.outputDatasetTag = submitname
+        try:
+            config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(getUsernameFromSiteDB()) + submitname
+        except Exception as e:
+            config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
 
         config.JobType.scriptArgs = ['ME_CONF={0}'.format(mem_cfg)]
         print  config.JobType.scriptArgs
         
-        if localtesting:
-            localsubmit(config, sample, sel_datasets[sample])
-        else:
-            try:
-                submit(config)
-            except Exception as e:
-                print e
-                print "skipping"
+        try:
+            submit(config)
+        except Exception as e:
+            print e
+            print "skipping"

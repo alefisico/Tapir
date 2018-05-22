@@ -31,14 +31,20 @@ def convertLFN(crabFiles,crabFiles_pfn):
         if not ("overflow" in os.getenv("GLIDECLIENT_Group","overflow")):
             pfn=os.popen("edmFileUtil -d %s"%(crabFiles[i])).read()
             pfn=re.sub("\n","",pfn)
-            if pfn.startswith("/"):
-                pfn = "file:"+pfn
+            #if pfn.startswith("/"):
+            #    pfn = "file:"+pfn
             print "replaced", crabFiles[i],"->",pfn
             crabFiles_pfn[i]=pfn
         else:
             print "data is not local" 
             crabFiles_pfn[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
-
+        f = ROOT.TFile.Open(crabFiles_pfn[i])
+        try:
+            f.IsZombie()
+        except ReferenceError:
+            print "ReferneceError for pfn path. Replacing with xrd path"
+            crabFiles_pfn[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
+        del f
 
 def getLumisProcessed(vlumiblock): 
     lumidict = {}
@@ -175,7 +181,7 @@ def getFJR(lumidict, inputfiles_lfn, inputfiles_pfn, outputfile):
     <LFN></LFN>
     <PFN>%s</PFN>
     <Catalog></Catalog>
-    <ModuleLabel>HEPPY</ModuleLabel>
+    <ModuleLabel>NANO</ModuleLabel>
     <Runs>
     """ % (outputfile)
     for run, lumis in lumidict.items():

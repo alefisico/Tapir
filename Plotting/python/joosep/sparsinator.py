@@ -40,7 +40,7 @@ syst_pairs = OrderedDict([
         getattr(ROOT.TTH_MEAnalysis.Systematic, d if d != "" else "None")
     ))
     for x in [
-        #"CMS_scale_j",
+        "CMS_scale_j",
         "CMS_res_j",
         "CMS_scaleSubTotalPileUp_j",
         "CMS_scaleAbsoluteStat_j",
@@ -262,7 +262,9 @@ def createEvent(
             event.topPTweightUp = topPTreweightUp(event.genTopLep_pt, event.genTopHad_pt)
             event.topPTweightDown = topPTreweightDown(event.genTopLep_pt, event.genTopHad_pt)
     event.leps_pdgId = [x.pdgId for x in event.leptons]
+    
     event.triggerPath = triggerPath(event)
+
     event.btag_LR_4b_2b_btagCSV_logit = logit(event.btag_LR_4b_2b_btagCSV)
     any_passes = applyCuts(event, matched_processes)
    
@@ -287,6 +289,7 @@ def createEvent(
 
     event.weight_nominal = 1.0
     if schema == "mc" or schema == "mc_syst":
+        event.lepton_weight = 1.0
         #event.lepton_weight = calc_lepton_SF(event)
         #if syst == "nominal":
         #    event.lepton_weights_syst = {w: calc_lepton_SF(event, w) for w in [
@@ -301,6 +304,12 @@ def createEvent(
         #        "CMS_effTrigger_emUp", "CMS_effTrigger_emDown",
         #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         #    ]}
+
+        LOG_MODULE_NAME.debug("pu={0} gen={1} btag={2}".format(
+            event.weights.at(syst_pairs["CMS_pu"]),
+            event.weights.at(syst_pairs["gen"]),
+            event.weights.at(syst_pairs["CMS_ttH_CSV"]))
+        )
         event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
         #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
@@ -340,6 +349,7 @@ def createEvent(
                 l4p(event.met_pt, 0, event.met_phi, 0),
             )
             event.common_bdt = ret_bdt
+
     return event
 
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1, outfilter=None):
@@ -438,9 +448,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #("CMS_topPTUp", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 #("CMS_topPTDown", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.lepton_weight ),
                 ("unweighted", lambda ev: 1.0),
-                #("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
-                #("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
-                #("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
+                ("pu_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_ttH_CSV"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight),
+                ("lep_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.weights.at(syst_pairs["CMS_ttH_CSV"])),
+                ("btag_off", lambda ev, syst_pairs=syst_pairs: ev.weights.at(syst_pairs["CMS_pu"]) * ev.weights.at(syst_pairs["gen"]) * ev.lepton_weight)
         ]
 
         #for lep_syst in ["CMS_effID_eUp", "CMS_effID_eDown",
@@ -563,7 +573,8 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     "use of postprocessing".format(file_name)
                 )
             else:
-                fn_base = os.path.basename(file_name).replace(".root", "")
+                #fix typo
+                fn_base = os.path.basename(file_name).replace("_out.root", "_postproccesing.root")
                 fns_postproc = [fn for fn in sample.file_names_postproc if fn_base in fn]
                 if len(fns_postproc) != 1:
                     raise Exception("Expected exactly one matching postprocessing file but got {0}".format(fns_postproc))
@@ -597,6 +608,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         tfile_postproc = None
         ttree_postproc = None
         if file_name_postproc:
+            LOG_MODULE_NAME.info("opening postprocessing file {0}".format(file_name_postproc))
             tfile_postproc = ROOT.TFile.Open(file_name_postproc)
             ttree_postproc = tfile_postproc.Get("Friends")
             if ttree_postproc.GetEntries() != events.reader.GetEntries(True):
@@ -646,6 +658,10 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     continue
                 
                 if ttree_postproc:
+                    LOG_MODULE_NAME.debug("replacing pu weight {0} with postprocessing {1}".format(
+                        event.weights[syst_pairs["CMS_pu"]],
+                        ttree_postproc.puWeight
+                    ))
                     event.weights[syst_pairs["CMS_pu"]] = ttree_postproc.puWeight
                     w = reduce(
                         lambda x,y: x*y,
@@ -655,8 +671,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     event.weights[syst_pairs["CMS_ttH_CSV"]] = w
 
                 #make sure data event is in golden JSON
-                if schema == "data" and not event.json:
-                    continue
+                #note: nanoAOD data is already pre-selected with the json specified in multicrab_94X.py
+                #if schema == "data" and not event.json:
+                #    continue
                 
                 if not pass_METfilter(event, schema):
                     print("Event {0}:{1}:{2} failed MET filter".format(event.run, event.lumi, event.evt))
@@ -745,7 +762,8 @@ if __name__ == "__main__":
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
         file_names = analysis.get_sample(sample).file_names
     else:
-        sample = "ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8"
+        sample = "ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8"
+        #sample = "SingleMuon"
         skip_events = 0
         max_events = 10000
         analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")

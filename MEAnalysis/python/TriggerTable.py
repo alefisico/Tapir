@@ -12,43 +12,45 @@ default.cfg). For this dataset the default configuration will be replaced.
 
 triggerTable = {
     "ttH_SL_el" : [
-        "HLT_Ele27_WPTight_Gsf",
+        "HLT_Ele35_WPTight_Gsf",
+        "HLT_Ele28_eta2p1_WPTight_Gsf_HT150",
     ],
     "ttH_SL_mu" : [
-        "HLT_IsoMu24",
+        "HLT_IsoMu24_eta2p1",
+        "HLT_IsoMu27",
     ],
-#    "ttH_DL_mumu" : [
-#        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v*",
-#        "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*",
-#        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*",
-#        "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*",
-#    ],
-#    "ttH_DL_elmu" : [
-#        "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*",
-#        "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*",
-#        "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*",
-#        "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*",
-#    ],
-#    "ttH_DL_elel" : [
-#        "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*",
-#    ],
-#    "ttH_FH" : [
-#        "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
-#        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0",
-#        "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
-#    ],
-#    "ttH_FH:JetHT" : [
-#        "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
-#        "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
-#        ("and","!HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0")
-#    ],
-#    "ttH_FH:BTagCSV" : [
-#        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0"
-#    ],
-#    "ttH_FH_prescaled" : [
-#        "HLT_PFHT450_SixJet40_v*",
-#        "HLT_PFHT400_SixJet30_v*",
-#    ],
+    "ttH_DL_mumu" : [
+        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ",
+        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8",
+        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8",
+    ],
+    "ttH_DL_elmu" : [
+        "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",
+        "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
+        "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+        "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",
+    ],
+    "ttH_DL_elel" : [
+        "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",
+        "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+    ],
+   "ttH_FH" : [
+       "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
+       "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0",
+       "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
+   ],
+   "ttH_FH:JetHT" : [
+       "HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
+       "HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2",
+       ("and not","HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0")
+   ],
+   "ttH_FH:BTagCSV" : [
+       "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0"
+   ],
+#   "ttH_FH_prescaled" : [
+#       "HLT_PFHT450_SixJet40_v",
+#       "HLT_PFHT400_SixJet30_v",
+#   ],
 }
 
 

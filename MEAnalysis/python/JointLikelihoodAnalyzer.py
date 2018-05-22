@@ -119,7 +119,7 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
             abottom = ROOT.TLorentzVector()
             add_rad = ROOT.TLorentzVector()
 
-            # !!! only works for ttH(H->bb) sample so far
+            # !! only implemented so far for ttH(H->bb) sample
             for p in HS:
                 
                 # top quark
