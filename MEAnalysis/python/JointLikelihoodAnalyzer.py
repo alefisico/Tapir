@@ -68,6 +68,8 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
 
         self.mem_configs = self.conf.mem_configs
 
+        self.save = True
+
         cfg = MEMConfig(self.conf)
         self.integrator = MEM.Integrand(
             0,#verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
@@ -176,5 +178,13 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
                 r = prob["ttbb"]/prob["ttHbb"]
                 print r
                 event.jointlikelihood = r
+
+            if self.save == True:
+
+                event.jlr_top = top
+                event.jlr_atop = atop
+                event.jlr_bottom = bottom
+                event.jlr_abottom = abottom
+                event.jlr_addRad = add_rad
 
         return True        

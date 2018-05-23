@@ -251,6 +251,10 @@ class Jet:
         if not MC:
             self.pt = tree.Jet_pt[n];
         else:
+            #self.pt = tree.Jet_pt[n]
+            #self.corr_JER = 0.0
+            self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
+            self.corr_JER = tree.Jet_pt_nom[n]/tree.Jet_pt[n];
 
             # btag Weights
             self.btagSF = tree.Jet_btagSF[n]
