@@ -68,6 +68,8 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
 
         self.mem_configs = self.conf.mem_configs
 
+        self.save = True
+
         cfg = MEMConfig(self.conf)
         self.integrator = MEM.Integrand(
             0,#verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
@@ -92,6 +94,8 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
 
         if self.cfg_comp.isMC:
 
+            print "Event number:", event.evt
+
             # get inputs for scattering amplitudes
             #double MEM::Integrand::scattering(const LV &top, const LV &atop, const LV &b1,
             #                      const LV &b2, const LV &additional_jet,
@@ -103,13 +107,12 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
             print idx
 
             # get inital-state partons
-            IS = [(i, tupl) for i, tupl in enumerate(idx) if tupl[0] == -1]
-            x1 = ROOT.TLorentzVector()
-            x1.SetPtEtaPhiM(event.GenParticle[IS[0][0]].pt, event.GenParticle[IS[0][0]].eta, event.GenParticle[IS[0][0]].phi, event.GenParticle[IS[0][0]].mass)
-            x2 = ROOT.TLorentzVector()
-            x2.SetPtEtaPhiM(event.GenParticle[IS[1][0]].pt, event.GenParticle[IS[1][0]].eta, event.GenParticle[IS[1][0]].phi, event.GenParticle[IS[1][0]].mass)
+            #IS = [(i, tupl) for i, tupl in enumerate(idx) if tupl[0] == -1]
+            #x1 = ROOT.TLorentzVector()
+            #x1.SetPtEtaPhiM(event.GenParticle[IS[0][0]].pt, event.GenParticle[IS[0][0]].eta, event.GenParticle[IS[0][0]].phi, event.GenParticle[IS[0][0]].mass)
+            #x2 = ROOT.TLorentzVector()
+            #x2.SetPtEtaPhiM(event.GenParticle[IS[1][0]].pt, event.GenParticle[IS[1][0]].eta, event.GenParticle[IS[1][0]].phi, event.GenParticle[IS[1][0]].mass)
 
-           
             # get top/antitop and bottom/anti-bottom LV 
             HS = [(i, tupl) for i, tupl in enumerate(idx) if tupl[0] == 0]
             top = ROOT.TLorentzVector()
@@ -134,7 +137,8 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
                     j = p[0]
                     while j < len(event.GenParticle):
                         decay = [(i,tupl) for i,tupl in enumerate(idx) if tupl[0] == j]
-                        if len(decay) != 2:
+                        print decay
+                        if len(decay) == 1:
                             j = decay[0][0]
                         else:
                             break
@@ -142,16 +146,45 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
                         if d[1][1] == 5:
                             bottom.SetPtEtaPhiM(event.GenParticle[d[0]].pt, event.GenParticle[d[0]].eta, event.GenParticle[d[0]].phi, event.GenParticle[d[0]].mass)    
                         if d[1][1] == -5:
-                            abottom.SetPtEtaPhiM(event.GenParticle[d[0]].pt, event.GenParticle[d[0]].eta, event.GenParticle[d[0]].phi, event.GenParticle[d[0]].mass)    
-                
+                            abottom.SetPtEtaPhiM(event.GenParticle[d[0]].pt, event.GenParticle[d[0]].eta, event.GenParticle[d[0]].phi, event.GenParticle[d[0]].mass)   
+
                 # additional radiation
-                else:
-                    add_rad.SetPtEtaPhiM(event.GenParticle[p[0]].pt, event.GenParticle[p[0]].eta, event.GenParticle[p[0]].phi, event.GenParticle[p[0]].mass)
-                              
-            
-            # call MEM scattering to get the probability for hypo = TTH and hypo = TTBB
-            # TTH
-            hypo = MEM.Hypothesis.TTH
-            prob_1 = self.integrator.scattering(top, atop, bottom, abottom, add_rad, ROOT.Double(x1.E()), ROOT.Double(x2.E()))
+                #else:
+                #    add_rad.SetPtEtaPhiM(event.GenParticle[p[0]].pt, event.GenParticle[p[0]].eta, event.GenParticle[p[0]].phi, event.GenParticle[p[0]].mass)
+
+
+            # check if enough information to compute joint likelihood, o.w. set all values to -9999
+            if bottom == ROOT.TLorentzVector() or abottom == ROOT.TLorentzVector() or top == ROOT.TLorentzVector() or atop == ROOT.TLorentzVector():
+    
+                event.prob_ttHbb = -9999
+                event.prob_ttbb = -9999
+                event.jointlikelihood = -9999
+
+            else:
+
+                # call MEM scattering to get the probability for hypo = TTH and hypo = TTBB
+                prob = {}
+                # TTH
+                self.integrator.set_hypo(MEM.Hypothesis.TTH)
+                prob["ttHbb"] = self.integrator.scattering(top, atop, bottom, abottom, add_rad, ROOT.Double(0), ROOT.Double(0))
+                # TTBB
+                self.integrator.set_hypo(MEM.Hypothesis.TTBB)
+                prob["ttbb"] = self.integrator.scattering(top, atop, bottom, abottom, add_rad, ROOT.Double(0), ROOT.Double(0))
+                print prob
+
+                event.prob_ttHbb = prob["ttHbb"]    
+                event.prob_ttbb = prob["ttbb"]
+
+                r = prob["ttbb"]/prob["ttHbb"]
+                print r
+                event.jointlikelihood = r
+
+            if self.save == True:
+
+                event.jlr_top = top
+                event.jlr_atop = atop
+                event.jlr_bottom = bottom
+                event.jlr_abottom = abottom
+                event.jlr_addRad = add_rad
 
         return True        

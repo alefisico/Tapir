@@ -243,6 +243,7 @@ class Conf:
     }
 
     general = {
+        #"passall": False,
         "passall": True,
         "boosted": False,
         "QGLtoDo": {

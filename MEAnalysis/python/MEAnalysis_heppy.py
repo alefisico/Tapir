@@ -387,6 +387,21 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
+    #compute joint likelihood ratio
+    jointlikelihood_ana = cfg.Analyzer(
+        MECoreAnalyzers.JointLikelihoodAnalyzer,
+        'joint_likelihood',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
+
+    # computes input for NN (training or prediction)
+    NN_ana = cfg.Analyzer(
+        MECoreAnalyzers.NNAnalyzer,
+        'NN_input',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
 
     gentth_pre = cfg.Analyzer(
         MECoreAnalyzers.GenTTHAnalyzerPre,
@@ -441,7 +456,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
 
             #After this, the event object has been created
             lumilist_ana,
-
             #puweight_ana, #possible to recompute the PU weight on the fly by uncommenting
             gentth_pre,
             pvana,
@@ -463,6 +477,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             gentth,
             #multiclass_analyzer,
             mem_analyzer,
+            jointlikelihood_ana,
+            NN_ana,
             mva,
             treevar,
 
@@ -626,6 +642,6 @@ if __name__ == "__main__":
         files = []
     print an
     looper_dir, files = main(an, sample_name=args.sample, numEvents=args.numEvents, files=files, loglevel = args.loglevel)
-#
+
 #    import TTH.MEAnalysis.counts as counts
 #    counts.main(files, "{0}/tree.root".format(looper_dir))
