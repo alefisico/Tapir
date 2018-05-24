@@ -332,7 +332,8 @@ workflow_datasets["pilot"][pilot_name] = D
 workflow_datasets["testing"] = {}
 
 for k in [
-    "SingleElectron-Run2017F-31Mar2018-v1",
+    "TTbar_sl1",
+    #"SingleElectron-Run2017F-31Mar2018-v1",
     "ttHTobb",
     ]:
     D = deepcopy(datasets[k])
