@@ -19,48 +19,6 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
     Perfomrs the calculation of the joint likelihood ratio using the MEM::Integrand::scattering function
     in order to follow the approach presented in https://arxiv.org/pdf/1805.00013.pdf
 
-    It stores the output for the parton-level distributions from matrix element for ttH and ttbb.    
-
-    The ME algorithms are run only in case the njet/nlep/Wtag category (event.cat)
-    is in the accepted categories specified in the config.
-    Additionally, we require the b-tagging category (event.cat_btag) to be "H" (high).
-
-    For each ME configuration on each event, the jets which are counted to be b-tagged
-    in event.selected_btagged_jets_high are added as the candidates for t->b (W) or h->bb.
-    These jets must be exactly 4, otherwise no permutation is accepted (in case
-    using BTagged/QUntagged assumptions).
-
-    Any additional jets are assumed to come from the hadronic W decay. These are
-    specified in event.wquark_candidate_jets.
-
-    Based on the event njet/nlep/Wtag category, if a jet fmor the W is counted as missing,
-    it is integrated over using additional variables set by self.vars_to_integrate.
-
-    self.vars_to_integrate_any contains the list of particles which are integrated over assuming
-    perfect reconstruction efficiency.
-
-    The MEM top pair hypothesis (di-leptonic or single leptonic top pair) is chosen based
-    on the reconstructed lepton multiplicity (event.good_leptons).
-
-    The algorithm is shortly as follows:
-    1. check if event passes event.cat and event.cat_btag
-    2. loop over all MEM configurations i=[0...Nmem)
-        2a. add all 4 b-tagged jets to integrator
-        2b. add all 0-3 untagged jets to integrator
-        2c. add all leptons to integrator
-        2d. decide SL/DL top pair hypo based on leptons
-        2e. based on event.cat, add additional integration vars
-        2f. run ME integrator for both tth and ttbb hypos
-        2g. save output in event.mem_output_tth[i] (or ttbb)
-        2i. clean up event in integrator
-
-    Relies on:
-    event.good_jets, event.good_leptons, event.cat, event.input.met_pt
-
-    Produces:
-    mem_results_tth (MEMOutput): probability for the tt+H(bb) hypothesis
-    mem_results_ttbb (MEMOutput): probability for the tt+bb hypothesis
-
     """
     def __init__(self, cfg_ana, cfg_comp, looperName):
         self.conf = cfg_ana._conf
