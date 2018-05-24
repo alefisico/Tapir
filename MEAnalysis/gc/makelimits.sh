@@ -9,7 +9,7 @@ cp ${datacardbase}/${analysis}/*.txt .
 
 # Run MakeLimits
 echo "Running MakeLimits"
-python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeLimits.py $specfile . $analysis $group
+python ${CMSSW_BASE}/src/TTH/Plotting/python/Datacards/MakeLimits.py $analysis $group
 echo "Done MakeLimits"
 
 ls -l .

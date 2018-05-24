@@ -10,7 +10,7 @@ Setup on SLC6 in a clean directory (no CMSSW) on a **shared file system (NFS)**
 ~~~
 $ mkdir -p ~/tth/sw
 $ cd ~/tth/sw
-$ wget --no-check-certificate https://gitlab.cern.ch/jpata/tthbb13/raw/SwitchNanoAOD/setup.sh
+$ wget --no-check-certificate https://gitlab.cern.ch/Zurich_ttH/tthbb13/raw/SwitchNanoAOD/setup.sh
 $ source setup.sh
 ~~~
 This will download CMSSW, the `tthbb13` code and all the dependencies.
@@ -44,8 +44,8 @@ NanoAOD links:
 ## Step2: tthbb13 code
 Using the nanoAOD-tree, we will run the ttH(bb) and matrix element code (tthbb13). The code is configured mainly from two files:
 
-1. A flat configuration in https://gitlab.cern.ch/jpata/tthbb13/blob/SwitchNanoAOD/MEAnalysis/data/default.cfg specifying the samples and analysis categories. This configuration should be preferred for most future options.
-2. A python configuration in https://gitlab.cern.ch/jpata/tthbb13/blob/SwitchNanoAOD/MEAnalysis/python/MEAnalysis_cfg_heppy.py used for the MEM configuration and specifying the object (jet, lepton) cuts. 
+1. A flat configuration in https://gitlab.cern.ch/Zurich_ttH/tthbb13/blob/SwitchNanoAOD/MEAnalysis/data/default.cfg specifying the samples and analysis categories. This configuration should be preferred for most future options.
+2. A python configuration in https://gitlab.cern.ch/Zurich_ttH/tthbb13/blob/SwitchNanoAOD/MEAnalysis/python/MEAnalysis_cfg_heppy.py used for the MEM configuration and specifying the object (jet, lepton) cuts. 
 
 In order to test the `tthbb13` code, run:
 ~~~
@@ -74,7 +74,7 @@ $ ./hadd.py /path/to/output/GC123445/ #call our merge script
 
 This will produce some skimmed ntuples in
 ~~~
-/mnt/t3nfs01/data01/shome/jpata/tth/gc/projectSkim/GCe0f041d65b98:
+/mnt/t3nfs01/data01/shome/Zurich_ttH/tth/gc/projectSkim/GCe0f041d65b98:
 Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8 <= unmerged
 Jul15_leptonic_v1__ttHTobb_M125_13TeV_powheg_pythia8.root <= merged file
 ...
@@ -150,21 +150,21 @@ The currently used samples are listed below. Generally, they are stored at T3_CH
 
 | production name | comments |
 |-----------------|----------|
-| [NanoCrabProdXmas](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas) | no boosted or hadronic triggers |
-| [nano_05Feb2018](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/nano_05Feb2018) | nanoAODv1, 2016 datasets |
-| [Apr16](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | 2017 datasets, no btag shape scale factor(step1) |
-| [May1](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May21) | data, relatively complete |
-| [May2](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May2) | MC |
+| [NanoCrabProdXmas](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoCrabProdXmas) | no boosted or hadronic triggers |
+| [nano_05Feb2018](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/nano_05Feb2018) | nanoAODv1, 2016 datasets |
+| [Apr16](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | 2017 datasets, no btag shape scale factor(step1) |
+| [May1](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May21) | data, relatively complete |
+| [May2](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May2) | MC |
 
 ## tthbb13 (step2)
 
 | production name | base NanoAOD run | comments |
 |-----------------|--------------|----------|
-| [Jan26](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26) | NanoCrabProdXmas | |
-| [Apr16](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | Apr16 | no trigger |
-| [NanoBoostedMEM_Mar15](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoBoostedMEM_Mar15) | RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1 | postprocessing,MEM,Boosted |
-| [May1](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May21) | May1 | data, no nPVs |
-| [May2](https://gitlab.cern.ch/jpata/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May2) | May2 | MC, no btagSF, wrong lepton veto criteria |
+| [Jan26](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Jan26) | NanoCrabProdXmas | |
+| [Apr16](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/Apr16) | Apr16 | no trigger |
+| [NanoBoostedMEM_Mar15](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/NanoBoostedMEM_Mar15) | RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1 | postprocessing,MEM,Boosted |
+| [May1](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May21) | May1 | data, no nPVs |
+| [May2](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May2) | May2 | MC, no btagSF, wrong lepton veto criteria |
 
 # Misc
 
@@ -182,6 +182,27 @@ a grid-control workflow in `MEAnalysis/gc/confs/copyData.conf`.
 We test the code regularly using the gitlab CI system. Since we are accessing
 the samples from T3_CH_PSI, this currently requires a valid proxy at CERN. 
 
+## Evaluate transfer functions
+
+Transfer functions map the measured properties of jets by the detector to the underlying generated particles. These are needed for the computation of the MEM. To evaluate these, a ROOT file containing the necessary information needs to be computed first (jets and generated quarks). To do this, run the `MEAnalysis/python/JetTranfer.py` script, or use the grid-control workflow in `MEAnalysis/gc/confs/transfer.conf` .
+
+Next the transfer functions are calculated via the `Plotting/python/TransferFunctions/CreateTF/TFmain.py` script. Before running the script, the config file needs to be created, specifiying the location of the input root file:
+
+~~~
+python config.py
+~~~
+
+Then run the transfer functions, specifying again the file name:
+
+~~~
+python TFmain.py TTToHadronic_TuneCP5_13TeV-powheg-pythia8
+~~~
+
+This produces the pickle file `TFMatrix.dat` needed to run the MEM code. Finally, to obtain the corresponding ROOT file which is needed for instance for the common classifier, run the `MEAnalysis/test/testTransferFunctions.py` script specifiying the pickle file for the resolved jet transfer functions (and the subjet transfer functions):
+
+~~~
+python testTransferFunctions.py [resolved jets transfer functions] [subjets transfer functions]
+~~~
 
 ## OpenLOOPS
 
@@ -197,9 +218,9 @@ Compile the signal and background amplitudes, which will be placed in `OpenLoops
 
 Errors when compiling the code:
 ~~~
->> Compiling  /builds/jpata/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc 
+>> Compiling  /builds/Zurich_ttH/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc 
 In file included from /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/include/TGLIncludes.h:21:0,
-                 from /builds/jpata/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc:4:
+                 from /builds/Zurich_ttH/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc:4:
 /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/include/GL/glew.h:1141:20: fatal error: GL/glu.h: No such file or directory
  #include <GL/glu.h>
                     ^
