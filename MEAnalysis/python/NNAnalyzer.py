@@ -11,7 +11,7 @@ class NNAnalyzer(FilterAnalyzer):
         super(FilterAnalyzer, self).beginLoop(setup)
 
         # defines which information is written to the output files, options = ["GenLevel", "PartLevel", "RecoLevel"]
-        self.setup = "PartLevel"
+        self.setup = "RecoLevel"
 
         # define the objects and variables for training/ predictions
         #self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "Wmass", "ht30"])}
@@ -31,8 +31,11 @@ class NNAnalyzer(FilterAnalyzer):
             # make header for file
             if self.setup != "PartLevel":
 
-                #for o in ["leptons", "jets", "met", "high_level_var"]:
-                for o in ["leptons", "jets", "nu"]:
+                if self.setup != "GenLevel":
+                    l = ["leptons", "jets", "met", "high_level_var"]
+                else:
+                    l = ["leptons", "jets", "nu"]
+                for o in l:
                     if o == "leptons" or o == "jets" or o == "nu":
                         self.output.write("num_" + o + " ")
                     for var in self.var[o][1]:
