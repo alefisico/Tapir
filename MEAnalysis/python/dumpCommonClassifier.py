@@ -17,6 +17,7 @@ class Jet:
                 setattr(self,"{a}{b}".format(a = v,b = ud),kwargs.get("{}{}".format(v,ud)))
 
         self.csv = kwargs.get("csv")
+        self.deepcsv = kwargs.get("deepcsv")
         self.cmva = kwargs.get("cmva")
         self.corrections = kwargs.get("corrections")
 
@@ -29,6 +30,7 @@ class Jet:
         dic["phi"] = self.phi
         dic["mass"] = self.mass
         dic["csv"] = self.csv
+        dic["deepcsv"] = self.deepcsv
         dic["cmva"] = self.cmva
         dic["corr"] = self.corr
         dic["corr_JER"] = self.corr_JER
@@ -134,7 +136,7 @@ if __name__ == "__main__":
     tree.var('systematic', type=int)
     tree.var('njets', type=int)
     max_jets = 10
-    for v in ["jet_pt", "jet_eta", "jet_phi", "jet_mass", "jet_csv", "jet_cmva"]:
+    for v in ["jet_pt", "jet_eta", "jet_phi", "jet_mass", "jet_csv", "jet_deepcsv", "jet_cmva"]:
         tree.vector(v, "njets", maxlen=max_jets, type=float, storageType="F")
 
     for v in ["jet_type"]:
@@ -194,13 +196,14 @@ if __name__ == "__main__":
             dic["phi"] = ev.jets_phi[ijet]
             dic["mass"] = ev.jets_mass[ijet]
             dic["csv"] = ev.jets_btagCSV[ijet]
+            dic["deepcsv"] = ev.jets_btagDeepCSV[ijet]
             dic["cmva"] = ev.jets_btagCMVA[ijet]
-            dic["corr"] = ev.jets_corr[ijet] if hasattr(ev,"jet_corr") else 0
-            dic["corr_JER"] = ev.jets_corr_JER[ijet] if hasattr(ev,"jet_corr_JER") else 0
+            dic["corr"] = ev.jets_corr[ijet] if hasattr(ev,"jet_corr") else 1
+            dic["corr_JER"] = ev.jets_corr_JER[ijet] if hasattr(ev,"jet_corr_JER") else 1
 
             for v in jet_corrections:
                 for ud in ["Up","Down"]:
-                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"jets_corr_{a}{b}".format(a = v,b = ud))[ijet] if hasattr(ev,"jets_corr_{a}{b}".format(a = v,b = ud)) else 0 
+                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"jets_corr_{a}{b}".format(a = v,b = ud))[ijet] if hasattr(ev,"jets_corr_{a}{b}".format(a = v,b = ud)) else 1 
 
             jets += [Jet(**dic)]
 
@@ -212,13 +215,14 @@ if __name__ == "__main__":
             dic["phi"] = ev.loose_jets_phi[ijet]
             dic["mass"] = ev.loose_jets_mass[ijet]
             dic["csv"] = ev.loose_jets_btagCSV[ijet]
+            dic["deepcsv"] = ev.loose_jets_btagDeepCSV[ijet]
             dic["cmva"] = ev.loose_jets_btagCMVA[ijet]
-            dic["corr"] = ev.loose_jets_corr[ijet] if hasattr(ev,"loose_jet_corr") else 0
-            dic["corr_JER"] = ev.loose_jets_corr_JER[ijet] if hasattr(ev,"loose_jet_corr_JER") else 0 
+            dic["corr"] = ev.loose_jets_corr[ijet] if hasattr(ev,"loose_jet_corr") else 1
+            dic["corr_JER"] = ev.loose_jets_corr_JER[ijet] if hasattr(ev,"loose_jet_corr_JER") else 1 
 
             for v in jet_corrections:
                 for ud in ["Up","Down"]:
-                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"loose_jets_corr_{a}{b}".format(a = v,b = ud))[ijet] if hasattr(ev,"loose_jets_corr_{a}{b}".format(a = v,b = ud)) else 0 
+                    dic["{a}{b}".format(a = v,b = ud)] = getattr(ev,"loose_jets_corr_{a}{b}".format(a = v,b = ud))[ijet] if hasattr(ev,"loose_jets_corr_{a}{b}".format(a = v,b = ud)) else 1 
 
             jets += [Jet(**dic)]
 
@@ -254,6 +258,7 @@ if __name__ == "__main__":
             tree.vfill('jet_phi', [x.phi for x in scenario.jets])
             tree.vfill('jet_mass', [x.mass for x in scenario.jets])
             tree.vfill('jet_csv', [x.csv for x in scenario.jets])
+            tree.vfill('jet_deepcsv', [x.deepcsv for x in scenario.jets])
             tree.vfill('jet_cmva', [x.cmva for x in scenario.jets])
             tree.vfill('jet_corr', [x.corr for x in scenario.jets])
             tree.vfill('jet_corr_JER', [x.corr_JER for x in scenario.jets])
