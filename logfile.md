@@ -350,3 +350,11 @@ tthbb13=803c4d5f
 CommonClassifier=a10a9df
 MEIntegratorStandalone=ab31bb6
 CMSSW=41220f99aff
+
+
+ttH_AH_v1
+-------------
+tthbb13=3ef88200
+CommonClassifier=a10a9df
+MEIntegratorStandalone=ab31bb6
+CMSSW=bba8bc89cf0

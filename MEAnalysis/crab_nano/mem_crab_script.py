@@ -68,6 +68,12 @@ if not "--nostep2" in args:
             if arg.startswith("AN_CFG="):
                 an_conf_name = arg.split("=")[1]
 
+    sampleNameFromArg = None
+    for arg in sys.argv:
+        if arg.startswith("DataSetName="):
+            sampleNameFromArg = arg.split("=")[1]
+            print "Found sampleName in arguments: {0}".format(sampleNameFromArg)
+    
     #Make Analysis object and set mem config if changed
     an = analysisFromConfig(an_conf_name)
     if me_conf_name is not None:
@@ -79,7 +85,8 @@ if not "--nostep2" in args:
         schema="mc" if isMC else "data",
         output_name="Output_tth",
         #files=os.getcwd()+"/Output/nanoAOD_postprocessed.root"
-        files="Output/nanoAOD_postprocessed.root"
+        files="Output/nanoAOD_postprocessed.root",
+        sampleName = sampleNameFromArg
     )
     #dumpfile.write(conf_to_str(mem_python_conf))
     #dumpfile.write("\n")
