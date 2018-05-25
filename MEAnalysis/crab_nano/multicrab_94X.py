@@ -17,6 +17,7 @@ workflows = [
     "leptonic", #ttH with SL/DL decays
     "leptonic_nome", #ttH with SL/DL decays
     "hadronic", #ttH with FH decays
+    "hadronic_test", #ttH with FH decays
     "hadronic_nome",
     "hadronic_nome_testing", #ttH with FH decays data + MC
     "QCD_nome", #QCD samples without MEM
@@ -245,23 +246,24 @@ for k in datasets.keys():
     if "JetHT" in k or "BTagCSV" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["hadronic"]
-        D["perjob"] = 20
+        D["perjob"] = 80
         D["runtime"] = 24
+        D["json"] = json_file 
         workflow_datasets["data_hadronic"][k] = D
 
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
-    if "QCD300_ext1" in k: #"TTbar_inc" in k: #"QCD" in k or or "ttH" in k 
+    if k == "TTbar_had" or "ttH" in k or "QCD" in k:
         D = deepcopy(datasets[k])
-    if k == "ttHTobb":
-        D["perjob"] = 4 #for ttH target 500 ev/job => 4 LSs => 8hrs/job
-    elif k == "TTbar_inc":
-        D["perjob"] = 70 #for ttbar target 8000 ev/job => 52 LSs => 6hrs/job
         D["mem_cfg"] = me_cfgs["hadronic"]
-        D["runtime"] = max(20,D["runtime"])
-#        D["maxlumis"] = 1
         workflow_datasets["hadronic"][k] = D
-
+    if ("BTagCSV" in k or "JetHT" in k):
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["hadronic"]
+        D["perjob"] = 30
+        D["runtime"] = max(40,D["runtime"])
+        D["json"] = json_file 
+        workflow_datasets["hadronic"][k] = D
         
 workflow_datasets["QCD_nome"] = {}
 for k in datasets.keys():
@@ -285,14 +287,36 @@ for k in datasets.keys():
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
         workflow_datasets["hadronic_nome"][k] = D
-    if ("BTagCSV" in k or "JetHT" in k) and "Run2017C" in k:
+    if ("BTagCSV" in k or "JetHT" in k):
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
-        D["perjob"] = 75
+        D["perjob"] = 80
         D["runtime"] = 24
         D["json"] = json_file 
         workflow_datasets["hadronic_nome"][k] = D
 
+workflow_datasets["hadronic_test"] = {}
+for k in datasets.keys():
+    #if k == "TTbar_had" or "ttH" in k or "QCD" in k:
+    #if k == "ttHTobb" or k in ["QCD500to700", "QCD700to1000", "QCD1500to2000", "QCD2000toInf"]:
+    #    D = deepcopy(datasets[k])
+    #    D["mem_cfg"] = me_cfgs["hadronic"]
+    #    D["maxlumis"] = D["perjob"]
+    #    workflow_datasets["hadronic_test"][k] = D
+    #if "WJetsToQQ" in k or "ZJetsToQQ" in k or "st_s_inc" in k or "st_t" in k or  "st_tw" in k or "stbar_t" in k or "stbar_tw" in k:
+    #    D["mem_cfg"] = me_cfgs["hadronic"]
+    #    D["maxlumis"] = 1
+    #    workflow_datasets["hadronic_test"][k] = D
+    if ("BTagCSV" in k or "JetHT" in k) and "Run2017C" in k:
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["hadronic"]
+        D["perjob"] = 75
+        D["maxlumis"] = 1#D["perjob"]
+        D["runtime"] = 24
+        D["json"] = json_file 
+        workflow_datasets["hadronic_test"][k] = D
+
+        
 workflow_datasets["hadronic_nome_testing"] = {}
 for k in  workflow_datasets["hadronic_nome"].keys():
     D = deepcopy(workflow_datasets["hadronic_nome"][k])
@@ -384,7 +408,8 @@ for k in ["ttHTobb"]: #"JetHT-Run2016D-23Sep2016-v1"]: #, "QCD1000", "JetHT-Run2
 
 #Now select a set of datasets
 sel_datasets = workflow_datasets[args.workflow]
-print sel_datasets
+print json.dumps(sel_datasets, sort_keys=True,
+                 indent=4, separators=(',', ': '))
 raw_input("Press ret to start")
 if __name__ == '__main__':
     from CRABAPI.RawCommand import crabCommand
@@ -406,8 +431,8 @@ if __name__ == '__main__':
     config.General.transferLogs = True
    
     #Disable overflow to prevent buggy site T2_US_UCSD
-    config.section_("Debug")
-    config.Debug.extraJDL = ['+CMS_ALLOW_OVERFLOW=False']
+    #config.section_("Debug")
+    #config.Debug.extraJDL = ['+CMS_ALLOW_OVERFLOW=False']
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'heppy_crab_fake_pset.py'
@@ -449,7 +474,7 @@ if __name__ == '__main__':
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
     
-    #config.Site.whitelist = ["T2_CH_CSCS"]
+    #config.Site.whitelist = [""]
     config.Site.blacklist = [
         "T3_UK_London_QMUL",
         "T2_CH_CSCS_HPC", #added on May 9 2018 due to PSet hash errors that only seem to occur on T2_CH_CSCS_HPC
@@ -495,6 +520,12 @@ if __name__ == '__main__':
             config.Data.outLFNDirBase = '/store/user/{0}/tth/'.format(os.environ["USER"]) + submitname
 
         config.JobType.scriptArgs = ['ME_CONF={0}'.format(mem_cfg)]
+        if "BTagCSV" in sample:
+            config.JobType.scriptArgs.append('DataSetName=BTagCSV')
+        if "JetHT" in sample:
+            config.JobType.scriptArgs.append('DataSetName=JetHT')
+        if "ttH" in sample:
+            config.JobType.scriptArgs.append('DataSetName=ttH')
         print  config.JobType.scriptArgs
         
         try:

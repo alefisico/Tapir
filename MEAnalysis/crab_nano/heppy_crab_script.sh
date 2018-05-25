@@ -10,10 +10,10 @@ EXITCODE=$?
 echo Finished_nano $EXITCODE
 tail -n10 log
 
-python mem_crab_script.py $@  --isMC >> log 2>&1
+python mem_crab_script.py $@  --isMC >> log2 2>&1
 EXITCODE=$?
 echo Finished_tthbb13 $EXITCODE
-head -n 70 log
+head -n 70 log2
 echo "=== SNIP ==="
-tail -n 70 log
+tail -n 70 log2
 ./post.sh $EXITCODE

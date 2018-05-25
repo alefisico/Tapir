@@ -109,7 +109,7 @@ class BufferedChain( object ):
             LOG_MODULE_NAME.info("Adding tree {0}".format(fi))
             ret = self.base_chain.AddFile(fi, 0)
             if ret == 0:
-                raise IOError("Could not open file {0}".format(fi))
+                raise IOError("Could not open file {0} with tree_name {1}".format(fi,self.tree_name))
         self.chain = BufferedTree(self.base_chain)
 
         self.iTree = 0
@@ -145,7 +145,7 @@ class BufferedChain( object ):
 
         return self
 
-def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None, dataset=None, loglevel="INFO"):
+def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None, dataset=None, sampleName=None, loglevel="INFO"):
     #configure logging
     logging.basicConfig(stream=sys.stdout, level=getattr(logging, loglevel))
     
@@ -195,11 +195,12 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             output_name = "Loop_" + sample_name
     elif schema:
         sample_name = dataset if dataset else "sample"
+        if sampleName is not None:
+            sample_name = sampleName
         step1_tree_name = "Events"
         pass
     else:
         raise Exception("Must specify either sample name or schema")
-
 
     #Event contents are defined here
     #This is work in progress

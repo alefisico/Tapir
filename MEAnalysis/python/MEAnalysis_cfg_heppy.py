@@ -84,7 +84,8 @@ factorizedJetCorrections = [
     "JER"
 ]
 
-factorizedJetCorrections = ["JER","Total"]
+#factorizedJetCorrections = ["JER","Total"]
+#factorizedJetCorrections = ["Total"]
 
 def el_baseline_loose(el):
     sca = abs(el.etaSc)
