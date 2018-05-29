@@ -26,8 +26,6 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
 
         self.mem_configs = self.conf.mem_configs
 
-        self.save = True
-
         cfg = MEMConfig(self.conf)
         self.integrator = MEM.Integrand(
             0,#verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
@@ -52,8 +50,6 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
 
         if self.cfg_comp.isMC:
 
-            print "Event number:", event.evt
-
             # get inputs for scattering amplitudes
             #double MEM::Integrand::scattering(const LV &top, const LV &atop, const LV &b1,
             #                      const LV &b2, const LV &additional_jet,
@@ -62,54 +58,43 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
 
 
             idx = [(event.GenParticle[p].genPartIdxMother, event.GenParticle[p].pdgId) for p in range(len(event.GenParticle))]
-            print idx
 
-            # get inital-state partons
-            #IS = [(i, tupl) for i, tupl in enumerate(idx) if tupl[0] == -1]
-            #x1 = ROOT.TLorentzVector()
-            #x1.SetPtEtaPhiM(event.GenParticle[IS[0][0]].pt, event.GenParticle[IS[0][0]].eta, event.GenParticle[IS[0][0]].phi, event.GenParticle[IS[0][0]].mass)
-            #x2 = ROOT.TLorentzVector()
-            #x2.SetPtEtaPhiM(event.GenParticle[IS[1][0]].pt, event.GenParticle[IS[1][0]].eta, event.GenParticle[IS[1][0]].phi, event.GenParticle[IS[1][0]].mass)
+
+            # get correct tops, bottoms and Higgs boson entries
+            top_idx = [(i, tupl) for i, tupl in enumerate(idx) if tupl[1] == 6][0][0]
+            atop_idx = [(i, tupl) for i, tupl in enumerate(idx) if tupl[1] == -6][0][0]
+
+            bottoms = [(i, tupl) for i, tupl in enumerate(idx) if tupl[1] == 5]
+            abottoms = [(i, tupl) for i, tupl in enumerate(idx) if tupl[1] == -5]
+            Higgs = [(i, tupl) for i, tupl in enumerate(idx) if tupl[1] == 25]
+            if len(Higgs) == 0:
+                bottom_idx = bottoms[0][0]
+                abottom_idx = abottoms[0][0]
+            else:
+                j = Higgs[0][0]
+                while j < len(event.GenParticle):
+                    decay = [(i,tupl) for i,tupl in enumerate(idx) if tupl[0] == j]
+                    if len(decay) == 1:
+                        j = decay[0][0]
+                    else:
+                        break
+                for d in decay:
+                    if d[1][1] == 5:
+                        bottom_idx = d[0]
+                    if d[1][1] == -5:
+                        abottom_idx = d[0]
 
             # get top/antitop and bottom/anti-bottom LV 
-            HS = [(i, tupl) for i, tupl in enumerate(idx) if tupl[0] == 0]
             top = ROOT.TLorentzVector()
             atop = ROOT.TLorentzVector()
             bottom = ROOT.TLorentzVector()
             abottom = ROOT.TLorentzVector()
             add_rad = ROOT.TLorentzVector()
 
-            # !! only implemented so far for ttH(H->bb) sample
-            for p in HS:
-                
-                # top quark
-                if p[1][1] == 6:
-                    top.SetPtEtaPhiM(event.GenParticle[p[0]].pt, event.GenParticle[p[0]].eta, event.GenParticle[p[0]].phi, event.GenParticle[p[0]].mass)
-                # anti-top quark
-                elif p[1][1] == -6:
-                    atop.SetPtEtaPhiM(event.GenParticle[p[0]].pt, event.GenParticle[p[0]].eta, event.GenParticle[p[0]].phi, event.GenParticle[p[0]].mass)
-
-                # Higgs decay
-                elif p[1][1] == 25:
-        
-                    j = p[0]
-                    while j < len(event.GenParticle):
-                        decay = [(i,tupl) for i,tupl in enumerate(idx) if tupl[0] == j]
-                        print decay
-                        if len(decay) == 1:
-                            j = decay[0][0]
-                        else:
-                            break
-                    for d in decay:
-                        if d[1][1] == 5:
-                            bottom.SetPtEtaPhiM(event.GenParticle[d[0]].pt, event.GenParticle[d[0]].eta, event.GenParticle[d[0]].phi, event.GenParticle[d[0]].mass)    
-                        if d[1][1] == -5:
-                            abottom.SetPtEtaPhiM(event.GenParticle[d[0]].pt, event.GenParticle[d[0]].eta, event.GenParticle[d[0]].phi, event.GenParticle[d[0]].mass)   
-
-                # additional radiation
-                #else:
-                #    add_rad.SetPtEtaPhiM(event.GenParticle[p[0]].pt, event.GenParticle[p[0]].eta, event.GenParticle[p[0]].phi, event.GenParticle[p[0]].mass)
-
+            top.SetPtEtaPhiM(event.GenParticle[top_idx].pt, event.GenParticle[top_idx].eta, event.GenParticle[top_idx].phi, event.GenParticle[top_idx].mass)
+            atop.SetPtEtaPhiM(event.GenParticle[atop_idx].pt, event.GenParticle[atop_idx].eta, event.GenParticle[atop_idx].phi, event.GenParticle[atop_idx].mass)
+            bottom.SetPtEtaPhiM(event.GenParticle[bottom_idx].pt, event.GenParticle[bottom_idx].eta, event.GenParticle[bottom_idx].phi, event.GenParticle[bottom_idx].mass)    
+            abottom.SetPtEtaPhiM(event.GenParticle[abottom_idx].pt, event.GenParticle[abottom_idx].eta, event.GenParticle[abottom_idx].phi, event.GenParticle[abottom_idx].mass)   
 
             # check if enough information to compute joint likelihood, o.w. set all values to -9999
             if bottom == ROOT.TLorentzVector() or abottom == ROOT.TLorentzVector() or top == ROOT.TLorentzVector() or atop == ROOT.TLorentzVector():
@@ -128,21 +113,19 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
                 # TTBB
                 self.integrator.set_hypo(MEM.Hypothesis.TTBB)
                 prob["ttbb"] = self.integrator.scattering(top, atop, bottom, abottom, add_rad, ROOT.Double(0), ROOT.Double(0))
-                print prob
 
                 event.prob_ttHbb = prob["ttHbb"]    
                 event.prob_ttbb = prob["ttbb"]
 
                 r = prob["ttbb"]/prob["ttHbb"]
-                print r
                 event.jointlikelihood = r
 
-            if self.save == True:
 
-                event.jlr_top = top
-                event.jlr_atop = atop
-                event.jlr_bottom = bottom
-                event.jlr_abottom = abottom
-                event.jlr_addRad = add_rad
+        # save information of the LVs
+        event.jlr_top = top
+        event.jlr_atop = atop
+        event.jlr_bottom = bottom
+        event.jlr_abottom = abottom
+        event.jlr_addRad = add_rad
 
         return True        
