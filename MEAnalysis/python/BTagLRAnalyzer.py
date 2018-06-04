@@ -3,12 +3,15 @@ ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 from ROOT import MEM
 import itertools
 import math
+import logging
 
 from TTH.MEAnalysis.Analyzer import FilterAnalyzer
 from TTH.MEAnalysis.vhbb_utils import lvec, autolog
 
 import numpy as np
 Cvectoruint = getattr(ROOT, "std::vector<unsigned int>")
+
+LOG_MODULE_NAME = logging.getLogger(__name__)
 
 def logit(x):
     return math.log(x/(1.0 - x)) if x > 0 else -10
@@ -28,9 +31,12 @@ class BTagLRAnalyzer(FilterAnalyzer):
         csv_pdfs = {}
 
         for x in ["b", "c", "l"]:
-            csv_pdfs[(x, "pt_eta")] = cplots.Get(
-                "{1}_{0}_pt_eta".format(x, algo)
-            )
+            name = "{1}_{0}_pt_eta".format(x, algo) 
+            LOG_MODULE_NAME.debug("getting pdf {0} from file {1}".format(name, cplots))
+            obj = cplots.Get(name)
+            if not obj:
+                raise Exception("Could not get PDF {0}".format(name))
+            csv_pdfs[(x, "pt_eta")] = obj
         return csv_pdfs
 
     def __init__(self, cfg_ana, cfg_comp, looperName):
@@ -40,7 +46,7 @@ class BTagLRAnalyzer(FilterAnalyzer):
         
         self.cplots = ROOT.TFile(self.conf.general["controlPlotsFile"])
         self.csv_pdfs = {}
-        for algo in ["btagCSV", "btagCMVA", "btagCMVA_log", "btagDeepCSV"]:
+        for algo in ["btagCSV", "btagDeepCSV"]:
             self.csv_pdfs[algo] = self.getPdfs(self.cplots, algo)
 
         self.conf.BTagLRAnalyzer = self
@@ -117,15 +123,8 @@ class BTagLRAnalyzer(FilterAnalyzer):
 
     def _process(self, event):
 
-        #transform the btagCMVA value from -1.0 .. 1.0 to 0.0 .. 1.0
-        #followed up by a logit transform to get rid of the peaks in the edges
-        for ij in range(len(event.good_jets)):
-            x = event.good_jets[ij].btagCMVA 
-            event.good_jets[ij].btagCMVA_log = math.log((1.0 + x)/(1.0 - x))
-            event.good_jets[ij].btagDeepCSV = event.good_jets[ij].btagDeepCSV
-
         #btag algos for which to calculate btag LR
-        btagalgos = ["btagCSV", "btagCMVA_log", "btagCMVA","btagDeepCSV"]
+        btagalgos = ["btagCSV","btagDeepCSV"]
         jets_for_btag_lr, jet_probs = self.getJetProbs(self.csv_pdfs, event, btagalgos )
 
         btag_likelihood_results = {}
