@@ -15,7 +15,8 @@ brs = ["mass", "nsub", "bbtag", "btagf", "btags", "fromhiggs"]
 
 #Variables to be used in the BDT
 #input_vars = ["mass", "nsub", "bbtag", "btagf", "btags","ptdr","nsj","nsub2"]
-input_vars = ["mass", "nsub", "bbtag", "btagf", "btags"]
+#input_vars = ["mass", "nsub", "bbtag", "btagf", "btags"]
+input_vars = ["nsub", "bbtag", "btags"]
 
 #Cut based discriminator: Mass, Nsub, bbtag, btagF, btagS
 #To be generalized for more points
@@ -40,12 +41,12 @@ cutpointsmax["nsj"] = [10]
 cutpointsmax["ptdr"] = [3]
 
 
-output_dir = "results/HiggsStudiesBDT_20180524/"
+output_dir = "results/HiggsStudiesBDT_20180528/"
 
 default_params = {        
 	# Common parameters
 	"n_chunks"          : 1,
-	"n_estimators"   : 1400,
+	"n_estimators"   : 3000,
     "max_depth"      : 2, 
     "learning_rate"  : 0.05, 
     "max_leaf_nodes" : 3,   
@@ -61,8 +62,8 @@ param_grid = {"n_estimators": [1100,1200,1300],
 
 
 #Training/Test file + get np arrays
-infname_train = "/mnt/t3nfs01/data01/shome/mameinha/TTH/CMSSW_9_4_4/CMSSW/src/TTH/Plotting/python/maren/TrainingSample_Higgs.root"
-infname_test = "/mnt/t3nfs01/data01/shome/mameinha/TTH/CMSSW_9_4_4/CMSSW/src/TTH/Plotting/python/maren/TestingSample_Higgs.root"
+infname_train = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleHiggs/Training.root"
+infname_test = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleHiggs/Test.root"
 
 ########################################
 # Read in parameters
@@ -155,7 +156,7 @@ def modelAdaBoost(params):
 
 
 classifiers = [
-    Classifier("BDT_GradientBoosting", 
+    Classifier("BDT_Higgs", 
                "scikit",
                params,
                False,

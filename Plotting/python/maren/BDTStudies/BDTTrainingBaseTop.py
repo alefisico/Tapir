@@ -447,6 +447,9 @@ def roccurve(clf,X_test,y_test,esig,ebkg):
     
     # Compute ROC curve and area under the curve    
     fpr, tpr, thresholds = roc_curve(y_test, decisions)
+    print fpr
+    print tpr
+    print thresholds
     
     roc_auc = auc(fpr, tpr)
 

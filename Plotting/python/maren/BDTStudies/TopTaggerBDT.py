@@ -39,7 +39,7 @@ output_dir = "results/TopStudiesBDT_20180522/"
 default_params = {        
 	# Common parameters
 	"n_chunks"          : 1,
-	"n_estimators"   : 1400,
+	"n_estimators"   : 1000,
     "max_depth"      : 2, 
     "learning_rate"  : 0.05, 
     "max_leaf_nodes" : 3,   
@@ -55,8 +55,8 @@ param_grid = {"n_estimators": [1100,1200,1300],
 
 
 #Training/Test file + get np arrays
-infname_train = "./TrainingSample_Top.root"
-infname_test = "./TestingSample_Top.root"
+infname_train = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleTop/Training.root"
+infname_test = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleTop/Test.root"
 
 ########################################
 # Read in parameters
@@ -149,7 +149,7 @@ def modelAdaBoost(params):
 
 
 classifiers = [
-    Classifier("BDT_GradientBoosting", 
+    Classifier("BDT_Top_PlayingAround", 
                "scikit",
                params,
                False,
@@ -159,7 +159,7 @@ classifiers = [
                image_fun = to_image,               
                class_names = {
                    0: "Other", 
-                   1: "Higgs",
+                   1: "Top",
                },
                input_vars = input_vars
                ),  

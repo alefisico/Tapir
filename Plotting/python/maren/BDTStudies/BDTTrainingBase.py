@@ -389,7 +389,7 @@ def calc_cutbased(fil,var,cutpointsmin,cutpointsmax):
 				passes[v].append(-1)
 
 		position = 0
-		for i in range(maxlength):
+		"""for i in range(maxlength):
 			for j in range(maxlength):
 				for k in range(maxlength):
 					for l in range(maxlength):
@@ -402,7 +402,23 @@ def calc_cutbased(fil,var,cutpointsmin,cutpointsmax):
 							if passes[var[0]][i] == -1 or passes[var[1]][j] == -1 or passes[var[2]][k] == -1 or passes[var[3]][l] == -1 or passes[var[4]][m] == -1:
 								pass
 							else:
-								position += 1
+								position += 1"""
+
+
+        for i in range(maxlength):
+            for j in range(maxlength):
+                for k in range(maxlength):
+                    if passes[var[0]][i] == 1 and passes[var[1]][j] == 1 and passes[var[2]][k] == 1:
+                        if ev.fromhiggs == 1:
+                            npassS[position]+= 1
+                        if ev.fromhiggs == 0:
+                            npassB[position]+= 1
+                    if passes[var[0]][i] == -1 or passes[var[1]][j] == -1 or passes[var[2]][k] == -1:
+                        pass
+                    else:
+                        position += 1
+
+
 
 		if ev.fromhiggs==1:
 			ntotS += 1

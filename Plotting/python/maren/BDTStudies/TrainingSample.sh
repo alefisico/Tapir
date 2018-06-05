@@ -8,7 +8,9 @@ cd $GC_SCRATCH
 
 echo "Starting"
 
-python ${CMSSW_BASE}/src/TTH/Plotting/python/maren/TrainingSample_HiggsTaggerBDT.py $FILE_NAMES 
+echo "using CMSSW946"
+
+python ${CMSSW_BASE}/src/TTH/Plotting/python/maren/BDTStudies/TrainingSample_HiggsTaggerBDT.py $FILE_NAMES 
 
 echo "done script"
 echo "pwd"

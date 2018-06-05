@@ -11,9 +11,8 @@ from array import array
 
 import TTH.MEAnalysis.nanoTreeClasses as nanoTreeClasses
 import TTH.MEAnalysis.nanoTreeGenClasses as nanoTreeGenClasses
+from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf as python_conf
 
-if "CMSSW_VERSION" in os.environ.keys():
-    from TTH.Plotting.Helpers.CompareDistributionsHelpers import *
 
 ########################################
 # Define helper functions
@@ -32,10 +31,17 @@ class JetCollection:
             self.tau1 = getattr(tree,"{}_tau1".format(name))[n]
             self.bbtag = getattr(tree,"{}_bbtag".format(name))[n]
             self.tau21 = self.tau2 / self.tau1 if self.tau1 > 0.0 else 0.0
-        if name == "FatjetCA15SoftDrop" or name == "HTTV2" or name == "FatJet":
+        if name == "FatjetCA15SoftDrop":
             self.subJetIdx1 = getattr(tree,"{}_subJetIdx1".format(name))[n]
             self.subJetIdx2 = getattr(tree,"{}_subJetIdx2".format(name))[n]
+            self.tau3 = getattr(tree,"{}_tau3".format(name))[n]
+            self.tau2 = getattr(tree,"{}_tau2".format(name))[n]
+            self.tau1 = getattr(tree,"{}_tau1".format(name))[n]
+            self.bbtag = getattr(tree,"{}_bbtag".format(name))[n]
+            self.tau21 = self.tau2 / self.tau1 if self.tau1 > 0.0 else 0.0
         if name == "HTTV2": 
+            self.subJetIdx1 = getattr(tree,"{}_subJetIdx1".format(name))[n]
+            self.subJetIdx2 = getattr(tree,"{}_subJetIdx2".format(name))[n]
             self.subJetIdx3 = getattr(tree,"{}_subJetIdx3".format(name))[n]   
             self.fRec = getattr(tree,"{}_fRec".format(name))[n]   
             self.Ropt = getattr(tree,"{}_Ropt".format(name))[n]   
@@ -166,7 +172,75 @@ def Match_two_lists( objs1_orig, label1,
         
     return n_matches
 
+#Define DL. Only considers leptons, not jets.
+def GetCategory(event,conf):
+    for id_type in ["SL", "DL", "veto"]:
+        sumleps = []
+        event.mu = event.Muon
+        event.el = event.Electron
+        for lep_flavour in ["mu", "el"]:
+            lepcuts = conf.leptons[lep_flavour][id_type]
+            incoll = getattr(event, lep_flavour)
+            
+            #The isolation type and cut value to be used
+            isotype = conf.leptons[lep_flavour]["isotype"]
+            isocut = lepcuts.get("iso", None)
 
+
+            #Filter leptons by pt and eta
+            leps = filter(
+                lambda x, lepcuts=lepcuts: (
+                    x.pt > lepcuts.get("pt", 0) #pt cut may be optional in case of DL
+                    and abs(x.eta) < lepcuts["eta"]
+                ), incoll
+            )
+
+            #Apply isolation cut
+            for lep in leps:
+                lep.iso = getattr(lep, isotype)
+            if not isocut is None:
+
+                #Inverted isolation cut
+                if lepcuts.get("isoinverted", False):
+                    leps = filter(
+                        lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) >= isocut, leps
+                    )
+                #Normal isolation cut
+                else:
+                    leps = filter(
+                        lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
+                    )
+            
+            #Apply ID cut 
+            leps = filter(lepcuts["idcut"], leps)
+
+            sumleps += leps
+            lepname = lep_flavour + "_" + id_type
+            setattr(event, lepname, leps)
+            setattr(event, "n_"+  lepname, len(leps))
+        #end of lep_flavour loop
+        setattr(event, "lep_{0}".format(id_type), sumleps)
+        setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
+    #end of id_type loop
+    event.lep_SL = sorted(event.lep_SL, key=lambda x: x.pt, reverse=True)
+    event.lep_DL = sorted(event.lep_DL, key=lambda x: x.pt, reverse=True)
+    event.lep_veto = sorted(event.lep_veto, key=lambda x: x.pt, reverse=True)
+
+    #Apply two-stage pt cut on DL leptons
+    lep_DL_afterpt = []
+    for lep in event.lep_DL:
+        if len(lep_DL_afterpt) == 0:
+            ptcut = conf.leptons["DL"]["pt_leading"]
+        else: 
+            ptcut = conf.leptons["DL"]["pt_subleading"]
+        if lep.pt > ptcut:
+            lep_DL_afterpt += [lep]
+    event.lep_DL = lep_DL_afterpt
+    event.n_lep_DL = len(event.lep_DL)
+
+    event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
+    event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
+    event.is_fh = (not event.is_sl and not event.is_dl)
 
 ########################################
 # Define Input Files and
@@ -181,15 +255,15 @@ else:
 # for the filename: basepath + filename + .root
 full_file_names = {}
 #for k,v in files.iteritems():
-#fn = os.environ['FILE_NAMES'].split(' ')
-#for v in fn:
-#    full_file_names[v] = basepath + v
+fn = os.environ['FILE_NAMES'].split(' ')
+for v in fn:
+    full_file_names[v] = v
 
 #full_file_names = {}
-full_file_names["v1"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/chreisse/tth/Apr16/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/Apr16/180416_072809/0000/tree_101.root"
-#full_file_names["v2"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_204.root"
-#full_file_names["v3"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_205.root"
-#full_file_names["v4"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_206.root"
+#full_file_names["v1"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_32.root"
+#full_file_names["v2"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_33.root"
+#full_file_names["v3"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_34.root"
+#full_file_names["v4"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_35.root"
 #full_file_names["v5"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_207.root"
 #full_file_names["v6"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_208.root"
 #full_file_names["v7"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_209.root"
@@ -251,7 +325,7 @@ for l in full_file_names:
     counter  = 0
     for event in ttree :
 
-        #if counter > 10000:
+        #if counter > 1000:
         #    break
 
         #if counter < 6495:
@@ -266,11 +340,11 @@ for l in full_file_names:
         event.Muon = nanoTreeClasses.Muon.make_array(ttree, MC = True)
         event.GenParticle = nanoTreeGenClasses.GenParticle.make_array(ttree)
         event.GenHiggsBoson = nanoTreeGenClasses.GenHiggsBoson.make_array(event.GenParticle)
-        event.GenTop = nanoTreeGenClasses.GenTop.make_array(event.GenParticle)
+        event.GenTop = nanoTreeGenClasses.GenTop.make_array(event.GenParticle)     
+        event.GenHadTop = filter(lambda x: (x.decayMode==1), event.GenTop)
         event.GenBQuarkFromH = nanoTreeGenClasses.GenBQuarkFromHiggs.make_array(event.GenParticle)
         event.GenWZQuark = nanoTreeGenClasses.GenWZQuark.make_array(event.GenParticle)
         event.GenBQuarkFromTop = nanoTreeGenClasses.GenBQuarkFromTop.make_array(event.GenParticle)
-        event.GenWBoson = nanoTreeGenClasses.GenWBoson.make_array(event.GenParticle)
         event.FatjetCA15SoftDrop = JetCollection.make_array(ttree,"FatjetCA15SoftDrop")
         event.FatjetCA15 = JetCollection.make_array(ttree,"FatjetCA15")
         event.FatjetCA15SoftDropSubjets = JetCollection.make_array(ttree,"FatjetCA15SoftDropSubjets")
@@ -278,60 +352,81 @@ for l in full_file_names:
         event.FatjetAK8Subjets = JetCollection.make_array(ttree,"SubJet")
         event.HTTV2 = JetCollection.make_array(ttree,"HTTV2")
         event.HTTV2Subjets = JetCollection.make_array(ttree,"HTTV2Subjets")
+        
+        
+        GetCategory(event,python_conf)
 
-        event.FatjetCA15SoftDrop = filter(lambda x: (x.pt > 200 and abs(x.eta) < 2.4), event.FatjetCA15SoftDrop)
+        #Get event category
+        cat = None
+        if event.is_sl:
+            cat = "sl"
+        elif event.is_dl:
+            cat = "dl"
+        else:
+            continue
+
+
+        #First apply all general cuts on objects
+        event.FatjetCA15SoftDrop = filter(lambda x: (x.pt > 200 and abs(x.eta) < 2.4 and x.mass>50), event.FatjetCA15SoftDrop)
+        event.FatjetCA15 = filter(lambda x: (x.pt > 200 and abs(x.eta) < 2.4), event.FatjetCA15)
+        event.HTTV2 = filter(lambda x: (x.pt > 200 and abs(x.eta) < 2.4), event.HTTV2)
+        event.GenHadTop = filter(lambda x: (x.pt > 200 and abs(x.eta) < 2.4), event.GenHadTop)
+        event.GenHiggsBoson = filter(lambda x: (x.pt > 200 and abs(x.eta) < 2.4), event.GenHiggsBoson)
 
         matched_fatjet = Match_two_lists(
-            event.HTTV2, 'HTT',
-            event.FatjetCA15, 'CA15',0.5)
+        event.FatjetCA15SoftDrop, 'CA15SD',
+        event.FatjetCA15, 'CA15',0.5)
+
+        event.FatjetCA15 =  filter(lambda x: (hasattr(x,"matched_CA15SD")), event.FatjetCA15)
+
+        matched_fatjet = Match_two_lists(
+        event.HTTV2, 'HTT',
+        event.FatjetCA15SoftDrop, 'CA15SD',1.0)
+
+        event.HTTV2 =  filter(lambda x: (hasattr(x,"matched_CA15SD")), event.HTTV2)
 
         event.GenHadTop = filter(lambda x: (x.decayMode==1), event.GenTop)
 
-        if len(event.GenHadTop) == 0:
-            continue
-
         event.FatjetCA15 =  filter(lambda x: (hasattr(x,"matched_HTT")), event.FatjetCA15)
+        if cat == "sl":
+            for i in event.HTTV2:
+                setattr(i,"drl",Get_DeltaR_two_objects(i,event.lep_SL[0]))
+                subjets = [event.HTTV2Subjets[i.subJetIdx1].btag,event.HTTV2Subjets[i.subJetIdx2].btag,event.HTTV2Subjets[i.subJetIdx3].btag]
+                subjets = sorted(subjets)
+                setattr(i,"btagmax",subjets[2])
+                setattr(i,"btagsecond",subjets[1])
+                matched = 0
+                for gentop in event.GenHadTop:
+                    if Get_DeltaR_two_objects(i,gentop) < 0.6:
+                        matched = 1
+                print matched
+                setattr(i,"matched",matched)
+            event.HTTV2 = filter(lambda x: (x.drl>1.0 and x.btagmax > 0.1522), event.HTTV2)
 
-        # Lepton selection
-        #if ev.nselLeptons == 0:
-        #    continue
-        #if ev.leps_pt[0] < 30:
-        #    continue
+        if cat == "dl":
+            event.HTTV2 = []
 
 
-        """numJets = 0
-        nBCSVM = 0
-        for i in range(ev.nJet):
-            if ev.Jet_pt[i]>20:
-                numJets += 1
-                if ev.Jet_btagCSV[i]>0.8484:
-                    nBCSVM += 1
-        # Calculate number of jets
-        if nBCSVM < 3:
-            continue
-
-        if numJets < 3:
-            continue"""
-
-        for fatjet in event.FatjetCA15:
+        for fatjet in event.HTTV2:
             dr = 0
             evt[0] = event.event
-            mass[0] = getattr(fatjet.matched_HTT,"mass")
-            frec[0] = getattr(fatjet.matched_HTT,"fRec")
-            nsub[0] =  float(fatjet.tau2/fatjet.tau1)
-            nsub2[0] =  float(fatjet.tau3/fatjet.tau2)
-            bbtag[0] = float(fatjet.bbtag)
-            subjets = [event.HTTV2Subjets[getattr(fatjet.matched_HTT,"subJetIdx1")], \
-            event.HTTV2Subjets[getattr(fatjet.matched_HTT,"subJetIdx2")], \
-            event.HTTV2Subjets[getattr(fatjet.matched_HTT,"subJetIdx3")]]
+            mass[0] = fatjet.mass
+            frec[0] = fatjet.fRec
+            nsub[0] =  float(getattr(fatjet.matched_CA15SD,"tau2")/getattr(fatjet.matched_CA15SD,"tau1"))
+            #nsub[0] =  float(fatjet.tau2/fatjet.tau1)
+            nsub2[0] =  float(getattr(fatjet.matched_CA15SD,"tau3")/getattr(fatjet.matched_CA15SD,"tau2"))
+            #nsub2[0] =  float(fatjet.tau3/fatjet.tau2)
+            bbtag[0] = getattr(fatjet.matched_CA15SD,"bbtag")
+            subjets = [event.HTTV2Subjets[fatjet.subJetIdx1], \
+            event.HTTV2Subjets[fatjet.subJetIdx2], \
+            event.HTTV2Subjets[fatjet.subJetIdx3]]
             #nsj[0] = nsubjets
             btag1 = max(subjets[0].btag,subjets[1].btag)
             btag2 = min(subjets[0].btag,subjets[1].btag)
             btagf[0] = btag1
             btags[0] = btag2
-            if Get_DeltaR_two_objects(fatjet,event.GenHadTop[0])<1.0:
-                fromtop[0] = 1
-            elif len(event.GenHadTop)>1 and Get_DeltaR_two_objects(fatjet,event.GenHadTop[1])<1.0: 
+            print fatjet.matched
+            if fatjet.matched == 1:
                 fromtop[0] = 1
             else:
                 fromtop[0] = 0
@@ -339,6 +434,6 @@ for l in full_file_names:
 
 f.Close()
 print counter 
-BDTInput = ROOT.TFile("TrainingSample_Top.root","recreate")
+BDTInput = ROOT.TFile("TestingSample_Top.root","recreate")
 t2.Write()
 BDTInput.Close()
