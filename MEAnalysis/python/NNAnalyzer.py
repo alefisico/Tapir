@@ -18,7 +18,7 @@ class NNAnalyzer(FilterAnalyzer):
 
         # define the objects and variables for training/ predictions
         if self.setup == "nanoAOD":
-            self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "ht30"]), "nu":(2, ["pt", "eta", "phi"])}
+            self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV", "matchFlag"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "ht30", "nMatch_wq", "nMatch_tb", "nMatch_hb"]), "nu":(2, ["pt", "eta", "phi"])}
         if self.setup == "Delphes":
             self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btag"]), "met":(0, ["eta", "phi", "sumEt"]), "high_level_var":(0,["nBtags", "mbb_closest", "ht30"])}
 
@@ -84,7 +84,7 @@ class NNAnalyzer(FilterAnalyzer):
                 for i in range(self.var["jets"][0]):
                     if i in range(len(event.systResults["nominal"].good_jets)):
                         io = event.systResults["nominal"].good_jets[i]
-                        features.append(getattr(io,var))
+                        features.append(getattr(io,var, 0.0))
                     else:
                         features.append(0.)
 
@@ -96,7 +96,7 @@ class NNAnalyzer(FilterAnalyzer):
 
         # high level variables
         for var in self.var["high_level_var"][1]:
-            io = getattr(event.systResults["nominal"], var)
+            io = getattr(event.systResults["nominal"], var, 0.0)
             features.append(float(io))
 
 
@@ -121,7 +121,7 @@ class NNAnalyzer(FilterAnalyzer):
                         for i in range(self.var["jets"][0]):
                             if i in range(len(event.GenJet)):
                                 io = event.GenJet[i]
-                                features.append(getattr(io,var))
+                                features.append(getattr(io,var, 0.0))
                             else:
                                 features.append(0.)
 
