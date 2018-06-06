@@ -293,7 +293,7 @@ class GenTTHAnalyzer(FilterAnalyzer):
             jet.tth_match_index = -1
             jet.tth_match_dr = -1
             jet.tth_match_label_numeric = -1
-
+            
             #Jet did not have a match (no jet index in matched_pairs)
             if not matched_pairs.has_key(ij):
                 continue #continue jet loop
@@ -325,7 +325,8 @@ class GenTTHAnalyzer(FilterAnalyzer):
             jet.tth_match_dr = mdr
             jet.tth_match_label_numeric = mlabel_num
             jet.tth_match_label_bfromhadt = mlabel_num_bfromhadt
-            
+            jet.matchFlag = jet.tth_match_label_numeric
+
             if mlabel == "wq":
                 event.nMatch_wq += 1
 

@@ -324,18 +324,27 @@ if __name__ == "__main__":
         option='recreate'
     )
 
-    fns = os.environ["FILE_NAMES"].split()
+    from TTH.MEAnalysis.samples_base import getSitePrefix
+    fns = map(getSitePrefix, os.environ["FILE_NAMES"].split())
+    print "debug grid-control"
+    print os.getcwd()
+    #fns = os.environ["FILE_NAMES"].split()
     if len(fns) != 1:
         raise Exception("need only one file")
     dataset = os.environ["DATASETPATH"]
     firstEvent = int(os.environ["SKIP_EVENTS"])
     nEvents = int(os.environ["MAX_EVENTS"])
 
+    print fns
+    print dataset
+    print firstEvent
+    print nEvents
+
     comp_cls = cfg.MCComponent
 
     comp = comp_cls(
         dataset,
-        files = fns[0],
+        files = fns,
         tree_name = "Delphes", #DS requires change to ../../PhysicsTools/HeppyCore/python/framework/config.py
     )
    
