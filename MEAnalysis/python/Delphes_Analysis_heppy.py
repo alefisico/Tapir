@@ -56,16 +56,25 @@ class Conf(dict):
         return self[x]
 
 conf = Conf()
-conf["jets"] = {
-    "pt": 20,
+conf["Jet"] = {
+    "pt": 30,
     "eta": 2.4,
 #    "pt_clustering": 10,
 #    "def":  "ROOT.fastjet.JetDefinition(ROOT.fastjet.antikt_algorithm, 0.5)"
 }
 
-conf["leptons"] = {
+conf["el"] = {
     "pt": 30,
-    "eta": 2.4
+    "eta": 2.1
+}
+
+conf["mu"] = {
+    "pt": 26,
+    "eta": 2.1
+}
+
+conf["met"] = {
+    "pt": 20
 }
 
 # test analyzer
@@ -101,9 +110,22 @@ class LeptonAnalyzer(Analyzer):
 
     def process(self, event):
 
-        event.Leptons = event.Muon + event.Electron
-        # implement object/event selection criteria here
-        event.good_leptons = sorted(event.Leptons, key=lambda x: x.pt, reverse=True)
+        event.mu = event.Muon
+        event.el = event.Electron
+        event.good_leptons = []
+
+        # Apply pt, eta cuts
+        # isolation still missing
+        for flv in ["mu", "el"]:
+                
+                lepcuts = conf[flv]
+                leps = filter(lambda x, lepcuts=lepcuts: (
+                        x.pt > lepcuts["pt"] and abs(x.eta) < lepcuts["eta"]
+                    ), getattr(event, flv)
+                )
+                event.good_leptons += leps
+
+        event.good_leptons = sorted(event.good_leptons, key=lambda x: x.pt, reverse=True)
         return True
 
 from collections import OrderedDict
@@ -158,7 +180,16 @@ class JetAnalyzer(FilterAnalyzer):
         evdict["nominal"] = SystematicObject(event, {"systematic": "nominal"})
         event.systResults = evdict
 
-        event.systResults["nominal"].good_jets = sorted(event.Jet, key=lambda x: x.pt, reverse=True)
+        # Apply pt, eta cuts
+        # isolation still missing
+        event.jet = event.Jet
+        jetcuts = conf["Jet"]
+        jets = filter(lambda x, jetcuts=jetcuts: (
+                        x.pt > jetcuts["pt"] and abs(x.eta) < jetcuts["eta"]
+                    ), event.jet
+                )
+
+        event.systResults["nominal"].good_jets = sorted(jets, key=lambda x: x.pt, reverse=True)
        
         # add high-level variables
         jets = event.systResults["nominal"].good_jets
