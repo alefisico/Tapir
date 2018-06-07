@@ -20,7 +20,7 @@ class NNAnalyzer(FilterAnalyzer):
         if self.setup == "nanoAOD":
             self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV", "matchFlag"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "ht30", "nMatch_wq", "nMatch_tb", "nMatch_hb"]), "nu":(2, ["pt", "eta", "phi"])}
         if self.setup == "Delphes":
-            self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btag"]), "met":(0, ["eta", "phi", "sumEt"]), "high_level_var":(0,["nBtags", "mbb_closest", "ht30"])}
+            self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btag"]), "met":(0, ["eta", "phi", "pt"]), "high_level_var":(0,["nBtags", "mbb_closest", "ht30"])}
 
         # open output file
         if self.training == True:
@@ -52,6 +52,12 @@ class NNAnalyzer(FilterAnalyzer):
                             if self.var[o][0] > 0:
                                 for i in range(self.var[o][0]):
                                     self.output.write("gen_" + o + "_" + var + "_" + str(i) + " ")
+
+            # add columns for inv_mass of combinations
+            import scipy.special
+            n_comb = scipy.special.binom(self.var["jets"][0], 2)
+            for i in range(int(n_comb)):
+                self.output.write("comb_mass_" + str(i) + " ")
 
             # parton
             for o in ["top", "atop", "bottom", "abottom"]:
@@ -135,6 +141,22 @@ class NNAnalyzer(FilterAnalyzer):
                     else:
                         features.append(0.)
 
+        # add combinations
+        import itertools
+        comb = [x for x in itertools.combinations(range(self.var["jets"][0]), 2)]
+        for c in comb:
+            idx1 = c[0]
+            idx2 = c[1]
+            lv1 = ROOT.TLorentzVector() 
+            lv2 = ROOT.TLorentzVector() 
+            if idx1 in range(len(event.systResults["nominal"].good_jets)):
+                jet1 = event.systResults["nominal"].good_jets[idx1]
+                lv1.SetPtEtaPhiM(jet1.pt, jet1.eta, jet1.phi, jet1.mass)
+            if idx2 in range(len(event.systResults["nominal"].good_jets)):
+                jet2 = event.systResults["nominal"].good_jets[idx2]
+                lv2.SetPtEtaPhiM(jet2.pt, jet2.eta, jet2.phi, jet2.mass)
+            v = lv1+lv2
+            features.append(v.M())
 
         # add parton level information
         for p in ["top", "atop", "bottom", "abottom"]:

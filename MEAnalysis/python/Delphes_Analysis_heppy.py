@@ -284,7 +284,7 @@ if __name__ == "__main__":
     metType = NTupleObjectType("metType", variables = [
         NTupleVariable("eta", lambda x : x.eta),
         NTupleVariable("phi", lambda x : x.phi),
-        NTupleVariable("sumEt", lambda x : x.sumEt),
+        NTupleVariable("pt", lambda x : x.pt),
     ])
 
 
@@ -325,7 +325,7 @@ if __name__ == "__main__":
                help=" ", mcOnly=False
             ),
             NTupleVariable(
-               "MET_sumEt", lambda ev: ev.met.sumEt,
+               "MET_pt", lambda ev: ev.met.pt,
                type=float,
                help=" ", mcOnly=False
             ),

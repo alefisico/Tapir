@@ -37,7 +37,7 @@ class met:
     def __init__(self, treeReader):
         self.eta = treeReader.MissingET.At(0).Eta
         self.phi = treeReader.MissingET.At(0).Phi
-        self.sumEt = treeReader.MissingET.At(0).MET
+        self.pt = treeReader.MissingET.At(0).MET
 
 class ScalarHT:
     def __init__(self, treeReader):
