@@ -21,7 +21,7 @@ class NNAnalyzer(FilterAnalyzer):
         if self.setup == "nanoAOD":
             self.var = {"leptons":(2,["pt","eta", "phi", "mass", "charge"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV", "matchFlag"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "ht30", "nMatch_wq", "nMatch_tb", "nMatch_hb"]), "nu":(2, ["pt", "eta", "phi"])}
         if self.setup == "Delphes":
-            self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btag"]), "met":(0, ["eta", "phi", "pt"]), "high_level_var":(0,["nBtags", "mbb_closest", "ht30"])}
+            self.var = {"leptons":(2,["pt","eta", "phi", "mass", "charge"]), "jets":(10, ["pt", "eta", "phi", "mass", "btag"]), "met":(0, ["eta", "phi", "pt"]), "high_level_var":(0,["nBtags", "mbb_closest", "ht30"])}
 
         if self.boosted == True:
             self.var["fatjets"] = (2, ["pt", "eta", "phi", "mass"])
@@ -182,7 +182,7 @@ class NNAnalyzer(FilterAnalyzer):
 
         # add parton level information
         for p in ["top", "atop", "bottom", "abottom"]:
-            LZ = getattr(event, "jlr_" + p)
+            LZ = getattr(event, "jlr_" + p, ROOT.TLorentzVector())
             features.append(LZ.Pt())
             features.append(LZ.Eta())
             features.append(LZ.Phi())
@@ -190,9 +190,9 @@ class NNAnalyzer(FilterAnalyzer):
 
         # target: joint likelihood ratio
         if self.training == True:
-            features.append(np.log10(event.prob_ttHbb))
-            features.append(np.log10(event.prob_ttbb))
-            features.append(np.log10(event.jointlikelihood))
+            features.append(np.log10(getattr(event, "prob_ttHbb", 1.0)))
+            features.append(np.log10(getattr(event, "prob_ttbb", 1.0)))
+            features.append(np.log10(getattr(event, "jointlikelihood", 1.0)))
 
         if self.training == True:
             for f in features:

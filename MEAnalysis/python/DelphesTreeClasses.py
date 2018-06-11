@@ -16,6 +16,7 @@ class Electron:
         self.pt = treeReader.Electron.At(n).PT
         self.eta = treeReader.Electron.At(n).Eta
         self.phi = treeReader.Electron.At(n).Phi
+        self.charge = treeReader.Electron.At(n).Charge
         self.mass =  0.000510998902
     @staticmethod
     def make_array(input):
@@ -27,6 +28,7 @@ class Muon:
         self.pt = treeReader.Muon.At(n).PT
         self.eta = treeReader.Muon.At(n).Eta
         self.phi = treeReader.Muon.At(n).Phi
+        self.charge = treeReader.Muon.At(n).Charge
         self.mass = 0.105658389
     @staticmethod
     def make_array(input):

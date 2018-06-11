@@ -394,6 +394,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'joint_likelihood',
         _conf = python_conf,
         _analysis_conf = analysis_cfg,
+        #only run JLR computation on the ttH sample
+        do_jlr = sample_name in ["ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8"]
     )
 
     # computes input for NN (training or prediction)

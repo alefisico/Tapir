@@ -290,7 +290,8 @@ if __name__ == "__main__":
     jlr_ana = cfg.Analyzer(
         JointLikelihoodAnalyzer,
         'jlr',
-        _conf = python_conf
+        _conf = python_conf,
+        do_jlr = True
     )
 
     NN_ana = cfg.Analyzer(

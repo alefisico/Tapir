@@ -31,6 +31,8 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
             0,#verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
             cfg.cfg
         )
+        
+        self.do_jlr = self.cfg_ana.do_jlr
 
         #self.mem_configs = self.conf.mem_configs
         #self.memkeysToRun = self.conf.mem["methodsToRun"]
@@ -47,8 +49,13 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
         super(FilterAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
+        
+        #set defaults for metree.py
+        event.prob_ttHbb = -9999
+        event.prob_ttbb = -9999
+        event.jointlikelihood = -9999
 
-        if self.cfg_comp.isMC:
+        if self.cfg_comp.isMC and self.do_jlr:
 
             # get inputs for scattering amplitudes
             #double MEM::Integrand::scattering(const LV &top, const LV &atop, const LV &b1,
@@ -120,12 +127,11 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
                 r = prob["ttbb"]/prob["ttHbb"]
                 event.jointlikelihood = r
 
-
-        # save information of the LVs
-        event.jlr_top = top
-        event.jlr_atop = atop
-        event.jlr_bottom = bottom
-        event.jlr_abottom = abottom
-        event.jlr_addRad = add_rad
+            # save information of the LVs
+            event.jlr_top = top
+            event.jlr_atop = atop
+            event.jlr_bottom = bottom
+            event.jlr_abottom = abottom
+            event.jlr_addRad = add_rad
 
         return True        
