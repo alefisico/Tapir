@@ -299,7 +299,7 @@ if __name__ == "__main__":
         _conf = python_conf,
         framework = "Delphes",
         training = True,
-        boosted = True
+        boosted = False
     )
 
     #Override the default fillCoreVariables and declareCoreVariables in heppy,
@@ -341,7 +341,6 @@ if __name__ == "__main__":
         NTupleVariable("phi", lambda x : x.phi),
         NTupleVariable("pt", lambda x : x.pt),
     ])
-
 
     treeProducer = cfg.Analyzer(
         class_object = AutoFillTreeProducer,
@@ -389,7 +388,7 @@ if __name__ == "__main__":
         collections = {
             "good_jets_nominal" : NTupleCollection("jets", jetType, 16, help="Selected resolved jets, pt ordered"),
             "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons, pt ordered"),
-            "fat_jets" : NTupleCollection("fatjets", fatjetType, 2, help="fat jet for top candidates (pt ordered)")
+            #"fat_jets" : NTupleCollection("fatjets", fatjetType, 2, help="fat jet for top candidates (pt ordered)")
         }
     )
 
@@ -397,7 +396,7 @@ if __name__ == "__main__":
         event_ana,
         lepton_ana,
         jet_ana,
-        toptag_ana,
+        #toptag_ana,
         jlr_ana,
         NN_ana,
         treeProducer
@@ -437,7 +436,8 @@ if __name__ == "__main__":
     )
    
 
-    from PhysicsTools.HeppyCore.framework.eventsDelphes import Events
+    #from PhysicsTools.HeppyCore.framework.eventsDelphes import Events
+    from TTH.MEAnalysis.eventsDelphes import Events
     config = cfg.Config(
         #Run across these inputs
         components = [comp],
