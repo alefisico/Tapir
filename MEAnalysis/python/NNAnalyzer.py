@@ -15,12 +15,16 @@ class NNAnalyzer(FilterAnalyzer):
         self.setup = self.cfg_ana.framework
         # defines if training or validation
         self.training = self.cfg_ana.training
+        self.boosted = self.cfg_ana.boosted
 
         # define the objects and variables for training/ predictions
         if self.setup == "nanoAOD":
             self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btagDeepCSV", "matchFlag"]), "met":(0, ["pt", "phi", "sumEt"]), "high_level_var":(0,["nBDeepCSVM", "mbb_closest", "ht30", "nMatch_wq", "nMatch_tb", "nMatch_hb"]), "nu":(2, ["pt", "eta", "phi"])}
         if self.setup == "Delphes":
             self.var = {"leptons":(2,["pt","eta", "phi", "mass"]), "jets":(10, ["pt", "eta", "phi", "mass", "btag"]), "met":(0, ["eta", "phi", "pt"]), "high_level_var":(0,["nBtags", "mbb_closest", "ht30"])}
+
+        if self.boosted == True:
+            self.var["fatjets"] = (2, ["pt", "eta", "phi", "mass"])
 
         # open output file
         if self.training == True:
@@ -29,8 +33,10 @@ class NNAnalyzer(FilterAnalyzer):
             # make header for file
             # reco
             l = ["leptons", "jets", "met", "high_level_var"]
+            if self.boosted == True:
+                l.append("fatjets")
             for o in l:
-                if o == "leptons" or o == "jets" or o == "nu":
+                if o == "leptons" or o == "jets" or o == "nu" or o == "fatjets":
                     self.output.write("num_" + o + " ")
                 for var in self.var[o][1]:
                     if self.var[o][0] > 0:
@@ -53,11 +59,13 @@ class NNAnalyzer(FilterAnalyzer):
                                 for i in range(self.var[o][0]):
                                     self.output.write("gen_" + o + "_" + var + "_" + str(i) + " ")
 
+            """
             # add columns for inv_mass of combinations
             import scipy.special
             n_comb = scipy.special.binom(self.var["jets"][0], 2)
             for i in range(int(n_comb)):
                 self.output.write("comb_mass_" + str(i) + " ")
+            """
 
             # parton
             for o in ["top", "atop", "bottom", "abottom"]:
@@ -78,7 +86,7 @@ class NNAnalyzer(FilterAnalyzer):
             for i in range(self.var["leptons"][0]):
                 if i in range(len(getattr(event.systResults["nominal"], "good_leptons"))):
                     io = event.systResults["nominal"].good_leptons[i]
-                    features.append(getattr(io,var))
+                    features.append(getattr(io,var, 0.0))
                 else:
                     features.append(0.)
 
@@ -104,6 +112,18 @@ class NNAnalyzer(FilterAnalyzer):
         for var in self.var["high_level_var"][1]:
             io = getattr(event.systResults["nominal"], var, 0.0)
             features.append(float(io))
+
+        # add boosted jet variables
+        if self.boosted == True:
+            features.append(len(event.systResults["nominal"].boosted_tops))
+            for var in self.var["fatjets"][1]:
+                for i in range(self.var["fatjets"][0]):
+                    if i in range(len(event.systResults["nominal"].boosted_tops)):
+                        io = event.systResults["nominal"].boosted_tops[i]
+                        features.append(getattr(io,var, 0.0))
+                    else:
+                        features.append(0.)
+
 
 
         # for CMSSW file: add Gen level information
@@ -141,6 +161,7 @@ class NNAnalyzer(FilterAnalyzer):
                     else:
                         features.append(0.)
 
+        """
         # add combinations
         import itertools
         comb = [x for x in itertools.combinations(range(self.var["jets"][0]), 2)]
@@ -157,6 +178,7 @@ class NNAnalyzer(FilterAnalyzer):
                 lv2.SetPtEtaPhiM(jet2.pt, jet2.eta, jet2.phi, jet2.mass)
             v = lv1+lv2
             features.append(v.M())
+        """
 
         # add parton level information
         for p in ["top", "atop", "bottom", "abottom"]:

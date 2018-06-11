@@ -403,7 +403,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf,
         _analysis_conf = analysis_cfg,
         framework = "nanoAOD",
-        training = True
+        training = True,
+        boosted = False
     )
 
     gentth_pre = cfg.Analyzer(

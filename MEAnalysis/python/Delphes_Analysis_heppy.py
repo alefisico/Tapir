@@ -73,6 +73,12 @@ conf["mu"] = {
     "eta": 2.1
 }
 
+conf["fatjet"] = {
+    "mass" : (110, 210),
+    "tau32" : 0.7
+}
+
+
 conf["met"] = {
     "pt": 20
 }
@@ -101,6 +107,8 @@ class EventAnalyzer(Analyzer):
         event.met = DelphesTreeClasses.met(event.input) 
         event.ScalarHT = DelphesTreeClasses.ScalarHT(event.input) 
         event.GenParticle = DelphesTreeClasses.GenParticle.make_array(event.input) 
+        event.FatJet = DelphesTreeClasses.FatJet.make_array(event.input)
+
 
 # Lepton analyzer
 class LeptonAnalyzer(Analyzer):
@@ -207,7 +215,40 @@ class JetAnalyzer(FilterAnalyzer):
         event.mbb_closest = self.calculate_mbb_closest(bjet_candidates)
 
         event.good_jets_nominal = event.systResults["nominal"].good_jets
-            
+
+        return True
+
+# tagging top candidates
+class TopTaggerAnalyzer(FilterAnalyzer):
+
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(TopTaggerAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+
+    def beginLoop(self, setup):
+        super(TopTaggerAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+       
+        event.fatjets = event.FatJet
+
+        fatjetcuts = conf["fatjet"]
+        fatjets = filter(lambda x, fatjetcuts=fatjetcuts: (
+                        fatjetcuts["mass"][0] < x.mass and x.mass < fatjetcuts["mass"][1] and x.Nsub[3]/x.Nsub[2] < fatjetcuts["tau32"]
+                    ), event.fatjets
+                  )
+
+        event.systResults["nominal"].boosted_tops = sorted(fatjets, key=lambda x: x.pt, reverse=True)
+
+        # remove here AK4 jets which are within the AK8 jets
+
+        event.systResults["nominal"].resolved_jets = event.systResults["nominal"].good_jets
+
+        event.fat_jets = event.systResults["nominal"].boosted_tops
+        if len(event.fat_jets) == 1 or len(event.fat_jets) == 2:
+            return True
+        else:
+            return False
+ 
 # import JointLikelihoodAnalyzer from CMSSW workflow
 from TTH.MEAnalysis.JointLikelihoodAnalyzer import JointLikelihoodAnalyzer 
 
@@ -240,6 +281,11 @@ if __name__ == "__main__":
         JetAnalyzer,
         'jet'
     )
+
+    toptag_ana = cfg.Analyzer(
+        TopTaggerAnalyzer,
+        'top_tag'
+    )
     
     jlr_ana = cfg.Analyzer(
         JointLikelihoodAnalyzer,
@@ -252,7 +298,8 @@ if __name__ == "__main__":
         'NN_input',
         _conf = python_conf,
         framework = "Delphes",
-        training = True
+        training = True,
+        boosted = True
     )
 
     #Override the default fillCoreVariables and declareCoreVariables in heppy,
@@ -273,6 +320,14 @@ if __name__ == "__main__":
         NTupleVariable("mass", lambda x : x.mass),
         NTupleVariable("btag", lambda x : x.btag)
     ])
+
+    fatjetType = NTupleObjectType("fatjetType", variables = [
+        NTupleVariable("pt", lambda x : x.pt),
+        NTupleVariable("eta", lambda x : x.eta),
+        NTupleVariable("phi", lambda x : x.phi),
+        NTupleVariable("mass", lambda x : x.mass),
+    ])
+
 
     leptonType = NTupleObjectType("leptonType", variables = [
         NTupleVariable("pt", lambda x : x.pt),
@@ -333,7 +388,8 @@ if __name__ == "__main__":
         ],
         collections = {
             "good_jets_nominal" : NTupleCollection("jets", jetType, 16, help="Selected resolved jets, pt ordered"),
-            "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons, pt ordered")
+            "good_leptons" : NTupleCollection("leps", leptonType, 2, help="Selected leptons, pt ordered"),
+            "fat_jets" : NTupleCollection("fatjets", fatjetType, 2, help="fat jet for top candidates (pt ordered)")
         }
     )
 
@@ -341,6 +397,7 @@ if __name__ == "__main__":
         event_ana,
         lepton_ana,
         jet_ana,
+        toptag_ana,
         jlr_ana,
         NN_ana,
         treeProducer

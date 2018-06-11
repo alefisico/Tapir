@@ -56,4 +56,15 @@ class GenParticle:
     @staticmethod
     def make_array(input):
         return [GenParticle(input, i) for i in range(input.Particle.GetEntries())]
-        
+       
+class FatJet:
+    def __init__(self, treeReader, n):
+        self.pt = treeReader.FatJet.At(n).PT
+        self.eta = treeReader.FatJet.At(n).Eta
+        self.phi = treeReader.FatJet.At(n).Phi
+        self.mass = treeReader.FatJet.At(n).Mass
+        self.Nsub = treeReader.FatJet.At(n).Tau
+    @staticmethod
+    def make_array(input):
+        return [FatJet(input, i) for i in range(input.FatJet.GetEntries())]
+ 
