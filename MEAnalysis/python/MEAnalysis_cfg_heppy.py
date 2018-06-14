@@ -199,10 +199,10 @@ class Conf:
         "minjets_fh": 6,
 
         #The default b-tagging algorithm (branch name)
-        "btagAlgo": "btagCSV",
+        "btagAlgo": "btagDeepCSV",
 
         #The default b-tagging WP
-        "btagWP": "CSVM",
+        "btagWP": "DeepCSVM",
 
         #The loose b-tag WP for QCD data estimation
         "looseBWP": "CSVL",
@@ -226,7 +226,7 @@ class Conf:
         #if btagCSV, untagged/tagged selection for W mass and MEM is done by CSVM cut
         #if btagLR, selection is done by the btag likelihood ratio permutation
         #"untaggedSelection": "btagCMVA",
-        "untaggedSelection": "btagCSV",
+        "untaggedSelection": "btagLR",
 
         #how many jets to consider for the btag LR permutations
         "NJetsForBTagLR": 15, #DS
@@ -384,7 +384,7 @@ class Conf:
         #note that we set hypothesis-specific cuts below
         "selection": lambda event: (
                 ((event.is_sl or event.is_dl) and
-                (event.numJets>=4 and event.nBCSVM >= 4))
+                (event.numJets>=4 and event.nBDeepCSVM >= 4))
             #(event.is_fh and event.cat in ["cat7","cat8"]
             #and event.btag_LR_4b_2b > 0.95)
         ),

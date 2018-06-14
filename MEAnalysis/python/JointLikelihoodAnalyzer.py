@@ -54,6 +54,12 @@ class JointLikelihoodAnalyzer(FilterAnalyzer):
         event.prob_ttHbb = -9999
         event.prob_ttbb = -9999
         event.jointlikelihood = -9999
+            
+        event.jlr_top = ROOT.TLorentzVector()
+        event.jlr_atop = ROOT.TLorentzVector()
+        event.jlr_bottom = ROOT.TLorentzVector()
+        event.jlr_abottom = ROOT.TLorentzVector()
+        event.jlr_addRad = ROOT.TLorentzVector()
 
         if self.cfg_comp.isMC and self.do_jlr:
 

@@ -418,6 +418,10 @@ def getTreeProducer(conf):
            #"MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
            "primaryVertex" : NTupleObject("pv", pvType, help="First PV"),
            "dilepton_p4" : NTupleObject("ll", p4type, help="Dilepton system"),
+           "jlr_top" : NTupleObject("jlr_top", p4type, help="Top quark from the JLR calculation", mcOnly=True),
+           "jlr_atop" : NTupleObject("jlr_atop", p4type, help="Antitop quark from the JLR calculation", mcOnly=True),
+           "jlr_bottom" : NTupleObject("jlr_bottom", p4type, help="bottom quark from the JLR calculation", mcOnly=True),
+           "jlr_abottom" : NTupleObject("jlr_abottom", p4type, help="Antibottom quark from the JLR calculation", mcOnly=True),
         },
         collections = {
         #standard dumping of objects
