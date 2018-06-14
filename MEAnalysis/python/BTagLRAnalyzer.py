@@ -221,18 +221,10 @@ class BTagLRAnalyzer(FilterAnalyzer):
             else:
                 event.buntagged_jets = event.buntagged_jets_maxLikelihood_4b
                 event.selected_btagged_jets = event.btagged_jets_maxLikelihood_4b
-        #Jets are untagged according to b-discriminatr
-        #"""CHECK: Removed by DS not sure if imporatant
-        #elif self.conf.jets["untaggedSelection"] == "btagCSV":
-        #    if "debug" in self.conf.general["verbosity"]:
-        #        autolog("using btagCSV for btag/untag jet selection")
-        #    event.buntagged_jets = event.buntagged_jets_bdisc
-        #    event.selected_btagged_jets = event.btagged_jets_bdisc
-        #elif self.conf.jets["untaggedSelection"] == "btagCMVA":
-        #"""
         else:
-            if "debug" in self.conf.general["verbosity"]:
-                autolog("using "+self.conf.jets["untaggedSelection"]+" for btag/untag jet selection")
+            #set untagged jets according to not b-tagged
+            event.buntagged_jets = event.buntagged_jets_bdisc
+            event.selected_btagged_jets = event.btagged_jets_bdisc
             if self.conf.jets["untaggedSelection"] != "btagLR" and event.is_fh and (not "ttH" in self.cfg_comp.name): #DS
                 if len(event.btagged_jets_bdisc)>=4:
                     event.buntagged_jets = event.buntagged_jets_bdisc
