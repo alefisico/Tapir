@@ -555,10 +555,10 @@ class FatjetCA15SoftDrop:
         self.phi = tree.FatjetCA15SoftDrop_phi[n];
         self.mass = tree.FatjetCA15SoftDrop_mass[n];
         self.area = tree.FatjetCA15SoftDrop_area[n];
-        self.bbtag = tree.FatJet_btagHbb[n];
-        self.tau1 = tree.FatJet_tau1[n];
-        self.tau2 = tree.FatJet_tau2[n];
-        self.tau3 = tree.FatJet_tau3[n];
+        self.bbtag = tree.FatjetCA15SoftDrop_bbtag[n];
+        self.tau1 = tree.FatjetCA15SoftDrop_tau1[n];
+        self.tau2 = tree.FatjetCA15SoftDrop_tau2[n];
+        self.tau3 = tree.FatjetCA15SoftDrop_tau3[n];
         self.subJetIdx1 = tree.FatjetCA15SoftDrop_subJetIdx1[n];
         self.subJetIdx2 = tree.FatjetCA15SoftDrop_subJetIdx2[n];
         self.subjetIDPassed = tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx1[n]] == 1 and tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx2[n]] == 1 

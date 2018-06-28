@@ -180,8 +180,14 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     pi_file.close()
 
     #Load the subjet transfer functions from pickle file
-    pi_file = open(python_conf.general["transferFunctions_sj_Pickle"] , 'rb')
-    python_conf.tf_sj_matrix = pickle.load(pi_file)
+    #For Top subjets
+    pi_file = open(python_conf.general["transferFunctions_htt_Pickle"] , 'rb')
+    python_conf.tf_htt_matrix = pickle.load(pi_file)
+    pi_file.close()
+
+    #For Higgs subjets
+    pi_file = open(python_conf.general["transferFunctions_higgs_Pickle"] , 'rb')
+    python_conf.tf_higgs_matrix = pickle.load(pi_file)
     pi_file.close()
 
     if sample_name:
@@ -618,7 +624,7 @@ if __name__ == "__main__":
         '--numEvents',
         action="store",
         help="Number of events to process",
-        default=1000,
+        default=10000,
     )
     parser.add_argument(
         '--files',

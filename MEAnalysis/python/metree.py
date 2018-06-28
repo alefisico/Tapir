@@ -92,6 +92,13 @@ p4type = NTupleObjectType("p4Type", variables = [
     NTupleVariable("mass", lambda x : x.M()),
 ])
 
+kinType = NTupleObjectType("kinType", variables = [
+    NTupleVariable("pt", lambda x : x.pt),
+    NTupleVariable("eta", lambda x : x.eta),
+    NTupleVariable("phi", lambda x : x.phi),
+    NTupleVariable("mass", lambda x : x.mass),
+])
+
 LHE_weights_type = NTupleObjectType("LHE_type", variables = [
     NTupleVariable("id", lambda x : x.id),
     NTupleVariable("wgt", lambda x : x.wgt),
@@ -186,11 +193,11 @@ topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("sj3mass", lambda x: x.sj3mass ),
     #NTupleVariable("sjNonWmasscal", lambda x: x.sjNonWmasscal ),
     NTupleVariable("sj3btag", lambda x: x.sj3btag ),
-    NTupleVariable("tau1", lambda x: x.tau1 ),   # Copied from matched fat jet
-    NTupleVariable("tau2", lambda x: x.tau2 ),   # Copied from matched fat jet
-    NTupleVariable("tau3", lambda x: x.tau3 ),   # Copied from matched fat jet
-    NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
-    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ), # Calculated
+    NTupleVariable("tau1SD", lambda x: x.tau1SD ),   # Copied from matched fat jet
+    NTupleVariable("tau2SD", lambda x: x.tau2SD ),   # Copied from matched fat jet
+    NTupleVariable("tau3SD", lambda x: x.tau3SD ),   # Copied from matched fat jet
+    #NTupleVariable("bbtag", lambda x: x.bbtag ), # Copied from matched fat jet
+    NTupleVariable("tau32SD", lambda x: x.tau32SD ), # Calculated
     #NTupleVariable("n_subjettiness_groomed", lambda x: x.n_subjettiness_groomed ), # Calculated
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
     NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
@@ -205,13 +212,16 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("mass", lambda x: x.mass ),
     NTupleVariable("tau1", lambda x: x.tau1 ),
     NTupleVariable("tau2", lambda x: x.tau2 ),
-    NTupleVariable("tau3", lambda x: x.tau3 ),
+    NTupleVariable("tau3", lambda x: x.tau3 ),    
+    NTupleVariable("tau1SD", lambda x: x.tau1SD ),
+    NTupleVariable("tau2SD", lambda x: x.tau2SD ),
+    NTupleVariable("tau3SD", lambda x: x.tau3SD ),
     NTupleVariable("bbtag", lambda x: x.bbtag ),
     NTupleVariable("area", lambda x: x.area ),
-    NTupleVariable("ungroomedpt", lambda x: x.ungroomedpt ),
-    NTupleVariable("ungroomedeta", lambda x: x.ungroomedeta ),
-    NTupleVariable("ungroomedphi", lambda x: x.ungroomedphi ),
-    NTupleVariable("ungroomedmass", lambda x: x.ungroomedmass ),
+    NTupleVariable("ptSD", lambda x: x.ptSD ),
+    NTupleVariable("etaSD", lambda x: x.etaSD ),
+    NTupleVariable("phiSD", lambda x: x.phiSD ),
+    NTupleVariable("massSD", lambda x: x.massSD ),
 
     NTupleVariable("sj1pt",   lambda x: x.sj1pt ),
     NTupleVariable("sj1eta",  lambda x: x.sj1eta ),
@@ -224,10 +234,12 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("sj2mass", lambda x: x.sj2mass ),
     NTupleVariable("sj2btag", lambda x: x.sj2btag ),
 
-    NTupleVariable("n_subjettiness", lambda x: x.n_subjettiness ),
+    NTupleVariable("tau21", lambda x: x.tau21 ),
+    #NTupleVariable("tau21SD", lambda x: x.tau21SD ),
     NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
     NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
     NTupleVariable("dr_genTop", lambda x: getattr(x, "dr_genTop", -1), help="deltaR to closest gen top"),
+    NTupleVariable("dr_lepton", lambda x: getattr(x, "delR_lepton", -1), help="deltaR to closest selection lepton"),
 ])
 
 
@@ -494,6 +506,12 @@ def getTreeProducer(conf):
            lambda ev: getattr(ev, "n_boosted_ljets_nominal", -1),
            help="Number of selected ljets in subjet-modified ljet list"
         )]
+
+        treeProducer.globalVariables += [NTupleVariable(
+           "n_boosted_allljets",
+           lambda ev: getattr(ev, "n_boosted_allljets_nominal", -1),
+           help="Number of selected ljets in subjet-modified ljet list, including additional FSR + ISR jets"
+        )]
     
         treeProducer.globalVariables += [NTupleVariable(
            "n_excluded_bjets",
@@ -506,10 +524,17 @@ def getTreeProducer(conf):
            lambda ev: getattr(ev, "n_excluded_ljets_nominal", -1),
            help="Number of excluded ljets: "
         )]
-        treeProducer.collections.update({"FatjetCA15" : NTupleCollection("fatjets", FatjetCA15Type, 4, help="Ungroomed CA 1.5 fat jets")})
+        treeProducer.globalVariables += [NTupleVariable(
+           "boosted",
+           lambda ev: getattr(ev, "boosted_nominal", -1),
+           help="Passed subjet analyzer"
+        )]
+        #treeProducer.collections.update({"FatjetCA15" : NTupleCollection("fatjets", FatjetCA15Type, 4, help="Ungroomed CA 1.5 fat jets")})
         treeProducer.collections.update({"topCandidate_nominal": NTupleCollection("topCandidate" , topCandidateType, 4, help="Boosted Top candidates")})
-        treeProducer.collections.update({"higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateType, 4, help="Boosted Higgs candidates")})
-        treeProducer.collections.update({"higgsCandidateAK8_nominal": NTupleCollection("higgsCandidateAK8", higgsCandidateAK8Type, 4, help="Boosted Higgs candidates AK8")})
+        treeProducer.collections.update({"higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateAK8Type, 4, help="Boosted Higgs candidates")})
+
+        treeProducer.collections.update({"boosted_bjets_nominal": NTupleCollection("boosted_bjets", kinType, 4, help="Boosted b jets")})
+        treeProducer.collections.update({"boosted_ljets_nominal": NTupleCollection("boosted_ljets", kinType, 4, help="Boosted l jets")})      
     
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
@@ -676,9 +701,9 @@ def getTreeProducer(conf):
         ("btagWeight_shapeCFERR2Up",            float,    "", lambda ev: ev.btagSF_shape_up_cferr2),
         ("btagWeight_shapeCFERR2Down",            float,    "", lambda ev: ev.btagSF_shape_down_cferr2),
 
-        ("prob_ttHbb",            float,    "squared matrix element for hypo ttHbb", lambda ev: ev.prob_ttHbb),
-        ("prob_ttbb",            float,    "squared matrix element for hypo ttbb", lambda ev: ev.prob_ttbb),
-        ("JointLikelihoodRatio",            float,    "joint likelihood ratio", lambda ev: ev.jointlikelihood),
+        #("prob_ttHbb",            float,    "squared matrix element for hypo ttHbb", lambda ev: ev.prob_ttHbb),
+        #("prob_ttbb",            float,    "squared matrix element for hypo ttbb", lambda ev: ev.prob_ttbb),
+        #("JointLikelihoodRatio",            float,    "joint likelihood ratio", lambda ev: ev.jointlikelihood),
 
         ("tth_rho_px_gen",  float,  ""),
         ("tth_rho_py_gen",  float,  ""),

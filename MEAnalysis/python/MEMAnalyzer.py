@@ -420,10 +420,15 @@ class MEAnalyzer(FilterAnalyzer):
                         event.res[(hypo, confname)] = MEM.MEMOutput()
                         continue
 
+                #Choose resolved or boosted event selection criteria
+                sel = "selection"
+                if "sj" in confname:
+                    sel = "selection_boosted"
+
                 #Run MEM if we did not explicitly disable it
                 if (
                         mem_cfg.do_calculate(event, mem_cfg) and
-                        self.conf.mem["selection"](event) and
+                        self.conf.mem[sel](event) and
                         confname in self.memkeysToRun and
                         (event.systematic in self.conf.mem["enabled_systematics"] or
                          event.systematic == "CatChange" or event.systematic == "nominal") #DS
