@@ -308,13 +308,15 @@ def Make_Histograms(conffile):
     default_dict = {}
 
     default_dict['input_root_file_name'] = 'Just_Jets.root'
-    default_dict['input_tree_name'] = 'tree'
+    default_dict['input_tree_name'] = 'Quarks'
     default_dict['outputdir'] = "EtoE-test"
     default_dict['Use_mc_values'] = True
     default_dict['eta_axis'] = [ 0.0 , 1.0 , 2.5 ]
     default_dict['n_E_bins'] = 58
     default_dict['E_bounds'] = [ 30.0, 300.0 ]
     default_dict['particles'] = [ 'b', 'l' ]
+    if "Higgs" in conffile:
+        default_dict['particles'] = [ 'b' ]
 
     default_dict['bin_functions'] = []
     # Initialize a single Gaussian for every eta bin for every particle by default
@@ -385,7 +387,7 @@ def Make_Histograms(conffile):
     
     # Fix the left and right bound of the E axis
     E_bounds = config['E_bounds']
-
+    
     particles = config['particles']
 
     for particle in particles:
