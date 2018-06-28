@@ -11,7 +11,7 @@ from BDTTrainingBaseTop import *
 
 #Branches to be loaded from file
 #brs = ["mass", "nsub", "bbtag", "btagf", "btags", "fromhiggs","ptdr","nsj","nsub2"]
-brs = ["mass", "nsub2", "frec" , "btagf", "btags", "fromtop"]
+brs = ["mass", "massuncor", "nsub2", "frec" , "btagf", "btags", "fromtop"]
 
 #Variables to be used in the BDT
 #input_vars = ["mass", "nsub", "bbtag", "btagf", "btags","ptdr","nsj","nsub2"]
@@ -39,7 +39,7 @@ output_dir = "results/TopStudiesBDT_20180522/"
 default_params = {        
 	# Common parameters
 	"n_chunks"          : 1,
-	"n_estimators"   : 1000,
+	"n_estimators"   : 3000,
     "max_depth"      : 2, 
     "learning_rate"  : 0.05, 
     "max_leaf_nodes" : 3,   
@@ -55,8 +55,8 @@ param_grid = {"n_estimators": [1100,1200,1300],
 
 
 #Training/Test file + get np arrays
-infname_train = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleTop/Training.root"
-infname_test = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleTop/Test.root"
+infname_train = "/mnt/t3nfs01/data01/shome/mameinha/TTH/CMSSW_9_4_6/CMSSW_9_4_6_patch1/src/TTH/Plotting/python/maren/BDTStudies/Top_BDT_Train.root"
+infname_test = "/mnt/t3nfs01/data01/shome/mameinha/TTH/CMSSW_9_4_6/CMSSW_9_4_6_patch1/src/TTH/Plotting/python/maren/BDTStudies/Top_BDT_Test.root"
 
 ########################################
 # Read in parameters
@@ -113,7 +113,8 @@ params["samples_per_epoch"] = n_train_samples
 datagen_train = datagen("(1)", brs, infname_train, n_chunks=params["n_chunks"])
 datagen_test  = datagen("(1)", brs, infname_test, n_chunks=params["n_chunks"])
 
-esig,ebkg = calc_cutbased(infname_test,input_vars,cutpointsmin,cutpointsmax)
+#esig,ebkg = calc_cutbased(infname_test,input_vars,cutpointsmin,cutpointsmax)
+esig,ebkg = 0,0 
 
 # This function produces the necessary shape for MVA training/evaluation
 # (batch_size,1,40,40)
@@ -149,7 +150,7 @@ def modelAdaBoost(params):
 
 
 classifiers = [
-    Classifier("BDT_Top_PlayingAround", 
+    Classifier("BDT_Top_Testing_Scaling_All", 
                "scikit",
                params,
                False,

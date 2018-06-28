@@ -14,253 +14,22 @@ import TTH.MEAnalysis.nanoTreeGenClasses as nanoTreeGenClasses
 from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf as python_conf
 
 
-########################################
-# Define helper functions
-########################################
+from TTH.Plotting.maren.BDTStudies.BasicBoostedFunctions import *
 
-
-class JetCollection:
-    def __init__(self, tree, n,name):
-        self.pt = getattr(tree,"{}_pt".format(name))[n]
-        self.eta = getattr(tree,"{}_eta".format(name))[n]
-        self.phi = getattr(tree,"{}_phi".format(name))[n]
-        self.mass = getattr(tree,"{}_mass".format(name))[n]
-        if name == "FatjetCA15":
-            self.tau3 = getattr(tree,"{}_tau3".format(name))[n]
-            self.tau2 = getattr(tree,"{}_tau2".format(name))[n]
-            self.tau1 = getattr(tree,"{}_tau1".format(name))[n]
-            self.bbtag = getattr(tree,"{}_bbtag".format(name))[n]
-            self.tau21 = self.tau2 / self.tau1 if self.tau1 > 0.0 else 0.0
-        if name == "FatjetCA15SoftDrop":
-            self.subJetIdx1 = getattr(tree,"{}_subJetIdx1".format(name))[n]
-            self.subJetIdx2 = getattr(tree,"{}_subJetIdx2".format(name))[n]
-            self.tau3 = getattr(tree,"{}_tau3".format(name))[n]
-            self.tau2 = getattr(tree,"{}_tau2".format(name))[n]
-            self.tau1 = getattr(tree,"{}_tau1".format(name))[n]
-            self.bbtag = getattr(tree,"{}_bbtag".format(name))[n]
-            self.tau21 = self.tau2 / self.tau1 if self.tau1 > 0.0 else 0.0
-        if name == "HTTV2": 
-            self.subJetIdx1 = getattr(tree,"{}_subJetIdx1".format(name))[n]
-            self.subJetIdx2 = getattr(tree,"{}_subJetIdx2".format(name))[n]
-            self.subJetIdx3 = getattr(tree,"{}_subJetIdx3".format(name))[n]   
-            self.fRec = getattr(tree,"{}_fRec".format(name))[n]   
-            self.Ropt = getattr(tree,"{}_Ropt".format(name))[n]   
-            self.RoptCalc = getattr(tree,"{}_RoptCalc".format(name))[n]   
-        if name == "FatjetCA15SoftDropSubjets" or name == "HTTV2Subjets":
-            self.btag = getattr(tree,"{}_btag".format(name))[n]
-        if name == "SubJet":
-            self.btag = getattr(tree,"{}_btagCSVV2".format(name))[n]
-        if name == "FatJet":
-            self.tau3 = getattr(tree,"{}_tau3".format(name))[n]
-            self.tau2 = getattr(tree,"{}_tau2".format(name))[n]
-            self.tau1 = getattr(tree,"{}_tau1".format(name))[n]
-            self.bbtag = getattr(tree,"{}_btagHbb".format(name))[n]
-            self.tau21 = self.tau2 / self.tau1 if self.tau1 > 0.0 else 0.0
-            self.tau32 = self.tau3 / self.tau2 if self.tau2 > 0.0 else 0.0  
-            self.msoftdrop = getattr(tree,"{}_msoftdrop".format(name))[n]
-        pass
-    @staticmethod
-    def make_array(input,name):
-        return [JetCollection(input, i, name) for i in range(getattr(input,"n{}".format(name)))]
-
-def Get_DeltaR_two_objects_coord(obj1_eta, obj1_phi, obj2_eta, obj2_phi ):
-
-    pi = math.pi
-
-    del_phi = abs( obj1_phi - obj2_phi )
-    if del_phi > pi: del_phi = 2*pi - del_phi
-
-    delR = pow( pow(obj1_eta-obj2_eta,2) + pow(del_phi,2) , 0.5 )
-
-    return delR
-
-def Get_DeltaR_two_objects(obj1, obj2):
-
-    for obj in [ obj1, obj2 ]:
-        if not ( hasattr( obj, 'phi' ) or hasattr( obj, 'eta' ) ):
-            print "Can't calculate Delta R: objects don't have right attributes"
-            return 0
-
-    pi = math.pi
-
-    del_phi = abs( obj1.phi - obj2.phi )
-    if del_phi > pi: del_phi = 2*pi - del_phi
-
-    delR = pow( pow(obj1.eta-obj2.eta,2) + pow(del_phi,2) , 0.5 )
-
-    return delR
-
-# ==============================================================================
-# Simple algorithm that matches the smallest delta R for two lists of objects
-def Get_min_delR( objs1, objs2, R_cut = 'def' ):
-
-    # Use self.R_cut if R_cut is not specified
-    if R_cut == 'def':
-        R_cut = self.R_cut
-
-    n_objs1 = len(objs1)
-    n_objs2 = len(objs2)
-
-    Rmat = [[ Get_DeltaR_two_objects(objs1[i], objs2[j]) \
-        for j in range(n_objs2)] for i in range(n_objs1) ]
-
-    Rmin = 9999.0
-    
-    for i in range(n_objs1):
-        for j in range(n_objs2):
-            if Rmat[i][j] < Rmin and Rmat[i][j] < R_cut:
-                Rmin = Rmat[i][j]
-                i_min = i
-                j_min = j
-
-    if Rmin == 9999.0: return ( 'No link', 0, 0)
-
-    return (i_min, j_min, Rmin)
-
-# ==============================================================================
-def Match_two_lists( objs1_orig, label1,
-                     objs2_orig, label2,
-                     R_cut = 'def' ):
-
-    # Check if object is not a list; if so, convert it to a list
-    # (This allows to conveniently pass single objects to the function as well)
-    if hasattr( objs1_orig, 'eta' ) and hasattr( objs1_orig, 'phi' ):
-        objs1_orig = [ objs1_orig ]
-    if hasattr( objs2_orig, 'eta' ) and hasattr( objs2_orig, 'phi' ):
-        objs2_orig = [ objs2_orig ]
-
-    # Create list of indices
-    objs1 = range(len(objs1_orig))
-    objs2 = range(len(objs2_orig))
-        
-    # Attempt matching until the shortest list is depleted, or until there are
-    # no more matches with delR < delR_cut
-    n_matches = min( len(objs1), len(objs2) )
-
-    for i_match in range(n_matches):
-
-        # Attempt a match (map indices to objects first)
-        tmp1 = [objs1_orig[i] for i in objs1]
-        tmp2 = [objs2_orig[i] for i in objs2]
-        (i1, i2, delR) = Get_min_delR( tmp1, tmp2, R_cut )
-
-        # Return the attempt number if no more matches could be made
-        if i1 == 'No link':
-            return i_match
-
-        # Pop the matched indices from the lists for the next iteration
-        matched_obj1 = objs1.pop(i1)
-        matched_obj2 = objs2.pop(i2)
-
-        # Record the match in the original objs
-        setattr(objs1_orig[matched_obj1],
-                'matched_{0}'.format( label2 ),
-                objs2_orig[matched_obj2])
-
-        setattr(objs2_orig[matched_obj2],
-                'matched_{0}'.format( label1 ),
-                objs1_orig[matched_obj1])
-
-        # Record the delR value in the original objs
-        setattr(objs1_orig[matched_obj1],
-                'matched_{0}_delR'.format( label2 ),
-                delR)
-
-        setattr(objs2_orig[matched_obj2],
-                'matched_{0}_delR'.format( label1 ),
-                delR)
-        
-    return n_matches
-
-#Define DL. Only considers leptons, not jets.
-def GetCategory(event,conf):
-    for id_type in ["SL", "DL", "veto"]:
-        sumleps = []
-        event.mu = event.Muon
-        event.el = event.Electron
-        for lep_flavour in ["mu", "el"]:
-            lepcuts = conf.leptons[lep_flavour][id_type]
-            incoll = getattr(event, lep_flavour)
-            
-            #The isolation type and cut value to be used
-            isotype = conf.leptons[lep_flavour]["isotype"]
-            isocut = lepcuts.get("iso", None)
-
-
-            #Filter leptons by pt and eta
-            leps = filter(
-                lambda x, lepcuts=lepcuts: (
-                    x.pt > lepcuts.get("pt", 0) #pt cut may be optional in case of DL
-                    and abs(x.eta) < lepcuts["eta"]
-                ), incoll
-            )
-
-            #Apply isolation cut
-            for lep in leps:
-                lep.iso = getattr(lep, isotype)
-            if not isocut is None:
-
-                #Inverted isolation cut
-                if lepcuts.get("isoinverted", False):
-                    leps = filter(
-                        lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) >= isocut, leps
-                    )
-                #Normal isolation cut
-                else:
-                    leps = filter(
-                        lambda x, isotype=isotype, isocut=isocut: abs(getattr(x, isotype)) < isocut, leps
-                    )
-            
-            #Apply ID cut 
-            leps = filter(lepcuts["idcut"], leps)
-
-            sumleps += leps
-            lepname = lep_flavour + "_" + id_type
-            setattr(event, lepname, leps)
-            setattr(event, "n_"+  lepname, len(leps))
-        #end of lep_flavour loop
-        setattr(event, "lep_{0}".format(id_type), sumleps)
-        setattr(event, "n_lep_{0}".format(id_type), len(sumleps))
-    #end of id_type loop
-    event.lep_SL = sorted(event.lep_SL, key=lambda x: x.pt, reverse=True)
-    event.lep_DL = sorted(event.lep_DL, key=lambda x: x.pt, reverse=True)
-    event.lep_veto = sorted(event.lep_veto, key=lambda x: x.pt, reverse=True)
-
-    #Apply two-stage pt cut on DL leptons
-    lep_DL_afterpt = []
-    for lep in event.lep_DL:
-        if len(lep_DL_afterpt) == 0:
-            ptcut = conf.leptons["DL"]["pt_leading"]
-        else: 
-            ptcut = conf.leptons["DL"]["pt_subleading"]
-        if lep.pt > ptcut:
-            lep_DL_afterpt += [lep]
-    event.lep_DL = lep_DL_afterpt
-    event.n_lep_DL = len(event.lep_DL)
-
-    event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
-    event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
-    event.is_fh = (not event.is_sl and not event.is_dl)
 
 ########################################
 # Define Input Files and
 # output directory
 ########################################
 
-if socket.gethostname() == "t3ui02":
-    basepath = 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat'
-else:
-    basepath = 'root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat'
                                          
-# for the filename: basepath + filename + .root
 full_file_names = {}
-#for k,v in files.iteritems():
 fn = os.environ['FILE_NAMES'].split(' ')
 for v in fn:
     full_file_names[v] = v
 
 #full_file_names = {}
-#full_file_names["v1"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_32.root"
+#full_file_names["v1"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/June07_withME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/June07_withME/180607_164153/0000/tree_129.root"
 #full_file_names["v2"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_33.root"
 #full_file_names["v3"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_34.root"
 #full_file_names["v4"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_35.root"
@@ -269,11 +38,6 @@ for v in fn:
 #full_file_names["v7"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_209.root"
 #full_file_names["v8"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr09_v1/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/Apr09_v1/170409_111637/0000/tree_210.root"
 
-
-
-#full_file_names = {}
-#full_file_names["v"] = "root://storage01.lcg.cscs.ch/pnfs/lcg.cscs.ch/cms/trivcat/store/user/mameinha/tth/Apr09_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/Apr09_v1/170409_111531/0000/tree_100.root"
-#full_file_names["v"] = "root://cms-xrd-global.cern.ch//store/user/mameinha/tth/Apr12_v1/SingleMuon/Apr12_v1/170412_122435/0000/tree_100.root"
 
 #class InputVars():
 #    def __init__(self, mass = 0, nsub = 0, bbtag = 0, btagf = 0, btags = 0):
@@ -287,6 +51,7 @@ for v in fn:
 t2 = ROOT.TTree("t2","a Tree with fatjets")
 #ivars = InputVars()
 mass = array( 'f', [ 0. ] )
+massuncor = array( 'f', [ 0. ] )
 ptdr = array( 'f', [ 0. ] )
 nsj = array( 'i', [ 0 ] )
 nsub = array( 'f', [ 0. ] )
@@ -298,6 +63,7 @@ frec = array( 'f', [ 0. ] )
 fromtop = array( 'i', [ 0 ] )
 evt = array( 'i', [ 0 ] )
 t2.Branch("mass",mass,"mass/F")
+t2.Branch("massuncor",massuncor,"mass/F")
 t2.Branch("ptdr",ptdr,"ptdr/F")
 t2.Branch("nsj",nsj,"nsj/I")
 t2.Branch("nsub",nsub,"nsub/F")
@@ -399,9 +165,16 @@ for l in full_file_names:
                 for gentop in event.GenHadTop:
                     if Get_DeltaR_two_objects(i,gentop) < 0.6:
                         matched = 1
-                print matched
                 setattr(i,"matched",matched)
-            event.HTTV2 = filter(lambda x: (x.drl>1.0 and x.btagmax > 0.1522), event.HTTV2)
+
+                #Get corrected mass from subjets
+                s1 = lvec(event.HTTV2Subjets[i.subJetIdx1])
+                s2 = lvec(event.HTTV2Subjets[i.subJetIdx2])
+                s3 = lvec(event.HTTV2Subjets[i.subJetIdx3])
+                vtop = s1+s2+s3
+                setattr(i,"massreco",vtop.M())
+
+            event.HTTV2 = filter(lambda x: (x.drl>1.5 and x.btagmax > 0.1522), event.HTTV2)
 
         if cat == "dl":
             event.HTTV2 = []
@@ -410,8 +183,9 @@ for l in full_file_names:
         for fatjet in event.HTTV2:
             dr = 0
             evt[0] = event.event
-            mass[0] = fatjet.mass
-            frec[0] = fatjet.fRec
+            massuncor[0] = fatjet.mass
+            mass[0] = fatjet.massreco
+            frec[0] = fatjet.frec
             nsub[0] =  float(getattr(fatjet.matched_CA15SD,"tau2")/getattr(fatjet.matched_CA15SD,"tau1"))
             #nsub[0] =  float(fatjet.tau2/fatjet.tau1)
             nsub2[0] =  float(getattr(fatjet.matched_CA15SD,"tau3")/getattr(fatjet.matched_CA15SD,"tau2"))
@@ -425,7 +199,6 @@ for l in full_file_names:
             btag2 = min(subjets[0].btag,subjets[1].btag)
             btagf[0] = btag1
             btags[0] = btag2
-            print fatjet.matched
             if fatjet.matched == 1:
                 fromtop[0] = 1
             else:
@@ -434,6 +207,6 @@ for l in full_file_names:
 
 f.Close()
 print counter 
-BDTInput = ROOT.TFile("TestingSample_Top.root","recreate")
+BDTInput = ROOT.TFile("out.root","recreate")
 t2.Write()
 BDTInput.Close()

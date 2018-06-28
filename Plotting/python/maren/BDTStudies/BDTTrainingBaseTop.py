@@ -454,7 +454,7 @@ def roccurve(clf,X_test,y_test,esig,ebkg):
     roc_auc = auc(fpr, tpr)
 
     plt.plot(fpr, tpr, lw=1, label='ROC (area = %0.2f)'%(roc_auc))
-    plt.plot(ebkg,esig,linestyle='None',marker='8', color='g', label='Cut based')
+    #plt.plot(ebkg,esig,linestyle='None',marker='8', color='g', label='Cut based')
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6))
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])

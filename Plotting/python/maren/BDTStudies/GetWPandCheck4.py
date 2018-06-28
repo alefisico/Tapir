@@ -22,18 +22,35 @@ from array import array
 full_file_names = {}
 
 
-full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck3/GC79477ba7e7a5/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
-full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck3/GC79477ba7e7a5/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root"
-#full_file_names = ""
+#full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck3/GCe06cd2532399/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
+#full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck3/GCe06cd2532399/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root"
+
+full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck3/GCf250358f81b9/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
+full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck3/GC8b6d8b6bf1aa/Run_TaggerCuts.root"
+
 
 #output_dir = "results/JetCalibrations_Plots/"
-output_dir = "results/TaggerCutsTesting_04062018/"
+output_dir = "results/TaggerCutsTesting_27062018/"
 
-lumis = {}
-lumis["ttH"] = 945.6877 #In pb-1 Assuming XS of 0.5071*0.5824 pb and Ngen = 2774696.04521
-lumis["tt"] = 8930.38 #Assuming XS of 365.45736135 pb and Ngen = 31280689575.4 
+ngen = {}
+ngen["ttH"] = 3425244.0
+ngen["tt"] = 5811679408.0
+
+xsection = {}
+xsection["ttH"] = 0.2934045
+xsection["tt"] = 365.45736135
+
+lumis = {} #These will be in fb-1
+lumis["ttH"] = ngen["ttH"] / xsection["ttH"] * 0.001
+lumis["tt"] = ngen["tt"] / xsection["tt"] * 0.001
+print lumis["ttH"], lumis["tt"]
 
 targetlumi = 49.0
+
+corrfactor = lumis["tt"]/lumis["ttH"]
+corrfactor2 = math.sqrt(targetlumi*lumis["tt"])/lumis["ttH"]
+corrfactor3 = targetlumi/lumis["ttH"]
+corrfactor4 = targetlumi/lumis["tt"]
 
 f1 = ROOT.TFile.Open(full_file_names["ttH"], "READ")
 f2 = ROOT.TFile.Open(full_file_names["tt"], "READ")
@@ -51,9 +68,9 @@ for cat in cats:
     HB = f2.Get("numbers_{}_H".format(cat)) 
     TB = f2.Get("numbers_{}_T".format(cat)) 
     HTB = f2.Get("numbers_{}_HT".format(cat)) 
-    SB = H.GetBinContent(3)/HB.GetBinContent(3)
-    SsB = H.GetBinContent(3)/math.sqrt(HB.GetBinContent(3))
-    SsSB = H.GetBinContent(3)/math.sqrt(HB.GetBinContent(3)+H.GetBinContent(3))
+    SB = H.GetBinContent(3)/HB.GetBinContent(3)*corrfactor
+    SsB = H.GetBinContent(3)/math.sqrt(HB.GetBinContent(3))*corrfactor2
+    SsSB = H.GetBinContent(3)*corrfactor3/math.sqrt(HB.GetBinContent(3)*corrfactor4+H.GetBinContent(3)*corrfactor3)
     eS = H.GetBinContent(3)/H.GetBinContent(2)
     eB = HB.GetBinContent(3)/HB.GetBinContent(2)
     eH = H.GetBinContent(4)/H.GetBinContent(3)
@@ -67,10 +84,9 @@ for cat in cats:
     print "e_Higgs,S", eH
     print "e_Higgs,B", eHB
     if cat == "sl":
-        SB2 = T.GetBinContent(3)/TB.GetBinContent(3)
-        print T.GetBinContent(3), TB.GetBinContent(3), H.GetBinContent(3), HB.GetBinContent(3)
-        SsB2 = T.GetBinContent(3)/math.sqrt(TB.GetBinContent(3))
-        SsSB2 = T.GetBinContent(3)/math.sqrt(TB.GetBinContent(3)+T.GetBinContent(3))
+        SB2 = T.GetBinContent(3)/TB.GetBinContent(3)*corrfactor
+        SsB2 = T.GetBinContent(3)/math.sqrt(TB.GetBinContent(3))*corrfactor2
+        SsSB2 = T.GetBinContent(3)*corrfactor3/math.sqrt(TB.GetBinContent(3)*corrfactor4+T.GetBinContent(3)*corrfactor3)
         eS2 = T.GetBinContent(3)/T.GetBinContent(2)
         eB2 = TB.GetBinContent(3)/TB.GetBinContent(2)
         eT2 = T.GetBinContent(4)/T.GetBinContent(3)
@@ -83,9 +99,9 @@ for cat in cats:
         print "e_Bkg", eB2
         print "e_Top,S", eT2
         print "e_Top,B", eTB2
-        SB3 = HT.GetBinContent(3)/HTB.GetBinContent(3)
-        SsB3 = HT.GetBinContent(3)/math.sqrt(HTB.GetBinContent(3))
-        SsSB3 = HT.GetBinContent(3)/math.sqrt(HTB.GetBinContent(3)+HT.GetBinContent(3))
+        SB3 = HT.GetBinContent(3)/HTB.GetBinContent(3)*corrfactor
+        SsB3 = HT.GetBinContent(3)/math.sqrt(HTB.GetBinContent(3))*corrfactor2
+        SsSB3 = HT.GetBinContent(3)*corrfactor3/math.sqrt(HTB.GetBinContent(3)*corrfactor4+HT.GetBinContent(3)*corrfactor3)
         eS3 = HT.GetBinContent(3)/HT.GetBinContent(2)
         eB3 = HTB.GetBinContent(3)/HTB.GetBinContent(2)
         eT3 = HT.GetBinContent(4)/HT.GetBinContent(3)

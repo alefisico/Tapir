@@ -62,8 +62,8 @@ param_grid = {"n_estimators": [1100,1200,1300],
 
 
 #Training/Test file + get np arrays
-infname_train = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleHiggs/Training.root"
-infname_test = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TrainingSampleHiggs/Test.root"
+infname_train = "/mnt/t3nfs01/data01/shome/mameinha/TTH/CMSSW_9_4_6/CMSSW_9_4_6_patch1/src/TTH/Plotting/python/maren/BDTStudies/Higgs_BDT_Train.root"
+infname_test = "/mnt/t3nfs01/data01/shome/mameinha/TTH/CMSSW_9_4_6/CMSSW_9_4_6_patch1/src/TTH/Plotting/python/maren/BDTStudies/Higgs_BDT_Test.root"
 
 ########################################
 # Read in parameters
