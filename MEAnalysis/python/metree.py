@@ -202,6 +202,7 @@ topCandidateType = NTupleObjectType("topCandidateType", variables = [
     NTupleVariable("delRopt", lambda x: x.delRopt ),             # Calculated
     NTupleVariable("genTopHad_dr", lambda x: getattr(x, "genTopHad_dr", -1), help="DeltaR to the closest hadronic gen top" ),
     NTupleVariable("genTopHad_index", lambda x: getattr(x, "genTopHad_index", -1), type=int, help="Index of the matched genTopHad" ),
+    NTupleVariable("dr_lepton", lambda x: getattr(x, "delR_lepton", -1), help="deltaR to closest selection lepton"),
 ])
 
 higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
@@ -239,7 +240,6 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("dr_top", lambda x: getattr(x, "dr_top", -1), help="deltaR to the best HTT candidate"),
     NTupleVariable("dr_genHiggs", lambda x: getattr(x, "dr_genHiggs", -1), help="deltaR to gen higgs"),
     NTupleVariable("dr_genTop", lambda x: getattr(x, "dr_genTop", -1), help="deltaR to closest gen top"),
-    NTupleVariable("dr_lepton", lambda x: getattr(x, "delR_lepton", -1), help="deltaR to closest selection lepton"),
 ])
 
 
@@ -251,6 +251,7 @@ higgsCandidateAK8Type = NTupleObjectType("higgsCandidateAK8Type", variables = [
     NTupleVariable("tau1", lambda x: x.tau1 ),
     NTupleVariable("tau2", lambda x: x.tau2 ),
     NTupleVariable("tau3", lambda x: x.tau3 ),
+    NTupleVariable("tau21", lambda x: x.tau21 ),
     NTupleVariable("bbtag", lambda x: x.bbtag ),
     NTupleVariable("area", lambda x: x.area ),
     NTupleVariable("msoftdrop", lambda x: x.msoftdrop ),
@@ -701,9 +702,9 @@ def getTreeProducer(conf):
         ("btagWeight_shapeCFERR2Up",            float,    "", lambda ev: ev.btagSF_shape_up_cferr2),
         ("btagWeight_shapeCFERR2Down",            float,    "", lambda ev: ev.btagSF_shape_down_cferr2),
 
-        #("prob_ttHbb",            float,    "squared matrix element for hypo ttHbb", lambda ev: ev.prob_ttHbb),
-        #("prob_ttbb",            float,    "squared matrix element for hypo ttbb", lambda ev: ev.prob_ttbb),
-        #("JointLikelihoodRatio",            float,    "joint likelihood ratio", lambda ev: ev.jointlikelihood),
+        ("prob_ttHbb",            float,    "squared matrix element for hypo ttHbb", lambda ev: ev.prob_ttHbb),
+        ("prob_ttbb",            float,    "squared matrix element for hypo ttbb", lambda ev: ev.prob_ttbb),
+        ("JointLikelihoodRatio",            float,    "joint likelihood ratio", lambda ev: ev.jointlikelihood),
 
         ("tth_rho_px_gen",  float,  ""),
         ("tth_rho_py_gen",  float,  ""),
