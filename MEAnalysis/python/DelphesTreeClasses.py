@@ -16,6 +16,7 @@ class Electron:
         self.pt = treeReader.Electron.At(n).PT
         self.eta = treeReader.Electron.At(n).Eta
         self.phi = treeReader.Electron.At(n).Phi
+        self.charge = treeReader.Electron.At(n).Charge
         self.mass =  0.000510998902
     @staticmethod
     def make_array(input):
@@ -27,6 +28,7 @@ class Muon:
         self.pt = treeReader.Muon.At(n).PT
         self.eta = treeReader.Muon.At(n).Eta
         self.phi = treeReader.Muon.At(n).Phi
+        self.charge = treeReader.Muon.At(n).Charge
         self.mass = 0.105658389
     @staticmethod
     def make_array(input):
@@ -37,7 +39,7 @@ class met:
     def __init__(self, treeReader):
         self.eta = treeReader.MissingET.At(0).Eta
         self.phi = treeReader.MissingET.At(0).Phi
-        self.sumEt = treeReader.MissingET.At(0).MET
+        self.pt = treeReader.MissingET.At(0).MET
 
 class ScalarHT:
     def __init__(self, treeReader):
@@ -56,4 +58,15 @@ class GenParticle:
     @staticmethod
     def make_array(input):
         return [GenParticle(input, i) for i in range(input.Particle.GetEntries())]
-        
+       
+class FatJet:
+    def __init__(self, treeReader, n):
+        self.pt = treeReader.FatJet.At(n).PT
+        self.eta = treeReader.FatJet.At(n).Eta
+        self.phi = treeReader.FatJet.At(n).Phi
+        self.mass = treeReader.FatJet.At(n).Mass
+        self.Nsub = treeReader.FatJet.At(n).Tau
+    @staticmethod
+    def make_array(input):
+        return [FatJet(input, i) for i in range(input.FatJet.GetEntries())]
+ 
