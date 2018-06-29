@@ -54,7 +54,7 @@ def Make_config(tf_gc_path, filename):
     config['input_root_file_name'] = '{0}/{1}.root'.format(tf_gc_path, filename)
     #config['input_root_file_name'] = '../out.root' #DS
 
-    config['input_tree_name'] = 'tree'
+    config['input_tree_name'] = 'Quarks'
 
     config['outputdir'] = filename
         
@@ -148,6 +148,9 @@ def Make_config(tf_gc_path, filename):
     # Set which particles will be used in the analysis.
     #   'b' = bottom, 'l' = light
     config['particles'] = [ 'b', 'l' ]
+    # For Higgs subjets do not evaluate light transfer functions
+    if "Higgs" in filename:
+        config['particles'] = [ 'b' ]
    
     # Set the eta axis
     #   Requires a minimum input of 2 (double) values.
@@ -361,10 +364,10 @@ def Make_config(tf_gc_path, filename):
 def main():
 
     # !!! Change this line to point to output from make_TF.sh gridcontrol run !!!
-    path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/transfer/GCecb606ea5572/"
-    #path = "file:///mnt/t3nfs01/data01/shome/dsalerno/TTH_2016/TTH_80X_M17/transfer/ttbar"
+    #path = "file:///mnt/t3nfs01/data01/shome/jpata/tth/gc/transfer/GCecb606ea5572/"
+    path = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/transfer/GC5378a53bab05/"
 
-    for jettype in ["resolved"]:
+    for jettype in ["transfer_HiggsAK8"]:
         Make_config(path, jettype)
 
 

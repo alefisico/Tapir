@@ -30,6 +30,7 @@ class JetCollection:
             self.subJetIdx1 = getattr(tree,"{}_subJetIdx1".format(name))[n]
             self.subJetIdx2 = getattr(tree,"{}_subJetIdx2".format(name))[n]
         if name == "HTTV2":
+            self.subjetIDPassed = tree.HTTV2Subjets_IDPassed[tree.HTTV2_subJetIdx1[n]] == 1 and tree.HTTV2Subjets_IDPassed[tree.HTTV2_subJetIdx2[n]] == 1 and tree.HTTV2Subjets_IDPassed[tree.HTTV2_subJetIdx3[n]] == 1
             self.subJetIdx3 = getattr(tree,"{}_subJetIdx3".format(name))[n]   
             self.frec = getattr(tree,"{}_fRec".format(name))[n]   
             self.Ropt = getattr(tree,"{}_Ropt".format(name))[n]   
@@ -115,7 +116,7 @@ def GetCategory(event,conf):
                     )
             
             #Apply ID cut 
-            leps = filter(lepcuts["idcut"], leps)
+            #leps = filter(lepcuts["idcut"], leps)
 
             sumleps += leps
             lepname = lep_flavour + "_" + id_type

@@ -34,7 +34,7 @@ class NanoConfig:
             self.conditionsMC = "auto:phase1_2017_realistic"
             self.conditionsData = "auto:run2_data"
             self.eraBtagSF = "2017"
-            self.algoBtag = "csvv2"
+            self.algoBtag = "deepcsv"
             print "Using CMSSW 94X with v2 era"
         
         imports = []

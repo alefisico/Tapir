@@ -35,12 +35,26 @@ for v in fn:
 #full_file_names["TTH"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/May24_NoME/180524_215806/0000/tree_32.root"
 #full_file_names["TTH"] = "root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/May24_NoME/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/May24_NoME/180524_220009/0000/tree_46.root"
 
-class Cuts:
+"""class Cuts:
     toptagger = {
     "massinf" : 160,
     "masssup" : 280,
     "nsub" : 0.8,
     "frec" : 0.3
+    }
+    higgstagger = {
+    "nsub" : 0.7,
+    "bbtag" : 0.4,
+    "btagsl" : 0.7
+    }"""
+
+#These are the default cuts...
+class Cuts:
+    toptagger = {
+    "massinf" : 85,
+    "masssup" : 280,
+    "nsub" : 0.97,
+    "frec" : 0.47
     }
     higgstagger = {
     "nsub" : 0.7,

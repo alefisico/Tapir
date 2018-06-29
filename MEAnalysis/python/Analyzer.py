@@ -113,7 +113,7 @@ class EventIDFilterAnalyzer(FilterAnalyzer):
         passes = True
         if not self.event_whitelist is None:
             passes = False
-            if (event.input.run, event.input.luminosityBlock, event.input.evt) in self.event_whitelist:
+            if (event.input.run, event.input.luminosityBlock, event.input.event) in self.event_whitelist:
                 print "IDFilter", (event.input.run, event.input.luminosityBlock, event.input.event)
                 passes = True
 

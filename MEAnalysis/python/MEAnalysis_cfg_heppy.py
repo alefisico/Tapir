@@ -86,6 +86,7 @@ factorizedJetCorrections = [
 
 #factorizedJetCorrections = ["JER","Total"]
 #factorizedJetCorrections = ["Total"]
+factorizedJetCorrections = []
 
 def el_baseline_loose(el):
     sca = abs(el.etaSc)
@@ -235,6 +236,31 @@ class Conf:
         "selection": jet_baseline
     }
 
+    boost = {
+        "top": {
+            #Cuts set by "default"
+            "pt":   200,
+            "eta":  2.4,
+            "drl": 1.5, #In SL events distance to lepton candidate
+            "btagL": "DeepCSVL",
+            #Cuts optained by optimization procedure
+            "mass_inf": 160,
+            "mass_sup": 380,
+            "tau32SD": 0.8,
+            "frec": 0.65,
+        },
+        "higgs": {
+            #Cuts set by "default"
+            "pt":   300,
+            "eta":  2.4,
+            "msoft": 50,
+            #Cuts optained by optimization procedure
+            "bbtag": 0.25,
+            "btagSL": 0.5,
+            "tau21SD": 0.8,
+        },
+    }
+
     trigger = {
 
         "filter": False,
@@ -256,9 +282,8 @@ class Conf:
         "QGLPlotsFile_flavour": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/QGL_3dPlot.root",
         "sampleFile": os.environ["CMSSW_BASE"]+"/python/TTH/MEAnalysis/samples.py",
         "transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions.pickle",
-        #"transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle",
-        "transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
-        #"transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj_ttbar.pickle",
+        "transferFunctions_htt_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_htt.pickle",
+        "transferFunctions_higgs_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_higgsAK8.pickle",
         "systematics": [
             "nominal",
         ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
@@ -269,6 +294,7 @@ class Conf:
         # "reco" - print out the reco-level selected particles
         # "matching" - print out the association between gen and reco objects
         "verbosity": [
+            #"subjet",
             #"eventboundary", #print run:lumi:event
             #"trigger", #print trigger bits
             #"input", #print input particles
@@ -283,12 +309,12 @@ class Conf:
             #"systematics",
         ],
 
-        # "eventWhitelist": [
-        #    # (1, 8471, 1181605),
-        #    # (1, 10785, 1504514),
-        #    # (1, 11359, 1584590),
-        #    (1, 4034, 562719),
-        # ]
+        #"eventWhitelist": [
+            #( 1 , 2630 , 2545001 ),
+            #( 1 , 2629 , 2543371 ),
+            #( 1 , 3778 , 3655350 ),
+            #( 1 , 3778 , 3655694 ),
+        #]
     }
 
     #multiclass = {
@@ -389,6 +415,13 @@ class Conf:
             #and event.btag_LR_4b_2b > 0.95)
         ),
 
+        "selection_boosted": lambda event: (
+                ((event.is_sl or event.is_dl) and
+                (len(event.boosted_bjets)>=4))
+            #(event.is_fh and event.cat in ["cat7","cat8"]
+            #and event.btag_LR_4b_2b > 0.95)
+        ),
+
         #This configures the MEMs to actually run, the rest will be set to 0
         "methodsToRun": [
             "SL_0w2h2t",
@@ -399,7 +432,11 @@ class Conf:
             "SL_2w2h2t",
             #"SL_2w2h2t_1j",
             #"SL_2w2h2t_sj",
+            #"SL_1w2h2t_sj",
             #"SL_0w2h2t_sj",
+            #SL_2w2h2t_sj_alllight",
+            #SL_1w2h2t_sj_alllight",
+            #"DL_0w2h2t_sj",
             #"SL_2w2h2t_memLR",
             #"SL_0w2h2t_memLR",
             #"FH_4w2h2t", #8j,4b
@@ -628,6 +665,7 @@ c.cfg.perm_pruning = strat
 Conf.mem_configs["DL_0w2h2t"] = c
 
 
+#######################
 #Subjet configurations#
 #######################
 
@@ -641,7 +679,7 @@ c.l_quark_candidates = lambda event: \
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
     len(mcfg.b_quark_candidates(ev)) == 4 and
-    len(mcfg.l_quark_candidates(ev)) == 2 and
+    len(mcfg.l_quark_candidates(ev)) >= 2 and
     ev.PassedSubjetAnalyzer == True
 )
 c.mem_assumptions.add("sl")
@@ -652,7 +690,8 @@ strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_2w2h2t_sj"] = c
 
-#SL_0w2h2t_sj
+
+#SL_1w2h2t_sj
 c = MEMConfig(Conf)
 # Select the custom jet lists
 c.b_quark_candidates = lambda event: \
@@ -661,17 +700,103 @@ c.l_quark_candidates = lambda event: \
                                      event.boosted_ljets
 c.do_calculate = lambda ev, mcfg: (
     len(mcfg.lepton_candidates(ev)) == 1 and
-    len(mcfg.b_quark_candidates(ev)) >= 4 and
-    len(mcfg.l_quark_candidates(ev)) >= 0
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 1 and
+    ev.PassedSubjetAnalyzer == True
 )
 c.mem_assumptions.add("sl")
-c.mem_assumptions.add("0w2h2t")
+c.mem_assumptions.add("1qW")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_1w2h2t_sj"] = c
+
+#SL_0w2h2t_sj
+c = MEMConfig(Conf)
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and 
+    len(mcfg.l_quark_candidates(ev)) == 0 and
+    ev.PassedSubjetAnalyzer == True
+
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("0qW")
 strat = CvectorPermutations()
 strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
 strat.push_back(MEM.Permutations.QUntagged)
 strat.push_back(MEM.Permutations.BTagged)
 c.cfg.perm_pruning = strat
 Conf.mem_configs["SL_0w2h2t_sj"] = c
+
+
+#SL_2w2h2t_sj_alllight
+c = MEMConfig(Conf)
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.l_quark_candidates = lambda event: \
+                                     event.boosted_allljets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) >= 2 and
+    ev.PassedSubjetAnalyzer == True
+)
+c.mem_assumptions.add("sl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_2w2h2t_sj_alllight"] = c
+
+
+#SL_1w2h2t_sj_alllight
+c = MEMConfig(Conf)
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.l_quark_candidates = lambda event: \
+                                     event.boosted_allljets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 1 and
+    len(mcfg.b_quark_candidates(ev)) == 4 and
+    len(mcfg.l_quark_candidates(ev)) == 1 and
+    ev.PassedSubjetAnalyzer == True
+)
+c.mem_assumptions.add("sl")
+c.mem_assumptions.add("1qW")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.QUntagged)
+strat.push_back(MEM.Permutations.BTagged)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["SL_1w2h2t_sj_alllight"] = c
+
+#DL_0w2h2t_sj
+c = MEMConfig(Conf)
+c.l_quark_candidates = lambda ev: []
+# Select the custom jet lists
+c.b_quark_candidates = lambda event: \
+                                     event.boosted_bjets
+c.do_calculate = lambda ev, mcfg: (
+    len(mcfg.lepton_candidates(ev)) == 2 and
+    len(mcfg.b_quark_candidates(ev)) >= 4 and
+    ev.PassedSubjetAnalyzer == True
+)
+c.maxLJets = 4
+c.mem_assumptions.add("dl")
+strat = CvectorPermutations()
+strat.push_back(MEM.Permutations.QQbarBBbarSymmetry)
+strat.push_back(MEM.Permutations.FirstRankedByBTAG)
+c.cfg.perm_pruning = strat
+Conf.mem_configs["DL_0w2h2t_sj"] = c
 
 ##SL_2w2h2t_sj_perm
 #c = MEMConfig(Conf)

@@ -4,7 +4,7 @@ from PhysicsTools.HeppyCore.framework.analyzer import Analyzer
 import copy
 import math
 
-from TTH.MEAnalysis.SubjetAnalyzer import SubjetAnalyzer
+from TTH.MEAnalysis.SubjetAnalyzerAK8 import SubjetAnalyzer
 #from TTH.MEAnalysis.MulticlassAnalyzer import MulticlassAnalyzer
 from TTH.MEAnalysis.WTagAnalyzer import WTagAnalyzer
 from TTH.MEAnalysis.GenRadiationModeAnalyzer import GenRadiationModeAnalyzer

@@ -47,16 +47,29 @@ def calc_roc(h1, h2, rebin=1):
 ########################################
 
 full_file_names = {}
-full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TaggerCuts/GCa5c93e589b69/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
-full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TaggerCuts/GC0bf2a57c0367/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root"
-#full_file_names = ""
+#full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TaggerCuts/GCa5c93e589b69/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
+#full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TaggerCuts/GC0bf2a57c0367/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root"
+full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TaggerCuts/GC33bbcd5193a5/ttHTobb_afterBDT.root"
+full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/TaggerCuts/GC04d2c320f0ca/TTToSemiLeptonic_afterBDT.root"
+
 
 #output_dir = "results/JetCalibrations_Plots/"
-output_dir = "results/TaggerCuts_28052018/"
+output_dir = "results/TaggerCuts_27062018/"
 
-lumis = {}
-lumis["ttH"] = 945.6877 #In pb-1 Assuming XS of 0.5071*0.5824 pb and Ngen = 2774696.04521
-lumis["tt"] = 8930.38 #Assuming XS of 365.45736135 pb and Ngen = 31280689575.4 
+ngen = {}
+ngen["ttH"] = 3425244.0
+ngen["tt"] = 5811679408.0
+
+xsection = {}
+xsection["ttH"] = 0.2934045
+xsection["tt"] = 365.45736135
+
+lumis = {} #These will be in fb-1
+lumis["ttH"] = ngen["ttH"] / xsection["ttH"] * 0.001
+lumis["tt"] = ngen["tt"] / xsection["tt"] * 0.001
+print lumis["ttH"], lumis["tt"]
+#lumis["ttH"] = 945.6877 #In pb-1 Assuming XS of 0.5071*0.5824 pb and Ngen = 2774696.04521
+#lumis["tt"] = 8930.38 #Assuming XS of 365.45736135 pb and Ngen = 31280689575.4 
 
 targetlumi = 49.0
 
@@ -107,8 +120,8 @@ for k in ["sl","dl"]:
     effH2["tth"][k] = f1.Get("count_{}_effH_H".format(k))
     effH2["tth"][k].Scale(targetlumi/lumis["ttH"])
     effT2["tth"][k] = f1.Get("count_{}_effT_T".format(k))
-    for i in range(effT2["tth"][k].GetNbinsX()):
-        print effT2["tth"][k].GetBinContent(i,1) 
+    #for i in range(effT2["tth"][k].GetNbinsX()):
+    #    print effT2["tth"][k].GetBinContent(i,1) 
     effT2["tth"][k].Scale(targetlumi/lumis["ttH"])
     S["ttjets"][k] = f2.Get("count_{}_S_HT".format(k)) 
     S["ttjets"][k].Scale(targetlumi/lumis["tt"])
@@ -158,8 +171,8 @@ for k in ["sl","dl"]:
 
     #Get efficiency and background rejection rate from BDT output score:
 
-    WPH = 0.5
-    WPT = 0.5
+    WPH = 0.9
+    WPT = 0.47
     efficiencyH = effH["sl"].GetBinContent(effH["sl"].FindBin(0,WPH))
     efficiencyT = effT["sl"].GetBinContent(effT["sl"].FindBin(WPT,0))
 
@@ -228,4 +241,3 @@ for cat in ["sl","dl"]:
 
 
 doWork(full_file_names, output_dir)
-

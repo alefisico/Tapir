@@ -27,8 +27,11 @@ from TTH.Plotting.Helpers.CompareDistributionsPlots import *
 ########################################
 
 full_file_names = {}
-full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck/GC510b027c7af4/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
-full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck/GCd502ee15b1f9/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root"
+#full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck/GC510b027c7af4/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
+#full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck/GCd502ee15b1f9/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8.root"
+full_file_names["ttH"] = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck/GC931ed5980ad8/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root"
+full_file_names["tt"]  = "/mnt/t3nfs01/data01/shome/mameinha/tth/gc/GetWPandCheck/GC2f488f596c6d/TTToSemiLeptonic_afterBDT.root"
+
 
 filename = "TaggerCuts_processed.root"
 
@@ -45,8 +48,8 @@ ssb.Scale(1/ssb.GetEntries())
 total = ssb.Clone()
 total.Multiply(effTH)
 
-total.GetXaxis().SetRangeUser(0.1,0.9)
-total.GetYaxis().SetRangeUser(0.1,0.9)
+#total.GetXaxis().SetRangeUser(0.1,0.9)
+#total.GetYaxis().SetRangeUser(0.1,0.9)
 
 print total.GetMaximum()
 
@@ -58,15 +61,29 @@ print "The bin having the maximum value is",x," ", y
 print "That corresponds to an Top efficiency of", float(x)/100
 print "and a Higgs efficiency of", float(y)/100
 
-results = ROOT.TFile("./GetWPandCheck2_processed.root","recreate")
+results = ROOT.TFile("./GetWPandCheck2_processed_June2018.root","recreate")
 total.Write("final")
 sb.Write()
 ssb.Write()
 effTH.Write("efficiency")
 results.Close()
 
+eH = fi.Get("effH_sl")
+eT = fi.Get("effT_sl")
 
-full_file_names["SBs"] = "GetWPandCheck2_processed.root"
+effH = eH.GetBinContent(1,y) 
+effT = eT.GetBinContent(x,1) 
+
+print "Based on the found maximum, we will use the following efficiencies:"
+print "Efficiency Higgs:", effH
+print "Efficiency Top: ", effT
+
+
+
+#ADD CODE HERE WHICH GETS CORRECT TOP AND HIGGS EFFICIENCY FROM HISTOGRAM!
+
+
+full_file_names["SBs"] = "GetWPandCheck2_processed_June2018.root"
 
 fil = ROOT.TFile.Open(full_file_names["SBs"], "READ")
 
@@ -76,17 +93,20 @@ combinedPlot2D("Final_discriminator",
     label_x   = "Top BDT discrimator",
     label_y   = "Higgs BDT discrimator",                          
     axis_unit = "",
-    log_y     = False,)
+    log_y     = False,
+    normalize = True)
 
-output_dir = "results/TaggerCutsOptimizer_04062018/"
+output_dir = "results/TaggerCutsOptimizer_27062018/"
 
 doWork(full_file_names, output_dir)
 
 fil.Close()
 
 
-targetefficiencyTop = 0.39
-targetefficiencyHiggs = 0.29
+#targetefficiencyTop = 0.39
+#targetefficiencyHiggs = 0.29
+targetefficiencyTop = effT
+targetefficiencyHiggs = effH
 maxdeviance = 0.02
 
 f1 = ROOT.TFile.Open(full_file_names["ttH"], "READ")
