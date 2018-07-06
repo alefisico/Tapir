@@ -305,25 +305,25 @@ class BTagLRAnalyzer(FilterAnalyzer):
             elif len(event.good_jets) >= 6:
                 cat += "jge6_"
 
-            if event.nBCSVM == 2:
+            if event.nBDeepCSVM == 2:
                 cat += "t2"
-            elif event.nBCSVM == 3:
+            elif event.nBDeepCSVM == 3:
                 cat += "t3"
-            elif event.nBCSVM >= 4:
+            elif event.nBDeepCSVM >= 4:
                 cat += "tge4"
             else:
                 cat = "unknown"
         elif event.is_dl:
             cat += "dl_"
-            if len(event.good_jets)==3 and event.nBCSVM==2:
+            if len(event.good_jets)==3 and event.nBDeepCSVM==2:
                 cat += "j3_t2"
-            elif len(event.good_jets)==3 and event.nBCSVM==3:
+            elif len(event.good_jets)==3 and event.nBDeepCSVM==3:
                 cat += "j3_t3"
-            elif len(event.good_jets)>=4 and event.nBCSVM==3:
+            elif len(event.good_jets)>=4 and event.nBDeepCSVM==3:
                 cat += "jge4_t3"
-            elif len(event.good_jets)>=4 and event.nBCSVM==2:
+            elif len(event.good_jets)>=4 and event.nBDeepCSVM==2:
                 cat += "jge4_t2"
-            elif len(event.good_jets)>=4 and event.nBCSVM>=4:
+            elif len(event.good_jets)>=4 and event.nBDeepCSVM>=4:
                 cat += "jge4_tge4"
             else:
                 cat = "unknown"
