@@ -47,15 +47,50 @@ FUNCTION_TABLE = {
     "mem_SL_0w2h2t_p": lambda ev: ev.mem_SL_0w2h2t_p,
     "mem_SL_1w2h2t_p": lambda ev: ev.mem_SL_1w2h2t_p,
     "mem_SL_2w2h2t_p": lambda ev: ev.mem_SL_2w2h2t_p,
+    "mem_DL_0w2h2t_sj_p": lambda ev: ev.mem_DL_0w2h2t_sj_p,
+    "mem_SL_0w2h2t_sj_p": lambda ev: ev.mem_SL_0w2h2t_sj_p,
+    "mem_SL_1w2h2t_sj_p": lambda ev: ev.mem_SL_1w2h2t_sj_p,
+    "mem_SL_2w2h2t_sj_p": lambda ev: ev.mem_SL_2w2h2t_sj_p,
+    #"mem_DL_0w2h2t_sj_perm_higgs_p": lambda ev: ev.mem_DL_0w2h2t_sj_perm_higgs_p,
+    #"mem_SL_0w2h2t_sj_perm_higgs_p": lambda ev: ev.mem_SL_0w2h2t_sj_perm_higgs_p,
+    #"mem_SL_1w2h2t_sj_perm_higgs_p": lambda ev: ev.mem_SL_1w2h2t_sj_perm_higgs_p,
+    #"mem_SL_2w2h2t_sj_perm_higgs_p": lambda ev: ev.mem_SL_2w2h2t_sj_perm_higgs_p,
+    #"mem_SL_2w2h2t_sj_perm_top_p": lambda ev: ev.mem_SL_2w2h2t_sj_perm_top_p,
+    #"mem_SL_2w2h2t_sj_perm_higgstop_p": lambda ev: ev.mem_SL_2w2h2t_sj_perm_top_p,
     "Wmass": lambda ev: ev.Wmass,
     "numJets": lambda ev: ev.numJets,
+    "nBDeepCSVM": lambda ev: ev.nBDeepCSVM,
     "nBCSVM": lambda ev: ev.nBCSVM,
+    "n_boosted_bjets": lambda ev: ev.n_boosted_bjets,
+    "n_boosted_ljets": lambda ev: ev.n_boosted_ljets,
+    "boosted": lambda ev: ev.boosted,
     "nPVs": lambda ev: ev.nPVs,
     "counting": 1.0,
     "mll": lambda ev: ev.mll,
     "met_pt": lambda ev: ev.met_pt,
-    "ht": lambda ev: sum([jet.lv.Pt() for jet in ev.jets])
-}
+    "ht": lambda ev: sum([jet.lv.Pt() for jet in ev.jets]),
+    "nhiggsCandidate": lambda ev: len(ev.higgsCandidate),
+    "higgsCandidate_msoftdrop": lambda ev: ev.higgsCandidate[0].msoftdrop if len(ev.higgsCandidate)>=1 else -10.0,
+    "higgsCandidate_pt": lambda ev: ev.higgsCandidate[0].lv.Pt() if len(ev.higgsCandidate)>=1 else  -10.0,
+    "higgsCandidate_eta": lambda ev: ev.higgsCandidate[0].lv.Eta() if len(ev.higgsCandidate)>=1 else  -10.0,
+    "higgsCandidate_tau21": lambda ev: ev.higgsCandidate[0].tau21 if len(ev.higgsCandidate)>=1 else  -10.0,
+    "higgsCandidate_bbtag": lambda ev: ev.higgsCandidate[0].bbtag if len(ev.higgsCandidate)>=1 else  -10.0,
+    "higgsCandidate_btagL": lambda ev: max(ev.higgsCandidate[0].sj1btag,ev.higgsCandidate[0].sj2btag) if len(ev.higgsCandidate)>=1 else  -10.0,
+    "higgsCandidate_btagSL": lambda ev: min(ev.higgsCandidate[0].sj1btag,ev.higgsCandidate[0].sj2btag) if len(ev.higgsCandidate)>=1 else  -10.0,
+    "higgsCandidate_ptsjL": lambda ev: max(ev.higgsCandidate[0].sj1pt,ev.higgsCandidate[0].sj2pt) if len(ev.higgsCandidate)>=1 else  -10.0,
+    "higgsCandidate_ptsjSL": lambda ev: min(ev.higgsCandidate[0].sj1pt,ev.higgsCandidate[0].sj2pt) if len(ev.higgsCandidate)>=1 else  -10.0,
+    "ntopCandidate": lambda ev: len(ev.topCandidate),
+    "topCandidate_mass": lambda ev: ev.topCandidate[0].lv.M() if len(ev.topCandidate)>=1 else -10.0,
+    "topCandidate_pt": lambda ev: ev.topCandidate[0].lv.Pt() if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_eta": lambda ev: ev.topCandidate[0].lv.Eta() if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_tau32SD": lambda ev: ev.topCandidate[0].tau32SD if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_fRec": lambda ev: ev.topCandidate[0].fRec if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_delRopt": lambda ev: ev.topCandidate[0].delRopt if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_btagL": lambda ev: max(ev.topCandidate[0].sj1btag,ev.topCandidate[0].sj2btag,ev.topCandidate[0].sj3btag) if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_btagSL": lambda ev: min(ev.topCandidate[0].sj1btag,ev.topCandidate[0].sj2btag,ev.topCandidate[0].sj3btag) if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_ptsjL": lambda ev: max(ev.topCandidate[0].sj1pt,ev.topCandidate[0].sj2pt,ev.topCandidate[0].sj3pt) if len(ev.topCandidate)>=1 else  -10.0,
+    "topCandidate_ptsjSL": lambda ev: min(ev.topCandidate[0].sj1pt,ev.topCandidate[0].sj2pt,ev.topCandidate[0].sj3pt) if len(ev.topCandidate)>=1 else  -10.0,
+    }
 
 class Cut(object):
     """
@@ -110,6 +145,9 @@ class Sample(object):
 
         #Schema of sample, e.g. mc, data, or mc_syst (MC that is a systematic variation)
         self.schema = kwargs.get("schema")
+
+        #Flag if sample contains boosted information: true or false
+        self.boosted = kwargs.get("boosted")
 
         #Name of the underlying event model, based in MEAnalysis/interface/EventModel.h
         self.treemodel = kwargs.get("treemodel")
@@ -170,6 +208,7 @@ class Sample(object):
             files_load_step1 = config.get(sample_name, "files_load_step1"),
             files_load_postproc = config.get(sample_name, "files_load_postproc"),
             schema = config.get(sample_name, "schema"),
+            boosted = config.get(sample_name, "boosted"),
             treemodel = config.get(sample_name, "treemodel"),
             step_size_sparsinator = config.get(sample_name, "step_size_sparsinator"),
             debug_max_files = config.get(sample_name, "debug_max_files"),
@@ -192,14 +231,16 @@ class HistogramOutput:
     def cut(self, event):
         return event.cuts.get(self.cut_name, False)
 
-    def fill(self, event, weight = 1.0):
+    def fill(self, event, weight = 1.0, dooverflow = False):
 
         #make sure underflow is filled to first visible bin and overflow to last visible
+        #Not for tagger-related variables, don't wan't default value to be filled in histogram.
         val = self.func(event)
-        if val < self.hist.GetBinLowEdge(1):
-            val = self.hist.GetBinLowEdge(1)
-        if val >= self.hist.GetBinLowEdge(self.hist.GetNbinsX()+1):
-            val = self.hist.GetBinLowEdge(self.hist.GetNbinsX())
+        if dooverflow == True:
+            if val < self.hist.GetBinLowEdge(1):
+                val = self.hist.GetBinLowEdge(1)
+            if val >= self.hist.GetBinLowEdge(self.hist.GetNbinsX()+1):
+                val = self.hist.GetBinLowEdge(self.hist.GetNbinsX())
         
         if weight == 1.0:
             self.hist.Fill(val)
