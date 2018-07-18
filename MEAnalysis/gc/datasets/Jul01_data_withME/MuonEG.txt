@@ -496,6 +496,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_186.root = 3730
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_703.root = 5998
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_842.root = 8873
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_42.root = 5382
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_479.root = 4686
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_398.root = 4555
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_51.root = 2610
@@ -693,6 +694,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_64.root = 7304
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_19.root = 6126
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_6.root = 2273
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_65.root = 3702
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_7.root = 3377
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_66.root = 3281
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085840/0000/tree_8.root = 3282
@@ -1410,6 +1412,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_084900/0000/tree_891.root = 10871
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_084900/0000/tree_900.root = 11126
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_084900/0000/tree_883.root = 9871
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_084900/0000/tree_261.root = 9936
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_084900/0000/tree_479.root = 10177
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_084900/0000/tree_398.root = 11760
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_084900/0000/tree_51.root = 9098
@@ -2367,6 +2370,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_426.root = 16970
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_264.root = 10475
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_669.root = 8138
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_505.root = 17621
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_479.root = 10465
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_398.root = 16569
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_975.root = 11677
@@ -2429,6 +2433,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_144.root = 14301
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_802.root = 15009
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_721.root = 9895
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_640.root = 16254
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_514.root = 11748
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_433.root = 14597
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_352.root = 8824
@@ -2547,6 +2552,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_982.root = 10149
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_937.root = 17825
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_13.root = 17461
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_198.root = 15926
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_856.root = 17850
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_775.root = 8789
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0000/tree_694.root = 11042
@@ -3262,6 +3268,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1939.root = 8022
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1139.root = 15064
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1896.root = 17716
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1930.root = 9029
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1100.root = 14070
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1101.root = 13164
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1020.root = 11976
@@ -3316,6 +3323,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1316.root = 17604
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1280.root = 18866
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1235.root = 17377
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1154.root = 10942
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1109.root = 15198
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1812.root = 19104
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0001/tree_1073.root = 17839
@@ -3817,6 +3825,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0002/tree_2012.root = 10290
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0002/tree_2013.root = 10094
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0002/tree_2014.root = 9363
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0002/tree_2015.root = 9605
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0002/tree_2016.root = 10404
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0002/tree_2017.root = 9868
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_083822/0002/tree_2018.root = 9889
@@ -4484,6 +4493,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0000/tree_436.root = 9209
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0000/tree_355.root = 5265
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0000/tree_274.root = 10098
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0000/tree_229.root = 7776
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0000/tree_932.root = 10642
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0000/tree_193.root = 8489
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0000/tree_148.root = 8243
@@ -5212,6 +5222,8 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1683.root = 10153
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1548.root = 5666
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1551.root = 6100
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1217.root = 11125
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1840.root = 8830
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1100.root = 10133
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1101.root = 9900
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_085034/0001/tree_1020.root = 10467
@@ -6913,6 +6925,7 @@ root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_090151/0001/tree_1274.root = 20028
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_090151/0001/tree_1068.root = 18935
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_090151/0001/tree_1144.root = 18609
+root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_090151/0001/tree_1355.root = 8791
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_090151/0001/tree_1100.root = 17706
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_090151/0001/tree_1101.root = 19164
 root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/mameinha/tth/Jul01_data_withME/MuonEG/Jul01_data_withME/180701_090151/0001/tree_1020.root = 10732
