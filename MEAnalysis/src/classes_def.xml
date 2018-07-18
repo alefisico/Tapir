@@ -11,11 +11,15 @@
     <class name="std::map<TTH_MEAnalysis::Systematic::SystId, double>"/>
 
     <class name="TTH_MEAnalysis::TreeDescriptionFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionBOOSTEDFloat"/>
     <class name="TTH_MEAnalysis::TreeDescriptionMCFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMCBOOSTEDFloat"/>
     <class name="TTH_MEAnalysis::TreeDescriptionMCSystematicFloat"/>
         
     <class name="TTH_MEAnalysis::TreeDescriptionDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionBOOSTEDDouble"/>
     <class name="TTH_MEAnalysis::TreeDescriptionMCDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionMCBOOSTEDDouble"/>
     <class name="TTH_MEAnalysis::TreeDescriptionMCSystematicDouble"/>
 
     <class name="TTH_MEAnalysis::EventDescription"/>
