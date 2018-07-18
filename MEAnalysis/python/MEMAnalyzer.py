@@ -253,7 +253,7 @@ class MEAnalyzer(FilterAnalyzer):
             corrfactor = jet.corr
         return getattr(jet, "corr_" + corr)/corrfactor
 
-    def configure_mem(self, event, mem_cfg):
+    def configure_mem(self, event, mem_cfg,confname):
         mem_cfg.cfg.num_jet_variations = len(self.conf.mem["jet_corrections"])
         self.vars_to_integrate.clear()
         self.vars_to_marginalize.clear()
@@ -287,6 +287,7 @@ class MEAnalyzer(FilterAnalyzer):
             lquarks = lquarks[:mem_cfg.maxLJets]
 
         event.mem_jets = bquarks + lquarks
+
         ##Only take up to 4 candidates, otherwise runtimes become too great        
         for jet in bquarks + lquarks:
             #calculate jet corrections with an exception for JER
@@ -298,22 +299,38 @@ class MEAnalyzer(FilterAnalyzer):
                     new_pt = getattr(jet, "pt_corr_"+jc)
                     jetcorrs.append( new_pt/jet.pt )
 
-            add_obj(
-                self.integrator,
-                MEM.ObjectType.Jet,
-                p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
-                obs_dict={
-                    MEM.Observable.BTAG: jet.btagFlag,
-                    #MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod, -1),
-                    #MEM.Observable.PDGID: getattr(jet, "PDGID", 0)
+            if "perm" in confname:
+                add_obj(
+                    self.integrator,
+                    MEM.ObjectType.Jet,
+                    p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
+                    obs_dict={
+                        MEM.Observable.BTAG: jet.btagFlag,
+                        #MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod, -1),
+                        MEM.Observable.PDGID: getattr(jet, "PDGID", 0)
+                        },
+                    tf_dict={
+                        MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
                     },
-                tf_dict={
-                    MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
-                },
-                corrections = jetcorrs,
-            )
-            LOG_MODULE_NAME.info("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4}".format(
-                jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag
+                    corrections = jetcorrs,
+                )
+            else:
+                add_obj(
+                    self.integrator,
+                    MEM.ObjectType.Jet,
+                    p4s=(jet.pt, jet.eta, jet.phi, jet.mass),
+                    obs_dict={
+                        MEM.Observable.BTAG: jet.btagFlag,
+                        #MEM.Observable.CSV: getattr(jet, mem_cfg.btagMethod, -1),
+                        #MEM.Observable.PDGID: getattr(jet, "PDGID", 0)
+                        },
+                    tf_dict={
+                        MEM.TFType.bReco: jet.tf_b, MEM.TFType.qReco: jet.tf_l,
+                    },
+                    corrections = jetcorrs,
+                    )
+            LOG_MODULE_NAME.info("adding jet: pt={0} eta={1} phi={2} mass={3} btagFlag={4} pdgId={5}".format(
+                jet.pt, jet.eta, jet.phi, jet.mass, jet.btagFlag, getattr(jet, "PDGID", 0)
             ))
 
         for lep in mem_cfg.lepton_candidates(event):
@@ -435,7 +452,7 @@ class MEAnalyzer(FilterAnalyzer):
 
                     ):
 
-                    self.configure_mem(event, mem_cfg)
+                    self.configure_mem(event, mem_cfg,confname)
                     if self.conf.mem["calcME"]:
                         LOG_MODULE_NAME.info("Integrator::run started hypo={0} conf={1} run:lumi:evt={2}:{3}:{4} {5}".format(
                             hypo, confname,

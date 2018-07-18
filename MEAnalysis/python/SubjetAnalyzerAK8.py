@@ -89,6 +89,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         setattr(event, 'otherhtt_subjets', [])
         setattr(event, 'otherhiggs_subjets', [])
         setattr(event, 'boosted', 0)
+        setattr(event, 'hastop', 0)
+        setattr(event, 'hashiggs', 0)
 
 
         ###############################################
@@ -224,6 +226,8 @@ class SubjetAnalyzer(FilterAnalyzer):
         ###################################
         #     Get the Higgs candidates    #
         ###################################
+
+        event.nhiggsCandidate_aftercuts = len(allhiggs)
 
 
         higgs_present = False
@@ -442,9 +446,11 @@ class SubjetAnalyzer(FilterAnalyzer):
 
             #Save also other candidate subjets
             if len(alltops) > 0:
+                event.hastop = 1
                 for ind,tsubjet in alltops_subjets.iteritems():
                     event.otherhtt_subjets = [tsubjet[0],tsubjet[1],tsubjet[2]]
             if len(allhiggs) > 0:
+                event.hashiggs = 1
                 for ind,hsubjet in allhiggs_subjets.iteritems():
                     event.otherhiggs_subjets = [hsubjet[0],hsubjet[1]]
 
@@ -645,6 +651,9 @@ class SubjetAnalyzer(FilterAnalyzer):
                     setattr(x, 'prefix', "sj{}".format(subindex.index(prefix)+1))
                     setattr(x,'btag',getattr(o,'btag'))
                     hs.append(x)
+
+            for sj in hs:
+                setattr( sj, 'PDGID', 22 )
 
 
             # Adding subjet transfer functions

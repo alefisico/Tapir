@@ -30,7 +30,7 @@ class MEMConfig:
         self.mem_assumptions = set([])
         self.maxBJets = 4
         self.maxLJets = 5
-        self.btagMethod = "btagCSV"
+        self.btagMethod = "btagDeepCSV"
         self.cfg.integrator_type = MEM.IntegratorType.Vegas
         self.ncalls = -1
 
