@@ -91,6 +91,7 @@ varnames = {
 
     "numJets": r"jet multiplicity, $N_{\mathrm{jets}}$",
     "nBCSVM": r"b tag multiplicity, $N_{\mathrm{CSVM}}$",
+    "nBDeepCSVM": r"b tag multiplicity, $N_{\mathrm{DeepCSVM}}$",
 
     "btag_LR_4b_2b_btagCSV_logit" : r"b tagging likelihood ratio, $\mathcal{BLR}$",
     "mem_SL_0w2h2t_p": r"MEM discriminant, $P_{\mathrm{s/b}}$",

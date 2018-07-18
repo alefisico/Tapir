@@ -508,7 +508,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             boost,
             #After this, the event has been created
             lumilist_ana,
-            puweight_ana,
+            #puweight_ana,
             gentth_pre,
             pvana,
             trigger,

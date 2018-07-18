@@ -42,11 +42,70 @@ public:
     }
 };
 
+class higgsCandidates {
+public:
+    TLorentzVector lv;
+    float msoftdrop;
+    float tau21;
+    float bbtag;
+    float sj1btag;
+    float sj2btag;
+    float sj1pt;
+    float sj2pt;
+
+    higgsCandidates() : lv(TLorentzVector()), msoftdrop(0),tau21(0),bbtag(0),sj1btag(0),sj2btag(0),sj1pt(0),sj2pt(0) {}
+
+    higgsCandidates(TLorentzVector lv, float msoftdrop,float tau21,float bbtag,float sj1btag,float sj2btag,float sj1pt,float sj2pt) :
+    lv(lv),
+    msoftdrop(msoftdrop),
+    tau21(tau21),
+    bbtag(bbtag),
+    sj1btag(sj1btag),
+    sj2btag(sj2btag),
+    sj1pt(sj1pt),
+    sj2pt(sj2pt)
+    {
+    }
+};
+
+class topCandidates {
+public:
+    TLorentzVector lv;
+    float tau32SD;
+    float fRec;
+    float delRopt;
+    float sj1btag;
+    float sj2btag;
+    float sj3btag;
+    float sj1pt;
+    float sj2pt;
+    float sj3pt;
+
+    topCandidates() : lv(TLorentzVector()), tau32SD(0),fRec(0),delRopt(0),sj1btag(0),sj2btag(0),sj3btag(0),sj1pt(0),sj2pt(0),sj3pt(0) {}
+
+    topCandidates(TLorentzVector lv,float tau32SD,float fRec,float delRopt,float sj1btag,float sj2btag,float sj3btag,float sj1pt,float sj2pt,float sj3pt) :
+    lv(lv),
+    tau32SD(tau32SD),
+    fRec(fRec),
+    delRopt(delRopt),
+    sj1btag(sj1btag),
+    sj2btag(sj2btag),
+    sj3btag(sj3btag),
+    sj1pt(sj1pt),
+    sj2pt(sj2pt),
+    sj3pt(sj3pt)
+    {
+    }
+};
+
+
 class SampleDescription {
 public:
     enum Schema {
         MC,
-        DATA
+        DATA,
+        MCBOOSTED,
+        DATABOOSTED,
     };
 
     Schema schema;
@@ -56,6 +115,8 @@ public:
     bool isMC() const {
         return schema == MC;
     }
+
+
 };
 
 namespace Systematic {
@@ -248,7 +309,6 @@ public:
     int json;
 
     std::vector<Lepton> leptons;
-
     std::vector<Jet> jets;
     std::vector<int> jets_hadronFlavour;
     
@@ -261,6 +321,7 @@ public:
     int is_dl;
     int is_fh;
     int numJets;
+    int nBDeepCSVM;
     int nBCSVM;
     int nPVs;
 
@@ -276,11 +337,31 @@ public:
     double mem_SL_0w2h2t_p;
     double mem_SL_1w2h2t_p;
     double mem_SL_2w2h2t_p;
+
     double Wmass;
     double met_pt;
 
     Systematic::SystId syst_id;
     std::map<Systematic::SystId, double> weights;
+
+
+    float n_boosted_bjets;
+    float n_boosted_ljets;
+    float boosted;
+
+    std::vector<higgsCandidates> higgsCandidate;
+    std::vector<topCandidates> topCandidate;
+
+    double mem_DL_0w2h2t_sj_p;
+    double mem_SL_0w2h2t_sj_p;
+    double mem_SL_1w2h2t_sj_p;
+    double mem_SL_2w2h2t_sj_p;
+    //double mem_DL_0w2h2t_sj_perm_higgs_p;
+    //double mem_SL_0w2h2t_sj_perm_higgs_p;
+    //double mem_SL_1w2h2t_sj_perm_higgs_p;
+    //double mem_SL_2w2h2t_sj_perm_higgs_p;
+    //double mem_SL_2w2h2t_sj_perm_top_p;
+    //double mem_SL_2w2h2t_sj_perm_higgstop_p;
 };
 
 //Translates a tthbb13 TTree to an EventDescription
@@ -307,6 +388,7 @@ public:
     //TTreeReaderValue<int> HLT_ttH_FH;
 
     TTreeReaderValue<int> numJets;
+    TTreeReaderValue<int> nBDeepCSVM;
     TTreeReaderValue<int> nBCSVM;
     TTreeReaderValue<T> nPVs;
     
@@ -330,6 +412,7 @@ public:
     TTreeReaderValue<T> mem_SL_0w2h2t_p;
     TTreeReaderValue<T> mem_SL_1w2h2t_p;
     TTreeReaderValue<T> mem_SL_2w2h2t_p;
+
     TTreeReaderValue<T> Wmass;
     TTreeReaderValue<T> met_pt;
 
@@ -356,6 +439,7 @@ public:
         //HLT_ttH_FH(reader, "HLT_ttH_FH"),
         
         numJets(reader, "numJets"),
+        nBDeepCSVM(reader, "nBDeepCSVM"),
         nBCSVM(reader, "nBCSVM"),
         nPVs(reader, "nPVs"),
         
@@ -380,17 +464,120 @@ public:
         mem_SL_0w2h2t_p(reader, "mem_SL_0w2h2t_p"),
         mem_SL_1w2h2t_p(reader, "mem_SL_1w2h2t_p"),
         mem_SL_2w2h2t_p(reader, "mem_SL_2w2h2t_p"),
+ 
         Wmass(reader, "Wmass"),
         met_pt(reader, "met_pt"),
+
+
         sample(sample) {
     }
     virtual ~TreeDescription() {}
 
-    
     std::vector<Lepton> build_leptons(Systematic::SystId syst_id = Systematic::syst_id_nominal);
     virtual std::vector<Jet> build_jets(Systematic::SystId syst_id = Systematic::syst_id_nominal);
     virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
 };
+
+template <typename T>
+class TreeDescriptionBOOSTED : public TreeDescription<T> {
+public:
+
+
+    TTreeReaderValue<float>  n_boosted_bjets;
+    TTreeReaderValue<float>  n_boosted_ljets;
+    TTreeReaderValue<float>  boosted;
+
+    TTreeReaderValue<int> nhiggsCandidate;
+    TTreeReaderArray<T> higgsCandidate_pt;
+    TTreeReaderArray<T> higgsCandidate_eta;
+    TTreeReaderArray<T> higgsCandidate_phi;
+    TTreeReaderArray<T> higgsCandidate_mass;
+    TTreeReaderArray<T> higgsCandidate_msoftdrop; 
+    TTreeReaderArray<T> higgsCandidate_tau21;
+    TTreeReaderArray<T> higgsCandidate_bbtag;
+    TTreeReaderArray<T> higgsCandidate_sj1btag;
+    TTreeReaderArray<T> higgsCandidate_sj2btag;
+    TTreeReaderArray<T> higgsCandidate_sj1pt;
+    TTreeReaderArray<T> higgsCandidate_sj2pt;
+
+    TTreeReaderValue<int> ntopCandidate;
+    TTreeReaderArray<T> topCandidate_pt;
+    TTreeReaderArray<T> topCandidate_eta;
+    TTreeReaderArray<T> topCandidate_phi;
+    TTreeReaderArray<T> topCandidate_mass;
+    TTreeReaderArray<T> topCandidate_tau32SD;
+    TTreeReaderArray<T> topCandidate_fRec;
+    TTreeReaderArray<T> topCandidate_delRopt; 
+    TTreeReaderArray<T> topCandidate_sj1btag;
+    TTreeReaderArray<T> topCandidate_sj2btag;
+    TTreeReaderArray<T> topCandidate_sj3btag;
+    TTreeReaderArray<T> topCandidate_sj1pt;
+    TTreeReaderArray<T> topCandidate_sj2pt;
+    TTreeReaderArray<T> topCandidate_sj3pt;
+
+    TTreeReaderValue<T> mem_DL_0w2h2t_sj_p;
+    TTreeReaderValue<T> mem_SL_0w2h2t_sj_p;
+    TTreeReaderValue<T> mem_SL_1w2h2t_sj_p;
+    TTreeReaderValue<T> mem_SL_2w2h2t_sj_p;
+    //TTreeReaderValue<T> mem_DL_0w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValue<T> mem_SL_0w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValue<T> mem_SL_1w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValue<T> mem_SL_2w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValue<T> mem_SL_2w2h2t_sj_perm_top_p;
+    //TTreeReaderValue<T> mem_SL_2w2h2t_sj_perm_higgstop_p;
+
+
+    TreeDescriptionBOOSTED(TFile* file, SampleDescription sample) :
+        TreeDescription<T>(file, sample),
+        n_boosted_bjets(TreeDescription<T>::reader, "n_boosted_bjets"),
+        n_boosted_ljets(TreeDescription<T>::reader, "n_boosted_ljets"),
+        boosted(TreeDescription<T>::reader, "boosted"),
+
+        nhiggsCandidate(TreeDescription<T>::reader, "nhiggsCandidate"),
+        higgsCandidate_pt(TreeDescription<T>::reader, "higgsCandidate_pt"),
+        higgsCandidate_eta(TreeDescription<T>::reader, "higgsCandidate_eta"),
+        higgsCandidate_phi(TreeDescription<T>::reader, "higgsCandidate_phi"),
+        higgsCandidate_mass(TreeDescription<T>::reader, "higgsCandidate_mass"),
+        higgsCandidate_msoftdrop(TreeDescription<T>::reader, "higgsCandidate_msoftdrop"),
+        higgsCandidate_tau21(TreeDescription<T>::reader, "higgsCandidate_tau21"),
+        higgsCandidate_bbtag(TreeDescription<T>::reader, "higgsCandidate_bbtag"),
+        higgsCandidate_sj1btag(TreeDescription<T>::reader, "higgsCandidate_sj1btag"),
+        higgsCandidate_sj2btag(TreeDescription<T>::reader, "higgsCandidate_sj2btag"),
+        higgsCandidate_sj1pt(TreeDescription<T>::reader, "higgsCandidate_sj1pt"),
+        higgsCandidate_sj2pt(TreeDescription<T>::reader, "higgsCandidate_sj2pt"),
+
+        ntopCandidate(TreeDescription<T>::reader, "ntopCandidate"),
+        topCandidate_pt(TreeDescription<T>::reader, "topCandidate_pt"),
+        topCandidate_eta(TreeDescription<T>::reader, "topCandidate_eta"),
+        topCandidate_phi(TreeDescription<T>::reader, "topCandidate_phi"),
+        topCandidate_mass(TreeDescription<T>::reader, "topCandidate_mass"),
+        topCandidate_tau32SD(TreeDescription<T>::reader, "topCandidate_tau32SD"),
+        topCandidate_fRec(TreeDescription<T>::reader, "topCandidate_fRec"),
+        topCandidate_delRopt(TreeDescription<T>::reader, "topCandidate_delRopt"),
+        topCandidate_sj1btag(TreeDescription<T>::reader, "topCandidate_sj1btag"),
+        topCandidate_sj2btag(TreeDescription<T>::reader, "topCandidate_sj2btag"),
+        topCandidate_sj3btag(TreeDescription<T>::reader, "topCandidate_sj3btag"),
+        topCandidate_sj1pt(TreeDescription<T>::reader, "topCandidate_sj1pt"),
+        topCandidate_sj2pt(TreeDescription<T>::reader, "topCandidate_sj2pt"),
+        topCandidate_sj3pt(TreeDescription<T>::reader, "topCandidate_sj3pt"),
+
+        mem_DL_0w2h2t_sj_p(TreeDescription<T>::reader, "mem_DL_0w2h2t_sj_p"),
+        mem_SL_0w2h2t_sj_p(TreeDescription<T>::reader, "mem_SL_0w2h2t_sj_p"),
+        mem_SL_1w2h2t_sj_p(TreeDescription<T>::reader, "mem_SL_1w2h2t_sj_p"),
+        mem_SL_2w2h2t_sj_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_p")
+        //mem_DL_0w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_DL_0w2h2t_sj_perm_higgs_p"),
+        //mem_SL_0w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_SL_0w2h2t_sj_perm_higgs_p"),
+        //mem_SL_1w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_SL_1w2h2t_sj_perm_higgs_p"),
+        //mem_SL_2w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_perm_higgs_p"),
+        //mem_SL_2w2h2t_sj_perm_top_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_perm_top_p"),
+        //mem_SL_2w2h2t_sj_perm_higgstop_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_perm_higgstop_p")
+    {}
+    ~TreeDescriptionBOOSTED() {}
+
+    virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    std::vector<higgsCandidates> build_higgsCandidate(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    std::vector<topCandidates> build_topCandidate(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+ };
 
 template <typename T>
 class TreeDescriptionMCSystematic : public TreeDescription<T> {
@@ -428,6 +615,7 @@ public:
     TTreeReaderValue<T> genTopLep_pt;
 
     TTreeReaderValueSystematic<int> numJets;
+    TTreeReaderValueSystematic<int> nBDeepCSVM;
     TTreeReaderValueSystematic<int> nBCSVM;
 
     TTreeReaderArray<int> jets_hadronFlavour;
@@ -464,7 +652,7 @@ public:
     TTreeReaderValue<T> btagWeight_shape_lfDown;
     TTreeReaderValue<T> btagWeight_shape_lfstats1Down;
     TTreeReaderValue<T> btagWeight_shape_lfstats2Down;
-    
+
     //TTreeReaderArray<T> LHE_weights_scale_wgt;
     
     TreeDescriptionMC(TFile* file, SampleDescription sample) :
@@ -474,6 +662,7 @@ public:
         genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt"),
         
         numJets(TreeDescription<T>::reader, "numJets"),
+        nBDeepCSVM(TreeDescription<T>::reader, "nBDeepCSVM"),
         nBCSVM(TreeDescription<T>::reader, "nBCSVM"),
 
         jets_hadronFlavour(TreeDescription<T>::reader, "jets_hadronFlavour"),
@@ -512,6 +701,7 @@ public:
         btagWeight_shape_lfstats1Down(TreeDescription<T>::reader, "btagWeight_shapeLFSTATS1Down"),
         btagWeight_shape_lfstats2Down(TreeDescription<T>::reader, "btagWeight_shapeLFSTATS2Down")
 
+
         //LHE_weights_scale_wgt(TreeDescription<T>::reader, "LHE_weights_scale_wgt")
     {}
     
@@ -524,12 +714,122 @@ public:
 
 };
 
+template <typename T>
+class TreeDescriptionMCBOOSTED : public TreeDescriptionMC<T> {
+public:
+
+    TTreeReaderValueSystematic<float>  n_boosted_bjets;
+    TTreeReaderValueSystematic<float>  n_boosted_ljets;
+    TTreeReaderValueSystematic<float>  boosted;
+
+    TTreeReaderValue<int> nhiggsCandidate;
+    TTreeReaderArray<T> higgsCandidate_pt;
+    TTreeReaderArray<T> higgsCandidate_eta;
+    TTreeReaderArray<T> higgsCandidate_phi;
+    TTreeReaderArray<T> higgsCandidate_mass;
+    TTreeReaderArray<T> higgsCandidate_msoftdrop; 
+    TTreeReaderArray<T> higgsCandidate_tau21;
+    TTreeReaderArray<T> higgsCandidate_bbtag;
+    TTreeReaderArray<T> higgsCandidate_sj1btag;
+    TTreeReaderArray<T> higgsCandidate_sj2btag;
+    TTreeReaderArray<T> higgsCandidate_sj1pt;
+    TTreeReaderArray<T> higgsCandidate_sj2pt;
+
+    TTreeReaderValue<int> ntopCandidate;
+    TTreeReaderArray<T> topCandidate_pt;
+    TTreeReaderArray<T> topCandidate_eta;
+    TTreeReaderArray<T> topCandidate_phi;
+    TTreeReaderArray<T> topCandidate_mass;
+    TTreeReaderArray<T> topCandidate_tau32SD;
+    TTreeReaderArray<T> topCandidate_fRec;
+    TTreeReaderArray<T> topCandidate_delRopt; 
+    TTreeReaderArray<T> topCandidate_sj1btag;
+    TTreeReaderArray<T> topCandidate_sj2btag;
+    TTreeReaderArray<T> topCandidate_sj3btag;
+    TTreeReaderArray<T> topCandidate_sj1pt;
+    TTreeReaderArray<T> topCandidate_sj2pt;
+    TTreeReaderArray<T> topCandidate_sj3pt;
+
+    TTreeReaderValueSystematic<T> mem_DL_0w2h2t_sj_p;
+    TTreeReaderValueSystematic<T> mem_SL_0w2h2t_sj_p;
+    TTreeReaderValueSystematic<T> mem_SL_1w2h2t_sj_p;
+    TTreeReaderValueSystematic<T> mem_SL_2w2h2t_sj_p;
+    //TTreeReaderValueSystematic<T> mem_DL_0w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValueSystematic<T> mem_SL_0w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValueSystematic<T> mem_SL_1w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValueSystematic<T> mem_SL_2w2h2t_sj_perm_higgs_p;
+    //TTreeReaderValueSystematic<T> mem_SL_2w2h2t_sj_perm_top_p;
+    //TTreeReaderValueSystematic<T> mem_SL_2w2h2t_sj_perm_higgstop_p;
+    
+    TreeDescriptionMCBOOSTED(TFile* file, SampleDescription sample) :
+        TreeDescriptionMC<T>(file, sample),
+
+        n_boosted_bjets(TreeDescription<T>::reader, "n_boosted_bjets"),
+        n_boosted_ljets(TreeDescription<T>::reader, "n_boosted_ljets"),
+        boosted(TreeDescription<T>::reader, "boosted"),
+
+        nhiggsCandidate(TreeDescription<T>::reader, "nhiggsCandidate"),
+        higgsCandidate_pt(TreeDescription<T>::reader, "higgsCandidate_pt"),
+        higgsCandidate_eta(TreeDescription<T>::reader, "higgsCandidate_eta"),
+        higgsCandidate_phi(TreeDescription<T>::reader, "higgsCandidate_phi"),
+        higgsCandidate_mass(TreeDescription<T>::reader, "higgsCandidate_mass"),
+        higgsCandidate_msoftdrop(TreeDescription<T>::reader, "higgsCandidate_msoftdrop"),
+        higgsCandidate_tau21(TreeDescription<T>::reader, "higgsCandidate_tau21"),
+        higgsCandidate_bbtag(TreeDescription<T>::reader, "higgsCandidate_bbtag"),
+        higgsCandidate_sj1btag(TreeDescription<T>::reader, "higgsCandidate_sj1btag"),
+        higgsCandidate_sj2btag(TreeDescription<T>::reader, "higgsCandidate_sj2btag"),
+        higgsCandidate_sj1pt(TreeDescription<T>::reader, "higgsCandidate_sj1pt"),
+        higgsCandidate_sj2pt(TreeDescription<T>::reader, "higgsCandidate_sj2pt"),
+
+        ntopCandidate(TreeDescription<T>::reader, "ntopCandidate"),
+        topCandidate_pt(TreeDescription<T>::reader, "topCandidate_pt"),
+        topCandidate_eta(TreeDescription<T>::reader, "topCandidate_eta"),
+        topCandidate_phi(TreeDescription<T>::reader, "topCandidate_phi"),
+        topCandidate_mass(TreeDescription<T>::reader, "topCandidate_mass"),
+        topCandidate_tau32SD(TreeDescription<T>::reader, "topCandidate_tau32SD"),
+        topCandidate_fRec(TreeDescription<T>::reader, "topCandidate_fRec"),
+        topCandidate_delRopt(TreeDescription<T>::reader, "topCandidate_delRopt"),
+        topCandidate_sj1btag(TreeDescription<T>::reader, "topCandidate_sj1btag"),
+        topCandidate_sj2btag(TreeDescription<T>::reader, "topCandidate_sj2btag"),
+        topCandidate_sj3btag(TreeDescription<T>::reader, "topCandidate_sj3btag"),
+        topCandidate_sj1pt(TreeDescription<T>::reader, "topCandidate_sj1pt"),
+        topCandidate_sj2pt(TreeDescription<T>::reader, "topCandidate_sj2pt"),
+        topCandidate_sj3pt(TreeDescription<T>::reader, "topCandidate_sj3pt"),
+
+        mem_DL_0w2h2t_sj_p(TreeDescription<T>::reader, "mem_DL_0w2h2t_sj_p"),
+        mem_SL_0w2h2t_sj_p(TreeDescription<T>::reader, "mem_SL_0w2h2t_sj_p"),
+        mem_SL_1w2h2t_sj_p(TreeDescription<T>::reader, "mem_SL_1w2h2t_sj_p"),
+        mem_SL_2w2h2t_sj_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_p")
+        //mem_DL_0w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_DL_0w2h2t_sj_perm_higgs_p"),
+        //mem_SL_0w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_SL_0w2h2t_sj_perm_higgs_p"),
+        //mem_SL_1w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_SL_1w2h2t_sj_perm_higgs_p"),
+        //mem_SL_2w2h2t_sj_perm_higgs_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_perm_higgs_p"),
+        //mem_SL_2w2h2t_sj_perm_top_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_perm_top_p"),
+        //mem_SL_2w2h2t_sj_perm_higgstop_p(TreeDescription<T>::reader, "mem_SL_2w2h2t_sj_perm_higgstop_p")
+
+
+        //LHE_weights_scale_wgt(TreeDescription<T>::reader, "LHE_weights_scale_wgt")
+    {}
+    
+    ~TreeDescriptionMCBOOSTED() {}
+
+    //TTreeReaderArray<T>* get_correction_branch(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+
+    std::vector<higgsCandidates> build_higgsCandidate(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    std::vector<topCandidates> build_topCandidate(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+    virtual EventDescription create_event(Systematic::SystId syst_id = Systematic::syst_id_nominal);
+};
+
 typedef TreeDescription<float> TreeDescriptionFloat;
+typedef TreeDescriptionBOOSTED<float> TreeDescriptionBOOSTEDFloat;
 typedef TreeDescriptionMC<float> TreeDescriptionMCFloat;
+typedef TreeDescriptionMCBOOSTED<float> TreeDescriptionMCBOOSTEDFloat;
 typedef TreeDescriptionMCSystematic<float> TreeDescriptionMCSystematicFloat;
 
 typedef TreeDescription<double> TreeDescriptionDouble;
+typedef TreeDescriptionBOOSTED<double> TreeDescriptionBOOSTEDDouble;
 typedef TreeDescriptionMC<double> TreeDescriptionMCDouble;
+typedef TreeDescriptionMCBOOSTED<double> TreeDescriptionMCBOOSTEDDouble;
 typedef TreeDescriptionMCSystematic<double> TreeDescriptionMCSystematicDouble;
 
 } //namespace TTH_MEAnalysis

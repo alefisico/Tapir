@@ -182,13 +182,16 @@ def triggerPath(event):
 def fillBase(matched_processes, event, syst, schema):
     for proc in matched_processes:
         for (k, histo_out) in proc.outdict_syst.get(syst, {}).items():
+            dooverflow = True
+            if "_topCandidate" in k or "_higgsCandidate" in k:
+                dooverflow = False
             weight = 1.0 
             if schema == "mc" or schema == "mc_syst":
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
                     LOG_MODULE_NAME.debug("negative weight, weight_nominal<=0: gen={0}".format(event.weights.at(syst_pairs["gen"])))
             if histo_out.cut(event):
-                histo_out.fill(event, weight)
+                histo_out.fill(event, weight, dooverflow)
 
 
 def fillSystematic(matched_processes, event, systematic_weights, schema):
@@ -311,6 +314,7 @@ def createEvent(
             event.weights.at(syst_pairs["CMS_ttH_CSV"]))
         )
         event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
+
         #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
    
     ##get MEM from the classifier database
@@ -399,7 +403,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     #Optionally add systematics
     if analysis.config.getboolean("sparsinator", "add_systematics"):
-
         #Get the list of systematics that modify the event topology
         systematics_event_nosdir = analysis.config.get("systematics", "event").split()
         #map the nice systematics names to a suffix in the ntuple
@@ -478,12 +481,12 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     sample = analysis.get_sample(sample_name)
     schema = sample.schema
+    boosted = sample.boosted
     sample_systematic = False 
 
     #now we find which processes are matched to have this sample as an input
     #these processes are used to generate histograms
     matched_processes = [p for p in analysis.processes if p.input_name == sample.name]
-   
     #Find the processes for which we have up/down variated samples
     systematics_sample = analysis.config.get("systematics", "sample").split()
     matched_procs_new = []
@@ -590,20 +593,36 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         if schema == "mc" or schema == "mc_syst":
             #Create MC-specific event model from tree
-            events = treemodel(
-                tfile,
-                ROOT.TTH_MEAnalysis.SampleDescription(
-                    ROOT.TTH_MEAnalysis.SampleDescription.MC
+            if boosted:
+                events = treemodel(
+                    tfile,
+                    ROOT.TTH_MEAnalysis.SampleDescription(
+                        ROOT.TTH_MEAnalysis.SampleDescription.MCBOOSTED
+                    )
                 )
-            )
+            else:
+                events = treemodel(
+                    tfile,
+                    ROOT.TTH_MEAnalysis.SampleDescription(
+                        ROOT.TTH_MEAnalysis.SampleDescription.MC
+                    )
+                )
         else:
             #Create data-specific event model
-             events = treemodel(
-                tfile,
-                ROOT.TTH_MEAnalysis.SampleDescription(
-                    ROOT.TTH_MEAnalysis.SampleDescription.DATA
+            if boosted:
+                events = treemodel(
+                    tfile,
+                    ROOT.TTH_MEAnalysis.SampleDescription(
+                        ROOT.TTH_MEAnalysis.SampleDescription.DATABOOSTED
+                    )
                 )
-            )
+            else:
+                events = treemodel(
+                    tfile,
+                    ROOT.TTH_MEAnalysis.SampleDescription(
+                        ROOT.TTH_MEAnalysis.SampleDescription.DATA
+                    )
+                )
 
         tfile_postproc = None
         ttree_postproc = None

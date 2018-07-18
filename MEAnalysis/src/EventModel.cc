@@ -1,6 +1,5 @@
 #include "TTH/MEAnalysis/interface/EventModel.h"
 
-
 namespace TTH_MEAnalysis {
 
 template <typename T> int sgn(T val) {
@@ -72,6 +71,30 @@ float recomputeMem(float p0, float p1, float sf=0.1) {
 }
 
 template <typename T>
+EventDescription TreeDescriptionMCBOOSTED<T>::create_event(Systematic::SystId syst_id) {
+    auto event = TreeDescriptionMC<T>::create_event(syst_id);
+
+    event.n_boosted_bjets = n_boosted_bjets.GetValue(syst_id);
+    event.n_boosted_ljets = n_boosted_ljets.GetValue(syst_id);
+    event.boosted = boosted.GetValue(syst_id);
+
+    event.higgsCandidate = build_higgsCandidate(syst_id);
+    event.topCandidate = build_topCandidate(syst_id);
+
+
+    if (Systematic::is_nominal(syst_id) || Systematic::is_jec(syst_id) || Systematic::is_jer(syst_id)) {
+        event.mem_DL_0w2h2t_sj_p = this->mem_DL_0w2h2t_sj_p.GetValue(syst_id);
+        event.mem_SL_0w2h2t_sj_p = this->mem_SL_0w2h2t_sj_p.GetValue(syst_id);
+        event.mem_SL_1w2h2t_sj_p = this->mem_SL_1w2h2t_sj_p.GetValue(syst_id);
+        event.mem_SL_2w2h2t_sj_p = this->mem_SL_2w2h2t_sj_p.GetValue(syst_id);
+    }
+    
+    //event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Up)] = LHE_weights_scale_wgt[4];
+    //event.weights[std::make_pair(Systematic::CMS_ttH_scaleME, Systematic::Down)] = LHE_weights_scale_wgt[5];
+    return event;
+}
+
+template <typename T>
 EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) {
     auto event = TreeDescription<T>::create_event(syst_id);
 
@@ -81,6 +104,7 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
 
     event.ttCls = *ttCls;
     event.numJets = numJets.GetValue(syst_id);
+    event.nBDeepCSVM = nBDeepCSVM.GetValue(syst_id);
     event.nBCSVM = nBCSVM.GetValue(syst_id);
 
     event.weights[std::make_pair(Systematic::gen, Systematic::None)] = (*genWeight);
@@ -154,6 +178,7 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.HLT_ttH_FH = 1;
     
     event.numJets = *(this->numJets);
+    event.nBDeepCSVM = *(this->nBDeepCSVM);
     event.nBCSVM = *(this->nBCSVM);
     event.jets = jets;
     event.syst_id = syst_id;
@@ -170,10 +195,31 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.mem_SL_0w2h2t_p = *(this->mem_SL_0w2h2t_p);
     event.mem_SL_1w2h2t_p = *(this->mem_SL_1w2h2t_p);
     event.mem_SL_2w2h2t_p = *(this->mem_SL_2w2h2t_p);
+
     event.Wmass = *(this->Wmass);
     event.met_pt = *(this->met_pt);
 
     event.weights[Systematic::syst_id_nominal] = 1.0;
+    return event;
+}
+
+
+template <typename T>
+EventDescription TreeDescriptionBOOSTED<T>::create_event(Systematic::SystId syst_id) {
+    auto event = TreeDescription<T>::create_event(syst_id);
+
+    event.n_boosted_bjets = *(this->n_boosted_bjets);
+    event.n_boosted_ljets = *(this->n_boosted_ljets);
+    event.boosted = *(this->boosted);
+
+    event.higgsCandidate = build_higgsCandidate(syst_id);
+    event.topCandidate = build_topCandidate(syst_id);
+
+    event.mem_DL_0w2h2t_sj_p = *(this->mem_DL_0w2h2t_sj_p);
+    event.mem_SL_0w2h2t_sj_p = *(this->mem_SL_0w2h2t_sj_p);
+    event.mem_SL_1w2h2t_sj_p = *(this->mem_SL_1w2h2t_sj_p);
+    event.mem_SL_2w2h2t_sj_p = *(this->mem_SL_2w2h2t_sj_p);
+
     return event;
 }
 
@@ -192,6 +238,110 @@ std::vector<Lepton> TreeDescription<T>::build_leptons(Systematic::SystId syst_id
         leps.push_back(Lepton(lv, sgn(this->leps_pdgId[ilep]), this->leps_pdgId[ilep]));
     }
     return leps;
+}
+
+template <typename T>
+std::vector<higgsCandidates> TreeDescriptionBOOSTED<T>::build_higgsCandidate(Systematic::SystId syst_id) {
+    std::vector<higgsCandidates> hc;
+
+    for (int ih = 0; ih < *(this->nhiggsCandidate); ih++) {
+        TLorentzVector lv;
+        lv.SetPtEtaPhiM(
+            this->higgsCandidate_pt[ih],
+            this->higgsCandidate_eta[ih],
+            this->higgsCandidate_phi[ih],
+            this->higgsCandidate_mass[ih]
+        );
+
+        float m_softdrop = this->higgsCandidate_msoftdrop[ih];
+        float tau21 = this->higgsCandidate_tau21[ih];
+        float bbtag = this->higgsCandidate_bbtag[ih];
+        float sj1btag = this->higgsCandidate_sj1btag[ih];
+        float sj2btag = this->higgsCandidate_sj2btag[ih];
+        float sj1pt = this->higgsCandidate_sj1pt[ih];
+        float sj2pt = this->higgsCandidate_sj2pt[ih];
+        hc.push_back(higgsCandidates(lv, m_softdrop,tau21,bbtag,sj1btag,sj2btag,sj1pt,sj2pt));
+    }
+    return hc;
+}
+
+template <typename T>
+std::vector<topCandidates> TreeDescriptionBOOSTED<T>::build_topCandidate(Systematic::SystId syst_id) {
+    std::vector<topCandidates> hc;
+
+    for (int ih = 0; ih < *(this->ntopCandidate); ih++) {
+        TLorentzVector lv;
+        lv.SetPtEtaPhiM(
+            this->topCandidate_pt[ih],
+            this->topCandidate_eta[ih],
+            this->topCandidate_phi[ih],
+            this->topCandidate_mass[ih]
+        );
+
+        float tau32SD = this->topCandidate_tau32SD[ih];
+        float fRec = this->topCandidate_fRec[ih];
+        float delRopt = this->topCandidate_delRopt[ih];
+        float sj1btag = this->topCandidate_sj1btag[ih];
+        float sj2btag = this->topCandidate_sj2btag[ih];
+        float sj3btag = this->topCandidate_sj3btag[ih];
+        float sj1pt = this->topCandidate_sj1pt[ih];
+        float sj2pt = this->topCandidate_sj2pt[ih];
+        float sj3pt = this->topCandidate_sj3pt[ih];
+        hc.push_back(topCandidates(lv, tau32SD,fRec,delRopt,sj1btag,sj2btag,sj3btag,sj1pt,sj2pt,sj3pt));
+    }
+    return hc;
+}
+
+template <typename T>
+std::vector<higgsCandidates> TreeDescriptionMCBOOSTED<T>::build_higgsCandidate(Systematic::SystId syst_id) {
+    std::vector<higgsCandidates> hc;
+
+    for (int ih = 0; ih < *(this->nhiggsCandidate); ih++) {
+        TLorentzVector lv;
+        lv.SetPtEtaPhiM(
+            this->higgsCandidate_pt[ih],
+            this->higgsCandidate_eta[ih],
+            this->higgsCandidate_phi[ih],
+            this->higgsCandidate_mass[ih]
+        );
+
+        float m_softdrop = this->higgsCandidate_msoftdrop[ih];
+        float tau21 = this->higgsCandidate_tau21[ih];
+        float bbtag = this->higgsCandidate_bbtag[ih];
+        float sj1btag = this->higgsCandidate_sj1btag[ih];
+        float sj2btag = this->higgsCandidate_sj2btag[ih];
+        float sj1pt = this->higgsCandidate_sj1pt[ih];
+        float sj2pt = this->higgsCandidate_sj2pt[ih];
+        hc.push_back(higgsCandidates(lv, m_softdrop,tau21,bbtag,sj1btag,sj2btag,sj1pt,sj2pt));
+    }
+    return hc;
+}
+
+template <typename T>
+std::vector<topCandidates> TreeDescriptionMCBOOSTED<T>::build_topCandidate(Systematic::SystId syst_id) {
+    std::vector<topCandidates> hc;
+
+    for (int ih = 0; ih < *(this->ntopCandidate); ih++) {
+        TLorentzVector lv;
+        lv.SetPtEtaPhiM(
+            this->topCandidate_pt[ih],
+            this->topCandidate_eta[ih],
+            this->topCandidate_phi[ih],
+            this->topCandidate_mass[ih]
+        );
+
+        float tau32SD = this->topCandidate_tau32SD[ih];
+        float fRec = this->topCandidate_fRec[ih];
+        float delRopt = this->topCandidate_delRopt[ih];
+        float sj1btag = this->topCandidate_sj1btag[ih];
+        float sj2btag = this->topCandidate_sj2btag[ih];
+        float sj3btag = this->topCandidate_sj3btag[ih];
+        float sj1pt = this->topCandidate_sj1pt[ih];
+        float sj2pt = this->topCandidate_sj2pt[ih];
+        float sj3pt = this->topCandidate_sj3pt[ih];
+        hc.push_back(topCandidates(lv, tau32SD,fRec,delRopt,sj1btag,sj2btag,sj3btag,sj1pt,sj2pt,sj3pt));
+    }
+    return hc;
 }
 
 template <typename T>
@@ -241,5 +391,11 @@ template class TreeDescriptionMC<double>;
 
 template class TreeDescriptionMCSystematic<float>;
 template class TreeDescriptionMCSystematic<double>;
+
+template class TreeDescriptionMCBOOSTED<float>;
+template class TreeDescriptionMCBOOSTED<double>;
+
+template class TreeDescriptionBOOSTED<float>;
+template class TreeDescriptionBOOSTED<double>;
 
 } //namespace TTH_MEAnalysis

@@ -262,7 +262,7 @@ def get_base_plot(basepath, outpath, analysis, category, variable):
         "do_syst": True,
         "blindFunc": "blind_mem" if "mem" in variable else "no_blind",
     }
-    if variable in ["numJets", "nBCSVM"]:
+    if variable in ["numJets", "nBDeepCSVM"]:
         ret["do_log"] = True
     return ret
 
@@ -273,7 +273,7 @@ if __name__ == "__main__":
     # Plot for all SL categories
     simple_vars = [
         "numJets",
-        "nBCSVM",
+        "nBDeepCSVM",
         "btag_LR_4b_2b_btagCSV_logit",
         "nPVs",
 #        "jetsByPt_0_btagCSV",
