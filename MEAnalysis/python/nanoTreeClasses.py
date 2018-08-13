@@ -247,7 +247,7 @@ class Jet:
         
         self.rawPt = tree.Jet_pt[n] * (1 - tree.Jet_rawFactor[n]);#IMPORTANT: May has to be changed when JEC recorrection is implemented in postprocessing
         self.corr = (1 - tree.Jet_rawFactor[n]); #IMPORTANT: May has to be changed when JEC recorrection is implemented in postprocessing
-
+        self.nanoPt = tree.Jet_pt[n];
         if not MC:
             self.pt = tree.Jet_pt[n];
         else:
@@ -255,7 +255,7 @@ class Jet:
             #self.corr_JER = 0.0
             self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
             self.corr_JER = tree.Jet_pt_nom[n]/tree.Jet_pt[n];
-
+            
             # btag Weights
             self.btagSF = tree.Jet_btagSF[n]
             self.btagSF_up = tree.Jet_btagSF_up[n]
