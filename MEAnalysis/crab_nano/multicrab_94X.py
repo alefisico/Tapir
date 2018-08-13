@@ -20,6 +20,7 @@ workflows = [
     "hadronic_test", #ttH with FH decays
     "hadronic_nome",
     "hadronic_nome_testing", #ttH with FH decays data + MC
+    "hadronic_trigger", #ttH AH dataset and processing for calculating trigger SF
     "QCD_nome", #QCD samples without MEM
     "pilot", #ttH sample only, with no MEM
     "signal", #signal sample with common config
@@ -50,6 +51,7 @@ me_cfgs = {
     "leptonic": "cfg_leptonic.py",
     "nome_hadSel" : "cfg_noME_FH.py",
     "hadronic": "cfg_FH.py",
+    "hadronic_trigger" : "cfg_FH_trigSF.py",
     "memcheck": "cfg_memcheck.py",
     "memcheck2": "cfg_memcheck2.py"
 }
@@ -280,9 +282,27 @@ for k in datasets.keys():
         D["mem_cfg"] = me_cfgs["nome"]
         workflow_datasets["allmc_nome"][k] = D
 
+workflow_datasets["hadronic_trigger"] = {}
+for k in datasets.keys():
+    #if "SingleMu" in k or k.startswith("TTbar_"):
+    if "SingleMu" in k and "Run2017B" in k:
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["hadronic_trigger"]
+        D["perjob"] = 40
+        workflow_datasets["hadronic_trigger"][k] = D
 
+        
 workflow_datasets["hadronic_nome"] = {}
 for k in datasets.keys():
+    if k == "TTbar_dl1" or k == "TTbar_sl1":
+    #if k == "TTbar_sl1":
+    #if k == "TTbar_had":
+        D = deepcopy(datasets[k])
+        D["mem_cfg"] = me_cfgs["nome_hadSel"]
+        workflow_datasets["hadronic_nome"][k] = D
+        D["perjob"] = 50
+                
+    """
     if k == "TTbar_had" or k == "ttHTobb" or "QCD" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome_hadSel"]
@@ -294,7 +314,7 @@ for k in datasets.keys():
         D["runtime"] = 24
         D["json"] = json_file 
         workflow_datasets["hadronic_nome"][k] = D
-
+    """
 workflow_datasets["hadronic_test"] = {}
 for k in datasets.keys():
     #if k == "TTbar_had" or "ttH" in k or "QCD" in k:

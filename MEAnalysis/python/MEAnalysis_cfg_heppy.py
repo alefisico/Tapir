@@ -175,6 +175,7 @@ class Conf:
             "pt_subleading": 15,
         },
         "selection": lambda event: event.is_sl or event.is_dl,
+        "force_isFH": False,
     }
 
     jets = {
@@ -267,6 +268,10 @@ class Conf:
         #Change to trig.triggerTable for 2017 menu (starting from 92X samples)
         "trigTable": trig.triggerTable,
         "trigTableData": trig.triggerTable,
+        "calcFHSF" : False,
+        "MergePaths" : ["FH"],
+        "TriggerSFFile" : os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/sf3d_out_3DSF_Finalv2_tightCutRunB-CNoPre-D-E-F_all_plusHTplusJet_wPuGenB_binningv2.root",
+        "TriggerSFHisto" : "h3SF_tot",
     }
 
     general = {

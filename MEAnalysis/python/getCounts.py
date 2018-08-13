@@ -1,4 +1,9 @@
 import ROOT, sys
+from glob import glob
+
+if len(sys.argv) == 2 and not sys.argv[1].endswith(".root"):
+    files = glob(sys.argv[1]+"/*.root")
+    sys.argv = [sys.argv[0]] + files
 
 
 for fn in sys.argv[1:]:

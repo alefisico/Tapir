@@ -359,7 +359,6 @@ def getTreeProducer(conf):
         NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
         NTupleVariable("puId", lambda x : x.puId),
     ] + corrs)
-
     #Create the output TTree writer
     #Here we define all the variables that we want to save in the output TTree
     treeProducer = cfg.Analyzer(
@@ -422,7 +421,7 @@ def getTreeProducer(conf):
             NTupleVariable("csv2", lambda ev: getattr(ev, "csv2", -9999), type=float, help="2nd highest jet csv value"),
             NTupleVariable("run", lambda ev: ev.input.run, type=int),
             NTupleVariable("lumi", lambda ev: ev.input.luminosityBlock, type=int),
-            NTupleVariable("evt", lambda ev: ev.input.event, type=int),
+            NTupleVariable("evt", lambda ev: ev.input.event, type=int, storageType="l"),
 
         ],
         globalObjects = {
@@ -467,7 +466,7 @@ def getTreeProducer(conf):
     for pathname, trigs in triggerlist:
         #add trigger path (combination of trigger)
         _pathname = "_".join(["HLT", pathname])
-        if not _pathname in trignames:
+        if not _pathname in trignames and "ttH" in _pathname: #Only save path with ttH in name 
             trignames += [_pathname]
 
         #add individual trigger bits
@@ -476,7 +475,12 @@ def getTreeProducer(conf):
             tn = "HLT_BIT_" + tn
             if not tn in trignames:
                 trignames += [tn]
-
+                
+    for mergedPath in conf.trigger["MergePaths"]:
+        _pathname = "HLT_ttH_"+mergedPath
+        if not _pathname in trignames:
+            trignames += [_pathname]
+            
     for trig in trignames:
         if trig.startswith("HLT_BIT_"):
             trig_ = trig[len("HLT_BIT_"):] #Bit is saved w/o "HLT_BIT_" in the beginning
@@ -487,7 +491,7 @@ def getTreeProducer(conf):
             treeProducer.globalVariables += [NTupleVariable(
                 trig, lambda ev, name=trig: getattr(ev, name, -1), type=int, mcOnly=False
             )]
-
+        
     if conf.general["boosted"] == True:
         treeProducer.globalVariables += [NTupleVariable(
             "n_bjets",
@@ -684,6 +688,7 @@ def getTreeProducer(conf):
         ("puWeight",                float,  "pileup weight"),
         ("puWeightUp",              float,    ""),
         ("puWeightDown",            float,    ""),
+        ("triggerFHWeight", float , "", lambda ev: ev.TriggerFHWeight),
 
         ("genWeight",            float,    "Generator weight", lambda ev: ev.input.genWeight),
 

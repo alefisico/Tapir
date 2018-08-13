@@ -4,7 +4,7 @@ from ROOT import MEM
 
 # integrator options
 #for k in ["FH_4w2h2t", "FH_3w2h2t", "FH_4w2h1t", "FH_0w2h2t", "FH_0w2h1t", "FH_0w1h2t"]:
-
+"""
 for k, v in Conf.mem_configs.items():
     Conf.mem_configs[k].cfg.do_prefit = 0 #selects perms based on highest MEprob (Minimisation)
     Conf.mem_configs[k].cfg.do_perm_filtering = 0 #does runtime pruning of permutations
@@ -13,14 +13,17 @@ for k, v in Conf.mem_configs.items():
     Conf.mem_configs[k].cfg.two_stage = 1 #two_stage integration, not implemented
     Conf.mem_configs[k].cfg.niters = 5 #max number of 2nd-stage iterations, not implemented
     #print "mem_configs[",k,"].cfg.rel = ",Conf.mem_configs[k].cfg.rel 
-
+"""
 #other options
 Conf.general["passall"] = False
+Conf.trigger["calcFHSF"] = True
 Conf.leptons["selection"] = lambda event: event.is_fh 
+
 Conf.mem["selection"] = lambda event: (event.is_fh and event.ht>450 
                                        and event.cat in ["cat7","cat8","cat9","cat10","cat11","cat12"]
                                        #and event.cat in ["cat8"]
                                        )
+
 #Conf.jets["untaggedSelection"] = "btagLR" #or "btagCSV" #DS needs to be set in MEAnalysis_cfg_heppy!!!
 Conf.jets["NJetsForBTagLR"] = 9
 Conf.jets["btagAlgo"] = "btagCSV"

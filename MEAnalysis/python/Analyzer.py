@@ -64,14 +64,13 @@ class PrefilterAnalyzer(Analyzer):
     
     def process(self, event):
         njet = event.input.nJet
-        #btag_csv = [getattr(event.input, "Jet_btagCSV")[nj] for nj in range(njet)]
-        btag_cmva = [getattr(event.input, "Jet_btagCMVA")[nj] for nj in range(njet)]
-        #btag_csv_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CSVM"][1]: x>=wp, btag_csv)
-        btag_cmva_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CMVAM"][1]: x>=wp, btag_cmva)
-        #if not njet >= 4:
-        #if not (len(btag_csv_m) >= 2 or len(btag_cmva_m) >= 2):
-        #    if not self.conf.general["passall"]:
-        #        return False
+        btag_csv = [getattr(event.input, "Jet_btagCSVV2")[nj] for nj in range(njet)]
+        #btag_cmva = [getattr(event.input, "Jet_btagCMVA")[nj] for nj in range(njet)]
+        btag_csv_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CSVM"][1]: x>=wp, btag_csv)
+        #btag_cmva_m = filter(lambda x, wp=self.conf.jets["btagWPs"]["CMVAM"][1]: x>=wp, btag_cmva)
+        if njet < 4 or (len(btag_csv_m) < 1):
+            #if not self.conf.general["passall"]:
+            return False
         return True
 
 class CounterAnalyzer(FilterAnalyzer):
@@ -140,7 +139,6 @@ class EventWeightAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         event.weight_xs = self.xs/float(self.n_gen) if self.n_gen > 0 else 1
-       
 
         return True
 
@@ -257,3 +255,48 @@ class PUWeightAnalyzer(Analyzer):
         self.out.fillEvent(event)
 
         return True
+
+
+class TriggerWeightAnalyzer(Analyzer):
+    """
+    Computes trigger weight from root files containing the SF
+    """
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(TriggerWeightAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.calcSF = cfg_ana._conf.trigger["calcFHSF"]
+        if self.calcSF:
+            sfFile = ROOT.TFile(cfg_ana._conf.trigger["TriggerSFFile"],"READ")
+            self.SF = deepcopy(sfFile.Get(cfg_ana._conf.trigger["TriggerSFHisto"])) #only works with deepcopy
+                
+    def beginLoop(self, setup):
+        super(TriggerWeightAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+        #Only process MC
+        if not self.cfg_comp.isMC:
+            return event 
+
+        if not self.calcSF:
+            event.TriggerFHWeight = 1    
+            return True
+        else:
+            SF = 1
+            nominalEvent = event.systResults["nominal"]
+            #Make the Analyizer save for runnign with pass all!
+            hasCSVHTAttr = hasattr(nominalEvent, "nBCSVM") and hasattr(nominalEvent, "ht30")
+            hasGoodJets = hasattr(nominalEvent, "good_jets")
+            hasSixJets = False
+            if hasGoodJets:
+                hasSixJets = len(nominalEvent.good_jets) >= 6
+            if not (hasCSVHTAttr and hasGoodJets and hasSixJets):
+                event.TriggerFHWeight = 1
+                return True
+            ht, pt, nBSCM = nominalEvent.ht30, getattr(nominalEvent.good_jets[5], "pt"), nominalEvent.nBCSVM
+            _bin = self.SF.FindBin(ht, pt, nBSCM)
+            SF = self.SF.GetBinContent(_bin)
+            #print ht, pt, nBSCM, _bin, SF
+            if SF == 0:
+                SF = 1
+
+            event.TriggerFHWeight = SF
+            return True

@@ -25,7 +25,7 @@ class LeptonAnalyzer(FilterAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(LeptonAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.conf = cfg_ana._conf
-
+        self.printedWarningOnce = False
     def beginLoop(self, setup):
         super(LeptonAnalyzer, self).beginLoop(setup)
 
@@ -117,6 +117,11 @@ class LeptonAnalyzer(FilterAnalyzer):
         event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
         event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
         event.is_fh = (event.n_lep_veto == 0)
+        if self.conf.leptons["force_isFH"]:
+            if not self.printedWarningOnce:
+                LOG_MODULE_NAME.warning("Forcing is_fh to True")
+                self.printedWarningOnce = True
+            event.is_fh = True
         LOG_MODULE_NAME.debug("is_sl={0} is_dl={1} is_fh={2}".format(event.is_sl, event.is_dl, event.is_fh))
 
         #Calculate di-lepton system momentum

@@ -1,20 +1,13 @@
 #when updating this file, don't forget to update also .gitlab-ci.yml
 export SCRAM_ARCH=slc6_amd64_gcc630
 
-cmsrel CMSSW_9_4_6_patch1
-cd CMSSW_9_4_6_patch1/src/
+cmsrel CMSSW_9_4_9
+cd CMSSW_9_4_9/src/
 eval `scramv1 runtime -sh`
 cmsenv 
 git cms-init
 
-#As long as this is the only change to heppy, it not worth dealing w/ merge conflicts in cmssw 
-git cms-addpkg PhysicsTools/HeppyCore
-sed -i s/json=None/json=None,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
-sed -i s/triggers=triggers/triggers=triggers,\ **kwargs/g PhysicsTools/HeppyCore/python/framework/config.py
-
-#merge rebased version of mmeinhard:BoostedNanoAOD
-#inlcudes nanoAOD/master from April 7
-git cms-merge-topic kschweiger:BoostedMiniAODReBaseMasterMay19
+git cms-merge-topic mmeinhard:BoostedNanoAOD
 
 
 git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
@@ -25,7 +18,7 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 cd $CMSSW_BASE/src
 
 #get the TTH code
-git clone ssh://git@gitlab.cern.ch:7999/Zurich_ttH/tthbb13.git TTH --branch SwitchNanoAOD
+git clone ssh://git@gitlab.cern.ch:7999/Zurich_ttH/tthbb13.git TTH --branch FHDev_Aug
 cd $CMSSW_BASE/src/TTH
 
 git submodule update --init --recursive

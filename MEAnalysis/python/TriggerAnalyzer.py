@@ -39,8 +39,10 @@ class TriggerAnalyzer(FilterAnalyzer):
                     LOG_MODULE_NAME.debug("Replacement: {0}".format(trigConf))
                 triglist[targetTrigger] = trigConf
 
+        paths = []
         for pathname, trigs in triglist.items():
             pathBit = False
+            paths.append(pathname)
             for name in trigs:
                 if isinstance(name, tuple):
                     if not self.setOnce:
@@ -75,6 +77,32 @@ class TriggerAnalyzer(FilterAnalyzer):
             bit = int(event.input.__getattr__(name, -1))
             setattr(event, name, bit)
             event.trigvec += [bit == 1]
+            
+        """ 
+        Merge paths as specified in the MergePaths variable in the Trigger config 
+
+        The code will look for path that start with **ttH_** plus the string defined
+        in the variable. All these path will be merged into a path called ttH_variable
+        """
+        for toMerge in self.conf.trigger["MergePaths"]:
+            if "ttH_"+toMerge in paths:
+                if not self.setOnce:
+                    LOG_MODULE_NAME.warning("Path ttH_%s aleady defined in TriggerTable!", toMerge)
+                continue
+            pathbit = False
+            for path in paths:
+                if toMerge in path:
+                    #print path, getattr(event, "HLT_"+path)
+                    pathbit = pathbit or bool(getattr(event, "HLT_"+path))
+            setattr(event, "HLT_ttH_"+str(toMerge), int(pathbit))
+            #print  "HLT_ttH_"+str(toMerge), getattr(event, "HLT_ttH_"+str(toMerge))
+        """ Add all trigger bits that are specified in paths that are not starting with ttH_* """
+        variousTrigList = filter(lambda x: "ttH" not in x[0], self.conf.trigger["trigTable"].items())
+        for pathname, trigs in variousTrigList:
+            for name in trigs:
+                bit = bool(event.input.__getattr__(name, 0))
+                setattr(event, name, bit)
+                event.trigvec += [bit == 1]
         passes = True
         if self.conf.trigger["filter"] and not event.triggerDecision:
             passes = False

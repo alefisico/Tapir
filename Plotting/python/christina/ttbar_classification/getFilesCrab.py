@@ -3,7 +3,7 @@ import os.path
 import argparse
 import ROOT
 
-def makeDatacards(fpath, opath, prefix, treename):
+def makeDatacards(fpath, opath, prefix, treename, countNano):
    
     #need /-terminated string
     if not fpath.endswith("/"):
@@ -21,8 +21,7 @@ def makeDatacards(fpath, opath, prefix, treename):
 
 
     for d in dirs:
-
-        dataset = open(outpath + d + ".txt", "w")
+        dataset = open (outpath + d + ".txt", "w")
         print ("[" + d + "]")
         dataset.write("[" + d + "]\n")
 
@@ -32,9 +31,12 @@ def makeDatacards(fpath, opath, prefix, treename):
                 rootfile = prefix +cf
 
                 # get number of entries
-                rf = ROOT.TFile.Open(rootfile)
-                tree = rf.Get(treename)
-                nevt = tree.GetEntries()  
+                if countNano:
+                    rf = ROOT.TFile.Open(rootfile)
+                    tree = rf.Get(treename)
+                    nevt = tree.GetEntries()
+                else:
+                    nevt = 1 #Set it to 1 so GridControl is happy
               
                 print prefix + cf + " = %i" % nevt
                 dataset.write(prefix + cf + " = %i\n" % nevt)
@@ -46,6 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--outpath", default="/mnt/t3nfs01/data01/shome/creissel/tth/2017/sw/CMSSW_9_4_5_cand1/src/TTH/MEAnalysis/gc/datasets", help="path to store dataset .txt files", type=str)
     parser.add_argument("--prefix", default="root://t3dcachedb.psi.ch/", help="server prefix to add to rootfiles", type=str)
     parser.add_argument("--treename", default="nanoAOD/Events", help="Name of the TTree to retrieve the number of events from", type=str)
+    parser.add_argument("--onlytthbb",  action = "store_false", help="Use this flag, if the list is generated for files only containing the tthbb13 output")
     args = parser.parse_args()
 
-    makeDatacards(args.path, args.outpath, args.prefix, args.treename)
+    makeDatacards(args.path, args.outpath, args.prefix, args.treename, args.onlytthbb)

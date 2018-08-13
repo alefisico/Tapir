@@ -203,6 +203,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         sample_name = dataset if dataset else "sample"
         if sampleName is not None:
             sample_name = sampleName
+        #step1_tree_name = "nanoAOD/Events"
         step1_tree_name = "Events"
         pass
     else:
@@ -324,6 +325,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter_name = "_jet",
     )
 
+    triggerSF = cfg.Analyzer(
+        MECoreAnalyzers.TriggerWeightAnalyzer,
+        "triggerWeight",
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
+    
     #calculates the number of matched simulated B, C quarks for tt+XY matching
     genrad = cfg.Analyzer(
         MECoreAnalyzers.GenRadiationModeAnalyzer,
@@ -463,7 +471,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             counter,
             # memory_ana,
             evtid_filter,
-            # prefilter,
+            #prefilter,
             evs,
 
             #After this, the event object has been created
@@ -478,6 +486,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             jets,
             btagweight,
             counter_jet,
+            triggerSF,
             btaglr,
             counter_blr,
             #btaglr_bdt,
@@ -503,7 +512,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             counter,
             # memory_ana,
             evtid_filter,
-            # prefilter,
+            #prefilter,
             evs,
             boost,
             #After this, the event has been created
