@@ -18,7 +18,7 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 cd $CMSSW_BASE/src
 
 #get the TTH code
-git clone ssh://git@gitlab.cern.ch:7999/Zurich_ttH/tthbb13.git TTH --branch FHDev_Aug
+git clone ssh://git@gitlab.cern.ch:7999/Zurich_ttH/tthbb13.git TTH --branch SwitchNanoAOD
 cd $CMSSW_BASE/src/TTH
 
 git submodule update --init --recursive
