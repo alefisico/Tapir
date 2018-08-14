@@ -499,7 +499,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             #multiclass_analyzer,
             mem_analyzer,
             jointlikelihood_ana,
-            NN_ana,
+            #NN_ana,
             mva,
             treevar,
 
