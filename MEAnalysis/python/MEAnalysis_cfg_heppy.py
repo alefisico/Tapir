@@ -920,8 +920,8 @@ Conf.mem_configs["DL_0w2h2t_sj_perm_higgs"] = c
 # apply btag LR cuts for FH MEM categories only if using btagLR
 # must allow for overlapping 3b and 4b regions (both hypos run)
 bLR = False
-if Conf.jets["untaggedSelection"] == "btagLR":
-    bLR = True
+#if Conf.jets["untaggedSelection"] == "btagLR":
+#    bLR = True
 
 # btag LR cuts for FH MEM categories
 FH_bLR_3b_SR = Conf.mem["FH_bLR_3b_SR"]
