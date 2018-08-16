@@ -16,9 +16,11 @@ parser.add_argument(
 args = parser.parse_args(sys.argv[2:])
 if args.testFH:
     cfgPath = "MEAnalysis/test/config_test_FH.cfg"
+    nEv = 14
 else:
     cfgPath = "MEAnalysis/test/config_test.cfg"
+    nEv = 25
 an = analysisFromConfig(cfgPath)
 
 
-tth_main(an, schema="mc", output_name="Output_ttH", files=_file, loglevel="DEBUG")
+tth_main(an, schema="mc", output_name="Output_ttH", files=_file, loglevel="DEBUG", numEvents=nEv)

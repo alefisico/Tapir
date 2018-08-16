@@ -66,7 +66,7 @@ test_nano_data:
     - cd $CI_HOME
     - cd $CMSSW_BASE/src
     - INPUT="/store/data/Run2017B/MuonEG/MINIAOD/31Mar2018-v1/60000/BA82913F-A639-E811-B3E0-00266CF919B8.root"
-    - cmsDriver.py nano_data --fileout=nano_data_singleMu.root -s NANO --filein $INPUT -n 100 --eventcontent NANOAOD --datatier NANOAOD --data --conditions auto:run2_data --era Run2_2017,run2_nanoAOD_94XMiniAODv2
+    - cmsDriver.py nano_data --fileout=nano_data_singleMu.root -s NANO --filein $INPUT -n 50 --eventcontent NANOAOD --datatier NANOAOD --data --conditions auto:run2_data --era Run2_2017,run2_nanoAOD_94XMiniAODv2
     - mv nano_data_singleMu.root $CI_HOME/
   artifacts:
     paths:
@@ -85,7 +85,7 @@ test_nano_ttH:
     - cd $CI_HOME
     - cd $CMSSW_BASE/src
     - INPUT="/store/mc/RunIIFall17MiniAODv2/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/10000/4C8366C0-4B42-E811-96C5-0017A4771054.root"
-    - cmsDriver.py nano_data --fileout=nano_mc_ttH.root -s NANO --filein $INPUT -n 50 --eventcontent NANOAODSIM --datatier NANOAODSIM --mc --conditions auto:phase1_2017_realistic --era Run2_2017,run2_nanoAOD_94XMiniAODv2
+    - cmsDriver.py nano_data --fileout=nano_mc_ttH.root -s NANO --filein $INPUT -n 25 --eventcontent NANOAODSIM --datatier NANOAODSIM --mc --conditions auto:phase1_2017_realistic --era Run2_2017,run2_nanoAOD_94XMiniAODv2
     - mv nano_mc_ttH.root $CI_HOME/
   artifacts:
     paths:
