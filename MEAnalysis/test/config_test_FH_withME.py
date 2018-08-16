@@ -3,7 +3,7 @@ from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf
 Conf.general["passall"] = False
 Conf.leptons["selection"] = lambda event: event.is_fh 
 Conf.general["systematics"] = ["nominal"]
-
+Conf.jets["untaggedSelection"] = "btagCSV"
 Conf.mem["calcME"] = True
 Conf.mem["selection"] = lambda event: (
     event.is_fh  and event.ht>450

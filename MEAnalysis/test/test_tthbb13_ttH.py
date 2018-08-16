@@ -19,7 +19,7 @@ if args.testFH:
     nEv = 14
 else:
     cfgPath = "MEAnalysis/test/config_test.cfg"
-    nEv = 25
+    nEv = 50
 an = analysisFromConfig(cfgPath)
 
 
