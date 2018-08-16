@@ -209,24 +209,26 @@ class JetAnalyzer(FilterAnalyzer):
         #choose pt cut key based on lepton channel
         pt_cut  = "pt"
         eta_cut = "eta"
+        jetSel = "baseSelection"
         if event.is_sl:
             pt_cut  = "pt_sl"
             eta_cut = "eta_sl"
         elif event.is_dl:
             pt_cut  = "pt_dl"
             eta_cut = "eta_dl"
+            jetSel = "tightSelection"
         
         #define lepton-channel specific selection function
         jetsel = lambda x, self=self, pt_cut=pt_cut, eta_cut=eta_cut: (
             x.pt > self.conf.jets[pt_cut]
             and abs(x.eta) < self.conf.jets[eta_cut]
-            and self.conf.jets["selection"](x)
+            and self.conf.jets[jetSel](x)
         )
         
         jetsel_loose_pt = lambda x, self=self, pt_cut=pt_cut, eta_cut=eta_cut: (
             x.pt > 20
             and abs(x.eta) < self.conf.jets[eta_cut]
-            and self.conf.jets["selection"](x)
+            and self.conf.jets[jetSel](x)
         )
 
         #Identify loose jets by (pt, eta)

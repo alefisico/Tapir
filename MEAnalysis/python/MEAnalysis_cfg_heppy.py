@@ -7,10 +7,14 @@ from ROOT import MEM
 #import VHbbAnalysis.Heppy.TriggerTable as trig
 import TTH.MEAnalysis.TriggerTable as trig
 
+# JetID: 0: noID, 1: looseID, 2: tightID, 4: tightLepVeto (alsways 6), 6: tight+tightLepVeto (see. nanoAOD jets_cff.py)
+# puID: 0: noWP, 4: looseID, 6: mediumID, 7: tightID
 def jet_baseline(jet):
-    #Require that jet must have at least loose POG_PFID
-    #Look in Heppy autophobj.py and Jet.py
-    return (jet.jetId >= 1)
+    #Jet baseline selection: tight JetID + loose PU ID
+    return (jet.jetId >= 2 and jet.puId >= 4)
+
+def jet_baseline_tight(jet):
+    return (jet.jetId >= 2 and jet.puId >= 7)
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
@@ -130,8 +134,6 @@ def print_el(el):
 class Conf:
     leptons = {
         "mu": {
-
-            #SL
             "SL": {
                 "pt": 26,
                 "eta":2.1,
@@ -190,7 +192,7 @@ class Conf:
         # pt, |eta| thresholds for **trailing jets** specific to dl channel
         "pt_dl":  20,
         "eta_dl": 2.4,
-
+        
         # pt threshold for leading jets in fh channel
         "pt_fh": 40,
 
@@ -234,7 +236,8 @@ class Conf:
         "NJetsForBTagLR": 15, #DS
 
         #base jet selection
-        "selection": jet_baseline
+        "baseSelection": jet_baseline,
+        "tightSelection" : jet_baseline_tight
     }
 
     boost = {
