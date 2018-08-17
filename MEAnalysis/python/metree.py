@@ -338,6 +338,7 @@ def getTreeProducer(conf):
         NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
         #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
         NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
+        NTupleVariable("rawPt", lambda x : x.rawPt),
         NTupleVariable("qg_sf", lambda x : getattr(x,"qg_sf",1.), type=float, mcOnly=True),
         NTupleVariable("partonFlavour", lambda x : x.partonFlavour, type=int, mcOnly=True),
         NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int, mcOnly=True),
@@ -357,6 +358,12 @@ def getTreeProducer(conf):
         #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
         NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        #Some SF for sync
+        NTupleVariable("corr_JEC_Up", lambda x : x.pt_corr_TotalUp/x.pt, mcOnly=True),
+        NTupleVariable("corr_JEC_Down", lambda x : x.pt_corr_TotalDown/x.pt, mcOnly=True),
+        NTupleVariable("corr_JEC_PileUpDataMC_Down", lambda x : x.pt_corr_PileUpDataMCDown/x.pt, mcOnly=True),
+        NTupleVariable("corr_JEC_RelativeFSR_Up", lambda x : x.pt_corr_RelativeFSRUp/x.pt, mcOnly=True),
+
         NTupleVariable("puId", lambda x : x.puId),
     ] + corrs)
     #Create the output TTree writer
