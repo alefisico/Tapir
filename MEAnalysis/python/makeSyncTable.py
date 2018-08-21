@@ -46,7 +46,13 @@ def makeOutputline(eventOutputDict):
             if value.endswith(".0000"):
                 value = value[:-len(".0000")]
         else:
-            value = str(eventOutputDict[key])
+            if isinstance(eventOutputDict[key],bool):
+                if eventOutputDict[key]:
+                    value = "1"
+                else:
+                    value = "0"
+            else:
+                value = str(eventOutputDict[key])
         if ikey != nkeys-1:
             outputline += value+","
         else:
@@ -116,6 +122,8 @@ def makeSyncTable(inputFile, outputName, isData):
     eventOutput.update({"csvSF_hf_down": -1})
     eventOutput.update({"csvSF_cErr1_down": -1})
 
+    checkEvent = 3290081
+    
     output = ""
     nVars = len(eventOutput.keys())
     for ikey, key in enumerate(eventOutput.keys()):
@@ -130,7 +138,6 @@ def makeSyncTable(inputFile, outputName, isData):
     logging.info("Will loop over %s events", nEvents)
     tdiff = time.time()
     for iev in range(nEvents):
-        
         for key in eventOutput.keys():
             eventOutput[key] = -1
             
@@ -138,15 +145,20 @@ def makeSyncTable(inputFile, outputName, isData):
         if iev%5000 == 0 and iev != 0:
             logging.info("Event {0:10d} | Total time: {1:8f} | Diff time {2:8f}".format(iev, time.time()-t0,time.time()-tdiff))
             tdiff = time.time()
-
+            
+        
+        addHLTCut4Cats = True
+        
         #Meta varibales
         eventOutput["run"] = tree.run
         eventOutput["lumi"] = tree.lumi
         eventOutput["event"] = tree.evt
+        if tree.evt == checkEvent:
+            print ":::::::::::::::"
         #Categories
         eventOutput["is_e"] = int(tree.is_sl and abs(tree.leps_pdgId[0]) == 11)
         eventOutput["is_mu"] = int(tree.is_sl and abs(tree.leps_pdgId[0]) == 13)
-        eventOutput["is_ee"] = int(tree.is_dl and abs(tree.leps_pdgId[0] == 11) and abs(tree.leps_pdgId[1]) == 11)
+        eventOutput["is_ee"] = int(tree.is_dl and abs(tree.leps_pdgId[0]) == 11 and abs(tree.leps_pdgId[1]) == 11)
         eventOutput["is_emu"] = int(tree.is_dl
                                     and (
                                         (abs(tree.leps_pdgId[0]) == 11 and abs(tree.leps_pdgId[1]) == 13)
@@ -154,6 +166,15 @@ def makeSyncTable(inputFile, outputName, isData):
                                     )
         )
         eventOutput["is_mumu"] = int(tree.is_dl and abs(tree.leps_pdgId[0]) == 13 and abs(tree.leps_pdgId[1]) == 13)
+
+
+        if addHLTCut4Cats:
+            eventOutput["is_e"] = eventOutput["is_e"] == 1 and tree.HLT_ttH_SL_el == 1
+            eventOutput["is_mu"] = eventOutput["is_mu"]  == 1 and tree.HLT_ttH_SL_mu == 1 
+            eventOutput["is_ee"] = eventOutput["is_ee"] == 1 and (tree.HLT_ttH_DL_elel == 1 or tree.HLT_ttH_SL_el == 1)
+            eventOutput["is_emu"] =eventOutput["is_emu"] == 1 and (tree.HLT_ttH_DL_elmu == 1 or tree.HLT_ttH_SL_el == 1 or tree.HLT_ttH_SL_mu == 1 )
+            eventOutput["is_mumu"] =  eventOutput["is_mumu"] == 1 and (tree.HLT_ttH_DL_mumu == 1 or tree.HLT_ttH_SL_mu == 1)
+
         #Leptons
         if tree.is_sl or tree.is_dl:
             eventOutput["lep1_pt"] = tree.leps_pt[0]
@@ -206,14 +227,82 @@ def makeSyncTable(inputFile, outputName, isData):
             eventOutput["mll"] = tree.ll_mass
         eventOutput["ttHFCategory"] = tree.ttCls
         #eventOutput["ttHFGenFilterTag"] = 
-        eventOutput["n_interactions"] = tree.nPVs
+        eventOutput["n_interactions"] = tree.Pileup_nTrueInt#nPVs
         eventOutput["puWeight"] = tree.puWeight
         eventOutput["csvSF"] = tree.btagWeight_shape
         eventOutput["csvSF_lf_up"] = tree.btagWeight_shapeLFUp
         eventOutput["csvSF_hf_down"] = tree.btagWeight_shapeHFDown
         eventOutput["csvSF_cErr1_down"] = tree.btagWeight_shapeCFERR1Down
+
+        if tree.evt == checkEvent:
+            print eventOutput
+            print tree.HLT_ttH_DL_elel, tree.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL, tree.HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ
+
+
+        if tree.evt == checkEvent:
+            logging.warning("Starting event selection: %s", checkEvent)
+
+            
+        if not (tree.HLT_ttH_SL_el == 1 or tree.HLT_ttH_SL_mu == 1 or tree.HLT_ttH_DL_mumu == 1 or tree.HLT_ttH_DL_elmu == 1 or tree.HLT_ttH_DL_elel == 1):
+            continue
+        if tree.evt == checkEvent:
+            logging.warning("Event passed general HLT cut")
         
+        if not (tree.Flag_goodVertices == 1 and tree.Flag_globalSuperTightHalo2016Filter == 1 and tree.Flag_HBHENoiseFilter == 1 and
+                tree.Flag_HBHENoiseIsoFilter == 1 and tree.Flag_EcalDeadCellTriggerPrimitiveFilter == 1 and tree.Flag_BadPFMuonFilter == 1 and
+                tree.Flag_BadChargedCandidateFilter == 1 and tree.Flag_eeBadScFilter == 1 and tree.Flag_ecalBadCalibFilter):
+            continue
+        if tree.evt == checkEvent:
+            logging.warning("Event passed met filters")
         
+        if tree.passPV < 1:
+            continue
+
+        if tree.evt == checkEvent:
+            logging.warning("Event passed PV cut")
+
+        if eventOutput["is_ee"] or eventOutput["is_mumu"] or eventOutput["is_emu"]:
+            if tree.ll_mass < 20:
+                continue
+
+        sign = lambda x: (1, -1)[x < 0]
+        if eventOutput["is_ee"] or eventOutput["is_mumu"] or eventOutput["is_emu"]:
+            if sign(eventOutput["lep1_pdgId"]) == sign(eventOutput["lep2_pdgId"]):
+                continue
+            
+            if tree.evt == checkEvent:
+                logging.warning("Event passing opposite sign lepton")
+            
+        if tree.evt == checkEvent:
+            logging.warning("Event passed mll > 20 cut")
+        if eventOutput["is_ee"] or eventOutput["is_mumu"]:
+            if tree.ll_mass > 76 and tree.ll_mass < 106:
+                continue
+            if tree.evt == checkEvent:
+                logging.warning("Event passed mll dl cuts")
+            if tree.met_pt < 40:
+                if tree.evt == checkEvent:
+                    logging.warning("Event failing DL met cuts (%s)", tree.met_pt)
+                continue
+            if tree.evt == checkEvent:
+                logging.warning("Event passed met cuts")
+
+
+        if eventOutput["is_e"] == 1 or eventOutput["is_mu"] == 1:
+            if tree.met_pt < 20:
+                if tree.evt == checkEvent:
+                    logging.warning("Event failing SL met cuts (%s)", tree.met_pt)
+                continue
+                
+        if ( eventOutput["is_e"] == 0 and eventOutput["is_mu"] == 0
+             and eventOutput["is_ee"] == 0 and eventOutput["is_emu"] == 0
+             and eventOutput["is_mumu"] == 0):
+            if tree.evt == checkEvent:
+                logging.warning("No fs flag set for event!")
+            continue
+        
+        if tree.evt == checkEvent:
+            logging.warning("Event passed all general selections")
 
         ########################################################
         ############# Writing all values in a line #############
