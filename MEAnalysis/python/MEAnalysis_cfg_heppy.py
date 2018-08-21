@@ -97,6 +97,15 @@ def el_baseline_loose(el):
     ret = ( el.eleCutId >= 2 and
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
+            and (
+                (el.dz < 0.10 and sca <= 1.479) #Barrel
+                 or (el.dz < 0.20 and sca > 1.479) #Endcap
+            ) 
+            and (
+                (el.dxy < 0.05 and sca <= 1.478) #Barrel
+                 or (el.dxy < 0.1 and sca > 1.479) #Endcap
+            )
+                 
     )
 
     return ret
@@ -106,6 +115,14 @@ def el_baseline_medium(el):
     ret = ( el.eleCutId >= 3 and
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
+            and (
+                (el.dz < 0.10 and sca <= 1.479) #Barrel
+                 or (el.dz < 0.20 and sca > 1.479) #Endcap
+            ) 
+            and (
+                (el.dxy < 0.05 and sca <= 1.478) #Barrel
+                 or (el.dxy < 0.1 and sca > 1.479) #Endcap
+            )
     )
 
     return ret
@@ -118,6 +135,15 @@ def el_baseline_tight(el):
     ret = ( el.eleCutId >= 4 and #tight ID as per nanoAOD bitmap mapper
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
+            and (
+                (el.dz < 0.10 and sca <= 1.479) #Barrel
+                 or (el.dz < 0.20 and sca > 1.479) #Endcap
+            ) 
+            and (
+                (el.dxy < 0.05 and sca <= 1.478) #Barrel
+                 or (el.dxy < 0.1 and sca > 1.479) #Endcap
+            )
+
     )
             
     return ret
@@ -167,7 +193,7 @@ class Conf:
             "veto": {
                 "pt": 15.0,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el),
+                "idcut": lambda el: el_baseline_tight(el),
             },
             #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff
             "isotype": "relIso03", #KS: changed for nanoAOD.
@@ -221,7 +247,7 @@ class Conf:
 
             #Note: these working points are currently NOT correct
             "DeepCSVL": ("btagDeepCSV", 0.1522),
-            "DeepCSVM": ("btagDeepCSV", 0.4641),
+            "DeepCSVM": ("btagDeepCSV", 0.4941),
             "DeepCSVT": ("btagDeepCSV", 0.8001),
 
             #Removed CMVA since not supported (at least in the BtagRecommendation94X
@@ -297,7 +323,6 @@ class Conf:
         "systematics": [
             "nominal",
         ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
-
 
         #If the list contains:
         # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons
