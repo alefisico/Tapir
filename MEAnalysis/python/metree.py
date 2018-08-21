@@ -556,18 +556,32 @@ def getTreeProducer(conf):
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
-        "Flag_goodVertices", 
-        #"Flag_GlobalTightHalo2016Filter", #Not in nanoAOD
         "Flag_HBHENoiseFilter",
         "Flag_HBHENoiseIsoFilter",
+        "Flag_CSCTightHaloFilter",
+        "Flag_CSCTightHaloTrkMuUnvetoFilter",
+        "Flag_CSCTightHalo2015Filter",
+        "Flag_globalTightHalo2016Filter",
+        "Flag_globalSuperTightHalo2016Filter",
+        "Flag_HcalStripHaloFilter",
+        "Flag_hcalLaserEventFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
+        "Flag_EcalDeadCellBoundaryEnergyFilter",
+        "Flag_ecalBadCalibFilter",
+        "Flag_goodVertices",
         "Flag_eeBadScFilter",
-
-        #TODO: These need to be added to VHBB somehow
-        # "Flag_BadPFMuonFilter",
-        # "Flag_BadChargedCandidateFilter",
-        # "badGlobalMuonTagger",
-        # "cloneGlobalMuonTagger",
+        "Flag_ecalLaserCorrFilter",
+        "Flag_trkPOGFilters",
+        "Flag_chargedHadronTrackResolutionFilter",
+        "Flag_muonBadTrackFilter",
+        "Flag_BadChargedCandidateFilter",
+        "Flag_BadPFMuonFilter",
+        "Flag_BadChargedCandidateSummer16Filter",
+        "Flag_BadPFMuonSummer16Filter",
+        "Flag_trkPOG_manystripclus53X",
+        "Flag_trkPOG_toomanystripclus53X",
+        "Flag_trkPOG_logErrorTooManyClusters",
+        "Flag_METFilters",
     ]
     for metfilter in metfilter_flags:
         treeProducer.globalVariables += [NTupleVariable(
