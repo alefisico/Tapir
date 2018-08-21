@@ -6,6 +6,8 @@ import copy
 from collections import OrderedDict
 import logging
 
+LOG_MODULE_NAME = logging.getLogger(__name__)
+
 #FIXME: understand the effect of cropping the transfer functions
 def attach_jet_transfer_function(jet, conf):
     """
@@ -172,9 +174,9 @@ class JetAnalyzer(FilterAnalyzer):
                 evdict[syst].changes_jet_category = True
                 # Only consider the first change in Category
                 if not event.catChange: #DS
-                    logging.info(syst+" invokes catChange from (j,b): {0},{1} to {2},{3}".format(nj_nominal,nt_nominal,nj,nt))
+                    LOG_MODULE_NAME.info(syst+" invokes catChange from (j,b): {0},{1} to {2},{3}".format(nj_nominal,nt_nominal,nj,nt))
                     if not pass_nominal:
-                        logging.debug("   --> nominal did not pass")
+                        LOG_MODULE_NAME.debug("   --> nominal did not pass")
                     event.catChange = deepcopy( evdict[syst] ) #requires change in BufferedTree class
                     event.catChange.systematic = "CatChange"
                     event.catChange.changes_jet_category = False
@@ -200,11 +202,9 @@ class JetAnalyzer(FilterAnalyzer):
         #injets = event.Jet+event.DiscardedJet
         event.injets = event.Jet
         #pt-descending input jets
-        if "input" in self.conf.general["verbosity"]:
-            autolog("jets input") 
+        if LOG_MODULE_NAME.parent.level <= 10:
             for ij, j in enumerate(event.injets):
-                autolog("InJetReco", ij, j.pt, j.eta, j.phi, j.mass, j.btagCMVA, j.partonFlavour)
-                autolog("InJetGen", ij, j.mcPt, j.mcEta, j.mcPhi, j.mcM)
+                LOG_MODULE_NAME.debug("InJetReco {0},pt = {1:06.2f}, eta = {2:05.2f},  deepcsv = {3:1.2f}, jetID = {4}, PUID = {5} ".format(ij, j.pt, j.eta, j.btagDeepCSV, j.jetId, j.puId))
 
         #choose pt cut key based on lepton channel
         pt_cut  = "pt"
@@ -246,14 +246,11 @@ class JetAnalyzer(FilterAnalyzer):
                 lv2 = lvec(lep)
                 dr = lv1.DeltaR(lv2)
                 if dr < 0.4:
-                    if "jets" in self.conf.general["verbosity"] or "debug" in self.conf.general["verbosity"]:
-                        autolog("[jet lepton cleaning] deltaR", dr, lep.pt, lep.eta, lep.phi, jet.pt, jet.eta, jet.phi)
                     jets_to_remove += [jet]
 
         #Now actually remove the overlapping jets
         for jet in jets_to_remove:
-            if "jets" in self.conf.general["verbosity"] or "debug" in self.conf.general["verbosity"]:
-                autolog("removing jet", jet.pt, jet.eta)
+            LOG_MODULE_NAME.debug("removing jet pt = {0:06.2f}, eta =  {1:05.2f}".format(jet.pt, jet.eta))
             if jet in loose_jets:
                 loose_jets.remove(jet)
         
@@ -274,6 +271,15 @@ class JetAnalyzer(FilterAnalyzer):
         event.good_jets = filter(jetsel, loose_jets)
         event.loose_jets = filter(lambda x, event=event: x not in event.good_jets, loose_jets) 
 
+        if LOG_MODULE_NAME.parent.level <= 10:
+            LOG_MODULE_NAME.debug("Loose jets: "+str(len(event.loose_jets)))
+            for ix,x in enumerate(event.loose_jets):
+                LOG_MODULE_NAME.debug("Jet: {0} - pt = {1:06.2f}, eta= {2:05.2f}, btag= {3:01.4f}".format(ix, x.pt, x.eta, x.btagDeepCSV))
+            LOG_MODULE_NAME.debug("Good jets:"+str(len(event.good_jets)))
+            for ix,x in enumerate(event.good_jets):
+                LOG_MODULE_NAME.debug("Jet: {0} - pt = {1:06.2f}, eta= {2:05.2f}, btag= {3:01.4f}".format(ix, x.pt, x.eta, x.btagDeepCSV))
+
+            
         if "debug" in self.conf.general["verbosity"]:
             autolog("All jets: ", len(event.injets))
             for ix, x in enumerate(event.injets):
@@ -341,7 +347,7 @@ class JetAnalyzer(FilterAnalyzer):
                 autolog("fails because SL NJ<3")
             passes = False
         elif event.is_dl:
-            if not (len(event_proxy.good_jets) >= 4 and getattr(event_proxy,"nB"+btag_wp)>=2):
+            if not (len(event_proxy.good_jets) >= 2 and getattr(event_proxy,"nB"+btag_wp)>=1):
                 if "debug" in self.conf.general["verbosity"]:
                     autolog("fails because DL NJ<2")
                 passes = False

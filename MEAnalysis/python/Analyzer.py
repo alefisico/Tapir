@@ -158,15 +158,15 @@ class LumiListAnalyzer(FilterAnalyzer):
         ll = LumiList(path)
         
         self.lls = set(ll.getLumis())
-
+        
     def beginLoop(self, setup):
         super(LumiListAnalyzer, self).beginLoop(setup)
 
     def process(self, event):
         run_lumi = (event.input.run, event.input.luminosityBlock)
         event.json = run_lumi in self.lls
-
-       
+        
+        #LOG_MODULE_NAME.debug("Event %s/%s in JSON: %s",event.input.run, event.input.luminosityBlock, event.json)
         
         event.runrange = -1
         for irunrange, runrange in enumerate(self.runranges):

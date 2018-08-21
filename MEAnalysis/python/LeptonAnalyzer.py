@@ -98,9 +98,10 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         #end of id_type loop
         event.lep_SL = sorted(event.lep_SL, key=lambda x: x.pt, reverse=True)
+        LOG_MODULE_NAME.debug("Lep_SL: "+ " " + str([(x.pt, x.eta, x.pdgId) for x in event.lep_SL]))
         event.lep_DL = sorted(event.lep_DL, key=lambda x: x.pt, reverse=True)
+        LOG_MODULE_NAME.debug("Lep_DL: "+ " " + str([(x.pt, x.eta, x.pdgId) for x in event.lep_DL]))
         event.lep_veto = sorted(event.lep_veto, key=lambda x: x.pt, reverse=True)
-
         #Apply two-stage pt cut on DL leptons
         lep_DL_afterpt = []
         for lep in event.lep_DL:
