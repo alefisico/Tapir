@@ -16,7 +16,7 @@ for k, v in Conf.mem_configs.items():
 """
 #other options
 Conf.general["passall"] = False
-Conf.trigger["calcFHSF"] = True
+Conf.trigger["calcFHSF"] = False
 Conf.leptons["selection"] = lambda event: event.is_fh 
 
 Conf.mem["selection"] = lambda event: (event.is_fh and event.ht>450 
@@ -24,10 +24,10 @@ Conf.mem["selection"] = lambda event: (event.is_fh and event.ht>450
                                        #and event.cat in ["cat8"]
                                        )
 
-#Conf.jets["untaggedSelection"] = "btagLR" #or "btagCSV" #DS needs to be set in MEAnalysis_cfg_heppy!!!
+Conf.jets["untaggedSelection"] = "btagCSV" # or "btagLR" #DS need to set bLR in MEAnalysis_cfg_heppy!!!
 Conf.jets["NJetsForBTagLR"] = 9
 Conf.jets["btagAlgo"] = "btagCSV"
-
+Conf.jets["btagWP"] = "CSVM"
 
 Conf.mem["calcME"] = True
 Conf.mem["weight"] = 0.02 #k in Psb = Ps/(Ps+k*Pb)    

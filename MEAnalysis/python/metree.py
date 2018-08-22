@@ -154,9 +154,8 @@ memPermType = NTupleObjectType("memPermType", variables = [
     NTupleVariable("p_me_std", lambda x : x.p_me_std),
 ] + perm_vars)
 
-
-FoxWolframType = NTupleObjectType("FoxWolframType", variables = [
-    NTupleVariable("v", lambda x : x),
+arrayType = NTupleObjectType("arrayType", variables = [ #generic vector variable
+    NTupleVariable("", lambda x : x),
 ])
 
 topCandidateType = NTupleObjectType("topCandidateType", variables = [
@@ -358,6 +357,11 @@ def getTreeProducer(conf):
         NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
         NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
         NTupleVariable("puId", lambda x : x.puId),
+        NTupleVariable("CSVrank", lambda x : getattr(x, "CSVrank", -99), type=int),
+        NTupleVariable("CSVindex", lambda x : getattr(x, "CSVindex", -99), type=int),
+        NTupleVariable("dRmax", lambda x : getattr(x, "dRmax", -99), type=float),
+        NTupleVariable("dRmin", lambda x : getattr(x, "dRmin", -99), type=float),
+        NTupleVariable("dRave", lambda x : getattr(x, "dRave", -99), type=float),
     ] + corrs)
     #Create the output TTree writer
     #Here we define all the variables that we want to save in the output TTree
@@ -640,6 +644,7 @@ def getTreeProducer(conf):
         if systematic == "nominal":
             syst_suffix2 = ""
        
+        treeProducer.collections.update({"Detaj"+syst_suffix : NTupleCollection("Detaj"+syst_suffix2, arrayType, 15, help="Average deltaEta to (N+1)th closest jet", mcOnly=is_mc_only)})
         #add nominal and systematically variated final MEM ratios
         #these are simple scalars already
         for hypo in conf.mem["methodsToRun"]:

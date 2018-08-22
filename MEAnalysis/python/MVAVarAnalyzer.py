@@ -67,6 +67,8 @@ class MVAVarAnalyzer(FilterAnalyzer):
 
     def process(self, event):
         for (syst, event_syst) in event.systResults.items():
+            #vector variables must always be present!
+            setattr(event_syst, 'Detaj', [])
             #print syst, event_syst.__dict__
             if event_syst.passes_btag:
                 res = self._process(event_syst)
@@ -218,21 +220,39 @@ class MVAVarAnalyzer(FilterAnalyzer):
         #all jet variables
         bigJmass = 9999.0
         mjjmin = -99.0
+        njets = len(event.good_jets)
+        Detaj = [0.0 for x in range(njets)]
         for j1 in event.good_jets:
+            detamin = [99 for x in range(njets-1)]
             for j2 in event.good_jets:
                 if j1==j2:
                     continue
+                #calculate minimum dijet mass
                 l1 = lvec(j1)
                 l2 = lvec(j2)
                 mass = (l1+l2).M()
                 if mass<bigJmass:
                     bigJmass = mass
                     mjjmin = mass
+                #calcualte delta Eta variables
+                deta = abs(j1.eta - j2.eta)
+                for x in range(njets-1):
+                    if deta < detamin[x]:
+                        for k in range((njets-2),(x-1),-1):
+                            if k==x:
+                                detamin[k] = deta
+                            else:
+                                detamin[k] = detamin[k-1]
+                        break
+            for k in range(njets-1):
+                Detaj[k] += detamin[k]
+        for k in range(njets-1):
+            Detaj[k] = Detaj[k] / njets
+        event.Detaj = Detaj
         event.mjjmin = mjjmin
 
         #csv rank variables (nominal only)
         if event.systematic=="nominal":
-            njets = len(event.good_jets)
             for i in range(njets):
                 maxCSV = -99.0
                 maxjet = -99
