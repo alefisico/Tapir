@@ -587,6 +587,11 @@ def getTreeProducer(conf):
         treeProducer.globalVariables += [NTupleVariable(
             metfilter, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
         )]
+    
+    treeProducer.globalVariables += [NTupleVariable(
+        "passMETFilters", lambda ev, name="passMETFilters": getattr(ev, "passMETFilters", -1), type=int, mcOnly=False
+        )]
+                                                                    
        
     #Add systematically variated quantities
     for systematic in conf.general["systematics"]:

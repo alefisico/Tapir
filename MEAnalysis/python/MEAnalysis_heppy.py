@@ -256,6 +256,15 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
+    
+    #Set passMETFilters flag according to list in config
+    metfilter_ana = cfg.Analyzer(
+        MECoreAnalyzers.METFilterAnalyzer,
+        'metfilter',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
+    
     #Set the json flag according to the provided data json
     lumilist_ana = cfg.Analyzer(
         MECoreAnalyzers.LumiListAnalyzer,
@@ -476,6 +485,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
 
             #After this, the event object has been created
             lumilist_ana,
+            metfilter_ana,
             #puweight_ana, #possible to recompute the PU weight on the fly by uncommenting
             gentth_pre,
             pvana,
@@ -517,6 +527,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             boost,
             #After this, the event has been created
             lumilist_ana,
+            metfilter_ana,
             #puweight_ana,
             gentth_pre,
             pvana,

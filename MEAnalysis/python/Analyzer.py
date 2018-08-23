@@ -198,7 +198,10 @@ class PrimaryVertexAnalyzer(FilterAnalyzer):
             #cannot use passAll here because we want to ntuplize the primary vertex, in case it doesn't exist, the
             #code will fail
             return False
-        return True
+        if not self.conf.general["passall"]:
+            return event.passPV        
+        else:
+            return True
 
 
 class NanoOutputEmulator:
@@ -300,3 +303,34 @@ class TriggerWeightAnalyzer(Analyzer):
 
             event.TriggerFHWeight = SF
             return True
+
+class METFilterAnalyzer(Analyzer):
+    """
+    Creates combination flag of MET data quality filters defiend in config.
+    """
+    
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(METFilterAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.conf = cfg_ana._conf
+        if cfg_comp.isMC:
+            self.METFilterList = self.conf.general["METFilterMC"]
+            LOG_MODULE_NAME.debug("Loading MC METFilters")
+        else:
+            self.METFilterList = self.conf.general["METFilterData"]
+            LOG_MODULE_NAME.debug("Loading Data METFilters")
+
+    def beginLoop(self, setup):
+        super(METFilterAnalyzer, self).beginLoop(setup)
+
+    def process(self, event):
+
+        passesFilter = False
+        for ifilter, _filter in enumerate(self.METFilterList):
+            filterVal = getattr(event.input,  _filter)
+            if ifilter == 0:
+                passesFilter = filterVal
+            else:
+                passesFilter = passesFilter and filterVal
+
+        event.passMETFilters = passesFilter
+        return True
