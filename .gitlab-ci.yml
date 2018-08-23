@@ -41,7 +41,7 @@ compile:
     - eval `scramv1 runtime -sh`
     - git cms-init
     - git cms-merge-topic mmeinhard:BoostedNanoAOD
-    - git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
+    - git clone https://github.com/kschweiger/nanoAOD-tools.git -b addCorr PhysicsTools/NanoAODTools
     - cp -r $CI_HOME TTH
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml

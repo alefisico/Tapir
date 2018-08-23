@@ -10,7 +10,8 @@ git cms-init
 git cms-merge-topic mmeinhard:BoostedNanoAOD
 
 
-git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
+#git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
+git clone https://github.com/kschweiger/nanoAOD-tools.git -b addCorr PhysicsTools/NanoAODTools
 #If need some additional patches on nanoAOD-tools, do this:
 #cd PhysicsTools/NanoAODTools
 #git remote add korbinian-nanoTools https://github.com/kschweiger/nanoAOD-tools.git
