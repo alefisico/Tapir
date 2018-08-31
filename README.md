@@ -166,6 +166,14 @@ The currently used samples are listed below. Generally, they are stored at T3_CH
 | [May1](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May21) | May1 | data, no nPVs |
 | [May2](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/SwitchNanoAOD/MEAnalysis/gc/datasets/May2) | May2 | MC, no btagSF, wrong lepton veto criteria |
 
+## Delphes files
+| process | tag | number of events | comments |
+|-----------------|--------------|----------|
+| ttH(bb) | Jun04 | 3720000 | old Delphes topology with AK5 jets | 
+| ttbb | Jun04 | 1920000 | old Delphes topology with AK5 jets, wrong BR of top decays |
+| ttH(bb) | Aug21_Delphes | 1590000 (by Maren) | new Delphes topology, boosted variabled included |
+| ttbar | Aug21_Delphes | 1960000 | new Delphes topology, boosted variables included |
+
 # Misc
 
 ## Copying nanoAOD ntuples
