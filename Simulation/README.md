@@ -1,8 +1,8 @@
 # Simulation instructions
 
-### LHE-GENSIM files for RunIISummer15wmLHEGS-MCRUN2_71_V1-v1
+### LHE-GENSIM files for RunIIFall17wmLHEGS-93X_mc2017_realistic_v3-v1
 
-This instructions are based on this (sample)[https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/TOP-RunIIFall17wmLHEGS-00034]
+This instructions are based on this [sample](https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/TOP-RunIIFall17wmLHEGS-00034).
 
 ~~~
 export SCRAM_ARCH=slc6_amd64_gcc630
@@ -15,5 +15,5 @@ scram b -j 5
 ~~~
 
 To run step0 (GENSIM from lhe file):
-python config file is: `step0_LHESIM_crab_cfg.py`
-crab file is: `crab_submit.py`
+* python config file is: `step0_LHESIM_crab_cfg.py`
+* crab file is: `crab_submit.py`
