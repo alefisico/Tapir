@@ -13,8 +13,8 @@ config.Data.unitsPerJob = 1000
 NJOBS = 2980
 config.Data.totalUnits = config.Data.unitsPerJob * NJOBS
 config.Data.publication = True
-config.Data.outputDatasetTag = 'RunIIFall17wmLHEGS-93X_mc2017_realistic_v3-v1_GENSIM'
-config.JobType.numCores = 8
+config.Data.outputDatasetTag = 'RunIIFall17wmLHEGS-93X_mc2017_realistic_v3-v1_privateGENSIM'
+#config.JobType.numCores = 8
 
 config.Site.storageSite = 'T2_CH_CSCS'
 config.Site.whitelist = ['T2_CH_CSCS']
