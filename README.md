@@ -171,10 +171,11 @@ The currently used samples are listed below. Generally, they are stored at T3_CH
 |-----------------|--------------|----------|----------|
 | [ttH(bb)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Jun04/Delphes_ttH.txt) | Jun04 | 3720000 | old Delphes topology with AK5 jets | 
 | [ttbb](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Jun04/Delphes_ttbb_inclusive.txt) | Jun04 | 1920000 | old Delphes topology with AK5 jets, wrong BR of top decays |
-| [ttH(bb)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse08/MEAnalysis/gc/datasets/Aug21_Delphes/ttHbb.txt) | Aug21_Delphes | 3650000 | new Delphes topology, boosted variabled included |
+| [ttH(bb)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse08/MEAnalysis/gc/datasets/Aug21_Delphes/ttHbb.txt) | Aug21_Delphes | 5529368 | new Delphes topology, boosted variabled included |
 | [ttbar](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Aug21_Delphes/ttbar.txt) | Aug21_Delphes | 2540000 | new Delphes topology, boosted variables included |
 | [ttbb (SL)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Aug21_Delphes/ttbb_semileptonic.txt) | Aug21_Delphes | 2740000 | new Delphes topology (AK4 jets), boosted variables included |
-| [ttbb (FH)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Aug21_Delphes/ttbb_hadronic.txt) | Aug21_Delphes | 580000 | new Delphes topology (AK4 jets), boosted variables included |
+| [ttbb (FH)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Aug21_Delphes/ttbb_hadronic.txt) | Aug21_Delphes | 2980000 | new Delphes topology (AK4 jets), boosted variables included |
+| [ttbb (DL)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Aug21_Delphes/ttbb_dileptonic.txt) | Aug21_Delphes | 2080000 | new Delphes topology (AK4 jets), boosted variables included |
 
 # Misc
 
