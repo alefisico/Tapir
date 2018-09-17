@@ -11,8 +11,8 @@ before_script:
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
   - export CI_HOME="$( pwd )"
   - git config --global user.name 'CERN CI'
-  - git config --global user.email 'korbinian.schweiger@cern.ch'
-  - git config --global user.github kschweiger
+  - git config --global user.email 'alejandro.gomez@cern.ch'
+  - git config --global user.github alefisico
   - git submodule update --init --recursive
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc630"
@@ -58,6 +58,7 @@ compile:
 test_nano_data:
   tags: [ cvmfs ]
   stage: test_nano
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -77,6 +78,7 @@ test_nano_data:
 test_nano_ttH:
   tags: [ cvmfs ]
   stage: test_nano
+  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
