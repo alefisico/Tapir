@@ -58,7 +58,6 @@ compile:
 test_nano_data:
   tags: [ cvmfs ]
   stage: test_nano
-  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
@@ -66,7 +65,8 @@ test_nano_data:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src
-    - INPUT="/store/data/Run2017B/MuonEG/MINIAOD/31Mar2018-v1/60000/BA82913F-A639-E811-B3E0-00266CF919B8.root"
+    - #INPUT="/store/data/Run2017B/MuonEG/MINIAOD/31Mar2018-v1/60000/BA82913F-A639-E811-B3E0-00266CF919B8.root"
+    INPUT="file:/afs/cern.ch/work/a/algomez/ttH/Files/MuonEG_Run2017B_31Mar2018-v1_MINIAOD.root"
     - cmsDriver.py nano_data --fileout=nano_data_singleMu.root -s NANO --filein $INPUT -n 50 --eventcontent NANOAOD --datatier NANOAOD --data --conditions auto:run2_data --era Run2_2017,run2_nanoAOD_94XMiniAODv2
     - mv nano_data_singleMu.root $CI_HOME/
   artifacts:
@@ -78,7 +78,6 @@ test_nano_data:
 test_nano_ttH:
   tags: [ cvmfs ]
   stage: test_nano
-  allow_failure: true
   script:
     - cd $CI_HOME/..
     - tar xfz $CI_HOME/cmssw.tgz
