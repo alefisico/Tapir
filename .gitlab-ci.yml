@@ -67,6 +67,7 @@ test_nano_data:
     - cd $CMSSW_BASE/src
     - INPUT="MuonEG_Run2017B_31Mar2018-v1_MINIAOD_200evts.root"
     - scp ${KRB_USERNAME}@lxplus.cern.ch:/afs/cern.ch/work/a/algomez/ttH/Files/${INPUT} .
+    - ll -h 
     - cmsDriver.py nano_data --fileout=nano_data_singleMu.root -s NANO --filein file:$INPUT -n 50 --eventcontent NANOAOD --datatier NANOAOD --data --conditions auto:run2_data --era Run2_2017,run2_nanoAOD_94XMiniAODv2
     - mv nano_data_singleMu.root $CI_HOME/
   artifacts:
