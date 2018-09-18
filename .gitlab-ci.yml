@@ -10,9 +10,9 @@ before_script:
   - source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
   - source /cvmfs/cms.cern.ch/cmsset_default.sh
   - export CI_HOME="$( pwd )"
-  - git config --global user.name 'CERN CI'
-  - git config --global user.email 'alejandro.gomez@cern.ch'
-  - git config --global user.github alefisico
+  - git config --global user.name 'Rocky Balboa'     ## dummy name
+  - git config --global user.email 'fake@mail.yes'   ## does not
+  - git config --global user.github 'rocky'          ## matter
   - git submodule update --init --recursive
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc630"
@@ -65,9 +65,10 @@ test_nano_data:
     - eval `scramv1 runtime -sh`
     - cd $CI_HOME
     - cd $CMSSW_BASE/src
+    - INPUT="MuonEG_Run2017B_31Mar2018-v1_MINIAOD_200evts.root"
+    - scp ${KRB_USERNAME}@lxplus.cern.ch:/afs/cern.ch/work/a/algomez/ttH/Files/${INPUT} .
     #- INPUT="/store/data/Run2017B/MuonEG/MINIAOD/31Mar2018-v1/60000/BA82913F-A639-E811-B3E0-00266CF919B8.root"
-    - INPUT="file:/afs/cern.ch/user/a/algomez/public/MuonEG_Run2017B_31Mar2018-v1_MINIAOD.root"
-    - cmsDriver.py nano_data --fileout=nano_data_singleMu.root -s NANO --filein $INPUT -n 50 --eventcontent NANOAOD --datatier NANOAOD --data --conditions auto:run2_data --era Run2_2017,run2_nanoAOD_94XMiniAODv2
+    - cmsDriver.py nano_data --fileout=nano_data_singleMu.root -s NANO --filein file:$INPUT -n 50 --eventcontent NANOAOD --datatier NANOAOD --data --conditions auto:run2_data --era Run2_2017,run2_nanoAOD_94XMiniAODv2
     - mv nano_data_singleMu.root $CI_HOME/
   artifacts:
     paths:
