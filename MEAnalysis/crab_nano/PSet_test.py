@@ -22,12 +22,15 @@ process.source = cms.Source("PoolSource",
 #        #'/store/data/Run2017E/SingleElectron/MINIAOD/17Nov2017-v1/60000/E45D32D2-33F6-E711-9ABA-A0369F836372.root'
         "root://xrootd-cms.infn.it//store/data/Run2017C/BTagCSV/MINIAOD/31Mar2018-v1/30000/DEA535F0-8338-E811-844E-001E67580724.root"
 #        'root://t3se.psi.ch//store/mc/RunIISummer17MiniAOD/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/92X_upgrade2017_realistic_v10-v2/10000/0C164E52-C692-E711-B1C8-00266CFEFDEC.root'
-        
+
     ),
     lumisToProcess = cms.untracked.VLuminosityBlockRange(
         "300400:191-300400:191",
     )
 )
+
+from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValTTbarPileUpMINIAODSIM
+process.source.fileNames = filesRelValTTbarPileUpMINIAODSIM
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10)

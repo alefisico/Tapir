@@ -33,7 +33,10 @@ In order to fix this, you have to re-copy the libraries, see the end of `setup.s
 
 Generally for running the code, `cmsenv` is sufficient. For some plotting tasks,
 we use a local python environment that can be configured on T3_CH_PSI
-through `source MEAnalysis/rq/env.sh`.
+through
+~~~
+source MEAnalysis/rq/env.sh
+~~~
 
 ## Step1: Running the nanoAOD code
 
@@ -44,21 +47,32 @@ NanoAOD links:
 ## Step2: tthbb13 code
 Using the nanoAOD-tree, we will run the ttH(bb) and matrix element code (tthbb13). The code is configured mainly from two files:
 
-1. A flat configuration in https://gitlab.cern.ch/Zurich_ttH/tthbb13/blob/SwitchNanoAOD/MEAnalysis/data/default.cfg specifying the samples and analysis categories. This configuration should be preferred for most future options.
-2. A python configuration in https://gitlab.cern.ch/Zurich_ttH/tthbb13/blob/SwitchNanoAOD/MEAnalysis/python/MEAnalysis_cfg_heppy.py used for the MEM configuration and specifying the object (jet, lepton) cuts. 
+1. A flat configuration in [MEAnalysis/data/default.cfg](https://gitlab.cern.ch/Zurich_ttH/tthbb13/blob/SwitchNanoAOD/MEAnalysis/data/default.cfg) specifying the samples and analysis categories. This configuration should be preferred for most future options.
+
+2. A python configuration in [MEAnalysis/python/MEAnalysis_cfg_heppy.py](https://gitlab.cern.ch/Zurich_ttH/tthbb13/blob/SwitchNanoAOD/MEAnalysis/python/MEAnalysis_cfg_heppy.py) used for the MEM configuration and specifying the object (jet, lepton) cuts.
+
 
 In order to test the `tthbb13` code, run:
 ~~~
-$ python $CMSSW_BASE/src/TTH/MEAnalysis/python/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8
+python $CMSSW_BASE/src/TTH/MEAnalysis/test/test_MEAnalysis_heppy.py --sample ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8
 ~~~
-
 This will call
 ~~~
 python $CMSSW_BASE/src/TTH/MEAnalysis/python/MEAnalysis_heppy.py MEAnalysis/data/default.cfg --sample SAMPLE_NAME
 ~~~
 
-Steps 1-2 can be run together on the grid using crab, see `MEAnalysis/crab_nano/multicrab_94X.py`.
-To produce the subsequent `.txt` files used for local running, see the script `Plotting/python/christina/ttbar_classification/getFilesCrab.py`.
+Steps 1-2 can be run together on the grid using crab, see [MEAnalysis/crab_nano/multicrab_94X.py](https://gitlab.cern.ch/algomez/tthbb13/blob/SwitchNanoAOD_946patch1/MEAnalysis/crab_nano/multicrab_94X.py). To run a test crab job:
+~~~
+python multicrab_94X.py --workflow testing --tag Jun19
+~~~
+here, workflow is defined in [these lines](https://gitlab.cern.ch/algomez/tthbb13/blob/SwitchNanoAOD_946patch1/MEAnalysis/crab_nano/multicrab_94X.py#L13) and --tag is for bookkeeping purposes.
+
+To produce the subsequent `.txt` files used for local running, see the script `Plotting/python/christina/ttbar_classification/getFilesCrab.py` as:
+~~~
+python Plotting/python/christina/ttbar_classification/getFilesCrab.py --path /pnfs/psi.ch/cms/trivcat/store/user/algomez/tth/v00_20180810 --outpath /mnt/t3nfs01/data01/shome/creissel/tth/2017/sw/CMSSW_9_4_5_cand1/src/TTH/MEAnalysis/gc/datasets  --onlytthbb
+~~~
+The path argument refers to the location of the crab output files; onlytthbb refers tot he kind of Ntuples used; and outpath is the location of the folder created by the script. In this folder you have a `.txt` file per dataset found in the path argument.
+ 
 
 ## Step3 (optional): skim with `projectSkim`
 
@@ -169,7 +183,7 @@ The currently used samples are listed below. Generally, they are stored at T3_CH
 ## Delphes files
 | process | tag | number of events | comments |
 |-----------------|--------------|----------|----------|
-| [ttH(bb)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Jun04/Delphes_ttH.txt) | Jun04 | 3720000 | old Delphes topology with AK5 jets | 
+| [ttH(bb)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Jun04/Delphes_ttH.txt) | Jun04 | 3720000 | old Delphes topology with AK5 jets |
 | [ttbb](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Jun04/Delphes_ttbb_inclusive.txt) | Jun04 | 1920000 | old Delphes topology with AK5 jets, wrong BR of top decays |
 | [ttH(bb)](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse08/MEAnalysis/gc/datasets/Aug21_Delphes/ttHbb.txt) | Aug21_Delphes | 5529368 | new Delphes topology, boosted variabled included |
 | [ttbar](https://gitlab.cern.ch/Zurich_ttH/tthbb13/tree/chreisse06/MEAnalysis/gc/datasets/Aug21_Delphes/ttbar.txt) | Aug21_Delphes | 2540000 | new Delphes topology, boosted variables included |
@@ -191,7 +205,7 @@ a grid-control workflow in `MEAnalysis/gc/confs/copyData.conf`.
 ## Continous integration (CI)
 
 We test the code regularly using the gitlab CI system. Since we are accessing
-the samples from T3_CH_PSI, this currently requires a valid proxy at CERN. 
+the samples from T3_CH_PSI, this currently requires a valid proxy at CERN.
 
 ## Evaluate transfer functions
 
@@ -229,7 +243,7 @@ Compile the signal and background amplitudes, which will be placed in `OpenLoops
 
 Errors when compiling the code:
 ~~~
->> Compiling  /builds/Zurich_ttH/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc 
+>> Compiling  /builds/Zurich_ttH/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc
 In file included from /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/include/TGLIncludes.h:21:0,
                  from /builds/Zurich_ttH/CMSSW_9_4_4/src/Fireworks/Core/src/FWGeoTopNodeGL.cc:4:
 /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/include/GL/glew.h:1141:20: fatal error: GL/glu.h: No such file or directory
@@ -237,7 +251,7 @@ In file included from /cvmfs/cms.cern.ch/slc6_amd64_gcc630/lcg/root/6.10.08/incl
                     ^
 ~~~
 
-This means that the base CMSSW release for nanoAOD has been updated, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Recipe_for_CMSSW_9_4_X_and_the_c 
+This means that the base CMSSW release for nanoAOD has been updated, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Recipe_for_CMSSW_9_4_X_and_the_c
 
 ## Installing newer matplotlib
 
