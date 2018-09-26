@@ -1,0 +1,548 @@
+The system is: Linux - 2.6.32-754.3.5.el6.x86_64 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/3.7.0/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/3.7.0/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_136f2/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_136f2.dir/build.make CMakeFiles/cmTC_136f2.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_136f2.dir/testCCompiler.c.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc     -o CMakeFiles/cmTC_136f2.dir/testCCompiler.c.o   -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_136f2
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_136f2.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc       CMakeFiles/cmTC_136f2.dir/testCCompiler.c.o  -o cmTC_136f2 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_ce787/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_ce787.dir/build.make CMakeFiles/cmTC_ce787.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc     -o CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o   -c /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/share/cmake-3.7/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_ce787
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ce787.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc      -v CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o  -o cmTC_ce787  
+Using built-in specs.
+COLLECT_GCC=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc
+COLLECT_LTO_WRAPPER=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper
+Target: x86_64-unknown-linux-gnu
+Configured with: ../configure --prefix=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --disable-multilib --disable-nls --disable-dssi --enable-languages=c,c++,fortran --enable-gnu-indirect-function --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-plugin --with-linker-hash-style=gnu --enable-linker-build-id --enable-ld=default --enable-lto --enable-gold=yes --with-gmp=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-mpfr=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-bootstrap --with-mpc=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-isl=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-checking=release --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --enable-libstdcxx-time=rt --enable-shared --disable-libgcj CC='gcc -fPIC' CXX='c++ -fPIC' CPP=cpp CXXCPP='c++ -E' CFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include CXXFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include LDFLAGS=-L/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/lib
+Thread model: posix
+gcc version 6.3.0 (GCC) 
+COMPILER_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/bin/
+LIBRARY_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ce787' '-mtune=generic' '-march=x86-64'
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/collect2 -plugin /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccmGju9t.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z common-page-size=4096 -z max-page-size=4096 -o cmTC_ce787 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtbegin.o -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtend.o /usr/lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ce787' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_ce787/fast"]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_ce787.dir/build.make CMakeFiles/cmTC_ce787.dir/build]
+  ignore line: [gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc     -o CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o   -c /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/share/cmake-3.7/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_ce787]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ce787.dir/link.txt --verbose=1]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc      -v CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o  -o cmTC_ce787  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper]
+  ignore line: [Target: x86_64-unknown-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --disable-multilib --disable-nls --disable-dssi --enable-languages=c,c++,fortran --enable-gnu-indirect-function --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-plugin --with-linker-hash-style=gnu --enable-linker-build-id --enable-ld=default --enable-lto --enable-gold=yes --with-gmp=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-mpfr=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-bootstrap --with-mpc=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-isl=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-checking=release --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --enable-libstdcxx-time=rt --enable-shared --disable-libgcj CC='gcc -fPIC' CXX='c++ -fPIC' CPP=cpp CXXCPP='c++ -E' CFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include CXXFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include LDFLAGS=-L/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/lib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.3.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/bin/]
+  ignore line: [LIBRARY_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ce787' '-mtune=generic' '-march=x86-64']
+  link line: [ /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/collect2 -plugin /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccmGju9t.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z common-page-size=4096 -z max-page-size=4096 -o cmTC_ce787 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtbegin.o -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtend.o /usr/lib/../lib64/crtn.o]
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccmGju9t.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-zcommon-page-size=4096] ==> ignore
+    arg [-zmax-page-size=4096] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_ce787] ==> ignore
+    arg [/usr/lib/../lib64/crt1.o] ==> ignore
+    arg [/usr/lib/../lib64/crti.o] ==> ignore
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtbegin.o] ==> ignore
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../..] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../..]
+    arg [CMakeFiles/cmTC_ce787.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtend.o] ==> ignore
+    arg [/usr/lib/../lib64/crtn.o] ==> ignore
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc/x86_64-unknown-linux-gnu/6.3.0]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/x86_64-unknown-linux-gnu/lib]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../..] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib]
+  implicit libs: [c]
+  implicit dirs: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc/x86_64-unknown-linux-gnu/6.3.0;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib64;/lib64;/usr/lib64;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/x86_64-unknown-linux-gnu/lib;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_cf970/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_cf970.dir/build.make CMakeFiles/cmTC_cf970.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cf970.dir/feature_tests.c.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc    -std=c11 -o CMakeFiles/cmTC_cf970.dir/feature_tests.c.o   -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_cf970
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cf970.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc       CMakeFiles/cmTC_cf970.dir/feature_tests.c.o  -o cmTC_cf970 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_32aa7/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_32aa7.dir/build.make CMakeFiles/cmTC_32aa7.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_32aa7.dir/feature_tests.c.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc    -std=c99 -o CMakeFiles/cmTC_32aa7.dir/feature_tests.c.o   -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_32aa7
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_32aa7.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc       CMakeFiles/cmTC_32aa7.dir/feature_tests.c.o  -o cmTC_32aa7 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_9e588/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_9e588.dir/build.make CMakeFiles/cmTC_9e588.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9e588.dir/feature_tests.c.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc    -std=c90 -o CMakeFiles/cmTC_9e588.dir/feature_tests.c.o   -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_9e588
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9e588.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/cc       CMakeFiles/cmTC_9e588.dir/feature_tests.c.o  -o cmTC_9e588 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_1637e/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_1637e.dir/build.make CMakeFiles/cmTC_1637e.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_1637e.dir/testCXXCompiler.cxx.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++      -o CMakeFiles/cmTC_1637e.dir/testCXXCompiler.cxx.o -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_1637e
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1637e.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++        CMakeFiles/cmTC_1637e.dir/testCXXCompiler.cxx.o  -o cmTC_1637e 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_ec961/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_ec961.dir/build.make CMakeFiles/cmTC_ec961.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++      -o CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o -c /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/share/cmake-3.7/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_ec961
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ec961.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++       -v CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_ec961  
+Using built-in specs.
+COLLECT_GCC=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++
+COLLECT_LTO_WRAPPER=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper
+Target: x86_64-unknown-linux-gnu
+Configured with: ../configure --prefix=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --disable-multilib --disable-nls --disable-dssi --enable-languages=c,c++,fortran --enable-gnu-indirect-function --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-plugin --with-linker-hash-style=gnu --enable-linker-build-id --enable-ld=default --enable-lto --enable-gold=yes --with-gmp=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-mpfr=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-bootstrap --with-mpc=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-isl=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-checking=release --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --enable-libstdcxx-time=rt --enable-shared --disable-libgcj CC='gcc -fPIC' CXX='c++ -fPIC' CPP=cpp CXXCPP='c++ -E' CFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include CXXFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include LDFLAGS=-L/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/lib
+Thread model: posix
+gcc version 6.3.0 (GCC) 
+COMPILER_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/bin/
+LIBRARY_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ec961' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/collect2 -plugin /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccyNAti3.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z common-page-size=4096 -z max-page-size=4096 -o cmTC_ec961 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtbegin.o -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtend.o /usr/lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ec961' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_ec961/fast"]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_ec961.dir/build.make CMakeFiles/cmTC_ec961.dir/build]
+  ignore line: [gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++      -o CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o -c /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/share/cmake-3.7/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_ec961]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ec961.dir/link.txt --verbose=1]
+  ignore line: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++       -v CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_ec961  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++]
+  ignore line: [COLLECT_LTO_WRAPPER=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper]
+  ignore line: [Target: x86_64-unknown-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --disable-multilib --disable-nls --disable-dssi --enable-languages=c,c++,fortran --enable-gnu-indirect-function --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-plugin --with-linker-hash-style=gnu --enable-linker-build-id --enable-ld=default --enable-lto --enable-gold=yes --with-gmp=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-mpfr=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-bootstrap --with-mpc=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --with-isl=/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0 --enable-checking=release --build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --enable-libstdcxx-time=rt --enable-shared --disable-libgcj CC='gcc -fPIC' CXX='c++ -fPIC' CPP=cpp CXXCPP='c++ -E' CFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include CXXFLAGS=-I/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/include LDFLAGS=-L/mnt/build/davidlt/gcc630/b/tmp/BUILDROOT/81ba3d1519d143a9fdd7a80ab404d079/opt/cmssw/slc6_amd64_gcc630/external/gcc/6.3.0/tmp/sw/lib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.3.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/bin/]
+  ignore line: [LIBRARY_PATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib/:/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_ec961' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/collect2 -plugin /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccyNAti3.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z common-page-size=4096 -z max-page-size=4096 -o cmTC_ec961 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtbegin.o -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib -L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtend.o /usr/lib/../lib64/crtn.o]
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../libexec/gcc/x86_64-unknown-linux-gnu/6.3.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccyNAti3.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-zcommon-page-size=4096] ==> ignore
+    arg [-zmax-page-size=4096] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_ec961] ==> ignore
+    arg [/usr/lib/../lib64/crt1.o] ==> ignore
+    arg [/usr/lib/../lib64/crti.o] ==> ignore
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtbegin.o] ==> ignore
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib]
+    arg [-L/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../..] ==> dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../..]
+    arg [CMakeFiles/cmTC_ec961.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/crtend.o] ==> ignore
+    arg [/usr/lib/../lib64/crtn.o] ==> ignore
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc/x86_64-unknown-linux-gnu/6.3.0]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../lib64] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../../../x86_64-unknown-linux-gnu/lib] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/x86_64-unknown-linux-gnu/lib]
+  collapse library dir [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/../lib/gcc/x86_64-unknown-linux-gnu/6.3.0/../../..] ==> [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib]
+  implicit libs: [stdc++;m;c]
+  implicit dirs: [/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc/x86_64-unknown-linux-gnu/6.3.0;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib/gcc;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib64;/lib64;/usr/lib64;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/x86_64-unknown-linux-gnu/lib;/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/lib]
+  implicit fwks: []
+
+
+
+
+Detecting CXX [-std=c++14] compiler features compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_6222b/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_6222b.dir/build.make CMakeFiles/cmTC_6222b.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6222b.dir/feature_tests.cxx.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++     -std=c++14 -o CMakeFiles/cmTC_6222b.dir/feature_tests.cxx.o -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_6222b
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6222b.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++        CMakeFiles/cmTC_6222b.dir/feature_tests.cxx.o  -o cmTC_6222b 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++11] compiler features compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_ab4a0/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_ab4a0.dir/build.make CMakeFiles/cmTC_ab4a0.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ab4a0.dir/feature_tests.cxx.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++     -std=c++11 -o CMakeFiles/cmTC_ab4a0.dir/feature_tests.cxx.o -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_ab4a0
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ab4a0.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++        CMakeFiles/cmTC_ab4a0.dir/feature_tests.cxx.o  -o cmTC_ab4a0 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:0cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:0cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:0cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:0cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:0cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:0cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:0cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:0cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:0cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:0cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++98] compiler features compiled with the following output:
+Change Dir: /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake" "cmTC_b60c9/fast"
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/cms/cmssw/CMSSW_9_4_9/external/slc6_amd64_gcc630/bin/gmake -f CMakeFiles/cmTC_b60c9.dir/build.make CMakeFiles/cmTC_b60c9.dir/build
+gmake[1]: Entering directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_b60c9.dir/feature_tests.cxx.o
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++     -std=c++98 -o CMakeFiles/cmTC_b60c9.dir/feature_tests.cxx.o -c /mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_b60c9
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/cmake/3.7.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b60c9.dir/link.txt --verbose=1
+/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/gcc/6.3.0/bin/c++        CMakeFiles/cmTC_b60c9.dir/feature_tests.cxx.o  -o cmTC_b60c9 
+gmake[1]: Leaving directory '/mnt/t3nfs01/data01/shome/algomez/work/ttH/CMSSW_9_4_9/src/Tapir/MEMAnalyzer/MEMCalculation/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:0cxx_alias_templates
+    Feature record: CXX_FEATURE:0cxx_alignas
+    Feature record: CXX_FEATURE:0cxx_alignof
+    Feature record: CXX_FEATURE:0cxx_attributes
+    Feature record: CXX_FEATURE:0cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:0cxx_auto_type
+    Feature record: CXX_FEATURE:0cxx_binary_literals
+    Feature record: CXX_FEATURE:0cxx_constexpr
+    Feature record: CXX_FEATURE:0cxx_contextual_conversions
+    Feature record: CXX_FEATURE:0cxx_decltype
+    Feature record: CXX_FEATURE:0cxx_decltype_auto
+    Feature record: CXX_FEATURE:0cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:0cxx_default_function_template_args
+    Feature record: CXX_FEATURE:0cxx_defaulted_functions
+    Feature record: CXX_FEATURE:0cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:0cxx_delegating_constructors
+    Feature record: CXX_FEATURE:0cxx_deleted_functions
+    Feature record: CXX_FEATURE:0cxx_digit_separators
+    Feature record: CXX_FEATURE:0cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:0cxx_explicit_conversions
+    Feature record: CXX_FEATURE:0cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:0cxx_extern_templates
+    Feature record: CXX_FEATURE:0cxx_final
+    Feature record: CXX_FEATURE:0cxx_func_identifier
+    Feature record: CXX_FEATURE:0cxx_generalized_initializers
+    Feature record: CXX_FEATURE:0cxx_generic_lambdas
+    Feature record: CXX_FEATURE:0cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:0cxx_inline_namespaces
+    Feature record: CXX_FEATURE:0cxx_lambdas
+    Feature record: CXX_FEATURE:0cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:0cxx_local_type_template_args
+    Feature record: CXX_FEATURE:0cxx_long_long_type
+    Feature record: CXX_FEATURE:0cxx_noexcept
+    Feature record: CXX_FEATURE:0cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:0cxx_nullptr
+    Feature record: CXX_FEATURE:0cxx_override
+    Feature record: CXX_FEATURE:0cxx_range_for
+    Feature record: CXX_FEATURE:0cxx_raw_string_literals
+    Feature record: CXX_FEATURE:0cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:0cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:0cxx_return_type_deduction
+    Feature record: CXX_FEATURE:0cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:0cxx_rvalue_references
+    Feature record: CXX_FEATURE:0cxx_sizeof_member
+    Feature record: CXX_FEATURE:0cxx_static_assert
+    Feature record: CXX_FEATURE:0cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:0cxx_thread_local
+    Feature record: CXX_FEATURE:0cxx_trailing_return_types
+    Feature record: CXX_FEATURE:0cxx_unicode_literals
+    Feature record: CXX_FEATURE:0cxx_uniform_initialization
+    Feature record: CXX_FEATURE:0cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:0cxx_user_literals
+    Feature record: CXX_FEATURE:0cxx_variable_templates
+    Feature record: CXX_FEATURE:0cxx_variadic_macros
+    Feature record: CXX_FEATURE:0cxx_variadic_templates
