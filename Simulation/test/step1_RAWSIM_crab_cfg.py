@@ -1,13 +1,14 @@
 # Auto generated configuration file
-# using: 
-# Revision: 1.19 
-# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step1 --filein file:../../../../../CMSSW_7_1_25/src/Tapir/Simulation/test/HIG-RunIISummer15wmLHEGS-00482.root --fileout file:HIG-RunIISummer16DR80Premix-00675_step1.root --pileup_input dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/GEN-SIM-DIGI-RAW --mc --eventcontent PREMIXRAW --datatier GEN-SIM-RAW --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:@frozen2016 --nThreads 4 --datamix PreMix --era Run2_2016 --python_filename HIG-RunIISummer16DR80Premix-00675_1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 169
+# using:
+# Revision: 1.19
+# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
+# with command line options: step1 --filein dbs:/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powhel_NLOPS-pythia8/algomez-RunIIFall17wmLHEGS-93X_mc2017_realistic_v3-v1_privateGENSIM-cefcf785733ecf53c923c454a98ea705/USER --fileout file:TOP-RunIIFall17DRPremix-00118_step1.root --pileup_input dbs:/_E-10_gun/RunIISummer17PrePremix-MCv2_correctPU_94X_mc2017_realistic_v9-v1/GEN-SIM-DIGI-RAW --mc --eventcontent PREMIXRAW --datatier GEN-SIM-RAW --conditions 94X_mc2017_realistic_v11 --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:2e34v40 --datamix PreMix --era Run2_2017 --python_filename TOP-RunIIFall17DRPremix-00118_1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1751
 import FWCore.ParameterSet.Config as cms
+import sys
 
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process('HLT',eras.Run2_2016)
+process = cms.Process('HLT',eras.Run2_2017)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -22,7 +23,7 @@ process.load('SimGeneral.MixingModule.digi_MixPreMix_cfi')
 process.load('Configuration.StandardSequences.DataMixerPreMix_cff')
 process.load('Configuration.StandardSequences.SimL1EmulatorDM_cff')
 process.load('Configuration.StandardSequences.DigiToRawDM_cff')
-process.load('HLTrigger.Configuration.HLT_25ns15e33_v4_cff')
+process.load('HLTrigger.Configuration.HLT_2e34v40_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -32,11 +33,8 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-	    #'root://t3dcachedb03.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/test/GC7e62240f3a40/job_0_ttbbNewMC_HIG-RunIISummer15wmLHEGS-00482.root'
-	    '/store/user/algomez/TTToSemilepton_NLOPS-powheg-pythia8/NewMCwithNLOPS/180430_155654/0000/ttbbNewMC_HIG-RunIISummer15wmLHEGS-00482_301.root',
-	    ),
-	secondaryFileNames = cms.untracked.vstring()
+    fileNames = cms.untracked.vstring('gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/algomez/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powhel_NLOPS-pythia8/RunIIFall17wmLHEGS-93X_mc2017_realistic_v3-v1_privateGENSIM/180907_083121/0002/TOP-RunIIFall17wmLHEGS_2788.root'),
+    secondaryFileNames = cms.untracked.vstring()
 )
 
 process.options = cms.untracked.PSet(
@@ -45,7 +43,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step1 nevts:169'),
+    annotation = cms.untracked.string('step1 nevts:1751'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -57,8 +55,7 @@ process.PREMIXRAWoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-RAW'),
         filterName = cms.untracked.string('')
     ),
-    eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('file:HIG-RunIISummer16DR80Premix_step1.root'),
+    fileName = cms.untracked.string('file:TOP-RunIIFall17DRPremix-00118_step1.root'),
     outputCommands = process.PREMIXRAWEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -70,7 +67,7 @@ process.mix.digitizers = cms.PSet(process.theDigitizersMixPreMix)
 minBiasFiles = __import__('Neutrino_E-10_gun_cfi')
 process.mixData.input.fileNames = cms.untracked.vstring(minBiasFiles.readFiles)
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v6', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '94X_mc2017_realistic_v11', '')
 
 # Path and EndPath definitions
 process.digitisation_step = cms.Path(process.pdigi)
@@ -84,24 +81,32 @@ process.PREMIXRAWoutput_step = cms.EndPath(process.PREMIXRAWoutput)
 process.schedule = cms.Schedule(process.digitisation_step,process.datamixing_step,process.L1simulation_step,process.digi2raw_step)
 process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.PREMIXRAWoutput_step])
-
-#Setup FWK for multithreaded
-#process.options.numberOfThreads=cms.untracked.uint32(4)
-#process.options.numberOfStreams=cms.untracked.uint32(0)
+from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
+associatePatAlgosToolsTask(process)
 
 # customisation of the process.
 
+#Setup FWK for multithreaded
+#process.options.numberOfThreads=cms.untracked.uint32(8)
+#process.options.numberOfStreams=cms.untracked.uint32(0)
+
 # Automatic addition of the customisation function from Configuration.DataProcessing.Utils
-from Configuration.DataProcessing.Utils import addMonitoring 
+from Configuration.DataProcessing.Utils import addMonitoring
 
 #call to customisation function addMonitoring imported from Configuration.DataProcessing.Utils
 process = addMonitoring(process)
 
 # Automatic addition of the customisation function from HLTrigger.Configuration.customizeHLTforMC
-from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforFullSim 
+from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
 
-#call to customisation function customizeHLTforFullSim imported from HLTrigger.Configuration.customizeHLTforMC
-process = customizeHLTforFullSim(process)
+#call to customisation function customizeHLTforMC imported from HLTrigger.Configuration.customizeHLTforMC
+process = customizeHLTforMC(process)
 
 # End of customisation functions
 
+# Customisation from command line
+
+# Add early deletion of temporary data products to reduce peak memory need
+from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
+process = customiseEarlyDelete(process)
+# End adding early deletion
