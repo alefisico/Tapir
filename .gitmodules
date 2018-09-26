@@ -2,3 +2,7 @@
 	path = MoMEMta
 	url = git@github.com:MoMEMta/MoMEMta.git
 	branch = v1.0
+[submodule "MEMAnalyzer/MOMemtaTutorials"]
+	path = MEMAnalyzer/MOMemtaTutorials
+	url = git@github.com:MoMEMta/Tutorials.git
+	branch = v1.0
