@@ -578,6 +578,11 @@ def getTreeProducer(conf):
         for vtype in [
             ("Wmass",               float,      "Best reconstructed W candidate mass"),
             ("mbb_closest",          float,      "Mass of geometrically closest bb pair"),
+            ("mjjmin",               float,      "Minimus mass of all jet pairs"),
+            ("min_dr_btag",          float,      "DR between closest b tags"),
+            ("mass_drpair_btag",     float,      "Mass of closest b tag pair"),
+            ("mass_drpair_untag",    float,      "Mass of closest jet pair"),
+            ("centralitymass",       float,      "HT over invariant mass of all jets"),
             ("cat",                 int,        "ME category", "catn"),
             ("cat_btag",            int,        "ME category (b-tag)", "cat_btag_n"),
             ("cat_gen",             int,        "top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)", "cat_gen_n"),

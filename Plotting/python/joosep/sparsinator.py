@@ -24,14 +24,12 @@ CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
 Cvectordouble = getattr(ROOT, "std::vector<double>")
 CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
 
-#Need to access this to initialize the library (?)
-dummy = ROOT.TTH_MEAnalysis.TreeDescription
-
 #From https://gitlab.cern.ch/jpata/tthbb13/blob/FH_systematics/Plotting/Daniel/Helper.py#L7
 #Derived by Silvio in a manual fit to semileptonic differential top pt data: CMS-PAS-TOP-17-002
 topPTreweight = lambda x,y: math.exp(0.5*((0.0843616-0.000743051*x)+(0.0843616-0.000743051*y)))
 topPTreweightUp = lambda x,y: math.exp(0.5*((0.00160296-0.000411375*x)+(0.00160296-0.000411375*y)))
 topPTreweightDown = lambda x,y: math.exp(0.5*((0.16712-0.00107473*x)+(0.16712-0.00107473*y)))
+
 
 #Create a mapping between a string and the C++ systematic enum defined in EventModel.h
 syst_pairs = OrderedDict([
@@ -164,7 +162,7 @@ def pass_HLT_dl_elel(event):
 
 def pass_HLT_fh(event):
     pass_hlt = event.HLT_ttH_FH
-    return event.is_fh and pass_hlt ## FIXME add: st == ??
+    return event.is_fh and pass_hlt
 
 def triggerPath(event):
     if event.is_sl and pass_HLT_sl_mu(event):
@@ -177,6 +175,8 @@ def triggerPath(event):
         return TRIGGERPATH_MAP["em"]
     elif event.is_dl and pass_HLT_dl_elel(event):
         return TRIGGERPATH_MAP["ee"]
+    elif event.is_fh and pass_HLT_fh(event):
+        return TRIGGERPATH_MAP["fh"]
     return 0
 
 def fillBase(matched_processes, event, syst, schema):
@@ -191,6 +191,7 @@ def fillBase(matched_processes, event, syst, schema):
                 if weight <= 0:
                     LOG_MODULE_NAME.debug("negative weight, weight_nominal<=0: gen={0}".format(event.weights.at(syst_pairs["gen"])))
             if histo_out.cut(event):
+                #print ("histo, event.weight_nominal, proc.xs_weight =", histo_out.cut_name[0], event.weight_nominal, proc.xs_weight) #DS temp
                 histo_out.fill(event, weight, dooverflow)
 
 
@@ -373,6 +374,15 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     Raises:
         Exception: Description
     """
+    
+    #Need to access this to initialize the library (?)
+    do_hadronic = analysis.config.getboolean("sparsinator", "do_hadronic")
+    if do_hadronic:
+        dummy = ROOT.TTH_MEAnalysis.TreeDescriptionFH
+        samdesc = ROOT.TTH_MEAnalysis.SampleDescriptionFH
+    else:
+        dummy = ROOT.TTH_MEAnalysis.TreeDescription
+        samdesc = ROOT.TTH_MEAnalysis.SampleDescription
 
     #need to import here, not in base, because needs special ROOT libraries
     CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
@@ -596,15 +606,15 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if boosted:
                 events = treemodel(
                     tfile,
-                    ROOT.TTH_MEAnalysis.SampleDescription(
-                        ROOT.TTH_MEAnalysis.SampleDescription.MCBOOSTED
+                    samdesc(
+                        samdesc.MCBOOSTED
                     )
                 )
             else:
                 events = treemodel(
                     tfile,
-                    ROOT.TTH_MEAnalysis.SampleDescription(
-                        ROOT.TTH_MEAnalysis.SampleDescription.MC
+                    samdesc(
+                        samdesc.MC
                     )
                 )
         else:
@@ -612,15 +622,15 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if boosted:
                 events = treemodel(
                     tfile,
-                    ROOT.TTH_MEAnalysis.SampleDescription(
-                        ROOT.TTH_MEAnalysis.SampleDescription.DATABOOSTED
+                    samdesc(
+                        samdesc.DATABOOSTED
                     )
                 )
             else:
                 events = treemodel(
                     tfile,
-                    ROOT.TTH_MEAnalysis.SampleDescription(
-                        ROOT.TTH_MEAnalysis.SampleDescription.DATA
+                    samdesc(
+                        samdesc.DATA
                     )
                 )
 
@@ -636,7 +646,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         LOG_MODULE_NAME.info("looping over {0} events".format(events.reader.GetEntries(True)))
        
         iEv = 0
-        
+
         #Loop over events using the TTreeReader
         while events.reader.Next():
             if ttree_postproc:
@@ -660,7 +670,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 LOG_MODULE_NAME.info("processed {0} events".format(nevents))
 
             #apply some basic preselection that does not depend on jet systematics
-            if not (events.is_sl or events.is_dl):
+            if not (events.is_sl or events.is_dl or events.is_fh):
                 continue
 
             #Loop over systematics that transform the event
@@ -675,7 +685,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
                 if event is None:
                     continue
-                
                 if ttree_postproc:
                     LOG_MODULE_NAME.debug("replacing pu weight {0} with postprocessing {1}".format(
                         event.weights[syst_pairs["CMS_pu"]],
@@ -693,7 +702,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #note: nanoAOD data is already pre-selected with the json specified in multicrab_94X.py
                 #if schema == "data" and not event.json:
                 #    continue
-                
                 if not pass_METfilter(event, schema):
                     print("Event {0}:{1}:{2} failed MET filter".format(event.run, event.lumi, event.evt))
                     continue
@@ -725,7 +733,6 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc" and not sample_systematic:
                     fillSystematic(matched_processes, event, systematic_weights, schema)
-
             #end of loop over event systematics
         #end of loop over events
         try:
@@ -768,24 +775,23 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     logging.basicConfig(level=logging.INFO)
+    analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",
+               os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg"))
     if os.environ.has_key("FILE_NAMES"):
         file_names = map(getSitePrefix, os.environ["FILE_NAMES"].split())
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
         skip_events = int(os.environ.get("SKIP_EVENTS", -1))
         max_events = int(os.environ.get("MAX_EVENTS", -1))
-        analysis = analysisFromConfig(os.environ.get("ANALYSIS_CONFIG",))
     elif os.environ.has_key("DATASETPATH"):
         prefix, sample = get_prefix_sample(os.environ["DATASETPATH"])
         skip_events = 0
-        max_events = 10000
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        max_events = int(os.environ.get("MAX_EVENTS", 1000))
         file_names = analysis.get_sample(sample).file_names
     else:
         sample = "ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8"
         #sample = "SingleMuon"
         skip_events = 0
-        max_events = 10000
-        analysis = analysisFromConfig(os.environ["CMSSW_BASE"] + "/src/TTH/MEAnalysis/data/default.cfg")
+        max_events = int(os.environ.get("MAX_EVENTS", 1000))
         file_names = analysis.get_sample(sample).file_names
 
     outfilter = os.environ.get("OUTFILTER", None)

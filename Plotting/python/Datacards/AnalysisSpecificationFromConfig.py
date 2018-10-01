@@ -29,6 +29,7 @@ def splitByTriggerPath(processes, lumi, cuts_dict):
         "em": lumi["MuonEG"],
         "ee": lumi["DoubleEG"],
         "fh": lumi["BTagCSV"],
+        "bt": lumi["JetHT"],
     }
 
     for proc in processes:

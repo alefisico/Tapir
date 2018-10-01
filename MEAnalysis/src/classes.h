@@ -1,5 +1,6 @@
 #include "TTH/MEAnalysis/interface/EventShapeVariables.h"
 #include "TTH/MEAnalysis/interface/EventModel.h"
+#include "TTH/MEAnalysis/interface/EventModelFH.h"
 
 namespace {
     namespace {
@@ -16,5 +17,15 @@ namespace {
         
         TTH_MEAnalysis::TreeDescriptionMCSystematic<float> _TTHMEAnalysis_i9(nullptr, TTH_MEAnalysis::SampleDescription(TTH_MEAnalysis::SampleDescription::MC));
         TTH_MEAnalysis::TreeDescriptionMCSystematic<double> _TTHMEAnalysis_i10(nullptr, TTH_MEAnalysis::SampleDescription(TTH_MEAnalysis::SampleDescription::MC));
+        
+        TTH_MEAnalysis::TreeDescriptionFH<float> _TTHMEAnalysis_i21(nullptr, TTH_MEAnalysis::SampleDescriptionFH(TTH_MEAnalysis::SampleDescriptionFH::MC));
+        TTH_MEAnalysis::TreeDescriptionFH<double> _TTHMEAnalysis_i22(nullptr, TTH_MEAnalysis::SampleDescriptionFH(TTH_MEAnalysis::SampleDescriptionFH::MC));
+        
+        TTH_MEAnalysis::TreeDescriptionFHMC<float> _TTHMEAnalysis_i23(nullptr, TTH_MEAnalysis::SampleDescriptionFH(TTH_MEAnalysis::SampleDescriptionFH::MC));
+        TTH_MEAnalysis::TreeDescriptionFHMC<double> _TTHMEAnalysis_i24(nullptr, TTH_MEAnalysis::SampleDescriptionFH(TTH_MEAnalysis::SampleDescriptionFH::MC));
+        
+        TTH_MEAnalysis::TreeDescriptionFHMCSystematic<float> _TTHMEAnalysis_i25(nullptr, TTH_MEAnalysis::SampleDescriptionFH(TTH_MEAnalysis::SampleDescriptionFH::MC));
+        TTH_MEAnalysis::TreeDescriptionFHMCSystematic<double> _TTHMEAnalysis_i26(nullptr, TTH_MEAnalysis::SampleDescriptionFH(TTH_MEAnalysis::SampleDescriptionFH::MC));
+
     }
 }
