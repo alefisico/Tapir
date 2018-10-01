@@ -60,6 +60,8 @@ TRIGGERPATH_MAP = {
     "mm": 3,
     "em": 4,
     "ee": 5,
+    "fh": 6,
+    "bt": 7,
 }
 
 #Configure the site-specific file path

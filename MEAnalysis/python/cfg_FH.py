@@ -29,7 +29,7 @@ Conf.jets["NJetsForBTagLR"] = 9
 Conf.jets["btagAlgo"] = "btagCSV"
 Conf.jets["btagWP"] = "CSVM"
 
-Conf.mem["calcME"] = True
+Conf.mem["calcME"] = False
 Conf.mem["weight"] = 0.02 #k in Psb = Ps/(Ps+k*Pb)    
 Conf.mem["methodsToRun"] = [
             #"SL_0w2h2t",                 #[0]

@@ -23,4 +23,21 @@
     <class name="TTH_MEAnalysis::TreeDescriptionMCSystematicDouble"/>
 
     <class name="TTH_MEAnalysis::EventDescription"/>
+
+    <enum name="TTH_MEAnalysis::SampleDescriptionFH::Schema"/>
+
+    <class name="TTH_MEAnalysis::TreeDescriptionFHFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHBOOSTEDFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHMCFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHMCBOOSTEDFloat"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHMCSystematicFloat"/>
+        
+    <class name="TTH_MEAnalysis::TreeDescriptionFHDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHBOOSTEDDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHMCDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHMCBOOSTEDDouble"/>
+    <class name="TTH_MEAnalysis::TreeDescriptionFHMCSystematicDouble"/>
+
+    <class name="TTH_MEAnalysis::EventDescriptionFH"/>
+
 </lcgdict>
