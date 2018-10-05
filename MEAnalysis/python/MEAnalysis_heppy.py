@@ -147,7 +147,8 @@ class BufferedChain( object ):
 
 def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=None, files=[], output_name=None, dataset=None, sampleName=None, loglevel="INFO"):
     #configure logging
-    logging.basicConfig(stream=sys.stdout, level=getattr(logging, loglevel))
+    log_format = ('%(levelname)-8s %(module)-20s %(message)s')
+    logging.basicConfig(stream=sys.stdout, level=getattr(logging, loglevel), format=log_format)
     
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
     #Create python configuration object based on path
@@ -164,7 +165,6 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #Load transfer functions from pickle file
     pi_file = open(python_conf.general["transferFunctionsPickle"] , 'rb')
     python_conf.tf_matrix = pickle.load(pi_file)
-
     #Pre-compute the TF formulae
     # eval_gen:specifies how the transfer functions are interpreted
     #     If True, TF [0] - reco, x - gen
@@ -256,6 +256,15 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
+    
+    #Set passMETFilters flag according to list in config
+    metfilter_ana = cfg.Analyzer(
+        MECoreAnalyzers.METFilterAnalyzer,
+        'metfilter',
+        _conf = python_conf,
+        _analysis_conf = analysis_cfg,
+    )
+    
     #Set the json flag according to the provided data json
     lumilist_ana = cfg.Analyzer(
         MECoreAnalyzers.LumiListAnalyzer,
@@ -476,6 +485,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
 
             #After this, the event object has been created
             lumilist_ana,
+            metfilter_ana,
             #puweight_ana, #possible to recompute the PU weight on the fly by uncommenting
             gentth_pre,
             pvana,
@@ -517,6 +527,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             boost,
             #After this, the event has been created
             lumilist_ana,
+            metfilter_ana,
             #puweight_ana,
             gentth_pre,
             pvana,

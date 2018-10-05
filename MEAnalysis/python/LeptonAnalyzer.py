@@ -98,9 +98,10 @@ class LeptonAnalyzer(FilterAnalyzer):
 
         #end of id_type loop
         event.lep_SL = sorted(event.lep_SL, key=lambda x: x.pt, reverse=True)
+        LOG_MODULE_NAME.debug("Lep_SL: "+ " " + str([(x.pt, x.eta, x.pdgId) for x in event.lep_SL]))
         event.lep_DL = sorted(event.lep_DL, key=lambda x: x.pt, reverse=True)
+        LOG_MODULE_NAME.debug("Lep_DL: "+ " " + str([(x.pt, x.eta, x.pdgId) for x in event.lep_DL]))
         event.lep_veto = sorted(event.lep_veto, key=lambda x: x.pt, reverse=True)
-
         #Apply two-stage pt cut on DL leptons
         lep_DL_afterpt = []
         for lep in event.lep_DL:
@@ -114,8 +115,14 @@ class LeptonAnalyzer(FilterAnalyzer):
         event.n_lep_DL = len(event.lep_DL)
         LOG_MODULE_NAME.debug("after two-stage DL pt: Nleps={0} leps={1}".format(len(event.lep_DL), str([[x.pt, x.eta, x.pdgId] for x in event.lep_DL])))
 
+        sameSignDL = False
+        if event.n_lep_DL == 2:
+            sign = lambda x: (1, -1)[x < 0]
+            sameSignDL = sign(event.lep_DL[0].pdgId) == sign(event.lep_DL[1].pdgId)
+        LOG_MODULE_NAME.debug("Same sign DL veto: %s", sameSignDL)
+        
         event.is_sl = (event.n_lep_SL == 1 and event.n_lep_veto == 1)
-        event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2)
+        event.is_dl = (event.n_lep_DL == 2 and event.n_lep_veto == 2 and not sameSignDL)
         event.is_fh = (event.n_lep_veto == 0)
         if self.conf.leptons["force_isFH"]:
             if not self.printedWarningOnce:

@@ -7,10 +7,14 @@ from ROOT import MEM
 #import VHbbAnalysis.Heppy.TriggerTable as trig
 import TTH.MEAnalysis.TriggerTable as trig
 
+# JetID: 0: noID, 1: looseID, 2: tightID, 4: tightLepVeto (alsways 6), 6: tight+tightLepVeto (see. nanoAOD jets_cff.py)
+# puID: 0: noWP, 4: looseID, 6: mediumID, 7: tightID
 def jet_baseline(jet):
-    #Require that jet must have at least loose POG_PFID
-    #Look in Heppy autophobj.py and Jet.py
-    return (jet.jetId >= 1)
+    #Jet baseline selection: tight JetID + loose PU ID
+    return (jet.jetId >= 2 and jet.puId >= 4)
+
+def jet_baseline_tight(jet):
+    return (jet.jetId >= 2 and jet.puId >= 7)
 
 # LB: in fact,  mu.tightId should contain all the other cuts
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
@@ -93,6 +97,15 @@ def el_baseline_loose(el):
     ret = ( el.eleCutId >= 2 and
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
+            and (
+                (el.dz < 0.10 and sca <= 1.479) #Barrel
+                 or (el.dz < 0.20 and sca > 1.479) #Endcap
+            ) 
+            and (
+                (el.dxy < 0.05 and sca <= 1.478) #Barrel
+                 or (el.dxy < 0.1 and sca > 1.479) #Endcap
+            )
+                 
     )
 
     return ret
@@ -102,6 +115,14 @@ def el_baseline_medium(el):
     ret = ( el.eleCutId >= 3 and
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
+            and (
+                (el.dz < 0.10 and sca <= 1.479) #Barrel
+                 or (el.dz < 0.20 and sca > 1.479) #Endcap
+            ) 
+            and (
+                (el.dxy < 0.05 and sca <= 1.478) #Barrel
+                 or (el.dxy < 0.1 and sca > 1.479) #Endcap
+            )
     )
 
     return ret
@@ -114,6 +135,15 @@ def el_baseline_tight(el):
     ret = ( el.eleCutId >= 4 and #tight ID as per nanoAOD bitmap mapper
             not ( sca >= 1.4442 and
                   sca < 1.5669 )
+            and (
+                (el.dz < 0.10 and sca <= 1.479) #Barrel
+                 or (el.dz < 0.20 and sca > 1.479) #Endcap
+            ) 
+            and (
+                (el.dxy < 0.05 and sca <= 1.478) #Barrel
+                 or (el.dxy < 0.1 and sca > 1.479) #Endcap
+            )
+
     )
             
     return ret
@@ -130,8 +160,6 @@ def print_el(el):
 class Conf:
     leptons = {
         "mu": {
-
-            #SL
             "SL": {
                 "pt": 26,
                 "eta":2.1,
@@ -165,7 +193,7 @@ class Conf:
             "veto": {
                 "pt": 15.0,
                 "eta": 2.4,
-                "idcut": lambda el: el_baseline_loose(el),
+                "idcut": lambda el: el_baseline_tight(el),
             },
             #Isolation applied directly in el_baseline_tight using combIsoAreaCorr as cutoff
             "isotype": "relIso03", #KS: changed for nanoAOD.
@@ -190,7 +218,7 @@ class Conf:
         # pt, |eta| thresholds for **trailing jets** specific to dl channel
         "pt_dl":  20,
         "eta_dl": 2.4,
-
+        
         # pt threshold for leading jets in fh channel
         "pt_fh": 40,
 
@@ -219,7 +247,7 @@ class Conf:
 
             #Note: these working points are currently NOT correct
             "DeepCSVL": ("btagDeepCSV", 0.1522),
-            "DeepCSVM": ("btagDeepCSV", 0.4641),
+            "DeepCSVM": ("btagDeepCSV", 0.4941),
             "DeepCSVT": ("btagDeepCSV", 0.8001),
 
             #Removed CMVA since not supported (at least in the BtagRecommendation94X
@@ -234,7 +262,8 @@ class Conf:
         "NJetsForBTagLR": 15, #DS
 
         #base jet selection
-        "selection": jet_baseline
+        "baseSelection": jet_baseline,
+        "tightSelection" : jet_baseline_tight
     }
 
     boost = {
@@ -290,11 +319,17 @@ class Conf:
         #"transferFunctionsPickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_ttbar.pickle",
         "transferFunctions_htt_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_htt.pickle",
         "transferFunctions_higgs_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_higgsAK8.pickle",
+        #MET filters for 2017 data: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Moriond_2018
+        "METFilterData":["Flag_goodVertices","Flag_globalSuperTightHalo2016Filter","Flag_HBHENoiseFilter","Flag_HBHENoiseIsoFilter",
+                         "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_BadPFMuonFilter", "Flag_BadChargedCandidateFilter",
+                         "Flag_eeBadScFilter","Flag_ecalBadCalibFilter"],
+        "METFilterMC":["Flag_goodVertices","Flag_globalSuperTightHalo2016Filter","Flag_HBHENoiseFilter","Flag_HBHENoiseIsoFilter",
+                         "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_BadPFMuonFilter", "Flag_BadChargedCandidateFilter",
+                         "Flag_ecalBadCalibFilter"],
         #"transferFunctions_sj_Pickle": os.environ["CMSSW_BASE"]+"/src/TTH/MEAnalysis/data/transfer_functions_sj.pickle",
         "systematics": [
             "nominal",
         ] + [fj+sdir for fj in factorizedJetCorrections for sdir in ["Up", "Down"]],
-
 
         #If the list contains:
         # "gen" - print out the ttH gen-level particles (b from top, b form higgs, q from W, leptons

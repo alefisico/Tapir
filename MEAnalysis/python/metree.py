@@ -337,6 +337,7 @@ def getTreeProducer(conf):
         NTupleVariable("btagCMVA", lambda x : x.btagCMVA),
         #NTupleVariable("btagCMVA_log", lambda x : getattr(x, "btagCMVA_log", -20), help="log-transformed btagCMVA"),
         NTupleVariable("btagFlag", lambda x : getattr(x, "btagFlag", -1), help="Jet was considered to be a b in MEM according to the algo"),
+        NTupleVariable("rawPt", lambda x : x.rawPt),
         NTupleVariable("qg_sf", lambda x : getattr(x,"qg_sf",1.), type=float, mcOnly=True),
         NTupleVariable("partonFlavour", lambda x : x.partonFlavour, type=int, mcOnly=True),
         NTupleVariable("hadronFlavour", lambda x : x.hadronFlavour, type=int, mcOnly=True),
@@ -356,6 +357,12 @@ def getTreeProducer(conf):
         #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
         NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        #Some SF for sync
+        NTupleVariable("corr_JEC_Up", lambda x : x.pt_corr_TotalUp/x.pt, mcOnly=True),
+        NTupleVariable("corr_JEC_Down", lambda x : x.pt_corr_TotalDown/x.pt, mcOnly=True),
+        NTupleVariable("corr_JEC_PileUpDataMC_Down", lambda x : x.pt_corr_PileUpDataMCDown/x.pt, mcOnly=True),
+        NTupleVariable("corr_JEC_RelativeFSR_Up", lambda x : x.pt_corr_RelativeFSRUp/x.pt, mcOnly=True),
+
         NTupleVariable("puId", lambda x : x.puId),
         NTupleVariable("CSVrank", lambda x : getattr(x, "CSVrank", -99), type=int),
         NTupleVariable("CSVindex", lambda x : getattr(x, "CSVindex", -99), type=int),
@@ -553,23 +560,42 @@ def getTreeProducer(conf):
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
-        "Flag_goodVertices", 
-        #"Flag_GlobalTightHalo2016Filter", #Not in nanoAOD
         "Flag_HBHENoiseFilter",
         "Flag_HBHENoiseIsoFilter",
+        "Flag_CSCTightHaloFilter",
+        "Flag_CSCTightHaloTrkMuUnvetoFilter",
+        "Flag_CSCTightHalo2015Filter",
+        "Flag_globalTightHalo2016Filter",
+        "Flag_globalSuperTightHalo2016Filter",
+        "Flag_HcalStripHaloFilter",
+        "Flag_hcalLaserEventFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
+        "Flag_EcalDeadCellBoundaryEnergyFilter",
+        "Flag_ecalBadCalibFilter",
+        "Flag_goodVertices",
         "Flag_eeBadScFilter",
-
-        #TODO: These need to be added to VHBB somehow
-        # "Flag_BadPFMuonFilter",
-        # "Flag_BadChargedCandidateFilter",
-        # "badGlobalMuonTagger",
-        # "cloneGlobalMuonTagger",
+        "Flag_ecalLaserCorrFilter",
+        "Flag_trkPOGFilters",
+        "Flag_chargedHadronTrackResolutionFilter",
+        "Flag_muonBadTrackFilter",
+        "Flag_BadChargedCandidateFilter",
+        "Flag_BadPFMuonFilter",
+        "Flag_BadChargedCandidateSummer16Filter",
+        "Flag_BadPFMuonSummer16Filter",
+        "Flag_trkPOG_manystripclus53X",
+        "Flag_trkPOG_toomanystripclus53X",
+        "Flag_trkPOG_logErrorTooManyClusters",
+        "Flag_METFilters",
     ]
     for metfilter in metfilter_flags:
         treeProducer.globalVariables += [NTupleVariable(
             metfilter, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
         )]
+    
+    treeProducer.globalVariables += [NTupleVariable(
+        "passMETFilters", lambda ev, name="passMETFilters": getattr(ev, "passMETFilters", -1), type=int, mcOnly=False
+        )]
+                                                                    
        
     #Add systematically variated quantities
     for systematic in conf.general["systematics"]:
