@@ -32,7 +32,7 @@ workflows = [
     "memcheck", #specific MEM jobs that contain lots of hypotheses for validation, many interpretations
     "memcheck2", #specific MEM jobs that contain lots of hypotheses for validation, JES variations
     #"memcheck3", #Sudakov/Recoil
-    "training_sl", #specific samples for training ETH DNN in SL category
+    "training", #specific samples for training ETH DNN 
 ]
 
 import argparse
@@ -55,7 +55,7 @@ me_cfgs = {
     "hadronic_trigger" : "cfg_FH_trigSF.py",
     "memcheck": "cfg_memcheck.py",
     "memcheck2": "cfg_memcheck2.py",
-    "training_sl": "cfg_noME.py",
+    "training": "cfg_noME.py",
 }
 
 sets_data = [
@@ -170,14 +170,18 @@ for k in [
     workflow_datasets["leptonic"][k] = D
 
 # workflow for training samples SL
-workflow_datasets["training_sl"] = {}
+workflow_datasets["training"] = {}
 for k in [
-        "ttHTobb_sl",
-        "TTbar_sl2"
+        #"ttHTobb_sl",
+        "ttHTobb_dl",
+        #"ttHTobb_newPU",
+        #"TTbar_sl2",
+        #"TTbar_dl3",
+        #"TTbar_had1"
     ]:
     D = deepcopy(datasets[k])
     D["mem_cfg"] = "cfg_noME.py"
-    workflow_datasets["training_sl"][k] = D
+    workflow_datasets["training"][k] = D
 
 #now we construct the workflows from all the base datasets
 workflow_datasets["memcheck"] = {}
@@ -501,8 +505,8 @@ if __name__ == '__main__':
     ]
 
     config.Data.inputDBS = 'global'
-    config.Data.splitting = 'LumiBased'
-    #config.Data.splitting = 'FileBased'
+    #config.Data.splitting = 'LumiBased'
+    config.Data.splitting = 'FileBased'
     config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
