@@ -32,6 +32,7 @@ workflows = [
     "memcheck", #specific MEM jobs that contain lots of hypotheses for validation, many interpretations
     "memcheck2", #specific MEM jobs that contain lots of hypotheses for validation, JES variations
     #"memcheck3", #Sudakov/Recoil
+    "training_sl", #specific samples for training ETH DNN in SL category
 ]
 
 import argparse
@@ -53,7 +54,8 @@ me_cfgs = {
     "hadronic": "cfg_FH.py",
     "hadronic_trigger" : "cfg_FH_trigSF.py",
     "memcheck": "cfg_memcheck.py",
-    "memcheck2": "cfg_memcheck2.py"
+    "memcheck2": "cfg_memcheck2.py",
+    "training_sl": "cfg_noME.py",
 }
 
 sets_data = [
@@ -167,12 +169,22 @@ for k in [
     D["mem_cfg"] = "cfg_leptonic.py"
     workflow_datasets["leptonic"][k] = D
 
+# workflow for training samples SL
+workflow_datasets["training_sl"] = {}
+for k in [
+        "ttHTobb_sl",
+        "TTbar_sl2"
+    ]:
+    D = deepcopy(datasets[k])
+    D["mem_cfg"] = "cfg_noME.py"
+    workflow_datasets["training_sl"][k] = D
+
 #now we construct the workflows from all the base datasets
 workflow_datasets["memcheck"] = {}
 for k in [
         "ttHTobb",
         "ttHToNonbb",
-        "TTbar_had",
+        "TTbar_had1",
         #"ttbb",
         "TTbar_sl1",
         "TTbar_dl1",
@@ -190,7 +202,7 @@ for k in [
     workflow_datasets["memcheck2"][k] = D
 
 workflow_datasets["signal"] = {}
-for k in ["ttHTobb", "ttHToNonbb", "TTbar_had","TTbar_sl1",]:
+for k in ["ttHTobb", "ttHToNonbb", "TTbar_had1","TTbar_sl1",]:
     D = deepcopy(datasets[k])
     workflow_datasets["signal"][k] = D
 
@@ -198,7 +210,7 @@ workflow_datasets["leptonic_nome"] = {}
 for k in [
         "ttHTobb",
         "ttHToNonbb",
-        "TTbar_had",
+        "TTbar_had1",
         "TTbar_sl1",
         "TTbar_dl1",
         #"ww1", "ww2",
@@ -255,7 +267,7 @@ for k in datasets.keys():
 
 workflow_datasets["hadronic"] = {}
 for k in datasets.keys():
-    if k == "TTbar_had" or "ttH" in k or "QCD" in k:
+    if k == "TTbar_had1" or "ttH" in k or "QCD" in k:
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["hadronic"]
         workflow_datasets["hadronic"][k] = D
@@ -277,7 +289,7 @@ for k in datasets.keys():
 
 workflow_datasets["allmc_nome"] = {}
 for k in datasets.keys():
-    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had", "TTbar_sl1", "TTbar_dl1",] :
+    if "QCD" in k or k in ["ttHTobb", "ttHToNonbb", "TTbar_had1", "TTbar_sl1", "TTbar_dl1",] :
         D = deepcopy(datasets[k])
         D["mem_cfg"] = me_cfgs["nome"]
         workflow_datasets["allmc_nome"][k] = D
@@ -350,7 +362,7 @@ for k in [ "SingleElectron-Run2017F-31Mar2018-v1",
            "MuonEG-Run2017F-31Mar2018-v1",
            "JetHT-Run2017B-31Mar2018-v1",
            "BTagCSV-Run2017B-31Mar2018-v1",
-           "TTbar_had",
+           "TTbar_had1",
            "TTbar_sl1",
            "ttHTobb",
            "QCD1500to2000"
@@ -404,7 +416,7 @@ datasets_local = {
 }
 
 workflow_datasets["testing_withme"] = {}
-for k in ["TTbar_had","TTbar_sl1","TTbar_dl1"]:
+for k in ["TTbar_had1","TTbar_sl1","TTbar_dl1"]:
     D = deepcopy(datasets[k])
     D["perjob"] = int(D["perjob"]/10)
     D["maxlumis"] = 10 * D["perjob"]
@@ -490,6 +502,7 @@ if __name__ == '__main__':
 
     config.Data.inputDBS = 'global'
     config.Data.splitting = 'LumiBased'
+    #config.Data.splitting = 'FileBased'
     config.Data.publication = False
     config.Data.ignoreLocality = False
     config.Data.allowNonValidInputDataset = True
