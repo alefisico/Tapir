@@ -355,8 +355,8 @@ def getTreeProducer(conf):
         NTupleVariable("mcMatchIdx", lambda x : x.mcMatchIdx, mcOnly=True),
         #NTupleVariable("mcNumBHadrons", lambda x : x.genjet.numBHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
         #NTupleVariable("mcNumCHadrons", lambda x : x.genjet.numCHadrons if hasattr(x, "genjet") else -1, mcOnly=True),
-        NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
-        NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
+        #NTupleVariable("corr_JEC", lambda x : x.corr, mcOnly=True),
+        #NTupleVariable("corr_JER", lambda x : x.corr_JER, mcOnly=True),
         #Some SF for sync
         NTupleVariable("corr_JEC_Up", lambda x : x.pt_corr_TotalUp/x.pt, mcOnly=True),
         NTupleVariable("corr_JEC_Down", lambda x : x.pt_corr_TotalDown/x.pt, mcOnly=True),
@@ -442,10 +442,10 @@ def getTreeProducer(conf):
            #"MET_tt_nominal" : NTupleObject("met_ttbar_gen", metType, help="Generated MET from nu(top)"),
            "primaryVertex" : NTupleObject("pv", pvType, help="First PV"),
            "dilepton_p4" : NTupleObject("ll", p4type, help="Dilepton system"),
-           "jlr_top" : NTupleObject("jlr_top", p4type, help="Top quark from the JLR calculation", mcOnly=True),
-           "jlr_atop" : NTupleObject("jlr_atop", p4type, help="Antitop quark from the JLR calculation", mcOnly=True),
-           "jlr_bottom" : NTupleObject("jlr_bottom", p4type, help="bottom quark from the JLR calculation", mcOnly=True),
-           "jlr_abottom" : NTupleObject("jlr_abottom", p4type, help="Antibottom quark from the JLR calculation", mcOnly=True),
+           #"jlr_top" : NTupleObject("jlr_top", p4type, help="Top quark from the JLR calculation", mcOnly=True),
+           #"jlr_atop" : NTupleObject("jlr_atop", p4type, help="Antitop quark from the JLR calculation", mcOnly=True),
+           #"jlr_bottom" : NTupleObject("jlr_bottom", p4type, help="bottom quark from the JLR calculation", mcOnly=True),
+           #"jlr_abottom" : NTupleObject("jlr_abottom", p4type, help="Antibottom quark from the JLR calculation", mcOnly=True),
         },
         collections = {
         #standard dumping of objects
@@ -752,9 +752,9 @@ def getTreeProducer(conf):
         ("btagWeight_shapeCFERR2Up",            float,    "", lambda ev: ev.btagSF_shape_up_cferr2),
         ("btagWeight_shapeCFERR2Down",            float,    "", lambda ev: ev.btagSF_shape_down_cferr2),
 
-        ("prob_ttHbb",            float,    "squared matrix element for hypo ttHbb", lambda ev: ev.prob_ttHbb),
-        ("prob_ttbb",            float,    "squared matrix element for hypo ttbb", lambda ev: ev.prob_ttbb),
-        ("JointLikelihoodRatio",            float,    "joint likelihood ratio", lambda ev: ev.jointlikelihood),
+        #("prob_ttHbb",            float,    "squared matrix element for hypo ttHbb", lambda ev: ev.prob_ttHbb),
+        #("prob_ttbb",            float,    "squared matrix element for hypo ttbb", lambda ev: ev.prob_ttbb),
+        #("JointLikelihoodRatio",            float,    "joint likelihood ratio", lambda ev: ev.jointlikelihood),
 
         ("tth_rho_px_gen",  float,  ""),
         ("tth_rho_py_gen",  float,  ""),

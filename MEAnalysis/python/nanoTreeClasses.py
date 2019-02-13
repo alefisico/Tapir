@@ -254,8 +254,8 @@ class Jet:
             #self.pt = tree.Jet_pt[n]
             #self.corr_JER = 0.0
             self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
-            self.corr_JER = tree.Jet_corr_JER[n]
-            self.corr = tree.Jet_corr_JEC[n]
+            #self.corr_JER = tree.Jet_corr_JER[n]
+            #self.corr = tree.Jet_corr_JEC[n]
             
             # btag Weights
             self.btagSF = tree.Jet_btagSF[n]

@@ -421,15 +421,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         do_jlr = sample_name in ["ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8"]
     )
 
-    # computes input for NN (training or prediction)
+    # inference of ETH DNN
     NN_ana = cfg.Analyzer(
         MECoreAnalyzers.NNAnalyzer,
         'NN_input',
         _conf = python_conf,
         _analysis_conf = analysis_cfg,
-        framework = "nanoAOD",
-        training = True,
-        boosted = False
+        tag = "0",
     )
 
     gentth_pre = cfg.Analyzer(
@@ -508,8 +506,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             gentth,
             #multiclass_analyzer,
             mem_analyzer,
-            jointlikelihood_ana,
-            #NN_ana,
+            #jointlikelihood_ana,
+            NN_ana,
             mva,
             treevar,
 
@@ -665,8 +663,6 @@ if __name__ == "__main__":
         required=False
     )
     args = parser.parse_args(sys.argv[2:])
-
-    
 
     if args.files:
         files = args.files.split(",")
