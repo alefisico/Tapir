@@ -230,9 +230,6 @@ flattener.py --infile input.root --intree tree \
         flatten_commands.append(cmd)
     print("scalar branches", args.branch)
 
-    import pdb
-    pdb.set_trace()
-
     infile = ROOT.TFile.Open(args.infile)
     intree = infile.Get(args.intree)
 
