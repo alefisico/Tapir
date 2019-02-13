@@ -45,8 +45,10 @@ class NNAnalyzer(FilterAnalyzer):
 
     def process(self, event):
 
+        event.dnn_ttH = -1.
+
         # get numpy arrays for jets, leps, met
-        # further improvement: load this later on from DNN code automatically by tag
+        # todo: load features from DNN code automatically by tag
         met_feats = ["phi", "pt", "px", "py"]
         jet_feats = ["pt","eta","phi","en","px","py","pz","btagCSV"]
         lep_feats = ["pt","eta","phi","en","px","py","pz"] 
@@ -58,11 +60,10 @@ class NNAnalyzer(FilterAnalyzer):
         met = met.reshape([-1, len(met)])
 
         # get prediction from DNN model
+        # todo: update for multiclassification
         if event.is_dl:
             pred = self.model["dl"]({"cmb_jet_inp:0" : jets, "cmb_lep_inp:0" : leps, "cmb_met_inp:0" : met})
-            import pdb
-            pdb.set_trace()
-
-        # todo: update for multiclassification
+            p = float(pred['cmb_out/Sigmoid:0'][0])
+            event.dnn_ttH = p
 
         return True
