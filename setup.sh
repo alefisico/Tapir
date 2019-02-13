@@ -23,6 +23,9 @@ cd $CMSSW_BASE/src/TTH
 
 git submodule update --init --recursive
 
+#get DNN training code
+git clone ssh://git@gitlab.cern.ch:7999/chreisse/TTH_massfit.git DNN
+
 cd $CMSSW_BASE/src
 
 #FIXME: combine is not yet 80X?
