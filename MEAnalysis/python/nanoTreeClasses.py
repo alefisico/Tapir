@@ -33,7 +33,7 @@ class Electron:
         self.DPhi = -99#tree.Electron_DPhi[n];#KS: Not in nanoAOD. Please check this var.
         self.hoe = tree.Electron_hoe[n];
         #Disabled until new nanoAOD
-        self.mvaFall17Iso = tree.Electron_mvaFall17Iso[n];
+        self.mvaFall17Iso = tree.Electron_mvaFall17V1Iso[n];
         self.eleCutId = tree.Electron_cutBased[n]; #https://github.com/cms-nanoAOD/cmssw/blob/master/PhysicsTools/NanoAOD/python/electrons_cff.py#L187
         self.jetIdx = tree.Electron_jetIdx[n];
         self.etaSc = tree.Electron_deltaEtaSC[n] + tree.Electron_eta[n];
@@ -41,7 +41,7 @@ class Electron:
         if MC:
             pass
 
-        
+
         #### Old variables (for reference)
         #self.mcMatchIdx = tree.Electron_mcMatchIdx[n]; #KS: Not in nanoAOD. Please check this var.
         #self.mcMatchAny = tree.selLeptons_mcMatchAny[n];
@@ -137,7 +137,7 @@ class Muon:
         if MC:
             pass
 
-        
+
         #### Old variables (for reference)
         #self.convVeto = tree.selLeptons_convVeto[n];
         #self.lostHits = tree.selLeptons_lostHits[n];
@@ -213,13 +213,13 @@ class GenPart:
     def __init__(self, tree, n, MC):
         self.genPartIdxMother = tree.GenPart_genPartIdxMother[n]
         self.pdgId = tree.GenPart_pdgId[n]
-        
+
         self.pt = tree.GenPart_pt[n]
         self.eta = tree.GenPart_eta[n]
         self.phi = tree.GenPart_phi[n]
         self.mass = tree.GenPart_mass[n]
         pass
-    @staticmethod   
+    @staticmethod
     def make_array(input, MC = True):
         return [GenPart(input, i, MC) for i in range(input.nGenPart)]
 
@@ -244,9 +244,9 @@ class Jet:
             self.hadronFlavour = tree.Jet_hadronFlavour[n];
             self.genJetIdx = tree.Jet_genJetIdx[n];
             pass
-        
+
         self.rawPt = tree.Jet_pt[n] * (1-tree.Jet_rawFactor[n]);
-        self.corr = 1/(1-tree.Jet_rawFactor[n]); 
+        self.corr = 1/(1-tree.Jet_rawFactor[n]);
         self.nanoPt = tree.Jet_pt[n];
         if not MC:
             self.pt = tree.Jet_pt[n];
@@ -256,7 +256,7 @@ class Jet:
             self.pt = tree.Jet_pt_nom[n]; #corrected pt from nanoAOD * JER (from postprocessing)
             #self.corr_JER = tree.Jet_corr_JER[n]
             #self.corr = tree.Jet_corr_JEC[n]
-            
+
             # btag Weights
             self.btagSF = tree.Jet_btagSF[n]
             self.btagSF_up = tree.Jet_btagSF_up[n]
@@ -435,7 +435,7 @@ class PV:
         return [PV(input)]
 class met:
     """
-    
+
     """
     @staticmethod
     def make_obj(tree, MC = False):
@@ -449,15 +449,15 @@ class met:
         #_eta = getattr(tree, "met_eta", None)
         #_phi = getattr(tree, "met_phi", None)
         #_mass = getattr(tree, "met_mass", None)
-        
-        
+
+
         if MC:
             _genPt = getattr(tree, "GenMET_pt", None)#KS: Not sure if this is correct
             _genPhi = getattr(tree, "GenMET_phi", None)#KS: Not sure if this is correct
         else:
             _genPt = -99
             _genPhi = -99
-            
+
         #return met(_pt,0, _phi, 0, _sumEt, 0, 0, 0, _genPt, _genPhi, 0)
         return met(_pt, _phi, _sumEt, _genPt, _genPhi)
     #def __init__(self, pt,eta,phi,mass,sumEt,rawPt,rawPhi,rawSumEt,genPt,genPhi,genEta):
@@ -478,7 +478,7 @@ class met:
 
 class trggerObject:
     """
-    Accessing the trigger objects saved in nanoAOD. 
+    Accessing the trigger objects saved in nanoAOD.
 
     Trigger Objects are saved in nanoAOD as TrigObj_* with len nTrigObj
     They can be identified with the TrigObj_id variable
@@ -562,7 +562,7 @@ class FatjetCA15SoftDrop:
         self.tau3 = tree.FatjetCA15SoftDrop_tau3[n];
         self.subJetIdx1 = tree.FatjetCA15SoftDrop_subJetIdx1[n];
         self.subJetIdx2 = tree.FatjetCA15SoftDrop_subJetIdx2[n];
-        self.subjetIDPassed = tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx1[n]] == 1 and tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx2[n]] == 1 
+        self.subjetIDPassed = tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx1[n]] == 1 and tree.FatjetCA15SoftDropSubjets_IDPassed[tree.FatjetCA15SoftDrop_subJetIdx2[n]] == 1
         pass
     @staticmethod
     def make_array(input, MC = False):

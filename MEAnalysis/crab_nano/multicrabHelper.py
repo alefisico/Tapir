@@ -2,7 +2,8 @@ import json, yaml
 import os
 
 #def getDatasets(mem_cfg, script, files = ["ttH.json","ttbar.json","otherbkg.json", "QCD.json"]):
-def getDatasets(mem_cfg, script, files = ["ttH_CMSSW_9X.json","ttbar_CMSSW_9X.json","otherbkg_CMSSW_9X.json", "QCD_CMSSW_9X.json"]):
+#def getDatasets(mem_cfg, script, files = ["ttH_CMSSW_9X.json","ttbar_CMSSW_9X.json","otherbkg_CMSSW_9X.json", "QCD_CMSSW_9X.json"]):
+def getDatasets(mem_cfg, script, files = ["ttH_CMSSW_102X.json","ttbar_CMSSW_102X.json"]):
     pwd = os.getcwd()
 
 
@@ -17,7 +18,7 @@ def getDatasets(mem_cfg, script, files = ["ttH_CMSSW_9X.json","ttbar_CMSSW_9X.js
             files.remove(filename)
         else:
             iFiles += 1
-            
+
     if iFiles == 0:
         print "No file for MC datasets"
         answer = raw_input("Is this correct? Type y to go on: ")
@@ -39,7 +40,7 @@ def getDatasets(mem_cfg, script, files = ["ttH_CMSSW_9X.json","ttbar_CMSSW_9X.js
             retDataSets[ds] = data[ds]
 
     return retDataSets
-    
+
 
 
 

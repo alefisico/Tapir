@@ -71,10 +71,10 @@ class BufferedTree:
 
     def __deepcopy__(self, memo):
         return BufferedTree(deepcopy(self.tree, memo))
-    
+
     def __iter__(self):
         return self
-    
+
 class BufferedChain( object ):
     """Wrapper to TChain, with a python iterable interface.
 
@@ -123,7 +123,7 @@ class BufferedChain( object ):
     def __len__(self):
         return int(self.chain.GetEntries())
 
-    
+
     def __getitem__(self, index):
         """
         Returns the event at position index.
@@ -149,7 +149,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #configure logging
     log_format = ('%(levelname)-8s %(module)-20s %(message)s')
     logging.basicConfig(stream=sys.stdout, level=getattr(logging, loglevel), format=log_format)
-    
+
     mem_python_config = analysis_cfg.mem_python_config.replace("$CMSSW_BASE", os.environ["CMSSW_BASE"])
     #Create python configuration object based on path
 
@@ -256,7 +256,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf
     )
 
-    
+
     #Set passMETFilters flag according to list in config
     metfilter_ana = cfg.Analyzer(
         MECoreAnalyzers.METFilterAnalyzer,
@@ -264,7 +264,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf,
         _analysis_conf = analysis_cfg,
     )
-    
+
     #Set the json flag according to the provided data json
     lumilist_ana = cfg.Analyzer(
         MECoreAnalyzers.LumiListAnalyzer,
@@ -281,7 +281,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #fills the passPV flag 
+    #fills the passPV flag
     pvana = cfg.Analyzer(
         MECoreAnalyzers.PrimaryVertexAnalyzer,
         'pvana',
@@ -320,7 +320,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         'jets',
         _conf = python_conf
     )
-    
+
     btagweight = cfg.Analyzer(
         MECoreAnalyzers.BtagWeightAnalyzer,
         'btagweight',
@@ -340,7 +340,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _conf = python_conf,
         _analysis_conf = analysis_cfg,
     )
-    
+
     #calculates the number of matched simulated B, C quarks for tt+XY matching
     genrad = cfg.Analyzer(
         MECoreAnalyzers.GenRadiationModeAnalyzer,
@@ -610,7 +610,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #execute the code
     looper.loop()
     LOG_MODULE_NAME.info("Looper done")
-    
+
     tf = looper.setup.services["outputfile"].file
     #tf.cd()
     #ts = ROOT.TNamed("config", conf_to_str(python_conf))
@@ -619,10 +619,10 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #write the output
     LOG_MODULE_NAME.info("writing the looper output to {0}".format(looper.name))
     looper.write()
-    
+
     return looper.name, files
 
-if __name__ == "__main__":   
+if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
     if len(sys.argv) == 1:
         print "Call signature:"

@@ -22,7 +22,7 @@ def fillCoreVariables(self, tr, event, isMC):
 def declareCoreVariables(self, tr, isMC):
     pass
 
-AutoFillTreeProducer.declareCoreVariables = declareCoreVariables 
+AutoFillTreeProducer.declareCoreVariables = declareCoreVariables
 AutoFillTreeProducer.fillCoreVariables = fillCoreVariables
 
 def makeGlobalVariable(vtype, systematic="nominal", mcOnly=False):
@@ -213,7 +213,7 @@ higgsCandidateType = NTupleObjectType("higgsCandidateType", variables = [
     NTupleVariable("mass", lambda x: x.mass ),
     NTupleVariable("tau1", lambda x: x.tau1 ),
     NTupleVariable("tau2", lambda x: x.tau2 ),
-    NTupleVariable("tau3", lambda x: x.tau3 ),    
+    NTupleVariable("tau3", lambda x: x.tau3 ),
     NTupleVariable("tau1SD", lambda x: x.tau1SD ),
     NTupleVariable("tau2SD", lambda x: x.tau2SD ),
     NTupleVariable("tau3SD", lambda x: x.tau3SD ),
@@ -289,12 +289,12 @@ def getTreeProducer(conf):
         NTupleVariable("dw_" + fc, lambda x,fc=fc : getattr(x, "dw", {}).get(fc, 0.0), type=float)
         for fc in conf.mem["jet_corrections"]
     ]
-    
+
     variated_vars = [
         NTupleVariable("var_" + fc, lambda x,i=i : x.variated.at(i) if x.variated.size()>i else 0.0, type=float)
         for (i, fc) in enumerate(conf.mem["jet_corrections"])
     ]
-    
+
     memType_nominal = NTupleObjectType("memType", variables = [
         NTupleVariable("p", lambda x : x.p),
         NTupleVariable("p_err", lambda x : x.p_err),
@@ -304,7 +304,7 @@ def getTreeProducer(conf):
         #NTupleVariable("efficiency", lambda x : x.efficiency),
         NTupleVariable("nperm", lambda x : x.num_perm, type=int),
     ] + factorized_dw_vars + variated_vars)
-    
+
     memType_syst = NTupleObjectType("memType", variables = [
         NTupleVariable("p", lambda x : x.p),
         NTupleVariable("p_err", lambda x : x.p_err),
@@ -314,7 +314,7 @@ def getTreeProducer(conf):
         #NTupleVariable("efficiency", lambda x : x.efficiency),
         #NTupleVariable("nperm", lambda x : x.num_perm, type=int),
     ])
-   
+
     #create jet up/down variations
     corrs = [NTupleVariable(
             "pt_corr_"+c,
@@ -330,7 +330,7 @@ def getTreeProducer(conf):
         NTupleVariable("eta", lambda x : x.eta),
         NTupleVariable("phi", lambda x : x.phi),
         NTupleVariable("mass", lambda x : x.mass),
-        NTupleVariable("id", lambda x : x.jetId),  
+        NTupleVariable("id", lambda x : x.jetId),
         NTupleVariable("qgl", lambda x : x.qgl),
         NTupleVariable("btagCSV", lambda x : x.btagCSV),
         NTupleVariable("btagDeepCSV", lambda x : x.btagDeepCSV),
@@ -395,7 +395,7 @@ def getTreeProducer(conf):
                type=int,
                help="Number of generated quarks from W", mcOnly=True
             ),
-            
+
             NTupleVariable(
                "passPV", lambda ev: getattr(ev, "passPV", -1),
                type=int,
@@ -432,7 +432,8 @@ def getTreeProducer(conf):
             NTupleVariable("csv2", lambda ev: getattr(ev, "csv2", -9999), type=float, help="2nd highest jet csv value"),
             NTupleVariable("run", lambda ev: ev.input.run, type=int),
             NTupleVariable("lumi", lambda ev: ev.input.luminosityBlock, type=int),
-            NTupleVariable("evt", lambda ev: ev.input.event, type=int, storageType="l"),
+            NTupleVariable("event", lambda ev: ev.input.event, type=int),
+            #NTupleVariable("evt", lambda ev: ev.input.event, type=int),
 
         ],
         globalObjects = {
@@ -464,12 +465,12 @@ def getTreeProducer(conf):
 
             "good_jets_nominal" : NTupleCollection("jets", jetType, 16, help="Selected resolved jets, pt ordered"),
             "good_leptons_nominal" : NTupleCollection("leps", leptonType, 2, help="Selected leptons"),
-            
+
             "loose_jets_nominal" : NTupleCollection("loose_jets", jetType, 6, help="Additional jets with 20<pt<30"),
 
         }
     )
-    
+
     #add HLT bits to final tree
     trignames = []
     triggerlist = list(conf.trigger["trigTable"].items()) + list(conf.trigger["trigTableData"].items())
@@ -477,7 +478,7 @@ def getTreeProducer(conf):
     for pathname, trigs in triggerlist:
         #add trigger path (combination of trigger)
         _pathname = "_".join(["HLT", pathname])
-        if not _pathname in trignames and "ttH" in _pathname: #Only save path with ttH in name 
+        if not _pathname in trignames and "ttH" in _pathname: #Only save path with ttH in name
             trignames += [_pathname]
 
         #add individual trigger bits
@@ -486,12 +487,12 @@ def getTreeProducer(conf):
             tn = "HLT_BIT_" + tn
             if not tn in trignames:
                 trignames += [tn]
-                
+
     for mergedPath in conf.trigger["MergePaths"]:
         _pathname = "HLT_ttH_"+mergedPath
         if not _pathname in trignames:
             trignames += [_pathname]
-            
+
     for trig in trignames:
         if trig.startswith("HLT_BIT_"):
             trig_ = trig[len("HLT_BIT_"):] #Bit is saved w/o "HLT_BIT_" in the beginning
@@ -502,26 +503,26 @@ def getTreeProducer(conf):
             treeProducer.globalVariables += [NTupleVariable(
                 trig, lambda ev, name=trig: getattr(ev, name, -1), type=int, mcOnly=False
             )]
-        
+
     if conf.general["boosted"] == True:
         treeProducer.globalVariables += [NTupleVariable(
             "n_bjets",
             lambda ev: getattr(ev, "n_bjets_nominal", -1),
             help="Number of selected bjets in event"
         )]
-    
+
         treeProducer.globalVariables += [NTupleVariable(
            "n_ljets",
            lambda ev: getattr(ev, "n_ljets_nominal", -1),
            help="Number of selected ljets in event"
         )]
-    
+
         treeProducer.globalVariables += [NTupleVariable(
            "n_boosted_bjets",
            lambda ev: getattr(ev, "n_boosted_bjets_nominal", -1),
            help="Number of selected bjets in subjet-modified bjet list"
         )]
-    
+
         treeProducer.globalVariables += [NTupleVariable(
            "n_boosted_ljets",
            lambda ev: getattr(ev, "n_boosted_ljets_nominal", -1),
@@ -533,13 +534,13 @@ def getTreeProducer(conf):
            lambda ev: getattr(ev, "n_boosted_allljets_nominal", -1),
            help="Number of selected ljets in subjet-modified ljet list, including additional FSR + ISR jets"
         )]
-    
+
         treeProducer.globalVariables += [NTupleVariable(
            "n_excluded_bjets",
            lambda ev: getattr(ev, "n_excluded_bjets_nominal", -1),
            help="Number of excluded bjets: reco resolved b-jets that match a subjet in the HTT-candidate"
         )]
-    
+
         treeProducer.globalVariables += [NTupleVariable(
            "n_excluded_ljets",
            lambda ev: getattr(ev, "n_excluded_ljets_nominal", -1),
@@ -555,8 +556,8 @@ def getTreeProducer(conf):
         treeProducer.collections.update({"higgsCandidate_nominal": NTupleCollection("higgsCandidate", higgsCandidateAK8Type, 4, help="Boosted Higgs candidates")})
 
         treeProducer.collections.update({"boosted_bjets_nominal": NTupleCollection("boosted_bjets", kinType, 4, help="Boosted b jets")})
-        treeProducer.collections.update({"boosted_ljets_nominal": NTupleCollection("boosted_ljets", kinType, 4, help="Boosted l jets")})      
-    
+        treeProducer.collections.update({"boosted_ljets_nominal": NTupleCollection("boosted_ljets", kinType, 4, help="Boosted l jets")})
+
     #MET filter flags added in VHBB
     #According to https://gitlab.cern.ch/ttH/reference/blob/master/definitions/Moriond17.md#42-met-filters
     metfilter_flags = [
@@ -591,12 +592,12 @@ def getTreeProducer(conf):
         treeProducer.globalVariables += [NTupleVariable(
             metfilter, lambda ev, name=metfilter: getattr(ev.input, name, -1), type=int, mcOnly=False
         )]
-    
+
     treeProducer.globalVariables += [NTupleVariable(
         "passMETFilters", lambda ev, name="passMETFilters": getattr(ev, "passMETFilters", -1), type=int, mcOnly=False
         )]
-                                                                    
-       
+
+
     #Add systematically variated quantities
     for systematic in conf.general["systematics"]:
 
@@ -653,7 +654,7 @@ def getTreeProducer(conf):
             ("nBCSVT",              int,      "Number of good jets that pass the DeepCSV Tight WP"),
             ("nBCSVL",              int,      "Number of good jets that pass the DeepCSV Loose WP"),
             ("nBDeepCSVM",          int,      "Number of good jets that pass the DeepCSV Medium WP"),
-            #("nCSVv2IVFM",              int,      ""),                
+            #("nCSVv2IVFM",              int,      ""),
             ("nBCMVAM",             int,      "Number of good jets that pass cMVAv2 Medium WP"),
             ("numJets",             int,        "Total number of good jets that pass jet ID"),
             #("ht",                  float,      ""),
@@ -668,13 +669,13 @@ def getTreeProducer(conf):
                 is_mc_only = True
 
             treeProducer.globalVariables += [makeGlobalVariable(vtype, systematic, mcOnly=is_mc_only)]
-        #end of loop over syst variables 
-        
+        #end of loop over syst variables
+
         syst_suffix = "_" + systematic
         syst_suffix2 = syst_suffix
         if systematic == "nominal":
             syst_suffix2 = ""
-       
+
         treeProducer.collections.update({"Detaj"+syst_suffix : NTupleCollection("Detaj"+syst_suffix2, arrayType, 15, help="Average deltaEta to (N+1)th closest jet", mcOnly=is_mc_only)})
         #add nominal and systematically variated final MEM ratios
         #these are simple scalars already
@@ -697,7 +698,7 @@ def getTreeProducer(conf):
             memType = memType_nominal
         for hypo in conf.mem["methodsToRun"]:
             for proc in ["tth", "ttbb"]:
-                name = "mem_{0}_{1}".format(proc, hypo) 
+                name = "mem_{0}_{1}".format(proc, hypo)
                 treeProducer.globalObjects.update({
                     name + syst_suffix: NTupleObject(
                         name + syst_suffix2, memType ,
@@ -772,7 +773,7 @@ def getTreeProducer(conf):
             ("nMatch_b_higgs",          int,    "number of b-quarks matched to HiggsTagger subjets"),
         ]:
             treeProducer.globalVariables += [makeGlobalVariable(vtype, "nominal", mcOnly=True)]
-   
+
     #for bweight in bweights:
     #    treeProducer.globalVariables += [
     #        makeGlobalVariable((bweight, float, ""), "nominal", mcOnly=True)
