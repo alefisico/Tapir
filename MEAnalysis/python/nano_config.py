@@ -20,7 +20,7 @@ class NanoConfig:
             self.algoBtag = "csvv2"
             print "Using CMSSW 92X"
         #For RunIIFall17MiniAOD we need v1
-        elif setEra == "94Xv1": 
+        elif setEra == "94Xv1":
             self.eraMC = "Run2_2017,run2_nanoAOD_94XMiniAODv1"
             self.eraData = "Run2_2017,run2_nanoAOD_94XMiniAODv1"
             self.conditionsMC = "94X_mc2017_realistic_v13"
@@ -36,7 +36,15 @@ class NanoConfig:
             self.eraBtagSF = "2017"
             self.algoBtag = "deepcsv"
             print "Using CMSSW 94X with v2 era"
-        
+        elif setEra == "102Xv1":
+            self.eraMC = "Run2_2018,run2_nanoAOD_102Xv1"
+            self.eraData = "Run2_2018,run2_nanoAOD_102Xv1"
+            self.conditionsMC = "101X_upgrade2018_realistic_v7"
+            self.conditionsData = "101X_upgrade2018_realistic_v7"
+            self.eraBtagSF = "2017"
+            self.algoBtag = "deepcsv"
+            print "Using CMSSW 102X with v2 era"
+
         imports = []
         if jec:
             imports += [
@@ -55,13 +63,13 @@ class NanoConfig:
         self.json = None #Intended use: Skimming
         self.cuts = None #Intended use: Skimming
         self.branchsel = None #Intended use: Skimming
-        
+
         from importlib import import_module
         import sys
 
         #Imports the various nanoAOD postprocessor modules
         self.modules = []
-        for mod, names in imports: 
+        for mod, names in imports:
             import_module(mod)
             obj = sys.modules[mod]
             selnames = names.split(",")

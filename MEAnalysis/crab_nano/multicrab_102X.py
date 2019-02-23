@@ -24,7 +24,7 @@ workflows = [
 #    "QCD_nome", #QCD samples without MEM
 #    "pilot", #ttH sample only, with no MEM
 #    "signal", #signal sample with common config
-#    "testing", #single-lumi jobs, a few samples
+    "testing", #single-lumi jobs, a few samples
 #    "testing_withme", #single-lumi jobs, a few samples
 #    "allmc_nome", # SL, DL and FH, no matrix element
 #    "testall",#Test all samples w/ small nJobs and no ME
@@ -59,47 +59,46 @@ me_cfgs = {
 }
 
 sets_data = [
-    "/MuonEG/Run2017B-31Mar2018-v1/MINIAOD",
-    "/MuonEG/Run2017C-31Mar2018-v1/MINIAOD",
-    "/MuonEG/Run2017D-31Mar2018-v1/MINIAOD",
-    "/MuonEG/Run2017E-31Mar2018-v1/MINIAOD",
-    "/MuonEG/Run2017F-31Mar2018-v1/MINIAOD",
-
-    "/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD",
-    "/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD",
-    "/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD",
-    "/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD",
-    "/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD",
-
-    "/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD",
-    "/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD",
-    "/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD",
-    "/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD",
-    "/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD",
-
-    "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
-    "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
-    "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
-    "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
-    "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
-
-    "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
-    "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
-    "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
-    "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
-    "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
-
-    "/JetHT/Run2017B-31Mar2018-v1/MINIAOD",
-    "/JetHT/Run2017C-31Mar2018-v1/MINIAOD",
-    "/JetHT/Run2017D-31Mar2018-v1/MINIAOD",
-    "/JetHT/Run2017E-31Mar2018-v1/MINIAOD",
-    "/JetHT/Run2017F-31Mar2018-v1/MINIAOD",
-
-    "/BTagCSV/Run2017B-31Mar2018-v1/MINIAOD",
-    "/BTagCSV/Run2017C-31Mar2018-v1/MINIAOD",
-    "/BTagCSV/Run2017D-31Mar2018-v1/MINIAOD",
-    "/BTagCSV/Run2017E-31Mar2018-v1/MINIAOD",
-    "/BTagCSV/Run2017F-31Mar2018-v1/MINIAOD",
+#    "/MuonEG/Run2017B-31Mar2018-v1/MINIAOD",
+#    "/MuonEG/Run2017C-31Mar2018-v1/MINIAOD",
+#    "/MuonEG/Run2017D-31Mar2018-v1/MINIAOD",
+#    "/MuonEG/Run2017E-31Mar2018-v1/MINIAOD",
+#    "/MuonEG/Run2017F-31Mar2018-v1/MINIAOD",
+#
+#    "/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+#    "/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+#    "/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+#    "/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+#    "/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD",
+#
+#    "/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD",
+#    "/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD",
+#    "/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD",
+#    "/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD",
+#    "/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD",
+#
+#    "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
+#    "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
+#    "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
+#    "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
+#    "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
+#
+    "/SingleMuon/Run2018A-17Sep2018-v1/MINIAOD",
+    "/SingleMuon/Run2018B-17Sep2018-v1/MINIAOD",
+    "/SingleMuon/Run2018C-17Sep2018-v1/MINIAOD",
+    "/SingleMuon/Run2018D-PromptReco-v2/MINIAOD",
+#
+#    "/JetHT/Run2017B-31Mar2018-v1/MINIAOD",
+#    "/JetHT/Run2017C-31Mar2018-v1/MINIAOD",
+#    "/JetHT/Run2017D-31Mar2018-v1/MINIAOD",
+#    "/JetHT/Run2017E-31Mar2018-v1/MINIAOD",
+#    "/JetHT/Run2017F-31Mar2018-v1/MINIAOD",
+#
+#    "/BTagCSV/Run2017B-31Mar2018-v1/MINIAOD",
+#    "/BTagCSV/Run2017C-31Mar2018-v1/MINIAOD",
+#    "/BTagCSV/Run2017D-31Mar2018-v1/MINIAOD",
+#    "/BTagCSV/Run2017E-31Mar2018-v1/MINIAOD",
+#    "/BTagCSV/Run2017F-31Mar2018-v1/MINIAOD",
 ]
 
 #all available datasets.
@@ -363,10 +362,10 @@ for k in  workflow_datasets["hadronic_nome"].keys():
 
 
 workflow_datasets["testall"] = {}
-for k in [ "SingleElectron-Run2017F-31Mar2018-v1",
-           "MuonEG-Run2017F-31Mar2018-v1",
-           "JetHT-Run2017B-31Mar2018-v1",
-           "BTagCSV-Run2017B-31Mar2018-v1",
+for k in [ #"SingleElectron-Run2017F-31Mar2018-v1",
+           #"MuonEG-Run2017F-31Mar2018-v1",
+           #"JetHT-Run2017B-31Mar2018-v1",
+           #"BTagCSV-Run2017B-31Mar2018-v1",
            #"TTbar_had1",
            "TTbar_sl1",
            "ttHTobb",
@@ -393,8 +392,9 @@ workflow_datasets["pilot"][pilot_name] = D
 workflow_datasets["testing"] = {}
 
 for k in [
-    "SingleElectron-Run2017F-31Mar2018-v1",
-    "ttHTobb",
+    #"SingleMuon-Run2018A-17Sep2018-v1",
+    #"ttHTobb",
+    "TTbar_sl1"
     ]:
     D = deepcopy(datasets[k])
     D["maxlumis"] = 20

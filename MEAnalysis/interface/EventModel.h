@@ -303,7 +303,7 @@ public:
 //Static (unchangin) data type that represents the event content
 class EventDescription {
 public:
-    unsigned long long evt;
+    unsigned long long event;
     unsigned int run;
     unsigned int lumi;
     int json;
@@ -371,7 +371,7 @@ public:
 
     TTreeReader reader;
 
-    TTreeReaderValue<int> evt;
+    TTreeReaderValue<int> event;
     TTreeReaderValue<int> run;
     TTreeReaderValue<int> lumi;
     TTreeReaderValue<int> json;
@@ -422,7 +422,7 @@ public:
 
     TreeDescription(TFile* file, SampleDescription sample) :
         reader("tree", file),
-        evt(reader, "evt"),
+        event(reader, "event"),
         run(reader, "run"),
         lumi(reader, "lumi"),
         json(reader, "json"),

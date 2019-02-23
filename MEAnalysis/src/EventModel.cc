@@ -161,7 +161,7 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
 
     event.run = *(this->run);
     event.lumi = *(this->lumi);
-    event.evt = *(this->evt);
+    event.event = *(this->event);
     event.json = *(this->json);
 
     event.is_sl = *(this->is_sl);

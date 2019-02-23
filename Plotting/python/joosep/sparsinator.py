@@ -9,7 +9,7 @@ import os
 from collections import OrderedDict
 import logging
 LOG_MODULE_NAME = logging.getLogger(__name__)
-    
+
 import numpy as np
 from TTH.MEAnalysis.samples_base import getSitePrefix, get_prefix_sample, TRIGGERPATH_MAP
 from TTH.Plotting.Datacards.sparse import add_hdict, save_hdict
@@ -88,7 +88,7 @@ syst_pairs = OrderedDict([
         "CMS_ttH_CSVlf",
         "CMS_ttH_CSVlfstats1",
         "CMS_ttH_CSVlfstats2",
-        
+
         "CMS_ttH_scaleME",
 
         "CMS_pu",
@@ -185,7 +185,7 @@ def fillBase(matched_processes, event, syst, schema):
             dooverflow = True
             if "_topCandidate" in k or "_higgsCandidate" in k:
                 dooverflow = False
-            weight = 1.0 
+            weight = 1.0
             if schema == "mc" or schema == "mc_syst":
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
@@ -196,7 +196,7 @@ def fillBase(matched_processes, event, syst, schema):
 
 
 def fillSystematic(matched_processes, event, systematic_weights, schema):
-    #pre-compute the event weights 
+    #pre-compute the event weights
     precomputed_weights = [
         (syst_weight, weightfunc(event))
         for (syst_weight, weightfunc) in systematic_weights
@@ -233,17 +233,17 @@ class FakeJet:
 
     def pt(self):
         return self._pt
-    
+
     def eta(self):
         return self._eta
-    
+
     def hadronFlavour(self):
         return self._hadronFlavour
-    
+
     def btag(self, algo):
         return self._csv
 
- 
+
 def createEvent(
     events, syst, schema,
     matched_processes,
@@ -254,10 +254,10 @@ def createEvent(
     """
     Creates an event with a specified systematic.
     """
-    
+
 
     event = events.create_event(syst_pairs[syst])
-    if schema.startswith("mc"): 
+    if schema.startswith("mc"):
         event.topPTweight = 1.0
         event.topPTweightUp = 1.0
         event.topPTweightDown = 1.0
@@ -266,20 +266,20 @@ def createEvent(
             event.topPTweightUp = topPTreweightUp(event.genTopLep_pt, event.genTopHad_pt)
             event.topPTweightDown = topPTreweightDown(event.genTopLep_pt, event.genTopHad_pt)
     event.leps_pdgId = [x.pdgId for x in event.leptons]
-    
+
     event.triggerPath = triggerPath(event)
 
     event.btag_LR_4b_2b_btagCSV_logit = logit(event.btag_LR_4b_2b_btagCSV)
     any_passes = applyCuts(event, matched_processes)
-   
+
     #workaround for passall=False systematic migrations
     if any_passes and len(event.jets) == 0:
         LOG_MODULE_NAME.info("Event {0}:{1}:{2} has 0 reconstructed jets, likely a weird systematic migration".format(event.run, event.lumi, event.evt))
         return None
-  
+
     if not any_passes:
         return None
-   
+
     #scaleME should be used only for some samples
     if not "scaleME" in sample.tags:
         event.weights[syst_pairs["CMS_ttH_scaleMEDown"]] = 1.0
@@ -317,7 +317,7 @@ def createEvent(
         event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
 
         #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
-   
+
     ##get MEM from the classifier database
     #ret["common_mem"] = -99
     #if do_classifier_db:
@@ -329,7 +329,7 @@ def createEvent(
     #            ret["common_mem"] = classifiers.mem_p_sig / (classifiers.mem_p_sig + float(MEM_SF) * classifiers.mem_p_bkg)
     #    else:
     #        ret["common_mem"] = -99
-    
+
     event.common_bdt = 0
 
     #calculate BDT using the CommonClassifier
@@ -359,7 +359,7 @@ def createEvent(
 
 def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1, outfilter=None):
     """Summary
-    
+
     Args:
         analysis (Analysis): The main Analysis object used to configure sparsinator
         file_names (list of string): the PFN of the files to process
@@ -367,14 +367,14 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         ofname (string): Name of the file
         skip_events (int, optional): Number of events to skip
         max_events (int, optional): Number of events to process
-    
+
     Returns:
         nothing
-    
+
     Raises:
         Exception: Description
     """
-    
+
     #Need to access this to initialize the library (?)
     do_hadronic = analysis.config.getboolean("sparsinator", "do_hadronic")
     if do_hadronic:
@@ -395,7 +395,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     # ttH/sl/sparse -> nominal event
     # ttH/sl/sparse_CMS_ttH_CSVJESUp -> event with btagWeight with JES up variation
     # ...
-    
+
     systematic_weights = []
 
     systematics_event = []
@@ -429,7 +429,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
         #systematics with weight
         systematics_weight_nosdir = analysis.config.get("systematics", "weight").split()
-        
+
         ##create b-tagging systematics
         systematics_btag = [s.replace("CMS_ttH_CSV", "") for s in systematics_weight_nosdir if s.startswith("CMS_ttH_CSV")]
         for sdir in ["Up", "Down"]:
@@ -492,7 +492,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     sample = analysis.get_sample(sample_name)
     schema = sample.schema
     boosted = sample.boosted
-    sample_systematic = False 
+    sample_systematic = False
 
     #now we find which processes are matched to have this sample as an input
     #these processes are used to generate histograms
@@ -512,7 +512,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     xs_weight = matched_proc.xs_weight,
                     systematic_name = syst_sample + "Up"
                 )
-                LOG_MODULE_NAME.info("replacing {0} with {1}".format(matched_proc.full_name, matched_proc_new.full_name))       
+                LOG_MODULE_NAME.info("replacing {0} with {1}".format(matched_proc.full_name, matched_proc_new.full_name))
                 matched_procs_new += [matched_proc_new]
             if matched_proc in procs_down:
                 matched_proc_new = SystematicProcess(
@@ -522,9 +522,9 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                     xs_weight = matched_proc.xs_weight,
                     systematic_name = syst_sample + "Down"
                 )
-                LOG_MODULE_NAME.info("replacing {0} with {1}".format(matched_proc.full_name, matched_proc_new.full_name))       
+                LOG_MODULE_NAME.info("replacing {0} with {1}".format(matched_proc.full_name, matched_proc_new.full_name))
                 matched_procs_new += [matched_proc_new]
-  
+
     if len(matched_procs_new) > 0:
         if len(matched_procs_new) != len(matched_processes):
             raise Exception("Could not match each process to a systematic replacement!")
@@ -541,7 +541,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     if do_classifier_db:
         cls_db = ClassifierDB(filename=sample.classifier_db_path)
-    
+
     #configure systematic scenarios according to MC/Data
     if schema == "mc":
         systematics_event = ["nominal"] + systematics_event
@@ -553,17 +553,17 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     LOG_MODULE_NAME.info("systematics_weight: " + str(systematics_weight))
 
     all_systematics = systematics_event + systematics_weight
-   
+
     outfile = ROOT.TFile(ofname, "RECREATE")
     outfile.cd()
-    
+
     #pre-create output histograms
     for proc in matched_processes:
         LOG_MODULE_NAME.info("creating outputs for {0}, xsw={1}".format(proc.full_name, proc.xs_weight))
         outdict_syst, outdict_cuts = proc.createOutputs(outfile, analysis, all_systematics, outfilter)
         proc.outdict_syst = outdict_syst
         proc.outdict_cuts = outdict_cuts
-    
+
     nevents = 0
 
     break_file_loop = False
@@ -644,7 +644,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
                 raise Exception("Expected same number of entries in main tree and postprocessed tree")
 
         LOG_MODULE_NAME.info("looping over {0} events".format(events.reader.GetEntries(True)))
-       
+
         iEv = 0
 
         #Loop over events using the TTreeReader
@@ -729,7 +729,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
                 fillBase(matched_processes, event, syst, schema)
                 #Fill the base histogram
-               
+
                 #nominal event, fill also histograms with systematic weights
                 if syst == "nominal" and schema == "mc" and not sample_systematic:
                     fillSystematic(matched_processes, event, systematic_weights, schema)
@@ -745,7 +745,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
     for proc in matched_processes:
         for (syst, hists_syst) in proc.outdict_syst.items():
             outdict = add_hdict(outdict, {k: v.hist for (k, v) in hists_syst.items()})
-   
+
     #put underflow and overflow entries into the first and last visible bin
     for k in sorted(outdict.keys()):
         v = outdict[k]
@@ -766,11 +766,11 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
         #
         #v.SetBinContent(nb, v.GetBinContent(nb) + bn)
         #v.SetBinError(nb, math.sqrt(v.GetBinError(nb)**2 + en**2))
-    
-    
+
+
     LOG_MODULE_NAME.info("writing output")
     save_hdict(hdict=outdict, outfile=outfile, )
-    
+
 
 if __name__ == "__main__":
     from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig

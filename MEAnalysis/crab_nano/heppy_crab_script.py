@@ -21,14 +21,14 @@ elif "--isData" in sys.argv:
 else:
     print "No MC flag in script --> falling back to isMC = True"
     isMC = True
-    
+
 import copy
 import json
 
 #Create the NanoAOD postprocessing configuration
 from TTH.MEAnalysis.nano_config import NanoConfig
 #TODO: Make the era sys.argv so it is set depending on the sample
-nanoCFG = NanoConfig("94Xv2", jec=isMC, pu=isMC, btag=isMC)
+nanoCFG = NanoConfig("102Xv1", jec=isMC, pu=isMC, btag=isMC)
 
 import heppy_crab_functions as fn
 
@@ -74,7 +74,7 @@ if hasattr(PSet.process.source, "lumisToProcess"):
     lumidict = fn.getLumisProcessed(lumisToProcess)
     fn.makeLumiJSON(lumisToProcess, lumiJSON)
 
-    
+
 os.system("mkdir Output")
 
 ### nanoAOD code
@@ -116,18 +116,18 @@ if not "--nostep1" in args:
     runstring="{0} {1} >& {2}/Output/cmsRun.log".format("cmsRun",configfile,dir_)
     print "Running cmsRun: {0}".format(runstring)
     ret=os.system(runstring)
-    
+
     tf = ROOT.TFile("Output/nanoAOD.root")
     if not tf or tf.IsZombie():
         raise Exception("Error occurred in processing step1")
     tt = tf.Get("Events")
     print "step1 tree={0}".format(tt.GetEntries())
     tf.Close()
-    
+
     print "timeto_donanoAOD ",(time.time()-t0)
 
 t1 = time.time()
-    
+
 ### Run nanoAOD postprocessing
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 
