@@ -7,7 +7,7 @@ import imp
 import cPickle as pickle
 
 import TTH.MEAnalysis.TFClasses as TFClasses
-import PhysicsTools.HeppyCore.framework.config as cfg
+import TTH.MEAnalysis.config as cfg
 import ROOT
 
 sys.modules["TFClasses"] = TFClasses
@@ -569,6 +569,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     if schema == "data":
         comp_cls = cfg.DataComponent
 
+    print step1_tree_name, schema
     comp = comp_cls(
         sample_name,
         files = files,
@@ -631,6 +632,7 @@ if __name__ == "__main__":
         print "Exiting..."
         sys.exit(0)
     an = analysisFromConfig(sys.argv[1])
+    print an
 
     import argparse
     parser = argparse.ArgumentParser(description='Runs MEAnalysis')

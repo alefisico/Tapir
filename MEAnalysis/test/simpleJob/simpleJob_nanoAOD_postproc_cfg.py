@@ -11,7 +11,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputF
 
 ### Adding modules for JEC, Btag SF and PU reweighting
 from TTH.MEAnalysis.nano_config import NanoConfig
-nanoCFG = NanoConfig( "102Xv1", jec=False, btag=False, pu=False )
+nanoCFG = NanoConfig( "102Xv1", jec=True, btag=True, pu=True )
 
 p=PostProcessor(
     '.', inputFiles(),
@@ -20,7 +20,7 @@ p=PostProcessor(
     modules=nanoCFG.modules,
     ##compression="LZMA:9", ## "LZMA:9" is the default
     #friend=args.noFriend,
-    postfix="_postprocessed",
+    #postfix="_postprocessed",
     provenance=True, ### copy MetaData and ParametersSets
     haddFileName = "nano_postprocessed.root",
     fwkJobReport=True,

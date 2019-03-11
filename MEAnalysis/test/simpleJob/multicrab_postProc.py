@@ -96,16 +96,18 @@ def submitJobs( job, lnfList ):
         # Parse it to look like JetHT_Run2017E-17Nov2017
         primarydataset = job.split('/')[1]
         cond = job.split('/')[2]
-        datatier = job.split('/')[3]
         runtag = cond.split('-v')[0]
         nameis = primarydataset + runtag
     else :
         # Names look like /QCD_Pt-15to7000_TuneCUETHS1_Flat_13TeV_herwigpp/srappocc-QCDPt-15to7000TuneCUETHS1Flat13TeVherwigppRunIISummer16MiniAODv2-PUMoriond1780XmcRun2-a6ef50520338a6183974a5fbdf726458/USER
         # or              /QCD_Pt-15to7000_TuneCUETHS1_Flat_13TeV_herwigpp/srappocc-QCD_Pt-15to7000_TuneCUETHS1_Flat_13TeV_herwigpp_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1-d796f2a7f7abc8de12da326415f22981/USER
         # Parse it to look like QCD_Pt-15to7000_TuneCUETHS1_Flat_13TeV_herwigpp_94x  (or _80x)
-        primarydataset = job.split('/')[1]
-        cond = job.split('/')[2]
-        datatier = job.split('/')[3]
+        try:
+            primarydataset = job.split('/')[1]
+            cond = job.split('/')[2]
+        except IndexError:
+            primarydataset = job
+            cond = ''
 
         if '80X' in cond :
             nameis = primarydataset + '_80X'
@@ -121,7 +123,7 @@ def submitJobs( job, lnfList ):
     requestname = 'tthbb13_nanoPostProc_'+ nameis + '_' +options.version
     print requestname
     config.JobType.scriptExe = 'runPostProcessor.sh'
-    config.JobType.inputFiles = [ 'PSet.py','runPostProcessor.sh', 'simpleJob_nanoAOD_postproc_cfg.py' ,'./haddnano.py', 'keep_and_drop.txt']
+    config.JobType.inputFiles = [ 'PSet.py','runPostProcessor.sh', 'simpleJob_nanoAOD_postproc_cfg.py' ,'./haddnano.py', 'keep_and_drop.txt', 'simpleJob_config.cfg']
     config.JobType.sendPythonFolder  = True
 
     # following 3 lines are the trick to skip DBS data lookup in CRAB Server
@@ -171,6 +173,9 @@ if __name__ == '__main__':
     parser.add_option("-d", "--datasets", dest="datasets", default='all',
         help=("File listing datasets to run over"),
         metavar="FILE")
+    parser.add_option("-t", "--textFile", dest="textFile", default='nanoAOD_simpleJobs_ttH2018.txt',
+        help=("Text file containing root files"),
+        metavar="TEXT")
     parser.add_option("-s", "--storageSite", dest="storageSite", default="T3_CH_PSI",
         help=("Site"),
         metavar="SITE")
@@ -186,6 +191,7 @@ if __name__ == '__main__':
     dictSamples['SingleMuon2018'] = ['/SingleMuon/Run2018A-14Sep2018_ver3-v1/NANOAOD', dbsglobal]
     dictSamples['TTSL'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v1/NANOAODSIM', dbsglobal]
     dictSamples['ttHbb'] = ['/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v3/NANOAODSIM', dbsglobal]
+    dictSamples['text'] = [ options.textFile ]
 
     processingSamples = {}
     if 'all' in options.datasets:
@@ -201,9 +207,15 @@ if __name__ == '__main__':
 
     for isam in processingSamples:
 
-        # DBS client returns a list of dictionaries, but we want a list of Logical File Names
-        fileDictList = processingSamples[isam][1].listFiles( dataset=processingSamples[isam][0], validFileOnly=1 )
-        print ("dataset %s has %d files" % (processingSamples[isam][0], len(fileDictList)))
-        lfnList = [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
+        if 'text' in isam:
+            rootLines = open( processingSamples[isam][0] ).readlines()
+            lfnList = []
+            for iroot in rootLines: lfnList.append( str(iroot[:-1] ) )
+            processingSamples[isam][0] = processingSamples[isam][0].split(".txt")[0]
+        else:
+            # DBS client returns a list of dictionaries, but we want a list of Logical File Names
+            fileDictList = processingSamples[isam][1].listFiles( dataset=processingSamples[isam][0], validFileOnly=1 )
+            lfnList = [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
 
+        print ("dataset %s has %d files" % (processingSamples[isam][0], len(lfnList)))
         submitJobs( processingSamples[isam][0], lfnList )
