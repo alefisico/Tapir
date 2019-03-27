@@ -206,8 +206,8 @@ void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& va
 
     const std::string brname(branch_name);
 
-    values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (brname + std::string("_TotalUp")).c_str());
-    values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (brname + std::string("_JERUp")).c_str());
+    //values[std::make_pair(Systematic::CMS_scale_j, Systematic::Up)] = new T(reader, (brname + std::string("_TotalUp")).c_str());
+    //values[std::make_pair(Systematic::CMS_res_j, Systematic::Up)] = new T(reader, (brname + std::string("_JERUp")).c_str());
     //values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Up)] = new T(reader, (brname + std::string("_SubTotalPileUpUp")).c_str());
     //values[std::make_pair(Systematic::CMS_scaleAbsoluteStat_j, Systematic::Up)] = new T(reader, (brname + std::string("_AbsoluteStatUp")).c_str());
     //values[std::make_pair(Systematic::CMS_scaleAbsoluteScale_j, Systematic::Up)] = new T(reader, (brname + std::string("_AbsoluteScaleUp")).c_str());
@@ -236,8 +236,8 @@ void attachSystematics(TTreeReader& reader, std::map<Systematic::SystId, T*>& va
     //values[std::make_pair(Systematic::CMS_scalePileUpPtEC2_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpPtEC2Up")).c_str());
     //values[std::make_pair(Systematic::CMS_scalePileUpPtHF_j, Systematic::Up)] = new T(reader, (brname + std::string("_PileUpPtHFUp")).c_str());
 
-    values[std::make_pair(Systematic::CMS_scale_j, Systematic::Down)] = new T(reader, (brname + std::string("_TotalDown")).c_str());
-    values[std::make_pair(Systematic::CMS_res_j, Systematic::Down)] = new T(reader, (brname + std::string("_JERDown")).c_str());
+    //values[std::make_pair(Systematic::CMS_scale_j, Systematic::Down)] = new T(reader, (brname + std::string("_TotalDown")).c_str());
+    //values[std::make_pair(Systematic::CMS_res_j, Systematic::Down)] = new T(reader, (brname + std::string("_JERDown")).c_str());
     //values[std::make_pair(Systematic::CMS_scaleSubTotalPileUp_j, Systematic::Down)] = new T(reader, (brname + std::string("_SubTotalPileUpDown")).c_str());
     //values[std::make_pair(Systematic::CMS_scaleAbsoluteStat_j, Systematic::Down)] = new T(reader, (brname + std::string("_AbsoluteStatDown")).c_str());
     //values[std::make_pair(Systematic::CMS_scaleAbsoluteScale_j, Systematic::Down)] = new T(reader, (brname + std::string("_AbsoluteScaleDown")).c_str());
@@ -390,6 +390,7 @@ public:
     TTreeReaderValue<int> numJets;
     TTreeReaderValue<int> nBDeepCSVM;
     TTreeReaderValue<int> nBCSVM;
+    TTreeReaderValue<int> ttCls;
     TTreeReaderValue<T> nPVs;
     
     TTreeReaderValue<int> nleps;
@@ -441,6 +442,7 @@ public:
         numJets(reader, "numJets"),
         nBDeepCSVM(reader, "nBDeepCSVM"),
         nBCSVM(reader, "nBCSVM"),
+        ttCls(reader, "ttCls"),
         nPVs(reader, "nPVs"),
         
         nleps(reader, "nleps"),
@@ -583,7 +585,7 @@ template <typename T>
 class TreeDescriptionMCSystematic : public TreeDescription<T> {
 public:
 
-    TTreeReaderValue<int> ttCls;
+    //TTreeReaderValue<int> ttCls;
     TTreeReaderValue<T> genTopHad_pt;
     TTreeReaderValue<T> genTopLep_pt;
     
@@ -593,7 +595,7 @@ public:
     
     TreeDescriptionMCSystematic(TFile* file, SampleDescription sample) :
         TreeDescription<T>(file, sample),
-        ttCls(TreeDescription<T>::reader, "ttCls"),
+        //ttCls(TreeDescription<T>::reader, "ttCls"),
         genTopHad_pt(TreeDescription<T>::reader, "genTopHad_pt"),
         genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt"),
         genWeight(TreeDescription<T>::reader, "genWeight"),
@@ -610,7 +612,7 @@ template <typename T>
 class TreeDescriptionMC : public TreeDescription<T> {
 public:
 
-    TTreeReaderValue<int> ttCls;
+    //TTreeReaderValue<int> ttCls;
     TTreeReaderValue<T> genTopHad_pt;
     TTreeReaderValue<T> genTopLep_pt;
 
@@ -657,7 +659,7 @@ public:
     
     TreeDescriptionMC(TFile* file, SampleDescription sample) :
         TreeDescription<T>(file, sample),
-        ttCls(TreeDescription<T>::reader, "ttCls"),
+        //ttCls(TreeDescription<T>::reader, "ttCls"),
         genTopHad_pt(TreeDescription<T>::reader, "genTopHad_pt"),
         genTopLep_pt(TreeDescription<T>::reader, "genTopLep_pt"),
         

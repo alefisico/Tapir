@@ -81,20 +81,20 @@ class MECategoryAnalyzer(FilterAnalyzer):
         pass_btag_csv = (self.conf.jets["untaggedSelection"] == "btagCSV" and
             len(event.selected_btagged_jets_high) >= 4
         )
-        
+
         # printouts by DS
         if "debug" in self.conf.general["verbosity"]:
             if (self.conf.jets["untaggedSelection"] == "btagLR") and event.is_fh and event.systematic == "nominal": #DS
                 if (event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_SR"]):
                     print "4b_SR",
-                if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and 
+                if (event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_excl"] and
                     event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_SR"]):
                     print "3b_SR",
-                if (event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_excl"] and 
-                    event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and 
+                if (event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_excl"] and
+                    event.btag_LR_4b_2b > self.conf.mem["FH_bLR_4b_CR_lo"] and
                     event.btag_LR_4b_2b < self.conf.mem["FH_bLR_4b_CR_hi"]):
                     print "4b_CR",
-                if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and 
+                if (event.btag_LR_3b_2b > self.conf.mem["FH_bLR_3b_CR_lo"] and
                     event.btag_LR_3b_2b < self.conf.mem["FH_bLR_3b_CR_hi"]):
                     print "3b_CR",
                 if (len(event.selected_btagged_jets_high)<3):
@@ -277,7 +277,7 @@ class MEAnalyzer(FilterAnalyzer):
         lquarks = sorted(list(mem_cfg.l_quark_candidates(event)), key=lambda x: x.pt, reverse=True)
         for l in lquarks:
             l.btagFlag = 0.0
-            
+
         if len(lquarks) > mem_cfg.maxLJets:
             LOG_MODULE_NAME.info("More than {0} l-quarks supplied, dropping last {1} from MEM".format(
                 mem_cfg.maxLJets, len(lquarks) - mem_cfg.maxLJets
@@ -288,7 +288,7 @@ class MEAnalyzer(FilterAnalyzer):
 
         event.mem_jets = bquarks + lquarks
 
-        ##Only take up to 4 candidates, otherwise runtimes become too great        
+        ##Only take up to 4 candidates, otherwise runtimes become too great
         for jet in bquarks + lquarks:
             #calculate jet corrections with an exception for JER
             #the Jetcorrs are expected to be relative correction. E.g. jetcorrs[JESUp] = JESUp / JES
@@ -495,7 +495,7 @@ class MEAnalyzer(FilterAnalyzer):
                     r.dw = dw
                     event.res[(hypo, confname)] = r
                 elif( #DS
-                    event.changes_jet_category and 
+                    event.changes_jet_category and
                     mem_cfg.do_calculate(event, mem_cfg) and
                     self.conf.mem["selection"](event) and
                     confname in self.memkeysToRun
@@ -550,7 +550,8 @@ class MEAnalyzer(FilterAnalyzer):
 
                 p0 = event.res[(MEM.Hypothesis.TTH, key)].p
                 p1 = event.res[(MEM.Hypothesis.TTBB, key)].p
-            mem_p = p0 / (p0 + self.conf.mem["weight"]*p1) if p0 > 0 else 0.0
+            mem_p = p0 / (p0 + self.conf.mem["weight"]*p1) if p0 > 0 else -999
+            ###print(p0, p1, mem_p)
             setattr(event, "mem_{0}_p".format(key), mem_p)
 
             for (hypo_name, hypo) in [

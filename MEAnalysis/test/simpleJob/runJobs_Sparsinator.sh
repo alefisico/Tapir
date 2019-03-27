@@ -2,9 +2,9 @@
 
 ### Usage: .
 
-FILESFOLDER="/work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/datasets_withME/"
+FILESFOLDER="/work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/simpleJob/datasets/nanoPostMEAnalysis/"
 sample=${1}
-VERSION="v01_20190308"
+VERSION="v01_20190316"
 
 
 WORKDIR=sparJobs/
@@ -156,11 +156,11 @@ EOF
 
 source /swshare/psit3/etc/profile.d/cms_ui_env.sh
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-cd /work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/
+cd /work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/simpleJob/
 eval `scramv1 runtime -sh`
 
-PYTHON_CFG="/work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/simpleJob_sparsinator.py"
-CONFIG_FILE="/work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/simpleJob_config.cfg"
+PYTHON_CFG="/work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/simpleJob/simpleJob_sparsinator.py"
+CONFIG_FILE="/work/algomez/work/ttH/CMSSW_10_2_11/src/TTH/MEAnalysis/test/simpleJob/simpleJob_config.cfg"
 
 cd $WORKDIR
 python ${PYTHON_CFG} --sample '${isam}' --inputDir '${FILESFOLDER}' --analysis_cfg ${CONFIG_FILE}

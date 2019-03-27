@@ -162,6 +162,9 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         from TTH.MEAnalysis.MEAnalysis_cfg_heppy import Conf as python_conf
     from TTH.MEAnalysis.MEAnalysis_cfg_heppy import conf_to_str
 
+    ############################################################################
+    #### Load Transfer functions
+
     #Load transfer functions from pickle file
     pi_file = open(python_conf.general["transferFunctionsPickle"] , 'rb')
     python_conf.tf_matrix = pickle.load(pi_file)
@@ -189,7 +192,10 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     pi_file = open(python_conf.general["transferFunctions_higgs_Pickle"] , 'rb')
     python_conf.tf_higgs_matrix = pickle.load(pi_file)
     pi_file.close()
+    ############################################################################
 
+    ############################################################################
+    ### Loading Files, Names and scheme (data or mc)
     if sample_name:
         an_sample = analysis_cfg.get_sample(sample_name)
         sample_name = an_sample.name
@@ -208,16 +214,16 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         pass
     else:
         raise Exception("Must specify either sample name or schema")
+    ############################################################################
 
-    #Event contents are defined here
-    #This is work in progress
+    ############################################################################
+    ### Loading event contents. aka: branches in nanoAOD
+    ### This Evetanalyzer reads basic branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
     if schema == "mc":
         from TTH.MEAnalysis.nanoTree import EventAnalyzer
     else:
         from TTH.MEAnalysis.nanoTree_data import EventAnalyzer
 
-
-    #This analyzer reads branches from event.input (the TTree/TChain) to event.XYZ (XYZ is e.g. jets, leptons etc)
     evs = cfg.Analyzer(
         EventAnalyzer,
         'events',
@@ -229,19 +235,22 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             EventAnalyzerBoosted,
             'events',
         )
+    ############################################################################
 
+    ############################################################################
+    ### Load Analyzers
 
-    #Here we define all the main analyzers
+    ### Here we define all the main analyzers
     import TTH.MEAnalysis.MECoreAnalyzers as MECoreAnalyzers
 
-    #throws away events that are not containing at least 4 jets
+    ### throws away events that are not containing at least 4 jets. It is not used since systematics can migrate event into diff category.
     prefilter = cfg.Analyzer(
         MECoreAnalyzers.PrefilterAnalyzer,
         'prefilter',
         _conf = python_conf
     )
 
-    #Checks that the event can be read
+    ### Checks that the event can be read, create a histo with numEvents
     counter = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter',
@@ -249,7 +258,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter_name = "",
     )
 
-    #Filters events by the run,lumi,event triplet
+    ### Filters events by the run,lumi,event triplet defined in the eventWhitelist in MEAnalysis/python/MEAnalysis_cfg_heppy.py. Currently (2018/10/22) no events are filter.
     evtid_filter = cfg.Analyzer(
         MECoreAnalyzers.EventIDFilterAnalyzer,
         'eventid',
@@ -257,7 +266,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     )
 
 
-    #Set passMETFilters flag according to list in config
+    ### Set the json flag according to the provided data json.
     metfilter_ana = cfg.Analyzer(
         MECoreAnalyzers.METFilterAnalyzer,
         'metfilter',
@@ -265,7 +274,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #Set the json flag according to the provided data json
+    ### Set the json flag according to the provided data json.
     lumilist_ana = cfg.Analyzer(
         MECoreAnalyzers.LumiListAnalyzer,
         'lumilist',
@@ -273,7 +282,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #As an option, we can recompute pileup weight
+    ### As an option, we can recompute pileup weight. Recomputes the pileup weight using the nanoAOD postprocessing module
     puweight_ana = cfg.Analyzer(
         MECoreAnalyzers.PUWeightAnalyzer,
         'puweight',
@@ -281,19 +290,21 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #fills the passPV flag
+    ## fills the passPV flag
     pvana = cfg.Analyzer(
         MECoreAnalyzers.PrimaryVertexAnalyzer,
         'pvana',
         _conf = python_conf
     )
 
+    ## Checks if events pass triggers described in MEAnalysis/python/TriggerTable.py
     trigger = cfg.Analyzer(
         MECoreAnalyzers.TriggerAnalyzer,
         'trigger',
         _conf = python_conf
     )
 
+    ## Count numEvents after trigger
     counter_trg = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter_trg',
@@ -301,12 +312,13 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter_name = "_trg",
     )
 
-    #This class performs lepton selection and SL/DL disambiguation
+    ## Lepton selection and SL/DL disambiguation
     leps = cfg.Analyzer(
         MECoreAnalyzers.LeptonAnalyzer,
         'leptons',
         _conf = python_conf
     )
+    ## Count numEvents after lepton selection
     counter_lep = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter_lep',
@@ -314,19 +326,21 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter_name = "_lep",
     )
 
-    #This class performs jet selection and b-tag counting
+    ## Jet selection and b-tag counting
     jets = cfg.Analyzer(
         MECoreAnalyzers.JetAnalyzer,
         'jets',
         _conf = python_conf
     )
 
+    ## Stores btag weights
     btagweight = cfg.Analyzer(
         MECoreAnalyzers.BtagWeightAnalyzer,
         'btagweight',
         _conf = python_conf
     )
 
+    ## Count numEvents after jet selection
     counter_jet = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter_jet',
@@ -334,6 +348,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         counter_name = "_jet",
     )
 
+    ## Computes trigger weight from root files containing the SF (2018/10/25 is not doing anything because calcFHSF is False in MEAnalysis/python/MEAnalysis_cfg_heppy.py)
     triggerSF = cfg.Analyzer(
         MECoreAnalyzers.TriggerWeightAnalyzer,
         "triggerWeight",
@@ -341,20 +356,21 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         _analysis_conf = analysis_cfg,
     )
 
-    #calculates the number of matched simulated B, C quarks for tt+XY matching
+    ## calculates the number of matched simulated B, C quarks for tt+XY matching
     genrad = cfg.Analyzer(
         MECoreAnalyzers.GenRadiationModeAnalyzer,
         'genrad',
         _conf = python_conf
     )
 
-    #calculates the b-tag likelihood ratio
+    ## calculates the b-tag likelihood ratio
     btaglr = cfg.Analyzer(
         MECoreAnalyzers.BTagLRAnalyzer,
         'btaglr',
         _conf = python_conf,
         btagAlgo = "btagCSV"
     )
+    ## Count numEvents after BLR selection
     counter_blr = cfg.Analyzer(
         MECoreAnalyzers.CounterAnalyzer,
         'counter_blr',
@@ -370,27 +386,28 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     #    btagAlgo = "btagBDT"
     #)
 
-    #calculates the b-tag likelihood ratio
+    ## QG likelihood ratio calculations
     qglr = cfg.Analyzer(
         MECoreAnalyzers.QGLRAnalyzer,
         'qglr',
         _conf = python_conf
     )
 
-    #assigns the ME category based on leptons, jets and the bLR
+    ## assigns the ME category based on leptons, jets and the bLR
     mecat = cfg.Analyzer(
         MECoreAnalyzers.MECategoryAnalyzer,
         'mecat',
         _conf = python_conf
     )
 
-    #performs W-tag calculation on pairs of untagged jets
+    ## performs W-tag calculation on pairs of untagged jets
     wtag = cfg.Analyzer(
         MECoreAnalyzers.WTagAnalyzer,
         'wtag',
         _conf = python_conf
     )
 
+    ## Checks subjets from boosted objects (HTT and boosted Higgs)
     subjet_analyzer = cfg.Analyzer(
         MECoreAnalyzers.SubjetAnalyzer,
         'subjet',
@@ -430,12 +447,14 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
         tag = "0",
     )
 
+    ## Takes content calculated in genrad and create event content
     gentth_pre = cfg.Analyzer(
         MECoreAnalyzers.GenTTHAnalyzerPre,
         'gentth_pre',
         _conf = python_conf
     )
 
+    ## Find the best possible match for each individual jet. Store for each jet, specified by it's index in the jet vector, if it is matched to any gen-level quarks
     gentth = cfg.Analyzer(
         MECoreAnalyzers.GenTTHAnalyzer,
         'gentth',
@@ -475,35 +494,35 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
 
     if python_conf.general["boosted"] == False:
         sequence = cfg.Sequence([
-            counter,
+            counter,        ## number of events, creates histo CounterAnalyzer_count
             # memory_ana,
-            evtid_filter,
-            #prefilter,
-            evs,
+            evtid_filter,   ## filter events by run:lumi:event
+            #prefilter,     ## at least 4 jets
+            evs,            ## load event content from nadoAOD trees
 
             #After this, the event object has been created
-            lumilist_ana,
+            lumilist_ana,   ## Checks if event is in JSON file (for data)
             metfilter_ana,
-            #puweight_ana, #possible to recompute the PU weight on the fly by uncommenting
-            gentth_pre,
-            pvana,
-            trigger,
-            counter_trg,
-            leps,
-            counter_lep,
-            jets,
-            btagweight,
-            counter_jet,
-            triggerSF,
-            btaglr,
-            counter_blr,
+            #puweight_ana,  ## Recompute the PU weight on the fly
+            gentth_pre,     ## Takes content calculated in genrad and create event content
+            pvana,          ## checks definition of PV
+            trigger,        ## checks OR of triggers
+            counter_trg,    ## count numEvents after trigger
+            leps,           ## lepton selection and SL/DL categorization
+            counter_lep,    ## count numEvents after lepton selection
+            jets,           ## Jet selection and b-tag counting
+            btagweight,     ## Stores btag weights
+            counter_jet,    ## count numEvents after jet selection
+            triggerSF,      ## Computes trigger weight from root files containing the SF (not doing anything 2018/10/25, does not run on Boosted)
+            btaglr,         ## calculates the b-tag likelihood ratio
+            counter_blr,    ## Count numEvents after BLR selection
             #btaglr_bdt,
-            qglr,
-            wtag,
-            mecat,
-            #subjet_analyzer,
-            genrad,
-            gentth,
+            qglr,           ## QG likelihood ratio calculations
+            wtag,           ## Performs W-mass calculation on pairs of untagged jets.
+            mecat,          ## assigns the ME category based on leptons, jets and the bLR
+            #subjet_analyzer, ## Checks subjets from boosted objects (HTT and boosted Higgs)
+            genrad,         ## calculates the number of matched simulated B, C quarks for tt+XY matching
+            gentth,         ## Find the best possible match for each individual jet.
             #multiclass_analyzer,
             mem_analyzer,
             #jointlikelihood_ana,
@@ -518,33 +537,34 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
     else:
         sequence = cfg.Sequence([
             counter,
+            counter,        ## number of events, creates histo CounterAnalyzer_count
             # memory_ana,
-            evtid_filter,
-            #prefilter,
-            evs,
+            evtid_filter,   ## filter events by run:lumi:event
+            #prefilter,     ## at least 4 jets
+            evs,            ## load event content from nadoAOD trees
             boost,
             #After this, the event has been created
-            lumilist_ana,
+            lumilist_ana,   ## Check if event is in JSON file (for data)
             metfilter_ana,
-            #puweight_ana,
-            gentth_pre,
-            pvana,
-            trigger,
-            counter_trg,
-            leps,
-            counter_lep,
-            jets,
-            btagweight,
-            counter_jet,
-            btaglr,
-            counter_blr,
+            #puweight_ana,  ## Recompute the PU weight on the fly
+            gentth_pre,     ## Takes content calculated in genrad and create event content
+            pvana,          ## checks definition of PV
+            trigger,        ## checks OR of triggers
+            counter_trg,    ## Count numEvents after trigger
+            leps,           ## lepton selection and SL/DL categorization
+            counter_lep,    ## Count numEvents after lepton selection
+            jets,           ## Jet selection and b-tag counting
+            btagweight,     ## Stores btag weights
+            counter_jet,    ## count numEvents after jet selection
+            btaglr,         ## calculates the b-tag likelihood ratio
+            counter_blr,    ## Count numEvents after BLR selection
             #btaglr_bdt,
-            qglr,
-            wtag,
-            mecat,
-            subjet_analyzer,
-            genrad,
-            gentth,
+            qglr,           ## QG likelihood ratio calculations
+            wtag,           ## Performs W-mass calculation on pairs of untagged jets.
+            mecat,          ## assigns the ME category based on leptons, jets and the bLR
+            subjet_analyzer, ## Checks subjets from boosted objects (HTT and boosted Higgs)
+            genrad,         ## calculates the number of matched simulated B, C quarks for tt+XY matching
+            gentth,         ## Find the best possible match for each individual jet.
             #multiclass_analyzer,
             mem_analyzer,
             #mva,

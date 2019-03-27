@@ -54,7 +54,7 @@ Systematic::SystId Systematic::make_id(Systematic::Event e, Systematic::Directio
 template <typename T>
 EventDescription TreeDescriptionMCSystematic<T>::create_event(Systematic::SystId syst_id) {
     auto event = TreeDescription<T>::create_event(syst_id);
-    event.ttCls = *ttCls;
+    //event.ttCls = *ttCls;
     event.genTopHad_pt = *genTopHad_pt;
     event.genTopLep_pt = *genTopLep_pt;
     event.weights[std::make_pair(Systematic::CMS_ttH_CSV, Systematic::None)] = 1.0;
@@ -102,7 +102,7 @@ EventDescription TreeDescriptionMC<T>::create_event(Systematic::SystId syst_id) 
         event.jets_hadronFlavour.push_back(this->jets_hadronFlavour[njet]);
     }
 
-    event.ttCls = *ttCls;
+    //event.ttCls = *ttCls;
     event.numJets = numJets.GetValue(syst_id);
     event.nBDeepCSVM = nBDeepCSVM.GetValue(syst_id);
     event.nBCSVM = nBCSVM.GetValue(syst_id);
@@ -180,6 +180,7 @@ EventDescription TreeDescription<T>::create_event(Systematic::SystId syst_id) {
     event.numJets = *(this->numJets);
     event.nBDeepCSVM = *(this->nBDeepCSVM);
     event.nBCSVM = *(this->nBCSVM);
+    event.ttCls = *(this->ttCls);
     event.jets = jets;
     event.syst_id = syst_id;
     event.leptons = build_leptons(syst_id);

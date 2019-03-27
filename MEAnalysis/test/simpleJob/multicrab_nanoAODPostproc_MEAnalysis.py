@@ -29,10 +29,17 @@ echo "CMSSW BASE, python path, pwd"
 echo $CMSSW_BASE
 echo $PYTHON_PATH
 echo $PWD
+rm -rf $CMSSW_BASE/lib/
+rm -rf $CMSSW_BASE/src/
+rm -rf $CMSSW_BASE/module/
+rm -rf $CMSSW_BASE/python/
+mv lib $CMSSW_BASE/lib
+mv src $CMSSW_BASE/src
+mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
-echo "python simpleJob_nanoAOD_postproc_withME_cfg.py ......."
-python simpleJob_nanoAOD_postproc_withME_cfg.py --sample {datasets} --config {config}
+echo "python simpleJob_nanoAODPostproc_MEAnalysis.py ......."
+python simpleJob_nanoAODPostproc_MEAnalysis.py --sample {datasets} --config {config}
 mv Loop_{datasets}/tree.root tree.root
 fi
     '''
@@ -74,7 +81,7 @@ def submitJobs( job, lnfList, unitJobs ):
     # That's why we need to set this parameter (here or above in the configuration file, it does not matter, we will not overwrite it).
     config.section_("General")
     config.General.workArea = options.dir
-    config.General.transferLogs = True
+    #config.General.transferLogs = True
 
     config.section_("JobType")
     config.JobType.pluginName = 'Analysis'
@@ -82,11 +89,9 @@ def submitJobs( job, lnfList, unitJobs ):
 
     config.section_("Data")
     config.Data.inputDataset = None
-    config.Data.splitting = ''
-    config.Data.unitsPerJob = 1
     config.Data.ignoreLocality = False
-    config.Data.publication = True
-    config.Data.publishDBS = 'phys03'
+    #config.Data.publication = True
+    #config.Data.publishDBS = 'phys03'
 
     config.section_("Site")
     config.Site.storageSite = options.storageSite
@@ -105,7 +110,7 @@ def submitJobs( job, lnfList, unitJobs ):
     requestname = 'tthbb13_PostProcMEAnalysis_withME_'+ job + '_' +options.version
     print requestname
     config.JobType.scriptExe = 'runPostProcMEAnalysis.sh'
-    config.JobType.inputFiles = [ 'PSet.py','runPostProcMEAnalysis.sh', 'simpleJob_nanoAOD_postproc_withME_cfg.py', options.config,'./haddnano.py', 'keep_and_drop.txt']
+    config.JobType.inputFiles = [ 'PSet.py','runPostProcMEAnalysis.sh', 'simpleJob_nanoAODPostproc_MEAnalysis.py', options.config,'../haddnano.py', 'keep_and_drop.txt']
     config.JobType.sendPythonFolder  = True
 
     # following 3 lines are the trick to skip DBS data lookup in CRAB Server
@@ -117,9 +122,12 @@ def submitJobs( job, lnfList, unitJobs ):
         config.Data.inputDataset = lfnList ### it is the dataset name
         config.Data.splitting = 'EventAwareLumiBased'
         config.Data.unitsPerJob = unitJobs
+        config.Data.inputDBS = 'phys03'
+        #config.Data.splitting = 'Automatic'
+        #config.Data.unitsPerJob = 480
 
     # since the input will have no metadata information, output can not be put in DBS
-    config.Data.publication = True
+    #config.Data.publication = True
     config.JobType.outputFiles = [ 'tree.root' ]
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoPostMEAnalysis/'
 
@@ -198,6 +206,7 @@ if __name__ == '__main__':
         #dictSamples['MuonEG_Run2018C'] = ['/MuonEG/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
         #dictSamples['MuonEG_Run2018D'] = ['/MuonEG/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 20000 ]
         dictSamples['TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v1/NANOAODSIM', dbsglobal, 20000 ]
+        dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/algomez-TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1-e05f95fef0725c09f3ec1f4a47bebd2d/USER', dbsglobal, 20000 ]
         dictSamples['ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v3/NANOAODSIM', dbsglobal, 2000 ]
 
     else: dictSamples[options.datasets] = [ options.textFile ]

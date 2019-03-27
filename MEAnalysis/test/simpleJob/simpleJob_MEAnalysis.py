@@ -5,6 +5,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputF
 from TTH.Plotting.Datacards.AnalysisSpecificationFromConfig import analysisFromConfig
 from TTH.MEAnalysis.MEAnalysis_heppy import main
 import argparse
+
 parser = argparse.ArgumentParser(description='Runs MEAnalysis')
 parser.add_argument(
     '--config',
@@ -42,11 +43,10 @@ print an
 
 for ifile in inputFiles():
     print ifile
-    looper_dir, files = main( an,
-                                sample_name=args.sample,
-                                files=[ifile],
-                                loglevel = args.loglevel
-                                )
+    main( an,
+            sample_name=args.sample,
+            #numEvents=args.numEvents,
+            files= [ifile], #['nano_postprocessed.root'],
+            loglevel = args.loglevel
+            )
 
-#    import TTH.MEAnalysis.counts as counts
-#    counts.main(files, "{0}/tree.root".format(looper_dir))

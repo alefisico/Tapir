@@ -24,7 +24,7 @@ config.Data.publication = True
 config.Data.unitsPerJob = 1
 #config.Data.ignoreLocality = True
 
-config.Site.storageSite = 'T2_CH_PSI'
+config.Site.storageSite = 'T2_CH_CSCS'
 config.Data.outLFNDirBase = '/store/user/algomez/ttH/nanoAOD/'
 
 def submit(config):
@@ -52,6 +52,7 @@ if __name__ == '__main__':
 	Samples = {}
 
 	Samples[ 'ttHTobb' ] = [ "/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+	Samples[ 'ttbar_dl' ] = [ "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", 1 ]
 	Samples[ 'ttbar_sl' ] = [ "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", 1 ]
 	#Samples[ 'TTWQQ' ] = [ "/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
 	#Samples[ 'TTZQQ' ] = [ "/TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]

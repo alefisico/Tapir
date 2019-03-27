@@ -42,6 +42,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     analysis = analysisFromConfig(args.analysis_cfg)
+    #file_names = ['Loop_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_3/tree.root']
     #file_names = ['root://t3dcachedb.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/nanoPostMEAnalysis/EGamma_Run2018A/tthbb13_PostProcMEAnalysis_noME_EGamma_Run2018A_102X_v00/190228_211822/0000/tree_123.root']
     file_names = [ line.rstrip('\n').split(' = ')[0] for line in open(args.inputDir+'/'+args.sample+'.txt') if ('root' in line ) ]
     outputFile = args.sample+"_sparsinator.root"

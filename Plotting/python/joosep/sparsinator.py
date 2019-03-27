@@ -190,7 +190,9 @@ def fillBase(matched_processes, event, syst, schema):
                 weight = event.weight_nominal * proc.xs_weight
                 if weight <= 0:
                     LOG_MODULE_NAME.debug("negative weight, weight_nominal<=0: gen={0}".format(event.weights.at(syst_pairs["gen"])))
+            #print("failed",proc)
             if histo_out.cut(event):
+                #print("passing",proc)
                 #print ("histo, event.weight_nominal, proc.xs_weight =", histo_out.cut_name[0], event.weight_nominal, proc.xs_weight) #DS temp
                 histo_out.fill(event, weight, dooverflow)
 
@@ -309,12 +311,12 @@ def createEvent(
         #        "CMS_effTrigger_mmUp", "CMS_effTrigger_mmDown",
         #    ]}
 
-        LOG_MODULE_NAME.debug("pu={0} gen={1} btag={2}".format(
-            event.weights.at(syst_pairs["CMS_pu"]),
-            event.weights.at(syst_pairs["gen"]),
-            event.weights.at(syst_pairs["CMS_ttH_CSV"]))
-        )
-        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
+#        LOG_MODULE_NAME.debug("pu={0} gen={1} btag={2}".format(
+#            event.weights.at(syst_pairs["CMS_pu"]),
+#            event.weights.at(syst_pairs["gen"]),
+#            event.weights.at(syst_pairs["CMS_ttH_CSV"]))
+#        )
+#        event.weight_nominal *= event.weights.at(syst_pairs["CMS_pu"]) * event.weights.at(syst_pairs["gen"]) * event.weights.at(syst_pairs["CMS_ttH_CSV"])
 
         #event.weight_nominal *= event.weights.at(syst_pairs["gen"])
 
@@ -544,7 +546,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
     #configure systematic scenarios according to MC/Data
     if schema == "mc":
-        systematics_event = ["nominal"] + systematics_event
+        systematics_event = ["nominal"] #+ systematics_event
         systematics_weight = [k[0] for k in systematic_weights]
     else:
         systematics_event = ["nominal"]
@@ -669,6 +671,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
             if nevents % 100 == 0:
                 LOG_MODULE_NAME.info("processed {0} events".format(nevents))
 
+            #if(events.ttCls !=0):print('yes'*10, events.ttCls)
             #apply some basic preselection that does not depend on jet systematics
             if not (events.is_sl or events.is_dl or events.is_fh):
                 continue
@@ -685,6 +688,7 @@ def main(analysis, file_names, sample_name, ofname, skip_events=0, max_events=-1
 
                 if event is None:
                     continue
+                #if(event.ttCls !=0):print('yes'*10, event.ttCls)
                 if ttree_postproc:
                     LOG_MODULE_NAME.debug("replacing pu weight {0} with postprocessing {1}".format(
                         event.weights[syst_pairs["CMS_pu"]],

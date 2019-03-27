@@ -1,8 +1,8 @@
 # Auto generated configuration file
-# using: 
-# Revision: 1.19 
-# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: simpleJob_nanoAOD -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v12 --era Run2_2018,run2_nanoAOD_102Xv1 --filein /store/mc/RunIIAutumn18MiniAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/00000/7CCF7255-8991-3A41-8691-119A69E84CE7.root --fileout=simpleJob_nanoAOD.root -n 100
+# using:
+# Revision: 1.19
+# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
+# with command line options: myNanoProdMc -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --no_exec --conditions 101X_upgrade2018_realistic_v7 --era Run2_2018,run2_nanoAOD_102Xv1
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -27,7 +27,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/RunIIAutumn18MiniAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/00000/7CCF7255-8991-3A41-8691-119A69E84CE7.root'),
+    fileNames = cms.untracked.vstring(['/store/mc/RunIIFall17MiniAODv2/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/120000/58771084-32BB-E811-9553-0CC47A13D0F2.root']),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -37,7 +37,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('simpleJob_nanoAOD nevts:100'),
+    annotation = cms.untracked.string('myNanoProdMc nevts:1'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -51,7 +51,7 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string('NANOAODSIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('simpleJob_nanoAOD.root'),
+    fileName = cms.untracked.string('myNanoProdMc_NANO.root'),
     outputCommands = process.NANOAODSIMEventContent.outputCommands
 )
 
@@ -59,7 +59,7 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v12', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '101X_upgrade2018_realistic_v7', '')
 
 # Path and EndPath definitions
 process.nanoAOD_step = cms.Path(process.nanoSequenceMC)
@@ -74,7 +74,7 @@ associatePatAlgosToolsTask(process)
 # customisation of the process.
 
 # Automatic addition of the customisation function from PhysicsTools.NanoAOD.nano_cff
-from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeMC 
+from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeMC
 
 #call to customisation function nanoAOD_customizeMC imported from PhysicsTools.NanoAOD.nano_cff
 process = nanoAOD_customizeMC(process)

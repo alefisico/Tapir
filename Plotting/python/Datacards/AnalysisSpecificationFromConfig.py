@@ -24,10 +24,10 @@ def splitByTriggerPath(processes, lumi, cuts_dict):
     out = []
     _lumis = {
         "m": lumi["SingleMuon"],
-        "e": lumi["SingleElectron"],
+        "e": lumi["EGamma"],
         "mm": lumi["DoubleMuon"],
         "em": lumi["MuonEG"],
-        "ee": lumi["DoubleEG"],
+        "ee": lumi["EGamma"],
         "fh": lumi["BTagCSV"],
         "bt": lumi["JetHT"],
     }
@@ -38,7 +38,7 @@ def splitByTriggerPath(processes, lumi, cuts_dict):
             out += [proc]
             continue
         for name, trigpath in TRIGGERPATH_MAP.items():
-            
+
             #Don't need to split data process
             if type(proc) is DataProcess:
                 continue
@@ -76,7 +76,7 @@ def analysisFromConfig(config_file_path):
 
     # Init config parser
     config = Analysis.getConfigParser(config_file_path)
-    
+
     # Get information on sparse input
     lumi = {k: float(v) for (k, v) in config.items("lumi")}
     #blr_cuts = {k: float(v) for (k, v) in config.items("blr_cuts")}
@@ -110,7 +110,7 @@ def analysisFromConfig(config_file_path):
     ########################################
     # Processes
     ########################################
-    
+
     process_lists = {}
     process_lists_original = {}
     for process_list in config.get("general","process_lists").split():
@@ -124,7 +124,7 @@ def analysisFromConfig(config_file_path):
 
             in_name  = config.get(process,"in")
             out_name = config.get(process,"out")
-            
+
             if not in_name in samples_dict.keys():
                 raise KeyError("process {0} needs sample {1}, but it was not defined".format(process, in_name))
             # Build cuts..
@@ -148,7 +148,7 @@ def analysisFromConfig(config_file_path):
                 #if not splitting by trigger path, use a common lumi for every sample
                 if not config.getboolean(process_list, "split_by_trigger_path"):
                     local_lumi = config.getfloat("lumi", "Common")
-                 
+
                 process_lists[process_list].append(
                     Process(
                         input_name = in_name,
@@ -187,7 +187,7 @@ def analysisFromConfig(config_file_path):
     analysis_groups = {}
 
     all_cats = []
-    
+
     for group in config.get("general","analysis_groups").split():
 
         cats = []
@@ -201,14 +201,14 @@ def analysisFromConfig(config_file_path):
             data_processes = sum([process_lists[x] for x in config.get(template, "data_processes").split()], [])
             signal_processes = config.get(template, "signal_processes").split()
 
-            common_shape_name = config.get(template, "common_shape_uncertainties")        
+            common_shape_name = config.get(template, "common_shape_uncertainties")
             common_shape_uncertainties = {k:float(v) for k,v in config.items(common_shape_name)}
 
             common_scale_name = config.get(template, "common_scale_uncertainties")
-            common_scale_uncertainties = {k:float(v) for k,v in config.items(common_scale_name)}        
+            common_scale_uncertainties = {k:float(v) for k,v in config.items(common_scale_name)}
 
             unique_output_processes = list(set([p.output_name for p in mc_processes]))
-            
+
             scale_name = config.get(template, "scale_uncertainties")
             scale_uncertainties = {}
             for process, name_uncert in config.items(scale_name):
@@ -228,7 +228,7 @@ def analysisFromConfig(config_file_path):
                 rebin = int(config.get(category_name,"rebin"))
             else:
                 rebin = 1
-            
+
             disc_name = config.get(category_name, "discriminator").strip()
             if len(disc_name) > 0:
                 category = Category(
@@ -236,10 +236,10 @@ def analysisFromConfig(config_file_path):
                     cuts = [cut],
                     processes = mc_processes,
                     data_processes = data_processes,
-                    signal_processes = signal_processes, 
-                    common_shape_uncertainties = common_shape_uncertainties, 
-                    common_scale_uncertainties = common_scale_uncertainties, 
-                    scale_uncertainties = scale_uncertainties, 
+                    signal_processes = signal_processes,
+                    common_shape_uncertainties = common_shape_uncertainties,
+                    common_scale_uncertainties = common_scale_uncertainties,
+                    scale_uncertainties = scale_uncertainties,
                     discriminator = Histogram.from_string(disc_name),
                     rebin = rebin,
                     do_limit = True
@@ -247,7 +247,7 @@ def analysisFromConfig(config_file_path):
                 cats.append(category)
 
             #a group consisting of only this category
-            analysis_groups[category.full_name] = [category] 
+            analysis_groups[category.full_name] = [category]
 
             # Also add control variables as separate categories
             if config.has_option(category_name, "control_variables"):
@@ -260,20 +260,20 @@ def analysisFromConfig(config_file_path):
                             cuts = [cut],
                             processes = mc_processes,
                             data_processes = data_processes,
-                            signal_processes = signal_processes, 
-                            common_shape_uncertainties = common_shape_uncertainties, 
-                            common_scale_uncertainties = common_scale_uncertainties, 
-                            scale_uncertainties = scale_uncertainties, 
+                            signal_processes = signal_processes,
+                            common_shape_uncertainties = common_shape_uncertainties,
+                            common_scale_uncertainties = common_scale_uncertainties,
+                            scale_uncertainties = scale_uncertainties,
                             discriminator = Histogram.from_string(cv),
                             rebin = rebin,
                             do_limit = False
                     )
                 )
-                
+
 
 
             # End loop over categories
-            
+
         analysis_groups[group] = cats
         all_cats.extend(cats)
     # End loop over groups of categories
@@ -303,7 +303,7 @@ def analysisFromConfig(config_file_path):
         groups = analysis_groups,
         do_fake_data = config.getboolean("general", "do_fake_data"),
         do_stat_variations = config.getboolean("general", "do_stat_variations")
-     )   
+     )
 
     return analysis
 
@@ -317,15 +317,15 @@ def analysisFromConfig(config_file_path):
 if __name__ == "__main__":
     an = analysisFromConfig(sys.argv[1])
     print an
-    
+
     print "processes"
     for proc in an.processes:
         print "  ", proc
-   
+
     print "samples"
     for samp in an.samples:
         print "  ", samp
-    
+
     print "categories"
     for cat in an.categories:
         print "  ", cat

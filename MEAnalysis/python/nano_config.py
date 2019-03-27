@@ -39,16 +39,17 @@ class NanoConfig:
         elif setEra == "102Xv1":
             self.eraMC = "Run2_2018,run2_nanoAOD_102Xv1"
             self.eraData = "Run2_2018,run2_nanoAOD_102Xv1"
-            self.conditionsMC = "101X_upgrade2018_realistic_v7"
-            self.conditionsData = "101X_upgrade2018_realistic_v7"
-            self.eraBtagSF = "2017"
+            self.conditionsMC = "102X_upgrade2018_realistic_v12"
+            self.conditionsData = "102X_dataRun2_Sep2018Rereco_v1"
+            self.jecMC = "Autumn18_V8_MC"
+            self.eraBtagSF = "2018"
             self.algoBtag = "deepcsv"
             print "Using CMSSW 102X with v2 era"
 
         imports = []
         if jec:
             imports += [
-                ('PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties', 'jetmetUncertainties2017All')
+                ('PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties', 'jetmetUncertaintiesProducer')
             ]
 
         if btag:
@@ -57,7 +58,7 @@ class NanoConfig:
             ]
         if pu:
             imports += [
-                ('PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer','puAutoWeight')
+                ('PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer','puAutoWeight2018')
             ]
 
         self.json = None #Intended use: Skimming
@@ -79,5 +80,8 @@ class NanoConfig:
                     print "Loading %s from %s " % (name, mod)
                     if name == "btagSFProducer":
                         self.modules.append(getattr(obj,name)(self.eraBtagSF, self.algoBtag))
+                    elif name == "jetmetUncertaintiesProducer":
+                        for itypeJet in ['AK4PFchs', 'AK4PFPuppi', 'AK8PFPuppi']:
+                            self.modules.append(getattr(obj,name)(self.eraBtagSF, self.jecMC, jesUncertainties=['All'], jetType=itypeJet, redoJEC=True))
                     else:
                         self.modules.append(getattr(obj,name)())
