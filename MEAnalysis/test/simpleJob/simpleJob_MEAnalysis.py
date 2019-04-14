@@ -45,8 +45,10 @@ for ifile in inputFiles():
     print ifile
     main( an,
             sample_name=args.sample,
-            #numEvents=args.numEvents,
-            files= [ifile], #['nano_postprocessed.root'],
+            numEvents=args.numEvents,
+            #files= [ifile],
+            files= ['nano_postprocessed.root'],
+            #files= ['nano_postprocessed_MEAnalysis.root'],
             loglevel = args.loglevel
             )
 

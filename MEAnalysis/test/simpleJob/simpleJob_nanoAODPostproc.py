@@ -42,9 +42,15 @@ args = parser.parse_args(sys.argv[1:])
 if 'pythia' in args.sample: isMC = True
 else: isMC = False
 
+### Preliminary selection to speed up postProcessing
+if args.sample in [ 'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8' ]:
+    cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
+else:
+    cuts='( nJet>3 ) && ( Jet_pt>30 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Electron_eta)<2.4 )'
+
 ### Adding modules for JEC, Btag SF and PU reweighting
 from TTH.MEAnalysis.nano_config import NanoConfig
-nanoCFG = NanoConfig( "102Xv1", jec=isMC, btag=isMC, pu=isMC )
+nanoCFG = NanoConfig( "102Xv1", jec=isMC, btag=False, pu=isMC )
 
 ### Rerunning JECs for data
 if not isMC:
@@ -54,13 +60,13 @@ if not isMC:
 
 p=PostProcessor(
     '.', inputFiles(),
-    cut="",
+    cut=cuts,
     branchsel="keep_and_drop.txt",
     modules=nanoCFG.modules,
     provenance=True, ### copy MetaData and ParametersSets
-    haddFileName = "nano_postprocessed.root",
-    jsonInput=runsAndLumis(),
     fwkJobReport=True,
+    haddFileName = "nano_postprocessed.root",
+    #jsonInput=runsAndLumis(),
     #noOut=False, justcount=False,
     #friend=args.noFriend,
     #postfix="_postprocessed",

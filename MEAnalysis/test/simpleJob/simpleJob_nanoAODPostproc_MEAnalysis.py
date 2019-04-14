@@ -55,18 +55,31 @@ args = parser.parse_args(sys.argv[1:])
 if 'pythia' in args.sample: isMC = True
 else: isMC = False
 
+### Preliminary selection to speed up postProcessing
+if args.sample in [ 'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8' ]:
+    cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>1) || (nMuon>1) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
+else:
+    cuts='( nJet>3 ) && ( Jet_pt>30 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>1) || (nMuon>1) )'
+
 ###### Running nanoAOD postprocessing
 nanoCFG = NanoConfig( "102Xv1", jec=isMC, btag=isMC, pu=isMC )
 
+### Rerunning JECs for data
+if not isMC:
+    runEra = args.sample.split('2018')[1]
+    from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import jetRecalib
+    nanoCFG.modules.append(jetRecalib("Autumn18_Run"+runEra+"_V8_DATA"))
+
 p=PostProcessor(
     '.', inputFiles(),
-    cut="",
+    cut=cuts,
     branchsel="keep_and_drop.txt",
     modules=nanoCFG.modules,
     provenance=True, ### copy MetaData and ParametersSets
     haddFileName = "nano_postprocessed.root",
+    #haddFileName = "nano_postprocessed_MEAnalysis.root",
     jsonInput=runsAndLumis(),
-    #fwkJobReport=True,
+    fwkJobReport=True,
 )
 p.run()
 
@@ -76,5 +89,6 @@ looper_dir, files = main( an,
                             sample_name=args.sample,
                             ##numEvents=args.numEvents,
                             files=["nano_postprocessed.root"],
+                            #files=["nano_postprocessed_MEAnalysis.root"],
                             loglevel = args.loglevel
                             )

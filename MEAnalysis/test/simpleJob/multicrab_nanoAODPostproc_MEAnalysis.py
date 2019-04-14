@@ -102,6 +102,7 @@ def submitJobs( job, lnfList, unitJobs ):
     def submit(config):
         try:
             crabCommand('submit', config = config)
+            #crabCommand('submit', "--dryrun", config = config)
         except HTTPException, hte:
             print 'Cannot execute command'
             print hte.headers
@@ -110,7 +111,7 @@ def submitJobs( job, lnfList, unitJobs ):
     requestname = 'tthbb13_PostProcMEAnalysis_withME_'+ job + '_' +options.version
     print requestname
     config.JobType.scriptExe = 'runPostProcMEAnalysis.sh'
-    config.JobType.inputFiles = [ 'PSet.py','runPostProcMEAnalysis.sh', 'simpleJob_nanoAODPostproc_MEAnalysis.py', options.config,'../haddnano.py', 'keep_and_drop.txt']
+    config.JobType.inputFiles = [ 'PSet.py','runPostProcMEAnalysis.sh', 'simpleJob_nanoAODPostproc_MEAnalysis.py', options.config, 'haddnano.py', 'keep_and_drop.txt']
     config.JobType.sendPythonFolder  = True
 
     # following 3 lines are the trick to skip DBS data lookup in CRAB Server
@@ -120,9 +121,11 @@ def submitJobs( job, lnfList, unitJobs ):
         config.Data.outputPrimaryDataset = job
     else:
         config.Data.inputDataset = lfnList ### it is the dataset name
-        config.Data.splitting = 'EventAwareLumiBased'
-        config.Data.unitsPerJob = unitJobs
-        config.Data.inputDBS = 'phys03'
+        #config.Data.splitting = 'EventAwareLumiBased'
+        #config.Data.splitting = 'FileBased'
+        config.Data.splitting = 'Automatic'
+        #config.Data.unitsPerJob = unitJobs
+        #config.Data.inputDBS = 'phys03'
         #config.Data.splitting = 'Automatic'
         #config.Data.unitsPerJob = 480
 
@@ -206,7 +209,8 @@ if __name__ == '__main__':
         #dictSamples['MuonEG_Run2018C'] = ['/MuonEG/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
         #dictSamples['MuonEG_Run2018D'] = ['/MuonEG/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 20000 ]
         dictSamples['TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v1/NANOAODSIM', dbsglobal, 20000 ]
-        dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/algomez-TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1-e05f95fef0725c09f3ec1f4a47bebd2d/USER', dbsglobal, 20000 ]
+        #dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/algomez-TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1-e05f95fef0725c09f3ec1f4a47bebd2d/USER', dbsglobal, 1 ]
+        dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
         dictSamples['ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v3/NANOAODSIM', dbsglobal, 2000 ]
 
     else: dictSamples[options.datasets] = [ options.textFile ]
