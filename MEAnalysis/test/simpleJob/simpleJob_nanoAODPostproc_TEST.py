@@ -9,6 +9,9 @@ import os
 from importlib import import_module
 import sys
 import ROOT
+import logging
+#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles, runsAndLumis
@@ -37,21 +40,32 @@ parser.add_argument(
     default="INFO",
     required=False
 )
+parser.add_argument(
+    '--config',
+    action="store",
+    help="Config file",
+    default='simpleJob_config.cfg',
+)
 args = parser.parse_args(sys.argv[1:])
 
 if 'pythia' in args.sample: isMC = True
 else: isMC = False
 
 ### Adding modules for JEC, Btag SF and PU reweighting
-from TTH.MEAnalysis.nano_config import NanoConfig
-nanoCFG = NanoConfig( "102Xv1", jec=isMC, btag=isMC, pu=isMC )
+### AND TEST includes MEAnalysis
+from TTH.MEAnalysis.simpleNano.nano_config import ModulesConfig
+nanoCFG = ModulesConfig( "102Xv1", isMC, args.sample, jec=isMC, btag=isMC, pu=isMC )
 
 
-#nanoCFG.modules.append()
+### Preliminary selection to speed up postProcessing
+if args.sample in [ 'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8' ]:
+    cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
+else:
+    cuts='( nJet>3 ) && ( Jet_pt>30 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Electron_eta)<2.4 )'
 
 p=PostProcessor(
     '.', inputFiles(),
-    cut="",
+    cut=cuts,
     branchsel="keep_and_drop.txt",
     modules=nanoCFG.modules,
     ##compression="LZMA:9", ## "LZMA:9" is the default
