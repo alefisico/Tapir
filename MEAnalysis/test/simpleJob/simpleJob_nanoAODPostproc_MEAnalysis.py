@@ -5,9 +5,10 @@
 ##  - python simpleJob_nanoAODPostproc_MEAnalysis_cfg.py
 #################################################################
 import os
-from importlib import import_module
 import sys
 import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+from importlib import import_module
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles, runsAndLumis
@@ -56,19 +57,22 @@ if 'pythia' in args.sample: isMC = True
 else: isMC = False
 
 ### Preliminary selection to speed up postProcessing
-if args.sample in [ 'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8' ]:
-    cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>1) || (nMuon>1) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
-else:
-    cuts='( nJet>3 ) && ( Jet_pt>30 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>1) || (nMuon>1) )'
+if args.sample.startswith( ( 'TTTo2L2Nu', 'MuonEG', 'DoubleMuon' ) ):  ### DL
+    cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
+elif args.sample.startswith( ( 'ttHTobb', 'EGamma' ) ):   #### looser DL and SL
+    cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
+else:   ### SL
+    cuts='( nJet>3 ) && ( Jet_pt>30 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
 
 ###### Running nanoAOD postprocessing
-nanoCFG = NanoConfig( "102Xv1", jec=isMC, btag=isMC, pu=isMC )
+nanoCFG = NanoConfig( "102Xv1", jec=isMC, btag=False, pu=isMC )
 
 ### Rerunning JECs for data
 if not isMC:
     runEra = args.sample.split('2018')[1]
     from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import jetRecalib
     nanoCFG.modules.append(jetRecalib("Autumn18_Run"+runEra+"_V8_DATA"))
+    print "Loading ", jetRecalib, "Autumn18_Run"+runEra+"_V8_DATA"
 
 p=PostProcessor(
     '.', inputFiles(),
@@ -77,8 +81,7 @@ p=PostProcessor(
     modules=nanoCFG.modules,
     provenance=True, ### copy MetaData and ParametersSets
     haddFileName = "nano_postprocessed.root",
-    #haddFileName = "nano_postprocessed_MEAnalysis.root",
-    jsonInput=runsAndLumis(),
+    jsonInput=(None if isMC else runsAndLumis()),
     fwkJobReport=True,
 )
 p.run()
@@ -86,9 +89,8 @@ p.run()
 ##### Running MEAnalysis
 an = analysisFromConfig(args.config)
 looper_dir, files = main( an,
-                            sample_name=args.sample,
+                            sample_name= args.sample if isMC else args.sample.split('_')[0],
                             ##numEvents=args.numEvents,
                             files=["nano_postprocessed.root"],
-                            #files=["nano_postprocessed_MEAnalysis.root"],
                             loglevel = args.loglevel
                             )

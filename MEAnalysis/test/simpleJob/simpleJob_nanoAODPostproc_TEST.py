@@ -10,8 +10,8 @@ from importlib import import_module
 import sys
 import ROOT
 import logging
-#logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.INFO)
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles, runsAndLumis
@@ -54,7 +54,7 @@ else: isMC = False
 ### Adding modules for JEC, Btag SF and PU reweighting
 ### AND TEST includes MEAnalysis
 from TTH.MEAnalysis.simpleNano.nano_config import ModulesConfig
-nanoCFG = ModulesConfig( "102Xv1", isMC, args.sample, jec=isMC, btag=isMC, pu=isMC )
+nanoCFG = ModulesConfig( "102Xv1", isMC, args.sample, jec=isMC, btag=False, pu=isMC )
 
 
 ### Preliminary selection to speed up postProcessing

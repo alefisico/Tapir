@@ -1,14 +1,15 @@
 #################################################################
 ## Based on PhysicsTools/NanoAODTools/scripts/nano_postproc.py
 ## To run:
+##  - python simpleJob_nanoAODPostproc.py --sample TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
 ##  - Input file in PSet.py
-##  - python simpleJob_nanoAODPostproc.py
-##  /store/mc/RunIIAutumn18NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/102X_upgrade2018_realistic_v15-v1/40000/A6521C51-AC51-DD43-9E43-5B06B630B635.root
+##  - nanoAOD file: "root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18NanoAODv4/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/70000/1C697EFF-55BB-F742-B9DE-1DAE67E24915.root"
 #################################################################
 import os
-from importlib import import_module
 import sys
 import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+from importlib import import_module
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles, runsAndLumis
@@ -53,11 +54,12 @@ from TTH.MEAnalysis.nano_config import NanoConfig
 nanoCFG = NanoConfig( "102Xv1", jec=isMC, btag=False, pu=isMC )
 
 ### Rerunning JECs for data
-if not isMC:
-    runEra = args.sample.split('2018')[1]
-    from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import jetRecalib
-    nanoCFG.modules.append(jetRecalib("Autumn18_Run"+runEra+"_V8_DATA"))
+#if not isMC:
+#    runEra = args.sample.split('2018')[1]
+#    from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import jetRecalib
+#    nanoCFG.modules.append(jetRecalib("Autumn18_Run"+runEra+"_V8_DATA"))
 
+print nanoCFG.modules
 p=PostProcessor(
     '.', inputFiles(),
     cut=cuts,

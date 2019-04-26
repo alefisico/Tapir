@@ -511,7 +511,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             leps,           ## lepton selection and SL/DL categorization
             counter_lep,    ## count numEvents after lepton selection
             jets,           ## Jet selection and b-tag counting
-            btagweight,     ## Stores btag weights
+            #btagweight,     ## Stores btag weights
             counter_jet,    ## count numEvents after jet selection
             triggerSF,      ## Computes trigger weight from root files containing the SF (not doing anything 2018/10/25, does not run on Boosted)
             btaglr,         ## calculates the b-tag likelihood ratio
@@ -526,8 +526,8 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             #multiclass_analyzer,
             mem_analyzer,
             #jointlikelihood_ana,
-            NN_ana,
-            mva,
+            #NN_ana,
+            #mva,
             treevar,
 
             #Write the output tree
@@ -554,7 +554,7 @@ def main(analysis_cfg, sample_name=None, schema=None, firstEvent=0, numEvents=No
             leps,           ## lepton selection and SL/DL categorization
             counter_lep,    ## Count numEvents after lepton selection
             jets,           ## Jet selection and b-tag counting
-            btagweight,     ## Stores btag weights
+            #btagweight,     ## Stores btag weights
             counter_jet,    ## count numEvents after jet selection
             btaglr,         ## calculates the b-tag likelihood ratio
             counter_blr,    ## Count numEvents after BLR selection

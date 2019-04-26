@@ -1,4 +1,4 @@
-#include "PhysicsTools/NanoAOD/plugins/SimpleFlatTableProducer.cc"
+#include "PhysicsTools/NanoAOD/plugins/SimpleFlatTableProducerPlugins.cc"
 #include "DataFormats/BTauReco/interface/HTTTopJetTagInfo.h"
 typedef SimpleFlatTableProducer<reco::HTTTopJetTagInfo> SimpleHTTInfoFlatTableProducer;
 

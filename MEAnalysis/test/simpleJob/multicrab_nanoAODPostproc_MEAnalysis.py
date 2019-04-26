@@ -40,7 +40,7 @@ mv python $CMSSW_BASE/python
 echo Found Proxy in: $X509_USER_PROXY
 echo "python simpleJob_nanoAODPostproc_MEAnalysis.py ......."
 python simpleJob_nanoAODPostproc_MEAnalysis.py --sample {datasets} --config {config}
-mv Loop_{datasets}/tree.root tree.root
+mv Loop_*/tree.root tree.root
 fi
     '''
     open('runPostProcMEAnalysis.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))
@@ -49,21 +49,21 @@ def createPSet():
 
     PYTHON_SCRIPT = '''import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("FAKE")
+process = cms.Process("NANO")
 
-process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring([
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(),
+#	lumisToProcess=cms.untracked.VLuminosityBlockRange("254231:1-254231:24")
+)
+
+process.source.fileNames = [
             "root://cms-xrd-global.cern.ch//store/user/algomez/ttH/nanoAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_simpleJobs_v00/190221_170126/0000/myNanoProdMc_NANO_38.root"
-            ]),
-)
+]
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.output = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('tree.root'),
-    fakeNameForCrab = cms.untracked.bool(True),
+    fileName = cms.untracked.string('nano_postprocessed.root'),
+    #fakeNameForCrab = cms.untracked.bool(True),
 )
-
 process.out = cms.EndPath(process.output)
     '''
     open('PSet.py', 'w').write(PYTHON_SCRIPT)
@@ -82,14 +82,15 @@ def submitJobs( job, lnfList, unitJobs ):
     config.section_("General")
     config.General.workArea = options.dir
     #config.General.transferLogs = True
+    config.General.transferOutputs = True
 
     config.section_("JobType")
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'PSet.py'
+    config.JobType.maxJobRuntimeMin = 2750
 
     config.section_("Data")
-    config.Data.inputDataset = None
-    config.Data.ignoreLocality = False
+    #config.Data.ignoreLocality = False
     #config.Data.publication = True
     #config.Data.publishDBS = 'phys03'
 
@@ -99,19 +100,8 @@ def submitJobs( job, lnfList, unitJobs ):
     #config.Site.blacklist = ['T2_US_Florida','T3_TW_*','T2_BR_*','T2_GR_Ioannina','T2_BR_SPRACE','T2_RU_IHEP','T2_PL_Swierk','T2_KR_KNU','T3_TW_NTU_HEP']
 
 
-    def submit(config):
-        try:
-            crabCommand('submit', config = config)
-            #crabCommand('submit', "--dryrun", config = config)
-        except HTTPException, hte:
-            print 'Cannot execute command'
-            print hte.headers
-
-
-    requestname = 'tthbb13_PostProcMEAnalysis_withME_'+ job + '_' +options.version
-    print requestname
     config.JobType.scriptExe = 'runPostProcMEAnalysis.sh'
-    config.JobType.inputFiles = [ 'PSet.py','runPostProcMEAnalysis.sh', 'simpleJob_nanoAODPostproc_MEAnalysis.py', options.config, 'haddnano.py', 'keep_and_drop.txt']
+    config.JobType.inputFiles = [ 'simpleJob_nanoAODPostproc_MEAnalysis.py', options.config, 'haddnano.py', 'keep_and_drop.txt']
     config.JobType.sendPythonFolder  = True
 
     # following 3 lines are the trick to skip DBS data lookup in CRAB Server
@@ -122,31 +112,30 @@ def submitJobs( job, lnfList, unitJobs ):
     else:
         config.Data.inputDataset = lfnList ### it is the dataset name
         #config.Data.splitting = 'EventAwareLumiBased'
-        #config.Data.splitting = 'FileBased'
-        config.Data.splitting = 'Automatic'
-        #config.Data.unitsPerJob = unitJobs
+        config.Data.splitting = 'FileBased'
+        #config.Data.splitting = 'Automatic'
+        config.Data.unitsPerJob = unitJobs
         #config.Data.inputDBS = 'phys03'
         #config.Data.splitting = 'Automatic'
         #config.Data.unitsPerJob = 480
 
-    # since the input will have no metadata information, output can not be put in DBS
-    #config.Data.publication = True
     config.JobType.outputFiles = [ 'tree.root' ]
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoPostMEAnalysis/'
 
+    outputTag = 'tthbb13_PostProcMEAnalysis_withME'
+    requestname = job + '_' +outputTag + '_' + options.version
+    print requestname
     if len(requestname) > 100: requestname = (requestname[:95-len(requestname)])
     print 'requestname = ', requestname
     config.General.requestName = requestname
     config.Data.outputDatasetTag = requestname
+    #config.Data.outputDatasetTag = outputTag + "_" + options.version
     print 'Submitting ' + config.General.requestName + ', dataset = ' + job
     print 'Configuration :'
     print config
     try :
-        from multiprocessing import Process
-        p = Process(target=submit, args=(config,))
-        p.start()
-        p.join()
-        #submit(config)
+        crabCommand('submit', config = config)
+        #crabCommand('submit', "--dryrun", config = config)
     except :
         print 'Not submitted.'
 
@@ -192,26 +181,25 @@ if __name__ == '__main__':
 
     dictSamples = {}
     if not options.textFile:
-        #dictSamples['SingleMuon_Run2018A'] = ['/SingleMuon/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        dictSamples['SingleMuon_Run2018B'] = ['/SingleMuon/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['SingleMuon_Run2018C'] = ['/SingleMuon/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['SingleMuon_Run2018D'] = ['/SingleMuon/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['EGamma_Run2018A'] = ['/EGamma/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        dictSamples['EGamma_Run2018B'] = ['/EGamma/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['EGamma_Run2018C'] = ['/EGamma/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['EGamma_Run2018D'] = ['/EGamma/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['DoubleMuon_Run2018A'] = ['/DoubleMuon/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['DoubleMuon_Run2018B'] = ['/DoubleMuon/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['DoubleMuon_Run2018C'] = ['/DoubleMuon/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['DoubleMuon_Run2018D'] = ['/DoubleMuon/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['MuonEG_Run2018A'] = ['/MuonEG/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['MuonEG_Run2018B'] = ['/MuonEG/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['MuonEG_Run2018C'] = ['/MuonEG/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 20000 ]
-        #dictSamples['MuonEG_Run2018D'] = ['/MuonEG/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 20000 ]
-        dictSamples['TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v1/NANOAODSIM', dbsglobal, 20000 ]
-        #dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/algomez-TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1-e05f95fef0725c09f3ec1f4a47bebd2d/USER', dbsglobal, 1 ]
+        dictSamples['SingleMuon_Run2018A'] = ['/SingleMuon/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['SingleMuon_Run2018B'] = ['/SingleMuon/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['SingleMuon_Run2018C'] = ['/SingleMuon/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['SingleMuon_Run2018D'] = ['/SingleMuon/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['EGamma_Run2018A'] = ['/EGamma/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['EGamma_Run2018B'] = ['/EGamma/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['EGamma_Run2018C'] = ['/EGamma/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['EGamma_Run2018D'] = ['/EGamma/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['DoubleMuon_Run2018A'] = ['/DoubleMuon/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['DoubleMuon_Run2018B'] = ['/DoubleMuon/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['DoubleMuon_Run2018C'] = ['/DoubleMuon/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['DoubleMuon_Run2018D'] = ['/DoubleMuon/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['MuonEG_Run2018A'] = ['/MuonEG/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['MuonEG_Run2018B'] = ['/MuonEG/Run2018B-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['MuonEG_Run2018C'] = ['/MuonEG/Run2018C-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['MuonEG_Run2018D'] = ['/MuonEG/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD', dbsglobal, 1 ]
+        dictSamples['TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v1/NANOAODSIM', dbsglobal, 1 ]
         dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
-        dictSamples['ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v3/NANOAODSIM', dbsglobal, 2000 ]
+        dictSamples['ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v3/NANOAODSIM', dbsglobal, 1 ]
 
     else: dictSamples[options.datasets] = [ options.textFile ]
 
@@ -226,12 +214,9 @@ if __name__ == '__main__':
 
     for isam in processingSamples:
 
-        if 'Run2018' in isam:
-            options.datasets = isam.split('_')[0]
-            isData = True
-        else:
-            options.datasets = isam
-            isData = False
+        options.datasets = isam
+        #if 'Run2018' in isam: isData = True
+        #else: isData = False
         createBash()
         print('Creating bash file...')
         createPSet()
