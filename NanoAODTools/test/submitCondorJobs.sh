@@ -5,6 +5,8 @@ if [[ $# -eq 0 ]] ; then
 else
 
     sample=$1
+    myproxy=/afs/cern.ch/user/a/algomez/x509up_u15148
+    t3Dir=ttH/training/'${sample}'/
 
     condorFile=${sample}_condorJob
     echo '''
@@ -24,7 +26,7 @@ queue myfile from '${sample}'.txt
 
     echo '''#!/bin/bash
 export SCRAM_ARCH=slc6_amd64_gcc700
-export X509_USER_PROXY=/afs/cern.ch/user/a/algomez/x509up_u15148
+export X509_USER_PROXY='${myproxy}'
 
 cd '${CMSSW_BASE}'/src
 eval `scramv1 runtime -sh`
@@ -36,11 +38,7 @@ python '${PWD}'/makeNumpyarrays.py -s -d ${1} -i ${2} -o ${3}
 
 ls -l
 
-gfal-copy -E /afs/cern.ch/user/a/algomez/x509up_u15148 --parent '${sample}'_${3}.npy gsiftp://t3se01.psi.ch/pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/training/'${sample}'/
-#for ifile in `ls *npy`; do
-#    gfal-copy -E /afs/cern.ch/user/a/algomez/x509up_u15148 --parent --force ${ifile} gsiftp://t3se01.psi.ch/pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/training/'${sample}'/
-#done
-#rm *npy
+gfal-copy -E '${myproxy}' --parent '${sample}'_${3}.h5 gsiftp://t3se01.psi.ch/pnfs/psi.ch/cms/trivcat/store/user/'$USER'/'${t3Dir}'
     ''' > ${condorFile}.sh
 
     condor_submit ${condorFile}.sub
