@@ -1,1 +1,0 @@
-/work/algomez/work/ttH/CMSSW_10_2_12/src/PhysicsTools/NanoAODTools/scripts/haddnano.py
