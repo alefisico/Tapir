@@ -44,6 +44,12 @@ parser.add_argument(
     default=-1,
 )
 parser.add_argument(
+    '--addMEAnalysis',
+    action="store_true",
+    help="Run Post processing and MEAnalysis (true) or postProcessing only (false)",
+    default=False,
+)
+parser.add_argument(
     '--loglevel',
     action="store",
     help="log level",
@@ -87,8 +93,9 @@ p=PostProcessor(
 p.run()
 
 ##### Running MEAnalysis
-an = analysisFromConfig(args.config)
-looper_dir, files = main( an,
+if args.addMEAnalysis:
+    an = analysisFromConfig(args.config)
+    looper_dir, files = main( an,
                             sample_name= args.sample if isMC else args.sample.split('_')[0],
                             ##numEvents=args.numEvents,
                             files=["nano_postprocessed.root"],

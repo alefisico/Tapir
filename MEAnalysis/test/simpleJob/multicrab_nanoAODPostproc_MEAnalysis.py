@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-This is a small script that submits a config over many datasets
+Multicrab script to submit several datasets at the time, for postProcessing with/wo MEAnalysis
 """
 import os
 from optparse import OptionParser
@@ -8,10 +8,10 @@ from dbs.apis.dbsClient import DbsApi  ## talk to DBS to get list of files in th
 dbsphys03 = DbsApi('https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader')
 dbsglobal = DbsApi('https://cmsweb.cern.ch/dbs/prod/global/DBSReader')
 
-def make_list(option, opt, value, parser):
-    setattr(parser.values, option.dest, value.split(','))
 
+##########################################
 def createBash():
+    """docstring for createBash: create the sh file for crab"""
 
     BASH_SCRIPT = '''#this is not mean to be run locally
 #
@@ -39,13 +39,15 @@ mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
 echo "python simpleJob_nanoAODPostproc_MEAnalysis.py ......."
-python simpleJob_nanoAODPostproc_MEAnalysis.py --sample {datasets} --config {config}
+python simpleJob_nanoAODPostproc_MEAnalysis.py --sample {datasets} --config {config} --addMEAnalysis
 mv Loop_*/tree.root tree.root
 fi
     '''
-    open('runPostProcMEAnalysis.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))
+    open('runPostProcMEAnalysis.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))     ### create file and replace arguments with {THIS}
 
+##########################################
 def createPSet():
+    """docstring for createPSet: create the PSet.py file needed for postprocessing"""
 
     PYTHON_SCRIPT = '''import FWCore.ParameterSet.Config as cms
 
@@ -69,7 +71,10 @@ process.out = cms.EndPath(process.output)
     open('PSet.py', 'w').write(PYTHON_SCRIPT)
 
 
+##########################################
 def submitJobs( job, lnfList, unitJobs ):
+    """docstring for submitJobs: create the crab python config file"""
+
 
     from WMCore.Configuration import Configuration
     config = Configuration()
@@ -99,7 +104,6 @@ def submitJobs( job, lnfList, unitJobs ):
     #config.Site.whitelist = ['T2_US_Nebraska','T2_CH_CSCS','T3_US_UMD','T2_US_Caltech','T2_US_MIT']
     #config.Site.blacklist = ['T2_US_Florida','T3_TW_*','T2_BR_*','T2_GR_Ioannina','T2_BR_SPRACE','T2_RU_IHEP','T2_PL_Swierk','T2_KR_KNU','T3_TW_NTU_HEP']
 
-
     config.JobType.scriptExe = 'runPostProcMEAnalysis.sh'
     config.JobType.inputFiles = [ 'simpleJob_nanoAODPostproc_MEAnalysis.py', options.config, 'haddnano.py', 'keep_and_drop.txt']
     config.JobType.sendPythonFolder  = True
@@ -111,18 +115,13 @@ def submitJobs( job, lnfList, unitJobs ):
         config.Data.outputPrimaryDataset = job
     else:
         config.Data.inputDataset = lfnList ### it is the dataset name
-        #config.Data.splitting = 'EventAwareLumiBased'
         config.Data.splitting = 'FileBased'
-        #config.Data.splitting = 'Automatic'
         config.Data.unitsPerJob = unitJobs
-        #config.Data.inputDBS = 'phys03'
-        #config.Data.splitting = 'Automatic'
-        #config.Data.unitsPerJob = 480
 
-    config.JobType.outputFiles = [ 'tree.root' ]
-    config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoPostMEAnalysis/'
+    if options.addMEAnalysis: config.JobType.outputFiles = [ 'tree.root' ]
+    config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoPostMEAnalysis/' if options.addMEAnalysis else '/store/user/'+os.environ['USER']+'/ttH/nanoAODPostproc/'
 
-    outputTag = 'tthbb13_PostProcMEAnalysis_withME'
+    outputTag = 'tthbb13_PostProcMEAnalysis_withME' if options.addMEAnalysis else 'tthbb13_PostProc'
     requestname = job + '_' +outputTag + '_' + options.version
     print requestname
     if len(requestname) > 100: requestname = (requestname[:95-len(requestname)])
@@ -140,7 +139,7 @@ def submitJobs( job, lnfList, unitJobs ):
         print 'Not submitted.'
 
 
-
+##########################################
 if __name__ == '__main__':
 
     usage = ('usage: python submit_all.py -c CONFIG -d DIR -f DATASETS_FILE')
@@ -176,9 +175,15 @@ if __name__ == '__main__':
             dest="config", default='simpleJob_config.cfg',
             help=("Config file "),
             metavar="CONFIG")
+    parser.add_option(
+            '-a', '--addMEAnalysis',
+            dest="addMEAnalysis", default=False,
+            help=("Including MEAnalysis"),
+            metavar="ADDMEANALYSIS")
 
     (options, args) = parser.parse_args()
 
+    ### dictionary with datasets
     dictSamples = {}
     if not options.textFile:
         dictSamples['SingleMuon_Run2018A'] = ['/SingleMuon/Run2018A-Nano14Dec2018-v1/NANOAOD', dbsglobal, 1 ]
@@ -203,20 +208,19 @@ if __name__ == '__main__':
 
     else: dictSamples[options.datasets] = [ options.textFile ]
 
+    ### Trick to copy only datasets specified
     processingSamples = {}
     if 'all' in options.datasets:
         for sam in dictSamples: processingSamples[ sam ] = dictSamples[ sam ]
     else:
         for sam in dictSamples:
             if sam.startswith( options.datasets ): processingSamples[ sam ] = dictSamples[ sam ]
-
     if len(processingSamples)==0: print 'No sample found. \n Have a nice day :)'
 
+    ### Creating files needed and running submitJobs
     for isam in processingSamples:
 
         options.datasets = isam
-        #if 'Run2018' in isam: isData = True
-        #else: isData = False
         createBash()
         print('Creating bash file...')
         createPSet()

@@ -31,17 +31,18 @@ line.SetLineColor(kRed)
 
 jetMassHTlabY = 0.20
 jetMassHTlabX = 0.85
-kfactor = 0.032
 
 ttbarComp = OrderedDict()
-ttbarComp['ttbarPlusB'] = [ 'tt+b', kRed+4 ]
-ttbarComp['ttbarPlus2B'] = [ 'tt+2b', kRed+3 ]
-ttbarComp['ttbarPlusBBbar'] = [ 'tt+bb', kRed+2 ]
-ttbarComp['ttbarPlusCCbar'] = [ 'tt+cc', kRed-1 ]
-ttbarComp['ttbarOther'] = [ 'tt+light', kRed-2 ]
+ttbarComp['ttb'] = [ 'tt+b', kRed+4 ]
+ttbarComp['tt2b'] = [ 'tt+2b', kRed+3 ]
+ttbarComp['ttbb'] = [ 'tt+bb', kRed+2 ]
+ttbarComp['ttcc'] = [ 'tt+cc', kRed-1 ]
+ttbarComp['ttll'] = [ 'tt+light', kRed-2 ]
 
 selection = {}
-selection['sl_presel'] = [ 'nlep > 0', 'nJets > 3', 'nDeepCSVM > 1' ]
+selection['SL_presel'] = [ 'SL Preselection' ]
+selection['DL_presel'] = [ 'DL Preselection' ]
+#selection['SL_presel'] = [ 'nlep > 0', 'nJets > 3', 'nDeepCSVM > 1' ]
 
 def setSelection( listSel, xMin=0.65, yMax=0.65, align='right' ):
 
@@ -63,16 +64,16 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
 
 	#if (labY < 0.5) and ( labX < 0.5 ): legend=TLegend(0.20,0.50,0.50,0.62)
 	#elif (labX < 0.5): legend=TLegend(0.20,0.75,0.50,0.87)
-	legend=TLegend(0.75,0.60,0.90,0.87)
+	legend=TLegend(0.70,0.53,0.90,0.83)
 	legend.SetFillStyle(0)
 	legend.SetTextSize(0.04)
 
 	histos = {}
         for idataLabel, idata in dataFiles.iteritems():
             try:
-                histos[ 'Data' ].Add( idata.Get( 'data__'+args.cut+'__'+nameInRoot ) )
+                histos[ 'Data' ].Add( idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018A' ) )
             except (KeyError, AttributeError) as e:
-                histos[ 'Data' ] = idata.Get( 'data__'+args.cut+'__'+nameInRoot )
+                histos[ 'Data' ] = idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018A' )
 	if rebinX > 1: histos[ 'Data' ].Rebin( rebinX )
 	hData = histos[ 'Data' ].Clone()
 	legend.AddEntry( hData, 'DATA' , 'ep' )
@@ -81,10 +82,11 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
 	hBkg = histos[ 'Data' ].Clone()
 	hBkg.Reset()
         for isamLabel, isam in bkgFiles.iteritems():
+            #numEventsProc = isam[0].Get( 'eventProcessed_'+isamLabel ).GetEntries()
             if 'TT' in isamLabel:
                 for flaLabel, flaInfo in ttbarComp.iteritems():
-                    histos[ flaLabel ] = isam[0].Get( flaLabel+'__'+args.cut+'__'+nameInRoot )
-                    histos[ flaLabel ].Scale( isam[1]*kfactor )
+                    histos[ flaLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel+'_'+flaLabel )
+                    histos[ flaLabel ].Scale( isam[1] )
                     histos[ flaLabel ].SetFillStyle( 1001 )
                     histos[ flaLabel ].SetFillColor( flaInfo[1] )
                     legend.AddEntry( histos[ flaLabel ], flaInfo[0], 'f' )
@@ -92,8 +94,8 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
                     hBkg.Add( histos[ flaLabel ].Clone() )
                     hBkgStack.Add( histos[ flaLabel ].Clone() )
             else:
-                histos[ isamLabel ] = isam[0].Get( isamLabel+'__'+args.cut+'__'+nameInRoot )
-                histos[ isamLabel ].Scale( isam[1]*kfactor )
+                histos[ isamLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel )
+                histos[ isamLabel ].Scale( isam[1] )
                 histos[ isamLabel ].SetFillStyle( 1001 )
                 histos[ isamLabel ].SetFillColor( flaInfo[1] )
                 legend.AddEntry( histos[ isamLabel ], flaInfo[0], 'f' )
@@ -102,13 +104,18 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
                 hBkgStack.Add( histos[ isamLabel ].Clone() )
 
         for isignalLabel, isig in signalFiles.iteritems():
-            hSignal = isig[0].Get( isignalLabel+'__'+args.cut+'__'+nameInRoot )
-            hSignal.Scale( isig[1]*kfactor )
+            ##numEventsProc = isam[0].Get( 'eventProcessed_'+isamLabel ).GetEntries()
+            hSignal = isig[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isignalLabel )
+            hSignal.Scale( isig[1] )
             #histos[ isignalLabel ].SetFillStyle( 1001 )
             hSignal.SetLineWidth( 2 )
             hSignal.SetLineColor( isig[3] )
             legend.AddEntry( hSignal, isig[2], 'l' )
             if rebinX > 1: hSignal.Rebin( rebinX )
+
+        hBkg.SetFillColor(kBlack)
+        hBkg.SetFillStyle(3004)
+        legend.AddEntry( hBkg, 'stat', 'f' )
 
 	hRatio = TGraphAsymmErrors()
 	hRatio.Divide( hData, hBkg, 'pois' )
@@ -127,6 +134,7 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
 	pad1.cd()
 	if log: pad1.SetLogy()
 	hBkgStack.Draw('hist')
+        hBkg.Draw('e2 same')
 	hData.Draw("same")
 	hSignal.Draw("hist same")
 	hBkgStack.SetMaximum( ymax ) #(10 if log else 1.4)* max( hBkgStack.GetMaximum(), hBkgStack.GetMaximum() )  )
@@ -189,28 +197,29 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
 def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMSlogo=False, fitRatio=False ):
 	"""docstring for plot"""
 
-	outputFileName = nameInRoot+'_dataQualityPlots_'+args.version+'.'+args.ext
+	outputFileName = nameInRoot+'_'+args.ttbarDecay+'_dataQualityPlots_'+args.version+'.'+args.ext
 	print 'Processing.......', outputFileName
 
 	histos = {}
 
         for idataLabel, idata in dataFiles.iteritems():
             try:
-                histos[ 'Data' ].Add( idata.Get( 'data__'+args.cut+'__'+nameInRoot ) )
+                histos[ 'Data' ].Add( idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018A' ) )
             except (KeyError, AttributeError) as e:
-                histos[ 'Data' ] = idata.Get( 'data__'+args.cut+'__'+nameInRoot )
+                histos[ 'Data' ] = idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018A' )
 
         histos[ 'Bkg' ] = histos[ 'Data' ].Clone()
         histos[ 'Bkg' ].Reset()
         for isamLabel, isam in bkgFiles.iteritems():
+            #numEventsProc = float(isam[0].Get( 'eventProcessed_'+isamLabel ).GetEntries())
             if 'TT' in isamLabel:
                 for flaLabel, flaInfo in ttbarComp.iteritems():
-                    histos[ flaLabel ] = isam[0].Get( flaLabel+'__'+args.cut+'__'+nameInRoot )
-                    histos[ flaLabel ].Scale( isam[1]*kfactor )
+                    histos[ flaLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel+'_'+flaLabel )
+                    histos[ flaLabel ].Scale( isam[1] )
                     histos[ 'Bkg' ].Add( histos[ flaLabel ] )
             else:
-                histos[ isamLabel ] = isam[0].Get( isamLabel+'__'+args.cut+'__'+nameInRoot )
-                histos[ isamLabel ].Scale( isam[1]*kfactor )
+                histos[ isamLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel )
+                histos[ isamLabel ].Scale( isam[1] )
                 histos[ 'Bkg' ].Add( histos[ isamLabel ] )
 
 	if rebinX > 1:
@@ -310,12 +319,11 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--proc', action='store', default='1D', dest='process', help='Process to draw, example: 1D, 2D, MC.' )
+        parser.add_argument('-d', '--decay', action='store', default='SL', dest='ttbarDecay', help='ttbar decay channel: SL, DL' )
 	parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
-	parser.add_argument('-c', '--cut', action='store', default='sl_presel', help='cut, example: sl+presel' )
+	parser.add_argument('-c', '--cut', action='store', default='SL_presel', help='cut, example: sl+presel' )
 	parser.add_argument('-s', '--single', action='store', default='all', help='single histogram, example: massAve_cutDijet.' )
-	#parser.add_argument('-c', '--camp', action='store', default='RunIISpring15MiniAODv2-74X', help='Campaign, example: PHYS14.' )
-	parser.add_argument('-l', '--lumi', action='store', type=float, default=35870, help='Luminosity, example: 1.' )
-	parser.add_argument('-r', '--range', action='store', default='low', dest='RANGE', help='Trigger used, example PFHT800.' )
+	parser.add_argument('-l', '--lumi', action='store', type=float, default=59215, help='Luminosity, example: 1.' )
 	parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
 	parser.add_argument('-u', '--unc', action='store', default='JES', dest='unc',  help='Type of uncertainty' )
 	parser.add_argument('-f', '--final', action='store_true', default=False, dest='final',  help='If plot is final' )
@@ -337,17 +345,17 @@ if __name__ == '__main__':
 
 	folder = 'root://t3dcachedb03.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/Sparsinator/'+args.version
 
-        dataFiles['EGamma_Run2018A'] = TFile.Open(folder+'/EGamma_Run2018A_sparsinator_'+args.version+'.root')
-        dataFiles['EGamma_Run2018B'] = TFile.Open(folder+'/EGamma_Run2018B_sparsinator_'+args.version+'.root')
-        dataFiles['EGamma_Run2018C'] = TFile.Open(folder+'/EGamma_Run2018C_sparsinator_'+args.version+'.root')
-        dataFiles['EGamma_Run2018D'] = TFile.Open(folder+'/EGamma_Run2018D_sparsinator_'+args.version+'.root')
-        dataFiles['SingleMuon_Run2018A'] = TFile.Open(folder+'/SingleMuon_Run2018A_sparsinator_'+args.version+'.root')
-        dataFiles['SingleMuon_Run2018B'] = TFile.Open(folder+'/SingleMuon_Run2018B_sparsinator_'+args.version+'.root')
-        dataFiles['SingleMuon_Run2018C'] = TFile.Open(folder+'/SingleMuon_Run2018C_sparsinator_'+args.version+'.root')
-        dataFiles['SingleMuon_Run2018D'] = TFile.Open(folder+'/SingleMuon_Run2018D_sparsinator_'+args.version+'.root')
-        bkgFiles[ 'TTSL' ] = [ TFile.Open(folder+'/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_sparsinator_'+args.version+'.root'), args.lumi, 'ttbar' ]
+        if args.ttbarDecay.startswith('SL'):
+            dataFiles['EGamma'] = TFile.Open('Rootfiles/EGamma_Run2018All_'+args.version+'.root')
+            dataFiles['SingleMuon'] = TFile.Open('Rootfiles/SingleMuon_Run2018All_'+args.version+'.root')
+            bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/100705000., 'ttbar' ]
+        else:
+            dataFiles['EGamma'] = TFile.Open('Rootfiles/EGamma_Run2018All_'+args.version+'.root')
+            dataFiles['MuonEG'] = TFile.Open('Rootfiles/MuonEG_Run2018All_'+args.version+'.root')
+            dataFiles['DoubleMuon'] = TFile.Open('Rootfiles/DoubleMuon_Run2018All_'+args.version+'.root')
+            bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259)/64310000., 'ttbar' ]
 
-        signalFiles[ 'ttH_hbb' ] = [ TFile.Open(folder+'/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8_sparsinator_'+args.version+'.root'), args.lumi*0.1, 'ttH(bb)', kBlue-4 ]
+        signalFiles[ 'ttHTobb' ] = [ TFile.Open('Rootfiles/ttHTobb_'+args.version+'.root'), (args.lumi*0.5071*0.5824/11791999.)*50, 'ttH(bb) (x50)', kBlue-4 ]
 
 	taulabX = 0.90
 	taulabY = 0.85
@@ -358,27 +366,34 @@ if __name__ == '__main__':
 		##[ '2D', 'Boosted', 'leadMassHT', 'Leading Jet Mass [GeV]', 'HT [GeV]', 0, massMaxX, 1, 100, 1300, 1, jetMassHTlabX, jetMassHTlabY],
 		##[ '2DResolved', 'Resolved', 'etas', '#eta_{jj1}', '#eta_{jj2}', -3.0, 3.0, 10, -3.0, 3.0, 10, jetMassHTlabX, jetMassHTlabY],
 
-		[ 'stack', 'jetsByPt_0_pt', 'Leading jet pT [GeV]', 0, 1000, 2, 10, 10e5, 0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_1_pt', '2nd leading jet pT [GeV]', 0, 1000, 2, 1, 10e5,  0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_2_pt', '3rd leading jet pT [GeV]', 0, 1000, 2, 1, 10e5,  0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_3_pt', '4th leading jet pT [GeV]', 0, 1000, 2, 1, 10e5,  0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_0_eta', 'Leading jet #eta', -2.5, 2.5, 1, 100, 10e6,  0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_1_eta', '2nd leading jet #eta', -2.5, 2.5, 1, 100, 10e6, 0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_2_eta', '3rd leading jet #eta', -2.5, 2.5, 1, 100, 10e6, 0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_3_eta', '4th leading jet #eta', -2.5, 2.5, 1, 100, 10e6, 0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_0_btagCSV', 'Leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_1_btagCSV', '2nd leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_2_btagCSV', '3rd leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.70, 0.80, True, False],
-		[ 'stack', 'jetsByPt_3_btagCSV', '4th leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.70, 0.80, True, False],
-		[ 'stack', 'leps_0_pt', 'Lepton pT [GeV]', 0, 800, 2, 1, 10e5, 0.70, 0.80, True, False],
-		[ 'stack', 'leps_0_eta', 'Lepton #eta', -2.5, 2.5, 1, 100, 10e6,  0.70, 0.80, True, False],
-		[ 'stack', 'met_pt', 'MET [GeV]', 0, 500, 2, 10, 10e6, 0.70, 0.80, True, False],
-		[ 'stack', 'numJets', 'Number of jets', 2, 14, 1, 1, 10e6, 0.70, 0.80, True, False],
-		[ 'stack', 'nBDeepCSVM', 'Number of deepCSVM jets', 1, 7, 1, 10, 10e7, 0.70, 0.80, True, False],
-		[ 'stack', 'ht', 'HT [GeV]', 0, 2000, 5, 10, 10e6, 0.70, 0.80, True, False],
+		[ 'stack', 'jetsByPt_0_pt', 'Leading jet pT [GeV]', 0, 1000, 2, 10, 10e5, 0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_1_pt', '2nd leading jet pT [GeV]', 0, 1000, 2, 1, 10e5,  0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_2_pt', '3rd leading jet pT [GeV]', 0, 1000, 2, 1, 10e5,  0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_3_pt', '4th leading jet pT [GeV]', 0, 1000, 2, 1, 10e5,  0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_0_eta', 'Leading jet #eta', -2.5, 2.5, 1, 100, 10e6,  0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_1_eta', '2nd leading jet #eta', -2.5, 2.5, 1, 100, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_2_eta', '3rd leading jet #eta', -2.5, 2.5, 1, 100, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_3_eta', '4th leading jet #eta', -2.5, 2.5, 1, 100, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_0_btag', 'Leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_1_btag', '2nd leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_2_btag', '3rd leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.90, 0.85, True, False],
+		[ 'stack', 'jetsByPt_3_btag', '4th leading jet deepCSV discriminator', 0, 1, 1, 100, 10e6,  0.90, 0.85, True, False],
+		[ 'stack', 'lepsByPt_0_pt', 'Leading Lepton pT [GeV]', 0, 800, 2, 1, 10e5, 0.90, 0.85, True, False],
+		[ 'stack', 'lepsByPt_0_eta', 'Leading Lepton #eta', -2.5, 2.5, 1, 100, 10e6,  0.90, 0.85, True, False],
+		[ 'stack', 'lepsByPt_0_pt', '2nd Leading Lepton pT [GeV]', 0, 800, 2, 1, 10e5, 0.90, 0.85, True, False],
+		[ 'stack', 'lepsByPt_0_eta', '2nd Leading Lepton #eta', -2.5, 2.5, 1, 100, 10e6,  0.90, 0.85, True, False],
+		[ 'stack', 'met_pt', 'MET [GeV]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'met_phi', 'MET #phi]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'Wmass', 'W mass [GeV]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'll_mass', 'Dilepton mass [GeV]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'njets', 'Number of jets', 2, 14, 1, 1, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'nleps', 'Number of leptons', 0, 5, 1, 1, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'nbjets', 'Number of deepCSVM jets', 1, 7, 1, 10, 10e7, 0.90, 0.85, True, False],
+		[ 'stack', 'mem_tth_SL_1w2h2t_p', 'MEM', 0, 1, 1, 100, 10e7, 0.90, 0.85, True, False],
+	####	[ 'stack', 'ht', 'HT [GeV]', 0, 2000, 5, 10, 10e6, 0.90, 0.85, True, False],
 
 		[ 'qual', 'nPVs', 'Number of PV', 0, 100, 1,  0.85, 0.70, False, False],
-		[ 'qual', 'numJets', 'Number of jets', 2, 14, 1,  0.85, 0.70, True, False],
+		#[ 'qual', 'numJets', 'Number of jets', 2, 14, 1,  0.85, 0.70, True, False],
 		#[ 'qual', 'FatJet_pt_all', 'jet pT [GeV]', 200, 1500, 5,  0.85, 0.70, True, False],
 		]
 

@@ -8,6 +8,8 @@ from ROOT import *
 from array import array
 from dbs.apis.dbsClient import DbsApi
 dbsPhys03 = DbsApi('https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader')
+currentDir = os.getcwd()
+gROOT.SetBatch()
 
 #####################################################################
 Variables = OrderedDict()
@@ -92,7 +94,7 @@ def get2DHistoFromTree( fileName, treeName, plotVar1, plotVar2, weights, cuts, h
     return histo
 
 ############################################################################
-def myPlotAnalyzer( myChain, listCuts, sample, UNC ):
+def myPlotAnalyzer( myChain, listCuts, sample, isData, UNC ):
 
     print '--- Sample ', sample
 
@@ -101,28 +103,30 @@ def myPlotAnalyzer( myChain, listCuts, sample, UNC ):
     outputFile = TFile( outputFileName, 'RECREATE' )
 
     ###################### Defining histos
-    allHistos[ "eventProcessed_"+sample ] = TH1F( "eventProcessed_"+sample, "eventProcessed_"+sample, 1, 0, 1 )
-    for var, infoVar in Variables.items():
-        if sample.startswith('TTTo'):
-            for ttXX, ttXXcond in ttCls.items():
-                allHistos[ infoVar[0]+"_"+sample+'_'+ttXX ] = TH1F( infoVar[0]+"_"+sample+'_'+ttXX, infoVar[0]+"_"+sample+'_'+ttXX, infoVar[1], infoVar[2], infoVar[3] )
-        else:
-            allHistos[ infoVar[0]+"_"+sample ] = TH1F( infoVar[0]+"_"+sample, infoVar[0]+"_"+sample, infoVar[1], infoVar[2], infoVar[3] )
+    ##allHistos[ "eventProcessed_"+sample ] = TH1F( "eventProcessed_"+sample, "eventProcessed_"+sample, 1, 0, 1 )
+    for sel in listCuts:
+        for var, infoVar in Variables.items():
+            if sample.startswith('TTTo'):
+                for ttXX, ttXXcond in ttCls.items():
+                    allHistos[ sel+'_'+infoVar[0]+"_"+sample+'_'+ttXX ] = TH1F( sel+'_'+infoVar[0]+"_"+sample+'_'+ttXX, sel+'_'+infoVar[0]+"_"+sample+'_'+ttXX, infoVar[1], infoVar[2], infoVar[3] )
+            else:
+                allHistos[ sel+'_'+infoVar[0]+"_"+sample ] = TH1F( sel+'_'+infoVar[0]+"_"+sample, sel+'_'+infoVar[0]+"_"+sample, infoVar[1], infoVar[2], infoVar[3] )
 
     for h in allHistos: allHistos[h].Sumw2()
 
     ######### Running the Analysis
-    myChain.Draw( '1>>'+str(allHistos[ "eventProcessed_"+sample ].GetName()), '')
-    for var, varInfo in Variables.items():
-        histoName = varInfo[0]+'_'+sample
-        SF = TCut("1")  ### tmp
-        if sample.startswith('TTTo'):
-            for ttXX, ttXXcond in ttCls.items():
-                newHistoName = histoName+'_'+ttXX
-                newListCuts = listCuts + TCut( ttXXcond )
-                getHistoFromTree( myChain, var, SF, newListCuts, allHistos[ newHistoName ] )
-        else:
-            getHistoFromTree( myChain, var, SF, listCuts, allHistos[ histoName ] )
+    ###myChain.Draw( '1>>'+str(allHistos[ "eventProcessed_"+sample ].GetName()), '1*puWeight', 'goff')
+    for selName, selInfo in listCuts.items():
+        for var, varInfo in Variables.items():
+            histoName = selName+'_'+varInfo[0]+'_'+sample
+            SF = TCut("puWeight") if isData else TCut('1')
+            if sample.startswith('TTTo'):
+                for ttXX, ttXXcond in ttCls.items():
+                    newHistoName = histoName+'_'+ttXX
+                    newListCuts = selInfo + TCut( ttXXcond )
+                    getHistoFromTree( myChain, var, SF, newListCuts, allHistos[ newHistoName ] )
+            else:
+                getHistoFromTree( myChain, var, SF, selInfo, allHistos[ histoName ] )
 
     ##### Closing
     outputFile.Write()
@@ -137,10 +141,10 @@ if __name__ == '__main__':
     usage = 'usage: %prog [options]'
 
     parser = argparse.ArgumentParser()
-    parser.add_argument( '-s', '--sample', action='store', dest='samples', default='ttHTobb', help='Type of sample' )
-    parser.add_argument( '-a', '--anChannel', action='store', dest='anChannel', default='SL', help='Type of ttbar decay: SL, DL' )
+    parser.add_argument( '-s', '--singleFile', action='store_true', dest='singleFile', default=False, help='Run one file at the time (true) or the whole dataset (false)' )
+    parser.add_argument( '-i', '--inputFile', action='store', dest='inputFile', default='/store/user/algomez/ttH/nanoPostMEAnalysis/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_102X_v02p1/190426_153044/0000/tree_115.root', help='Input file if singleFile=True' )
+    parser.add_argument( '-d', '--dataset', action='store', dest='dataset', default='ttHTobb', help='Type of sample' )
     parser.add_argument( '-u', '--unc', action='store',  dest='unc', default='', help='Process: all or single.' )
-    parser.add_argument( '-l', '--lumi', action='store', type=float, default=1787, help='Luminosity, example: 1.' )
     parser.add_argument( '-b', '--batchSys', action='store_true',  dest='batchSys', default=False, help='Where to run: True lxplus, False psi.' )
     parser.add_argument( '-v', '--version', action='store', default='v01', dest='version', help='Version of the RUNAnalysis file.' )
 
@@ -149,31 +153,24 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(0)
 
-    ##### Selection
-    if args.anChannel.startswith('SL'):
-        jetCut = TCut( '(njets>3) && (jets_pt[Iteration$]>30) && (abs(jets_eta[Iteration$])<2.4) && (nBDeepCSVM>1)')
-        lepCut = TCut( '(nleps>0) && (abs(leps_eta[Iteration$])<2.4) && (leps_pt[0]>30)' )
-        metCut = TCut( '(met_pt>20)' )
-    elif args.anChannel.startswith('DL'):
-        pass
-    else: print 'Incorrect ttbar decay. Options: SL, DL, FH'
-    preselection = jetCut + lepCut + metCut
-
     ##### Samples
     allSamples = {}
     allSamples[ 'EGamma_Run2018A' ] = '/EGamma/algomez-EGamma_Run2018A_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'EGamma_Run2018B' ] = '/EGamma/algomez-EGamma_Run2018B_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'EGamma_Run2018C' ] = '/EGamma/algomez-EGamma_Run2018C_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'EGamma_Run2018D' ] = '/EGamma/algomez-EGamma_Run2018D_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-8f87a7a44696406b0351f755f100b05c/USER'
+#    allSamples[ 'EGamma_Run2018B' ] = '/EGamma/algomez-EGamma_Run2018B_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'EGamma_Run2018C' ] = '/EGamma/algomez-EGamma_Run2018C_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'EGamma_Run2018D' ] = '/EGamma/algomez-EGamma_Run2018D_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-8f87a7a44696406b0351f755f100b05c/USER'
     allSamples[ 'SingleMuon_Run2018A' ] = '/SingleMuon/algomez-SingleMuon_Run2018A_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'SingleMuon_Run2018B' ] = '/SingleMuon/algomez-SingleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'SingleMuon_Run2018C' ] = '/SingleMuon/algomez-SingleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'SingleMuon_Run2018D' ] = '/SingleMuon/algomez-SingleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-8f87a7a44696406b0351f755f100b05c/USER'
+#    allSamples[ 'SingleMuon_Run2018B' ] = '/SingleMuon/algomez-SingleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'SingleMuon_Run2018C' ] = '/SingleMuon/algomez-SingleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'SingleMuon_Run2018D' ] = '/SingleMuon/algomez-SingleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-8f87a7a44696406b0351f755f100b05c/USER'
     allSamples[ 'DoubleMuon_Run2018A' ] = '/DoubleMuon/algomez-DoubleMuon_Run2018A_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'DoubleMuon_Run2018B' ] = '/DoubleMuon/algomez-DoubleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'DoubleMuon_Run2018C' ] = '/DoubleMuon/algomez-DoubleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
-    allSamples[ 'DoubleMuon_Run2018D' ] = '/DoubleMuon/algomez-DoubleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-8f87a7a44696406b0351f755f100b05c/USER'
-    #allSamples[ ''] = '/MuonEG/algomez-tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'DoubleMuon_Run2018B' ] = '/DoubleMuon/algomez-DoubleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'DoubleMuon_Run2018C' ] = '/DoubleMuon/algomez-DoubleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'DoubleMuon_Run2018D' ] = '/DoubleMuon/algomez-DoubleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-8f87a7a44696406b0351f755f100b05c/USER'
+    allSamples[ 'MuonEG_Run2018A' ] = '/MuonEG/algomez-MuonEG_Run2018A_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'MuonEG_Run2018B' ] = '/MuonEG/algomez-MuonEG_Run2018B_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'MuonEG_Run2018C' ] = '/MuonEG/algomez-MuonEG_Run2018C_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0cddb9e2402d2a936e94a815e9296873/USER'
+#    allSamples[ 'MuonEG_Run2018D' ] = '/MuonEG/algomez-MuonEG_Run2018D_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-8f87a7a44696406b0351f755f100b05c/USER'
 
     allSamples[ 'ttHTobb' ] = '/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/algomez-ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-82f9a1e3d3dcf76bf6a4a44034cf6840/USER'
     allSamples[ 'TTToSemiLeptonic' ] = '/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_102X_v02p1-0607c559a339ced63de31d38b5efa1f6/USER'
@@ -182,27 +179,55 @@ if __name__ == '__main__':
     ## trick to run only in specific samples
     dictSamples = OrderedDict()
     for sam in allSamples:
-            if sam.startswith( args.samples ): dictSamples[ sam ] = allSamples[ sam ]
+        if sam.startswith( args.dataset ): dictSamples[ sam ] = allSamples[ sam ]
+        #else: dictSamples = allSamples
     allHistos = {}  ## dict for histos
+
 
     for sample, jsample in dictSamples.items():
 
-        ##### Create a list from the dataset
-        fileDictList = dbsPhys03.listFiles(dataset=jsample,validFileOnly=1)
-        print "dataset %s has %d files" % (jsample, len(fileDictList))
-        # DBS client returns a list of dictionaries, but we want a list of Logical File Names
-        allfiles = [ "root://cms-xrd-global.cern.ch/"+dic['logical_file_name'].replace('nano_postprocessed', 'tree') for dic in fileDictList ]  ## Previous step publish nano files but not tree, this is a trick to list
+        if 'Run2018' in sample: isData=True
+        else: isData=False
+        ##### Selection
+        presel = OrderedDict()
+        jetCutDL = TCut( '(njets>1) && (jets_pt[Iteration$]>20) && (jets_pt[0]>30) && (jets_pt[1]>30) && (abs(jets_eta[Iteration$])<2.4) && (nBDeepCSVM>0)')
+        lepCutDL = TCut( '(nleps==2) && (abs(leps_eta[Iteration$])<2.4) && (leps_pt[0]>25) && (leps_pt[1]>25)' )
+        metCutDL = TCut( '(met_pt>40)' )
+        jetCutSL = TCut( '(njets>3) && (jets_pt[Iteration$]>30) && (abs(jets_eta[Iteration$])<2.4) && (nBDeepCSVM>1)')
+        lepCutSL = TCut( '(nleps==1) && (abs(leps_eta[Iteration$])<2.4) && (leps_pt[0]>30)' )
+        metCutSL = TCut( '(met_pt>20)' )
+        if sample.startswith( ('EGamma', 'SingleMuon', 'TTToSemi' ) ):
+            presel['SL']= jetCutSL + lepCutSL + metCutSL
+        elif sample.startswith( ('DoubleMuon', 'MuonEG', 'TTTo2L2Nu' ) ):
+            presel['DL']= jetCutDL + lepCutDL + metCutDL
+        elif sample.startswith( ('ttHTobb' ) ):
+            presel['SL']= jetCutSL + lepCutSL + metCutSL
+            presel['DL']= jetCutDL + lepCutDL + metCutDL
+        else: print 'Incorrect ttbar decay. Options: SL, DL, FH'
+
+        if args.singleFile: allfiles = [ args.inputFile ]
+        else:
+            ##### Create a list from the dataset
+            fileDictList = dbsPhys03.listFiles(dataset=jsample,validFileOnly=1)
+            print "dataset %s has %d files" % (jsample, len(fileDictList))
+            # DBS client returns a list of dictionaries, but we want a list of Logical File Names
+            allfiles = [ "root://cms-xrd-global.cern.ch/"+dic['logical_file_name'].replace('nano_postprocessed', 'tree') for dic in fileDictList ]  ## Previous step publish nano files but not tree, this is a trick to list
+            #### trick to write txt files
+            #with open( currentDir+'/samples/'+(jsample.split('/')[1])+'.txt', 'a') as f:
+            #   for item in allfiles: f.write("%s\n" % item)
+
 
         ##### Opening root files
         myChain = TChain("tree")
         #dummy=0
         for ifile in allfiles:
-            tmpFile = xroot+str(ifile) if not ifile.startswith('root') else ifile
+            tmpFile = "root://cms-xrd-global.cern.ch/"+str(ifile) if not ifile.startswith('root') else ifile
             print 'Adding :', tmpFile
             myChain.Add( tmpFile )
             #dummy+=1
-            #if dummy>0: break
+            #if dummy>3: break
 
-        p = Process( target=myPlotAnalyzer, args=( myChain, preselection, sample, '' ) )
-        p.start()
-        p.join()
+        myPlotAnalyzer( myChain, presel, sample, isData, '' )
+        #p = Process( target=myPlotAnalyzer, args=( myChain, presel, sample, '' ) )
+        #p.start()
+        #p.join()
