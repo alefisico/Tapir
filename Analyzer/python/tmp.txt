@@ -1,0 +1,575 @@
+*Tree    :tree      : PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer.AutoFillTreeProducer_32 *
+*Br    0 :nGenBHiggs : Int_t Number of generated b from higgs                *
+*Br    1 :nGenBTop  : Int_t Number of generated b from top                   *
+*Br    2 :nGenQW    : Int_t Number of generated quarks from W                *
+*Br    3 :passPV    : Int_t First PV passes selection                        *
+*Br    4 :triggerDecision : Int_t Trigger selection                          *
+*Br    5 :triggerBitmask : Int_t Bitmask of trigger decisions                *
+*Br    6 :is_sl     : Int_t is single-leptonic                               *
+*Br    7 :is_dl     : Int_t is di-leptonic                                   *
+*Br    8 :is_fh     : Int_t is fully hadronic                                *
+*Br    9 :csv1      : Float_t highest jet csv value                          *
+*Br   10 :csv2      : Float_t 2nd highest jet csv value                      *
+*Br   11 :run       : run/I                                                  *
+*Br   12 :lumi      : lumi/I                                                 *
+*Br   13 :evt       : evt/I                                                  *
+*Br   14 :HLT_ttH_DL_elmu : HLT_ttH_DL_elmu/I                                *
+*Br   15 :HLT_BIT_HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ :       *
+*         | HLT_BIT_HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ/I     *
+*Br   16 :HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL :          *
+*         | HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL/I        *
+*Br   17 :HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ :       *
+*         | HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ/I     *
+*Br   18 :HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ :        *
+*         | HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ/I      *
+*Br   19 :HLT_ttH_DL_elel : HLT_ttH_DL_elel/I                                *
+*Br   20 :HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL :                   *
+*         | HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL/I                 *
+*Br   21 :HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ :                *
+*         | HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ/I              *
+*Br   22 :HLT_ttH_SL_mu : HLT_ttH_SL_mu/I                                    *
+*Br   23 :HLT_BIT_HLT_IsoMu24_eta2p1 : HLT_BIT_HLT_IsoMu24_eta2p1/I          *
+*Br   24 :HLT_BIT_HLT_IsoMu27 : HLT_BIT_HLT_IsoMu27/I                        *
+*Br   25 :HLT_ttH_SL_el : HLT_ttH_SL_el/I                                    *
+*Br   26 :HLT_BIT_HLT_Ele35_WPTight_Gsf : HLT_BIT_HLT_Ele35_WPTight_Gsf/I    *
+*Br   27 :HLT_BIT_HLT_Ele28_eta2p1_WPTight_Gsf_HT150 :                       *
+*         | HLT_BIT_HLT_Ele28_eta2p1_WPTight_Gsf_HT150/I                     *
+*Br   28 :HLT_ttH_DL_mumu : HLT_ttH_DL_mumu/I                                *
+*Br   29 :HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ :                      *
+*         | HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ/I                    *
+*Br   30 :HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8 :              *
+*         | HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8/I            *
+*Br   31 :HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8 :                *
+*         | HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8/I              *
+*Br   32 :HLT_ttH_FH : HLT_ttH_FH/I                                          *
+*Br   33 :HLT_BIT_HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5 :                     *
+*         | HLT_BIT_HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5/I                   *
+*Br   34 :HLT_BIT_HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0 : *
+*         | HLT_BIT_HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0/I*
+*Br   35 :HLT_BIT_HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2 :               *
+*         | HLT_BIT_HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2/I             *
+*Br   36 :n_bjets   : Float_t Number of selected bjets in event              *
+*Br   37 :n_ljets   : Float_t Number of selected ljets in event              *
+*Br   38 :n_boosted_bjets :                                                  *
+*         | Float_t Number of selected bjets in subjet-modified bjet list    *
+*Br   39 :n_boosted_ljets :                                                  *
+*         | Float_t Number of selected ljets in subjet-modified ljet list    *
+*Br   40 :n_boosted_allljets :                                               *
+*         | Float_t Number of selected ljets in subjet-modified ljet list, including additional FSR + ISR jets*
+*Br   41 :n_excluded_bjets : Float_t Number of excluded bjets:               *
+*         |  reco resolved b-jets that match a subjet in the HTT-candidate   *
+*Br   42 :n_excluded_ljets : Float_t Number of excluded ljets:
+*Br   43 :boosted   : Float_t Passed subjet analyzer                         *
+*Br   44 :Flag_goodVertices : Flag_goodVertices/I                            *
+*Br   45 :Flag_HBHENoiseFilter : Flag_HBHENoiseFilter/I                      *
+*Br   46 :Flag_HBHENoiseIsoFilter : Flag_HBHENoiseIsoFilter/I                *
+*Br   47 :Flag_EcalDeadCellTriggerPrimitiveFilter :                          *
+*         | Flag_EcalDeadCellTriggerPrimitiveFilter/I                        *
+*Br   48 :Flag_eeBadScFilter : Flag_eeBadScFilter/I                          *
+*Br   49 :Wmass     : Float_t Best reconstructed W candidate mass            *
+*Br   50 :mbb_closest : Float_t Mass of geometrically closest bb pair        *
+*Br   51 :cat       : Int_t ME category                                      *
+*Br   52 :cat_btag  : Int_t ME category (b-tag)                              *
+*Br   53 :cat_gen   :                                                        *
+*         | Int_t top decay category (-1 unknown, 0 single-leptonic, 1 di-leptonic, 2 fully hadronic)*
+*Br   54 :fh_region : Int_t FH region for QCD estimation                     *
+*Br   55 :btag_LR_4b_2b_btagCMVA :                                           *
+*         | Float_t 4b vs 2b b-tag likelihood ratio using the cMVA tagger    *
+*Br   56 :btag_LR_4b_2b_btagCSV :                                            *
+*         | Float_t 4b vs 2b b-tag likelihood ratio using the CSV tagger     *
+*Br   57 :btag_LR_4b_3b_btagCMVA : btag_LR_4b_3b_btagCMVA/F                  *
+*Br   58 :btag_LR_4b_3b_btagCSV : btag_LR_4b_3b_btagCSV/F                    *
+*Br   59 :btag_LR_3b_2b_btagCMVA : btag_LR_3b_2b_btagCMVA/F                  *
+*Br   60 :btag_LR_3b_2b_btagCSV : btag_LR_3b_2b_btagCSV/F                    *
+*Br   61 :btag_LR_geq2b_leq1b_btagCMVA : btag_LR_geq2b_leq1b_btagCMVA/F      *
+*Br   62 :btag_LR_geq2b_leq1b_btagCSV : btag_LR_geq2b_leq1b_btagCSV/F        *
+*Br   63 :qg_LR_4b_flavour_3q_0q : qg_LR_4b_flavour_3q_0q/F                  *
+*Br   64 :qg_LR_4b_flavour_4q_0q : qg_LR_4b_flavour_4q_0q/F                  *
+*Br   65 :qg_LR_4b_flavour_5q_0q : qg_LR_4b_flavour_5q_0q/F                  *
+*Br   66 :qg_LR_3b_flavour_4q_0q : qg_LR_3b_flavour_4q_0q/F                  *
+*Br   67 :qg_LR_3b_flavour_5q_0q : qg_LR_3b_flavour_5q_0q/F                  *
+*Br   68 :nBCSVM    : Int_t Number of good jets that pass the CSV Medium WP  *
+*Br   69 :nBCSVT    :                                                        *
+*         | Int_t Number of good jets that pass the DeepCSV Tight WP         *
+*Br   70 :nBCSVL    :                                                        *
+*         | Int_t Number of good jets that pass the DeepCSV Loose WP         *
+*Br   71 :nBDeepCSVM :                                                       *
+*         | Int_t Number of good jets that pass the DeepCSV Medium WP        *
+*Br   72 :nBCMVAM   : Int_t Number of good jets that pass cMVAv2 Medium WP   *
+*Br   73 :numJets   : Int_t Total number of good jets that pass jet ID       *
+*Br   74 :changes_jet_category : Int_t Jet category changed on systematic    *
+*Br   75 :ht30      : ht30/F                                                 *
+*Br   76 :mem_SL_0w2h2t_p : mem_SL_0w2h2t_p/F                                *
+*Br   77 :mem_DL_0w2h2t_p : mem_DL_0w2h2t_p/F                                *
+*Br   78 :mem_SL_1w2h2t_p : mem_SL_1w2h2t_p/F                                *
+*Br   79 :mem_SL_2w2h2t_p : mem_SL_2w2h2t_p/F                                *
+*Br   80 :mem_SL_2w2h2t_sj_p : mem_SL_2w2h2t_sj_p/F                          *
+*Br   81 :mem_SL_1w2h2t_sj_p : mem_SL_1w2h2t_sj_p/F                          *
+*Br   82 :mem_SL_0w2h2t_sj_p : mem_SL_0w2h2t_sj_p/F                          *
+*Br   83 :mem_DL_0w2h2t_sj_p : mem_DL_0w2h2t_sj_p/F                          *
+*Br   84 :mem_SL_2w2h2t_sj_perm_top_p : mem_SL_2w2h2t_sj_perm_top_p/F        *
+*Br   85 :mem_SL_2w2h2t_sj_perm_tophiggs_p :                                 *
+*         | mem_SL_2w2h2t_sj_perm_tophiggs_p/F                               *
+*Br   86 :mem_SL_2w2h2t_sj_perm_higgs_p : mem_SL_2w2h2t_sj_perm_higgs_p/F    *
+*Br   87 :mem_SL_1w2h2t_sj_perm_higgs_p : mem_SL_1w2h2t_sj_perm_higgs_p/F    *
+*Br   88 :mem_SL_0w2h2t_sj_perm_higgs_p : mem_SL_0w2h2t_sj_perm_higgs_p/F    *
+*Br   89 :mem_DL_0w2h2t_sj_perm_higgs_p : mem_DL_0w2h2t_sj_perm_higgs_p/F    *
+*Br   90 :nMatch_wq : nMatch_wq/I                                            *
+*Br   91 :nMatch_wq_btag : nMatch_wq_btag/I                                  *
+*Br   92 :nMatch_tb : nMatch_tb/I                                            *
+*Br   93 :nMatch_tb_btag : nMatch_tb_btag/I                                  *
+*Br   94 :nMatch_hb : nMatch_hb/I                                            *
+*Br   95 :nMatch_hb_btag : nMatch_hb_btag/I                                  *
+*Br   96 :ttCls     : Int_t ttbar classification from GenHFHadronMatcher     *
+*Br   97 :genHiggsDecayMode : genHiggsDecayMode/I                            *
+*Br   98 :qgWeight  : qgWeight/F                                             *
+*Br   99 :Pileup_nTrueInt : Pileup_nTrueInt/F                                *
+*Br  100 :Pileup_nPU : Pileup_nPU/I                                          *
+*Br  101 :puWeight  : Float_t pileup weight                                  *
+*Br  102 :puWeightUp : puWeightUp/F                                          *
+*Br  103 :puWeightDown : puWeightDown/F                                      *
+*Br  104 :genWeight : Float_t Generator weight                               *
+*Br  105 :btagWeight : Float_t per event btag weight                         *
+*Br  106 :btagWeightUp : btagWeightUp/F                                      *
+*Br  107 :btagWeightDown : btagWeightDown/F                                  *
+*Br  108 :btagWeight_shape : Float_t per event btag weight (shape)           *
+*Br  109 :btagWeight_shapeJESUp : btagWeight_shapeJESUp/F                    *
+*Br  110 :btagWeight_shapeJESDown : btagWeight_shapeJESDown/F                *
+*Br  111 :btagWeight_shapeLFUp : btagWeight_shapeLFUp/F                      *
+*Br  112 :btagWeight_shapeLFDown : btagWeight_shapeLFDown/F                  *
+*Br  113 :btagWeight_shapeHFUp : btagWeight_shapeHFUp/F                      *
+*Br  114 :btagWeight_shapeHFDown : btagWeight_shapeHFDown/F                  *
+*Br  115 :btagWeight_shapeHFSTATS1Up : btagWeight_shapeHFSTATS1Up/F          *
+*Br  116 :btagWeight_shapeHFSTATS1Down : btagWeight_shapeHFSTATS1Down/F      *
+*Br  117 :btagWeight_shapeHFSTATS2Up : btagWeight_shapeHFSTATS2Up/F          *
+*Br  118 :btagWeight_shapeHFSTATS2Down : btagWeight_shapeHFSTATS2Down/F      *
+*Br  119 :btagWeight_shapeLFSTATS1Up : btagWeight_shapeLFSTATS1Up/F          *
+*Br  120 :btagWeight_shapeLFSTATS1Down : btagWeight_shapeLFSTATS1Down/F      *
+*Br  121 :btagWeight_shapeLFSTATS2Up : btagWeight_shapeLFSTATS2Up/F          *
+*Br  122 :btagWeight_shapeLFSTATS2Down : btagWeight_shapeLFSTATS2Down/F      *
+*Br  123 :btagWeight_shapeCFERR1Up : btagWeight_shapeCFERR1Up/F              *
+*Br  124 :btagWeight_shapeCFERR1Down : btagWeight_shapeCFERR1Down/F          *
+*Br  125 :btagWeight_shapeCFERR2Up : btagWeight_shapeCFERR2Up/F              *
+*Br  126 :btagWeight_shapeCFERR2Down : btagWeight_shapeCFERR2Down/F          *
+*Br  127 :tth_rho_px_gen : tth_rho_px_gen/F                                  *
+*Br  128 :tth_rho_py_gen : tth_rho_py_gen/F                                  *
+*Br  129 :tth_rho_px_reco : tth_rho_px_reco/F                                *
+*Br  130 :tth_rho_py_reco : tth_rho_py_reco/F                                *
+*Br  131 :nMatch_q_htt :                                                     *
+*         | Int_t number of light quarks matched to HEPTopTagger subjets     *
+*Br  132 :nMatch_b_htt :                                                     *
+*         | Int_t number of b-quarks matched to HEPTopTagger subjets         *
+*Br  133 :nMatch_b_higgs :                                                   *
+*         | Int_t number of b-quarks matched to HiggsTagger subjets          *
+*Br  134 :rho       : rho/F                                                  *
+*Br  135 :json      : json/I                                                 *
+*Br  136 :runrange  : Int_t integer index of the run range (A-F)             *
+*Br  137 :nPVs      : nPVs/F                                                 *
+*Br  138 :mem_tth_SL_0w2h2t_p : mem_tth_SL_0w2h2t_p/F                        *
+*Br  139 :mem_tth_SL_0w2h2t_p_err : mem_tth_SL_0w2h2t_p_err/F                *
+*Br  140 :mem_tth_SL_0w2h2t_time : mem_tth_SL_0w2h2t_time/F                  *
+*Br  141 :mem_tth_SL_0w2h2t_nperm : mem_tth_SL_0w2h2t_nperm/I                *
+*Br  142 :mem_tth_DL_0w2h2t_sj_perm_higgs_p :                                *
+*         | mem_tth_DL_0w2h2t_sj_perm_higgs_p/F                              *
+*Br  143 :mem_tth_DL_0w2h2t_sj_perm_higgs_p_err :                            *
+*         | mem_tth_DL_0w2h2t_sj_perm_higgs_p_err/F                          *
+*Br  144 :mem_tth_DL_0w2h2t_sj_perm_higgs_time :                             *
+*         | mem_tth_DL_0w2h2t_sj_perm_higgs_time/F                           *
+*Br  145 :mem_tth_DL_0w2h2t_sj_perm_higgs_nperm :                            *
+*         | mem_tth_DL_0w2h2t_sj_perm_higgs_nperm/I                          *
+*Br  146 :mem_ttbb_DL_0w2h2t_p : mem_ttbb_DL_0w2h2t_p/F                      *
+*Br  147 :mem_ttbb_DL_0w2h2t_p_err : mem_ttbb_DL_0w2h2t_p_err/F              *
+*Br  148 :mem_ttbb_DL_0w2h2t_time : mem_ttbb_DL_0w2h2t_time/F                *
+*Br  149 :mem_ttbb_DL_0w2h2t_nperm : mem_ttbb_DL_0w2h2t_nperm/I              *
+*Br  150 :mem_ttbb_SL_1w2h2t_sj_perm_higgs_p :                               *
+*         | mem_ttbb_SL_1w2h2t_sj_perm_higgs_p/F                             *
+*Br  151 :mem_ttbb_SL_1w2h2t_sj_perm_higgs_p_err :                           *
+*         | mem_ttbb_SL_1w2h2t_sj_perm_higgs_p_err/F                         *
+*Br  152 :mem_ttbb_SL_1w2h2t_sj_perm_higgs_time :                            *
+*         | mem_ttbb_SL_1w2h2t_sj_perm_higgs_time/F                          *
+*Br  153 :mem_ttbb_SL_1w2h2t_sj_perm_higgs_nperm :                           *
+*         | mem_ttbb_SL_1w2h2t_sj_perm_higgs_nperm/I                         *
+*Br  154 :pv_z      : pv_z/F                                                 *
+*Br  155 :pv_rho    : pv_rho/F                                               *
+*Br  156 :pv_ndof   : pv_ndof/F                                              *
+*Br  157 :pv_isFake : pv_isFake/F                                            *
+*Br  158 :mem_ttbb_SL_0w2h2t_sj_p : mem_ttbb_SL_0w2h2t_sj_p/F                *
+*Br  159 :mem_ttbb_SL_0w2h2t_sj_p_err : mem_ttbb_SL_0w2h2t_sj_p_err/F        *
+*Br  160 :mem_ttbb_SL_0w2h2t_sj_time : mem_ttbb_SL_0w2h2t_sj_time/F          *
+*Br  161 :mem_ttbb_SL_0w2h2t_sj_nperm : mem_ttbb_SL_0w2h2t_sj_nperm/I        *
+*Br  162 :mem_ttbb_SL_0w2h2t_sj_perm_higgs_p :                               *
+*         | mem_ttbb_SL_0w2h2t_sj_perm_higgs_p/F                             *
+*Br  163 :mem_ttbb_SL_0w2h2t_sj_perm_higgs_p_err :                           *
+*         | mem_ttbb_SL_0w2h2t_sj_perm_higgs_p_err/F                         *
+*Br  164 :mem_ttbb_SL_0w2h2t_sj_perm_higgs_time :                            *
+*         | mem_ttbb_SL_0w2h2t_sj_perm_higgs_time/F                          *
+*Br  165 :mem_ttbb_SL_0w2h2t_sj_perm_higgs_nperm :                           *
+*         | mem_ttbb_SL_0w2h2t_sj_perm_higgs_nperm/I                         *
+*Br  166 :mem_ttbb_DL_0w2h2t_sj_perm_higgs_p :                               *
+*         | mem_ttbb_DL_0w2h2t_sj_perm_higgs_p/F                             *
+*Br  167 :mem_ttbb_DL_0w2h2t_sj_perm_higgs_p_err :                           *
+*         | mem_ttbb_DL_0w2h2t_sj_perm_higgs_p_err/F                         *
+*Br  168 :mem_ttbb_DL_0w2h2t_sj_perm_higgs_time :                            *
+*         | mem_ttbb_DL_0w2h2t_sj_perm_higgs_time/F                          *
+*Br  169 :mem_ttbb_DL_0w2h2t_sj_perm_higgs_nperm :                           *
+*         | mem_ttbb_DL_0w2h2t_sj_perm_higgs_nperm/I                         *
+*Br  170 :mem_ttbb_SL_1w2h2t_p : mem_ttbb_SL_1w2h2t_p/F                      *
+*Br  171 :mem_ttbb_SL_1w2h2t_p_err : mem_ttbb_SL_1w2h2t_p_err/F              *
+*Br  172 :mem_ttbb_SL_1w2h2t_time : mem_ttbb_SL_1w2h2t_time/F                *
+*Br  173 :mem_ttbb_SL_1w2h2t_nperm : mem_ttbb_SL_1w2h2t_nperm/I              *
+*Br  174 :mem_tth_SL_1w2h2t_sj_p : mem_tth_SL_1w2h2t_sj_p/F                  *
+*Br  175 :mem_tth_SL_1w2h2t_sj_p_err : mem_tth_SL_1w2h2t_sj_p_err/F          *
+*Br  176 :mem_tth_SL_1w2h2t_sj_time : mem_tth_SL_1w2h2t_sj_time/F            *
+*Br  177 :mem_tth_SL_1w2h2t_sj_nperm : mem_tth_SL_1w2h2t_sj_nperm/I          *
+*Br  178 :mem_ttbb_SL_0w2h2t_p : mem_ttbb_SL_0w2h2t_p/F                      *
+*Br  179 :mem_ttbb_SL_0w2h2t_p_err : mem_ttbb_SL_0w2h2t_p_err/F              *
+*Br  180 :mem_ttbb_SL_0w2h2t_time : mem_ttbb_SL_0w2h2t_time/F                *
+*Br  181 :mem_ttbb_SL_0w2h2t_nperm : mem_ttbb_SL_0w2h2t_nperm/I              *
+*Br  182 :mem_tth_SL_2w2h2t_p : mem_tth_SL_2w2h2t_p/F                        *
+*Br  183 :mem_tth_SL_2w2h2t_p_err : mem_tth_SL_2w2h2t_p_err/F                *
+*Br  184 :mem_tth_SL_2w2h2t_time : mem_tth_SL_2w2h2t_time/F                  *
+*Br  185 :mem_tth_SL_2w2h2t_nperm : mem_tth_SL_2w2h2t_nperm/I                *
+*Br  186 :mem_tth_SL_2w2h2t_sj_perm_top_p : mem_tth_SL_2w2h2t_sj_perm_top_p/F*
+*Br  187 :mem_tth_SL_2w2h2t_sj_perm_top_p_err :                              *
+*         | mem_tth_SL_2w2h2t_sj_perm_top_p_err/F                            *
+*Br  188 :mem_tth_SL_2w2h2t_sj_perm_top_time :                               *
+*         | mem_tth_SL_2w2h2t_sj_perm_top_time/F                             *
+*Br  189 :mem_tth_SL_2w2h2t_sj_perm_top_nperm :                              *
+*         | mem_tth_SL_2w2h2t_sj_perm_top_nperm/I                            *
+*Br  190 :ll_pt     : ll_pt/F                                                *
+*Br  191 :ll_eta    : ll_eta/F                                               *
+*Br  192 :ll_phi    : ll_phi/F                                               *
+*Br  193 :ll_mass   : ll_mass/F                                              *
+*Br  194 :mem_ttbb_SL_2w2h2t_sj_perm_top_p :                                 *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_top_p/F                               *
+*Br  195 :mem_ttbb_SL_2w2h2t_sj_perm_top_p_err :                             *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_top_p_err/F                           *
+*Br  196 :mem_ttbb_SL_2w2h2t_sj_perm_top_time :                              *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_top_time/F                            *
+*Br  197 :mem_ttbb_SL_2w2h2t_sj_perm_top_nperm :                             *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_top_nperm/I                           *
+*Br  198 :mem_tth_SL_0w2h2t_sj_p : mem_tth_SL_0w2h2t_sj_p/F                  *
+*Br  199 :mem_tth_SL_0w2h2t_sj_p_err : mem_tth_SL_0w2h2t_sj_p_err/F          *
+*Br  200 :mem_tth_SL_0w2h2t_sj_time : mem_tth_SL_0w2h2t_sj_time/F            *
+*Br  201 :mem_tth_SL_0w2h2t_sj_nperm : mem_tth_SL_0w2h2t_sj_nperm/I          *
+*Br  202 :mem_tth_SL_2w2h2t_sj_p : mem_tth_SL_2w2h2t_sj_p/F                  *
+*Br  203 :mem_tth_SL_2w2h2t_sj_p_err : mem_tth_SL_2w2h2t_sj_p_err/F          *
+*Br  204 :mem_tth_SL_2w2h2t_sj_time : mem_tth_SL_2w2h2t_sj_time/F            *
+*Br  205 :mem_tth_SL_2w2h2t_sj_nperm : mem_tth_SL_2w2h2t_sj_nperm/I          *
+*Br  206 :met_pt    : met_pt/F                                               *
+*Br  207 :met_phi   : met_phi/F                                              *
+*Br  208 :met_px    : met_px/F                                               *
+*Br  209 :met_py    : met_py/F                                               *
+*Br  210 :met_sumEt : met_sumEt/F                                            *
+*Br  211 :met_genPt : met_genPt/F                                            *
+*Br  212 :met_genPhi : met_genPhi/F                                          *
+*Br  213 :mem_ttbb_SL_1w2h2t_sj_p : mem_ttbb_SL_1w2h2t_sj_p/F                *
+*Br  214 :mem_ttbb_SL_1w2h2t_sj_p_err : mem_ttbb_SL_1w2h2t_sj_p_err/F        *
+*Br  215 :mem_ttbb_SL_1w2h2t_sj_time : mem_ttbb_SL_1w2h2t_sj_time/F          *
+*Br  216 :mem_ttbb_SL_1w2h2t_sj_nperm : mem_ttbb_SL_1w2h2t_sj_nperm/I        *
+*Br  217 :mem_tth_DL_0w2h2t_p : mem_tth_DL_0w2h2t_p/F                        *
+*Br  218 :mem_tth_DL_0w2h2t_p_err : mem_tth_DL_0w2h2t_p_err/F                *
+*Br  219 :mem_tth_DL_0w2h2t_time : mem_tth_DL_0w2h2t_time/F                  *
+*Br  220 :mem_tth_DL_0w2h2t_nperm : mem_tth_DL_0w2h2t_nperm/I                *
+*Br  221 :mem_tth_SL_1w2h2t_sj_perm_higgs_p :                                *
+*         | mem_tth_SL_1w2h2t_sj_perm_higgs_p/F                              *
+*Br  222 :mem_tth_SL_1w2h2t_sj_perm_higgs_p_err :                            *
+*         | mem_tth_SL_1w2h2t_sj_perm_higgs_p_err/F                          *
+*Br  223 :mem_tth_SL_1w2h2t_sj_perm_higgs_time :                             *
+*         | mem_tth_SL_1w2h2t_sj_perm_higgs_time/F                           *
+*Br  224 :mem_tth_SL_1w2h2t_sj_perm_higgs_nperm :                            *
+*         | mem_tth_SL_1w2h2t_sj_perm_higgs_nperm/I                          *
+*Br  225 :mem_tth_DL_0w2h2t_sj_p : mem_tth_DL_0w2h2t_sj_p/F                  *
+*Br  226 :mem_tth_DL_0w2h2t_sj_p_err : mem_tth_DL_0w2h2t_sj_p_err/F          *
+*Br  227 :mem_tth_DL_0w2h2t_sj_time : mem_tth_DL_0w2h2t_sj_time/F            *
+*Br  228 :mem_tth_DL_0w2h2t_sj_nperm : mem_tth_DL_0w2h2t_sj_nperm/I          *
+*Br  229 :mem_tth_SL_0w2h2t_sj_perm_higgs_p :                                *
+*         | mem_tth_SL_0w2h2t_sj_perm_higgs_p/F                              *
+*Br  230 :mem_tth_SL_0w2h2t_sj_perm_higgs_p_err :                            *
+*         | mem_tth_SL_0w2h2t_sj_perm_higgs_p_err/F                          *
+*Br  231 :mem_tth_SL_0w2h2t_sj_perm_higgs_time :                             *
+*         | mem_tth_SL_0w2h2t_sj_perm_higgs_time/F                           *
+*Br  232 :mem_tth_SL_0w2h2t_sj_perm_higgs_nperm :                            *
+*         | mem_tth_SL_0w2h2t_sj_perm_higgs_nperm/I                          *
+*Br  233 :mem_tth_SL_2w2h2t_sj_perm_tophiggs_p :                             *
+*         | mem_tth_SL_2w2h2t_sj_perm_tophiggs_p/F                           *
+*Br  234 :mem_tth_SL_2w2h2t_sj_perm_tophiggs_p_err :                         *
+*         | mem_tth_SL_2w2h2t_sj_perm_tophiggs_p_err/F                       *
+*Br  235 :mem_tth_SL_2w2h2t_sj_perm_tophiggs_time :                          *
+*         | mem_tth_SL_2w2h2t_sj_perm_tophiggs_time/F                        *
+*Br  236 :mem_tth_SL_2w2h2t_sj_perm_tophiggs_nperm :                         *
+*         | mem_tth_SL_2w2h2t_sj_perm_tophiggs_nperm/I                       *
+*Br  237 :mem_ttbb_SL_2w2h2t_p : mem_ttbb_SL_2w2h2t_p/F                      *
+*Br  238 :mem_ttbb_SL_2w2h2t_p_err : mem_ttbb_SL_2w2h2t_p_err/F              *
+*Br  239 :mem_ttbb_SL_2w2h2t_time : mem_ttbb_SL_2w2h2t_time/F                *
+*Br  240 :mem_ttbb_SL_2w2h2t_nperm : mem_ttbb_SL_2w2h2t_nperm/I              *
+*Br  241 :mem_ttbb_SL_2w2h2t_sj_p : mem_ttbb_SL_2w2h2t_sj_p/F                *
+*Br  242 :mem_ttbb_SL_2w2h2t_sj_p_err : mem_ttbb_SL_2w2h2t_sj_p_err/F        *
+*Br  243 :mem_ttbb_SL_2w2h2t_sj_time : mem_ttbb_SL_2w2h2t_sj_time/F          *
+*Br  244 :mem_ttbb_SL_2w2h2t_sj_nperm : mem_ttbb_SL_2w2h2t_sj_nperm/I        *
+*Br  245 :mem_ttbb_DL_0w2h2t_sj_p : mem_ttbb_DL_0w2h2t_sj_p/F                *
+*Br  246 :mem_ttbb_DL_0w2h2t_sj_p_err : mem_ttbb_DL_0w2h2t_sj_p_err/F        *
+*Br  247 :mem_ttbb_DL_0w2h2t_sj_time : mem_ttbb_DL_0w2h2t_sj_time/F          *
+*Br  248 :mem_ttbb_DL_0w2h2t_sj_nperm : mem_ttbb_DL_0w2h2t_sj_nperm/I        *
+*Br  249 :mem_tth_SL_2w2h2t_sj_perm_higgs_p :                                *
+*         | mem_tth_SL_2w2h2t_sj_perm_higgs_p/F                              *
+*Br  250 :mem_tth_SL_2w2h2t_sj_perm_higgs_p_err :                            *
+*         | mem_tth_SL_2w2h2t_sj_perm_higgs_p_err/F                          *
+*Br  251 :mem_tth_SL_2w2h2t_sj_perm_higgs_time :                             *
+*         | mem_tth_SL_2w2h2t_sj_perm_higgs_time/F                           *
+*Br  252 :mem_tth_SL_2w2h2t_sj_perm_higgs_nperm :                            *
+*         | mem_tth_SL_2w2h2t_sj_perm_higgs_nperm/I                          *
+*Br  253 :mem_tth_SL_1w2h2t_p : mem_tth_SL_1w2h2t_p/F                        *
+*Br  254 :mem_tth_SL_1w2h2t_p_err : mem_tth_SL_1w2h2t_p_err/F                *
+*Br  255 :mem_tth_SL_1w2h2t_time : mem_tth_SL_1w2h2t_time/F                  *
+*Br  256 :mem_tth_SL_1w2h2t_nperm : mem_tth_SL_1w2h2t_nperm/I                *
+*Br  257 :mem_ttbb_SL_2w2h2t_sj_perm_higgs_p :                               *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_higgs_p/F                             *
+*Br  258 :mem_ttbb_SL_2w2h2t_sj_perm_higgs_p_err :                           *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_higgs_p_err/F                         *
+*Br  259 :mem_ttbb_SL_2w2h2t_sj_perm_higgs_time :                            *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_higgs_time/F                          *
+*Br  260 :mem_ttbb_SL_2w2h2t_sj_perm_higgs_nperm :                           *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_higgs_nperm/I                         *
+*Br  261 :mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_p :                            *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_p/F                          *
+*Br  262 :mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_p_err :                        *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_p_err/F                      *
+*Br  263 :mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_time :                         *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_time/F                       *
+*Br  264 :mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_nperm :                        *
+*         | mem_ttbb_SL_2w2h2t_sj_perm_tophiggs_nperm/I                      *
+*Br  265 :nboosted_bjets : nboosted_bjets/I                                  *
+*Br  266 :boosted_bjets_pt : Float_t pt for Boosted b jets                   *
+*Br  267 :boosted_bjets_eta : Float_t eta for Boosted b jets                 *
+*Br  268 :boosted_bjets_phi : Float_t phi for Boosted b jets                 *
+*Br  269 :boosted_bjets_mass : Float_t mass for Boosted b jets               *
+*Br  270 :boosted_bjets_btag : Float_t btag for Boosted b jets               *
+*Br  271 :nGenBFromHiggs : nGenBFromHiggs/I                                  *
+*Br  272 :GenBFromHiggs_pt : Float_t pt for generated b quarks from higgs    *
+*Br  273 :GenBFromHiggs_eta : Float_t eta for generated b quarks from higgs  *
+*Br  274 :GenBFromHiggs_phi : Float_t phi for generated b quarks from higgs  *
+*Br  275 :GenBFromHiggs_mass : Float_t mass for generated b quarks from higgs*
+*Br  276 :GenBFromHiggs_pdgId :                                              *
+*         | Float_t pdgId for generated b quarks from higgs                  *
+*Br  277 :nGenLep   : nGenLep/I                                              *
+*Br  278 :GenLep_pt : Float_t pt for Generated leptons                       *
+*Br  279 :GenLep_eta : Float_t eta for Generated leptons                     *
+*Br  280 :GenLep_phi : Float_t phi for Generated leptons                     *
+*Br  281 :GenLep_mass : Float_t mass for Generated leptons                   *
+*Br  282 :GenLep_pdgId : Float_t pdgId for Generated leptons                 *
+*Br  283 :nboosted_ljets : nboosted_ljets/I                                  *
+*Br  284 :boosted_ljets_pt : Float_t pt for Boosted l jets                   *
+*Br  285 :boosted_ljets_eta : Float_t eta for Boosted l jets                 *
+*Br  286 :boosted_ljets_phi : Float_t phi for Boosted l jets                 *
+*Br  287 :boosted_ljets_mass : Float_t mass for Boosted l jets               *
+*Br  288 :boosted_ljets_btag : Float_t btag for Boosted l jets               *
+*Br  289 :nhiggsCandidate : nhiggsCandidate/I                                *
+*Br  290 :higgsCandidate_pt : Float_t pt for Boosted Higgs candidates        *
+*Br  291 :higgsCandidate_eta : Float_t eta for Boosted Higgs candidates      *
+*Br  292 :higgsCandidate_phi : Float_t phi for Boosted Higgs candidates      *
+*Br  293 :higgsCandidate_mass : Float_t mass for Boosted Higgs candidates    *
+*Br  294 :higgsCandidate_tau1 : Float_t tau1 for Boosted Higgs candidates    *
+*Br  295 :higgsCandidate_tau2 : Float_t tau2 for Boosted Higgs candidates    *
+*Br  296 :higgsCandidate_tau3 : Float_t tau3 for Boosted Higgs candidates    *
+*Br  297 :higgsCandidate_tau21 : Float_t tau21 for Boosted Higgs candidates  *
+*Br  298 :higgsCandidate_bbtag : Float_t bbtag for Boosted Higgs candidates  *
+*Br  299 :higgsCandidate_area : Float_t area for Boosted Higgs candidates    *
+*Br  300 :higgsCandidate_msoftdrop :                                         *
+*         | Float_t msoftdrop for Boosted Higgs candidates                   *
+*Br  301 :higgsCandidate_sj1pt : Float_t sj1pt for Boosted Higgs candidates  *
+*Br  302 :higgsCandidate_sj1eta : Float_t sj1eta for Boosted Higgs candidates*
+*Br  303 :higgsCandidate_sj1phi : Float_t sj1phi for Boosted Higgs candidates*
+*Br  304 :higgsCandidate_sj1mass :                                           *
+*         | Float_t sj1mass for Boosted Higgs candidates                     *
+*Br  305 :higgsCandidate_sj1btag :                                           *
+*         | Float_t sj1btag for Boosted Higgs candidates                     *
+*Br  306 :higgsCandidate_sj2pt : Float_t sj2pt for Boosted Higgs candidates  *
+*Br  307 :higgsCandidate_sj2eta : Float_t sj2eta for Boosted Higgs candidates*
+*Br  308 :higgsCandidate_sj2phi : Float_t sj2phi for Boosted Higgs candidates*
+*Br  309 :higgsCandidate_sj2mass :                                           *
+*         | Float_t sj2mass for Boosted Higgs candidates                     *
+*Br  310 :higgsCandidate_sj2btag :                                           *
+*         | Float_t sj2btag for Boosted Higgs candidates                     *
+*Br  311 :higgsCandidate_n_subjettiness :                                    *
+*         | Float_t n_subjettiness for Boosted Higgs candidates              *
+*Br  312 :higgsCandidate_dr_top :                                            *
+*         | Float_t deltaR to the best HTT candidate for Boosted Higgs candidates*
+*Br  313 :higgsCandidate_dr_genHiggs :                                       *
+*         | Float_t deltaR to gen higgs for Boosted Higgs candidates         *
+*Br  314 :higgsCandidate_dr_genTop :                                         *
+*         | Float_t deltaR to closest gen top for Boosted Higgs candidates   *
+*Br  315 :nleps     : nleps/I                                                *
+*Br  316 :leps_pt   : Float_t pt for Selected leptons                        *
+*Br  317 :leps_eta  : Float_t eta for Selected leptons                       *
+*Br  318 :leps_etaSc : Float_t etaSc for Selected leptons                    *
+*Br  319 :leps_phi  : Float_t phi for Selected leptons                       *
+*Br  320 :leps_mass : Float_t mass for Selected leptons                      *
+*Br  321 :leps_pdgId : Float_t pdgId for Selected leptons                    *
+*Br  322 :leps_iso  : Float_t iso for Selected leptons                       *
+*Br  323 :leps_mu_id : Float_t mu_id for Selected leptons                    *
+*Br  324 :leps_SF_HLT_RunD4p2 : Float_t SF_HLT_RunD4p2 for Selected leptons  *
+*Br  325 :leps_SF_HLT_RunD4p3 : Float_t SF_HLT_RunD4p3 for Selected leptons  *
+*Br  326 :leps_SF_IdCutLoose : Float_t SF_IdCutLoose for Selected leptons    *
+*Br  327 :leps_SF_IdCutTight : Float_t SF_IdCutTight for Selected leptons    *
+*Br  328 :leps_SF_IdMVALoose : Float_t SF_IdMVALoose for Selected leptons    *
+*Br  329 :leps_SF_IdMVATight : Float_t SF_IdMVATight for Selected leptons    *
+*Br  330 :leps_SF_IsoLoose : Float_t SF_IsoLoose for Selected leptons        *
+*Br  331 :leps_SF_IsoTight : Float_t SF_IsoTight for Selected leptons        *
+*Br  332 :leps_SF_trk_eta : Float_t SF_trk_eta for Selected leptons          *
+*Br  333 :leps_SFerr_HLT_RunD4p2 :                                           *
+*         | Float_t SFerr_HLT_RunD4p2 for Selected leptons                   *
+*Br  334 :leps_SFerr_HLT_RunD4p3 :                                           *
+*         | Float_t SFerr_HLT_RunD4p3 for Selected leptons                   *
+*Br  335 :leps_SFerr_IdCutLoose :                                            *
+*         | Float_t SFerr_IdCutLoose for Selected leptons                    *
+*Br  336 :leps_SFerr_IdCutTight :                                            *
+*         | Float_t SFerr_IdCutTight for Selected leptons                    *
+*Br  337 :leps_SFerr_IdMVALoose :                                            *
+*         | Float_t SFerr_IdMVALoose for Selected leptons                    *
+*Br  338 :leps_SFerr_IdMVATight :                                            *
+*         | Float_t SFerr_IdMVATight for Selected leptons                    *
+*Br  339 :leps_SFerr_IsoLoose : Float_t SFerr_IsoLoose for Selected leptons  *
+*Br  340 :leps_SFerr_IsoTight : Float_t SFerr_IsoTight for Selected leptons  *
+*Br  341 :leps_SFerr_trk_eta : Float_t SFerr_trk_eta for Selected leptons    *
+*Br  342 :ngenHiggs : ngenHiggs/I                                            *
+*Br  343 :genHiggs_pt : Float_t pt for Generated Higgs boson                 *
+*Br  344 :genHiggs_eta : Float_t eta for Generated Higgs boson               *
+*Br  345 :genHiggs_phi : Float_t phi for Generated Higgs boson               *
+*Br  346 :genHiggs_mass : Float_t mass for Generated Higgs boson             *
+*Br  347 :genHiggs_pdgId : Float_t pdgId for Generated Higgs boson           *
+*Br  348 :nloose_jets : nloose_jets/I                                        *
+*Br  349 :loose_jets_pt : Float_t pt for Additional jets with 20<pt<30       *
+*Br  350 :loose_jets_eta : Float_t eta for Additional jets with 20<pt<30     *
+*Br  351 :loose_jets_phi : Float_t phi for Additional jets with 20<pt<30     *
+*Br  352 :loose_jets_mass : Float_t mass for Additional jets with 20<pt<30   *
+*Br  353 :loose_jets_id : Float_t id for Additional jets with 20<pt<30       *
+*Br  354 :loose_jets_qgl : Float_t qgl for Additional jets with 20<pt<30     *
+*Br  355 :loose_jets_btagCSV :                                               *
+*         | Float_t btagCSV for Additional jets with 20<pt<30                *
+*Br  356 :loose_jets_btagDeepCSV :                                           *
+*         | Float_t btagDeepCSV for Additional jets with 20<pt<30            *
+*Br  357 :loose_jets_btagCMVA :                                              *
+*         | Float_t btagCMVA for Additional jets with 20<pt<30               *
+*Br  358 :loose_jets_btagFlag :                                              *
+*         | Float_t Jet was considered to be a b in MEM according to the algo for Additional jets with 20<pt<30*
+*Br  359 :loose_jets_qg_sf : Float_t qg_sf for Additional jets with 20<pt<30 *
+*Br  360 :loose_jets_partonFlavour :                                         *
+*         | Int_t partonFlavour for Additional jets with 20<pt<30            *
+*Br  361 :loose_jets_hadronFlavour :                                         *
+*         | Int_t hadronFlavour for Additional jets with 20<pt<30            *
+*Br  362 :loose_jets_matchFlag :                                             *
+*         | Int_t 0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs for Additional jets with 20<pt<30*
+*Br  363 :loose_jets_matchBfromHadT :                                        *
+*         | Int_t matchBfromHadT for Additional jets with 20<pt<30           *
+*Br  364 :loose_jets_mcPt : Float_t mcPt for Additional jets with 20<pt<30   *
+*Br  365 :loose_jets_mcEta : Float_t mcEta for Additional jets with 20<pt<30 *
+*Br  366 :loose_jets_mcPhi : Float_t mcPhi for Additional jets with 20<pt<30 *
+*Br  367 :loose_jets_mcM : Float_t mcM for Additional jets with 20<pt<30     *
+*Br  368 :loose_jets_mcMatchIdx :                                            *
+*         | Float_t mcMatchIdx for Additional jets with 20<pt<30             *
+*Br  369 :loose_jets_corr_JEC :                                              *
+*         | Float_t corr_JEC for Additional jets with 20<pt<30               *
+*Br  370 :loose_jets_corr_JER :                                              *
+*         | Float_t corr_JER for Additional jets with 20<pt<30               *
+*Br  371 :loose_jets_puId : Float_t puId for Additional jets with 20<pt<30   *
+*Br  372 :njets     : njets/I                                                *
+*Br  373 :jets_pt   : Float_t pt for Selected resolved jets, pt ordered      *
+*Br  374 :jets_eta  : Float_t eta for Selected resolved jets, pt ordered     *
+*Br  375 :jets_phi  : Float_t phi for Selected resolved jets, pt ordered     *
+*Br  376 :jets_mass : Float_t mass for Selected resolved jets, pt ordered    *
+*Br  377 :jets_id   : Float_t id for Selected resolved jets, pt ordered      *
+*Br  378 :jets_qgl  : Float_t qgl for Selected resolved jets, pt ordered     *
+*Br  379 :jets_btagCSV :                                                     *
+*         | Float_t btagCSV for Selected resolved jets, pt ordered           *
+*Br  380 :jets_btagDeepCSV :                                                 *
+*         | Float_t btagDeepCSV for Selected resolved jets, pt ordered       *
+*Br  381 :jets_btagCMVA :                                                    *
+*         | Float_t btagCMVA for Selected resolved jets, pt ordered          *
+*Br  382 :jets_btagFlag :                                                    *
+*         | Float_t Jet was considered to be a b in MEM according to the algo for Selected resolved jets, pt ordered*
+*Br  383 :jets_qg_sf : Float_t qg_sf for Selected resolved jets, pt ordered  *
+*Br  384 :jets_partonFlavour :                                               *
+*         | Int_t partonFlavour for Selected resolved jets, pt ordered       *
+*Br  385 :jets_hadronFlavour :                                               *
+*         | Int_t hadronFlavour for Selected resolved jets, pt ordered       *
+*Br  386 :jets_matchFlag :                                                   *
+*         | Int_t 0 - matched to light quark from W, 1 - matched to b form top, 2 - matched to b from higgs for Selected resolved jets, pt ordered*
+*Br  387 :jets_matchBfromHadT :                                              *
+*         | Int_t matchBfromHadT for Selected resolved jets, pt ordered      *
+*Br  388 :jets_mcPt : Float_t mcPt for Selected resolved jets, pt ordered    *
+*Br  389 :jets_mcEta : Float_t mcEta for Selected resolved jets, pt ordered  *
+*Br  390 :jets_mcPhi : Float_t mcPhi for Selected resolved jets, pt ordered  *
+*Br  391 :jets_mcM  : Float_t mcM for Selected resolved jets, pt ordered     *
+*Br  392 :jets_mcMatchIdx :                                                  *
+*         | Float_t mcMatchIdx for Selected resolved jets, pt ordered        *
+*Br  393 :jets_corr_JEC :                                                    *
+*         | Float_t corr_JEC for Selected resolved jets, pt ordered          *
+*Br  394 :jets_corr_JER :                                                    *
+*         | Float_t corr_JER for Selected resolved jets, pt ordered          *
+*Br  395 :jets_puId : Float_t puId for Selected resolved jets, pt ordered    *
+*Br  396 :ngenTopHad : ngenTopHad/I                                          *
+*Br  397 :genTopHad_pt : Float_t pt for Generated top quark (hadronic)       *
+*Br  398 :genTopHad_eta : Float_t eta for Generated top quark (hadronic)     *
+*Br  399 :genTopHad_phi : Float_t phi for Generated top quark (hadronic)     *
+*Br  400 :genTopHad_mass : Float_t mass for Generated top quark (hadronic)   *
+*Br  401 :genTopHad_decayMode :                                              *
+*         | Float_t decayMode for Generated top quark (hadronic)             *
+*Br  402 :ntopCandidate : ntopCandidate/I                                    *
+*Br  403 :topCandidate_subjetIDPassed :                                      *
+*         | Float_t subjetIDPassed for Boosted Top candidates                *
+*Br  404 :topCandidate_fRec : Float_t fRec for Boosted Top candidates        *
+*Br  405 :topCandidate_Ropt : Float_t Ropt for Boosted Top candidates        *
+*Br  406 :topCandidate_RoptCalc : Float_t RoptCalc for Boosted Top candidates*
+*Br  407 :topCandidate_ptForRoptCalc :                                       *
+*         | Float_t ptForRoptCalc for Boosted Top candidates                 *
+*Br  408 :topCandidate_pt : Float_t pt for Boosted Top candidates            *
+*Br  409 :topCandidate_eta : Float_t eta for Boosted Top candidates          *
+*Br  410 :topCandidate_phi : Float_t phi for Boosted Top candidates          *
+*Br  411 :topCandidate_mass : Float_t mass for Boosted Top candidates        *
+*Br  412 :topCandidate_sj1pt : Float_t sj1pt for Boosted Top candidates      *
+*Br  413 :topCandidate_sj1eta : Float_t sj1eta for Boosted Top candidates    *
+*Br  414 :topCandidate_sj1phi : Float_t sj1phi for Boosted Top candidates    *
+*Br  415 :topCandidate_sj1mass : Float_t sj1mass for Boosted Top candidates  *
+*Br  416 :topCandidate_sj1btag : Float_t sj1btag for Boosted Top candidates  *
+*Br  417 :topCandidate_sj2pt : Float_t sj2pt for Boosted Top candidates      *
+*Br  418 :topCandidate_sj2eta : Float_t sj2eta for Boosted Top candidates    *
+*Br  419 :topCandidate_sj2phi : Float_t sj2phi for Boosted Top candidates    *
+*Br  420 :topCandidate_sj2mass : Float_t sj2mass for Boosted Top candidates  *
+*Br  421 :topCandidate_sj2btag : Float_t sj2btag for Boosted Top candidates  *
+*Br  422 :topCandidate_sj3pt : Float_t sj3pt for Boosted Top candidates      *
+*Br  423 :topCandidate_sj3eta : Float_t sj3eta for Boosted Top candidates    *
+*Br  424 :topCandidate_sj3phi : Float_t sj3phi for Boosted Top candidates    *
+*Br  425 :topCandidate_sj3mass : Float_t sj3mass for Boosted Top candidates  *
+*Br  426 :topCandidate_sj3btag : Float_t sj3btag for Boosted Top candidates  *
+*Br  427 :topCandidate_tau1SD : Float_t tau1SD for Boosted Top candidates    *
+*Br  428 :topCandidate_tau2SD : Float_t tau2SD for Boosted Top candidates    *
+*Br  429 :topCandidate_tau3SD : Float_t tau3SD for Boosted Top candidates    *
+*Br  430 :topCandidate_tau32SD : Float_t tau32SD for Boosted Top candidates  *
+*Br  431 :topCandidate_delRopt : Float_t delRopt for Boosted Top candidates  *
+*Br  432 :topCandidate_genTopHad_dr :                                        *
+*         | Float_t DeltaR to the closest hadronic gen top for Boosted Top candidates*
+*Br  433 :topCandidate_genTopHad_index :                                     *
+*         | Int_t Index of the matched genTopHad for Boosted Top candidates  *
+*Br  434 :topCandidate_dr_lepton :                                           *
+*         | Float_t deltaR to closest selection lepton for Boosted Top candidates*
+*Br  435 :ngenTopLep : ngenTopLep/I                                          *
+*Br  436 :genTopLep_pt : Float_t pt for Generated top quark (leptonic)       *
+*Br  437 :genTopLep_eta : Float_t eta for Generated top quark (leptonic)     *
+*Br  438 :genTopLep_phi : Float_t phi for Generated top quark (leptonic)     *
+*Br  439 :genTopLep_mass : Float_t mass for Generated top quark (leptonic)   *
+*Br  440 :genTopLep_decayMode :                                              *
+*         | Float_t decayMode for Generated top quark (leptonic)             *
+*Br  441 :nGenBFromTop : nGenBFromTop/I                                      *
+*Br  442 :GenBFromTop_pt : Float_t pt for generated b quarks from top        *
+*Br  443 :GenBFromTop_eta : Float_t eta for generated b quarks from top      *
+*Br  444 :GenBFromTop_phi : Float_t phi for generated b quarks from top      *
+*Br  445 :GenBFromTop_mass : Float_t mass for generated b quarks from top    *
+*Br  446 :GenBFromTop_pdgId : Float_t pdgId for generated b quarks from top  *
+*Br  447 :nGenQFromW : nGenQFromW/I                                          *
+*Br  448 :GenQFromW_pt : Float_t pt for generated light quarks from W        *
+*Br  449 :GenQFromW_eta : Float_t eta for generated light quarks from W      *
+*Br  450 :GenQFromW_phi : Float_t phi for generated light quarks from W      *
+*Br  451 :GenQFromW_mass : Float_t mass for generated light quarks from W    *
+*Br  452 :GenQFromW_pdgId : Float_t pdgId for generated light quarks from W  *
+
