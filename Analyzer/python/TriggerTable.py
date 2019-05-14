@@ -34,6 +34,42 @@ triggerTable = {
         "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",
         "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
     ],
+    "FH_JetHT" : [
+        "HLT_PFHT1050",
+        "HLT_PFHT780",
+        "HLT_PFHT680",
+        "HLT_PFHT510",
+        "HLT_PFHT590",
+        "HLT_PFHT430",
+        "HLT_PFJet500",
+    ],
+}
+
+
+triggerTable2017 = {
+    "ttH_SL_el" : [
+        "HLT_Ele35_WPTight_Gsf",
+        "HLT_Ele28_eta2p1_WPTight_Gsf_HT150",
+    ],
+    "ttH_SL_mu" : [
+        "HLT_IsoMu24_eta2p1",
+        "HLT_IsoMu27",
+    ],
+    "ttH_DL_mumu" : [
+        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ",
+        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8",
+        "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8",
+    ],
+    "ttH_DL_elmu" : [
+        "HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",
+        "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
+        "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+        "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",
+    ],
+    "ttH_DL_elel" : [
+        "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",
+        "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+    ],
 #    "ttH_FH_RunCF" : [
 #        #"HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5",
 #        "HLT_PFHT300PT30_QuadPFJet_75_60_45_40_TriplePFBTagCSV_3p0",
@@ -91,7 +127,6 @@ triggerTable = {
         "HLT_HT300PT30_QuadJet_75_60_45_40_TripeCSV_p07"
     ],
 }
-
 
 
 '''
