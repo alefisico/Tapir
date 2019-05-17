@@ -13,7 +13,7 @@ class LeptonAnalyzer(Module):
     Analyzes leptons and applies single-lepton and di-lepton selection.
     **** this description is outdated ***
 
-    Relies on TTH.MEAnalysis.simpleNano.EventAnalyzer for inputs.
+    Relies on TTH.Analyzer.EventAnalyzer for inputs.
 
     Configuration:
     Conf.leptons[channel][cuttype] where channel=mu,ele, cuttype=tight,loose,(+veto)

@@ -11,7 +11,7 @@ LOG_MODULE_NAME = logging.getLogger(__name__)
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
-from TTH.MEAnalysis.simpleNano.utils import lvec, autolog
+from TTH.Analyzer.utils import lvec, autolog
 
 Cvectoruint = getattr(ROOT, "std::vector<unsigned int>")
 

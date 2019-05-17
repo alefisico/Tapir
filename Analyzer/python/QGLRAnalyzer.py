@@ -5,7 +5,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from TTH.MEAnalysis.simpleNano.utils import lvec, autolog
+from TTH.Analyzer.utils import lvec, autolog
 
 class QGLRAnalyzer(Module):
     """

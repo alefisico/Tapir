@@ -3,7 +3,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from TTH.MEAnalysis.simpleNano.utils import *
+from TTH.Analyzer.utils import *
 import numpy as np
 from rootpy.tree import Tree
 from rootpy.io import root_open

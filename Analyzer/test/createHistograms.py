@@ -119,7 +119,7 @@ def myPlotAnalyzer( myChain, listCuts, sample, isData, UNC ):
     for selName, selInfo in listCuts.items():
         for var, varInfo in Variables.items():
             histoName = selName+'_'+varInfo[0]+'_'+sample
-            SF = TCut("puWeight") if isData else TCut('1')
+            SF = TCut("1") if isData else TCut('puWeight')
             if sample.startswith('TTTo'):
                 for ttXX, ttXXcond in ttCls.items():
                     newHistoName = histoName+'_'+ttXX
@@ -196,13 +196,24 @@ if __name__ == '__main__':
         jetCutSL = TCut( '(njets>3) && (jets_pt[Iteration$]>30) && (abs(jets_eta[Iteration$])<2.4) && (nBDeepCSVM>1)')
         lepCutSL = TCut( '(nleps==1) && (abs(leps_eta[Iteration$])<2.4) && (leps_pt[0]>30)' )
         metCutSL = TCut( '(met_pt>20)' )
-        if sample.startswith( ('EGamma', 'SingleMuon', 'TTToSemi' ) ):
-            presel['SL']= jetCutSL + lepCutSL + metCutSL
+        if sample.startswith( ( 'SingleMuon', 'TTToSemi' ) ):
+            if sample.startswith('SingleMuon'): triggerCut = TCut('HLT_ttH_SL_mu==1')
+            else: triggerCut = TCut('1')
+            presel['SL'] = jetCutSL + lepCutSL + metCutSL + triggerCut
         elif sample.startswith( ('DoubleMuon', 'MuonEG', 'TTTo2L2Nu' ) ):
-            presel['DL']= jetCutDL + lepCutDL + metCutDL
-        elif sample.startswith( ('ttHTobb' ) ):
-            presel['SL']= jetCutSL + lepCutSL + metCutSL
-            presel['DL']= jetCutDL + lepCutDL + metCutDL
+            if sample.startswith('DoubleMuon'): triggerCut = TCut('HLT_ttH_SL_mumu==1')
+            elif sample.startswith('MuonEG'): triggerCut = TCut('HLT_ttH_SL_elmu==1')
+            else: triggerCut = TCut('1')
+            presel['DL'] = jetCutDL + lepCutDL + metCutDL
+        elif sample.startswith( ('ttHTobb', 'EGamma' ) ):
+            if sample.startswith('EGamma'):
+                triggerCutSL = TCut('HLT_ttH_SL_el==1')
+                triggerCutDL = TCut('HLT_ttH_DL_elel==1')
+            else:
+                triggerCutSL = TCut('1')
+                triggerCutDL = TCut('1')
+            presel['SL'] = jetCutSL + lepCutSL + metCutSL + triggerCutSL
+            presel['DL'] = jetCutDL + lepCutDL + metCutDL + triggerCutDL
         else: print 'Incorrect ttbar decay. Options: SL, DL, FH'
 
         if args.singleFile: allfiles = [ args.inputFile ]

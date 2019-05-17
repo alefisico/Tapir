@@ -3,7 +3,7 @@ from collections import OrderedDict
 from TTH.MEAnalysis.MEMConfig import MEMConfig
 import ROOT
 from ROOT import MEM
-import TTH.MEAnalysis.simpleNano.TriggerTable as trig
+import TTH.Analyzer.TriggerTable as trig
 
 # JetID: 0: noID, 1: looseID, 2: tightID, 4: tightLepVeto (alsways 6), 6: tight+tightLepVeto (see. nanoAOD jets_cff.py)
 # puID: 0: noWP, 4: looseID, 6: mediumID, 7: tightID

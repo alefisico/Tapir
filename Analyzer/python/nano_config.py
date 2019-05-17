@@ -74,12 +74,12 @@ class ModulesConfig:
                         self.modules.append(getattr(obj,name)())
 
         ### load event content from nadoAOD trees #### this can be replaced with nanoaodTools Object and Collection
-        from TTH.MEAnalysis.simpleNano.nanoTree import EventAnalyzer
+        from TTH.Analyzer.nanoTree import EventAnalyzer
         print "Loading %s from %s " % ('EventAnalyzer', EventAnalyzer)
         self.modules.append(EventAnalyzer(isMC))
 
         ### Importing selections/definitions
-        from TTH.MEAnalysis.simpleNano.MEAnalysis_cfg_heppy import Conf
+        from TTH.Analyzer.MEAnalysis_cfg_heppy import Conf
 
         ############################################################################
         #### Load Transfer functions     .... should be move to somewhere else
@@ -116,101 +116,101 @@ class ModulesConfig:
         ############################################################################
 
         ### Memory filter
-        from TTH.MEAnalysis.simpleNano.MemoryAnalyzer import MemoryAnalyzer
+        from TTH.Analyzer.MemoryAnalyzer import MemoryAnalyzer
         print "Loading %s from %s " % ('MemoryAnalyzer', MemoryAnalyzer)
         self.modules.append(MemoryAnalyzer())
 
         ### MET filter
-        from TTH.MEAnalysis.simpleNano.METFilterAnalyzer import METFilterAnalyzer
+        from TTH.Analyzer.METFilterAnalyzer import METFilterAnalyzer
         print "Loading %s from %s " % ('METFilterAnalyzer', METFilterAnalyzer)
         self.modules.append(METFilterAnalyzer(Conf, isMC))
 
         ### Gen definitions for ttH, takes content calculated in genrad and create event content
-        from TTH.MEAnalysis.simpleNano.GenTTHAnalyzer import GenTTHAnalyzerPre
+        from TTH.Analyzer.GenTTHAnalyzer import GenTTHAnalyzerPre
         print "Loading %s from %s " % ('GenTTHAnalyzerPre', GenTTHAnalyzerPre)
         self.modules.append(GenTTHAnalyzerPre(Conf, isMC))
 
         ### PV analyzer
-        from TTH.MEAnalysis.simpleNano.PrimaryVertexAnalyzer import PrimaryVertexAnalyzer
+        from TTH.Analyzer.PrimaryVertexAnalyzer import PrimaryVertexAnalyzer
         print "Loading %s from %s " % ('PrimaryVertexAnalyzer', PrimaryVertexAnalyzer)
         self.modules.append(PrimaryVertexAnalyzer(Conf))
 
         ### Trigger: checks OR of triggers  ##### needs doublecheck
-        from TTH.MEAnalysis.simpleNano.TriggerAnalyzer import TriggerAnalyzer
+        from TTH.Analyzer.TriggerAnalyzer import TriggerAnalyzer
         print "Loading %s from %s " % ('TriggerAnalyzer', TriggerAnalyzer)
         self.modules.append(TriggerAnalyzer(Conf, isMC, sample))
 
         ### Lepton analyzer
-        from TTH.MEAnalysis.simpleNano.LeptonAnalyzer import LeptonAnalyzer
+        from TTH.Analyzer.LeptonAnalyzer import LeptonAnalyzer
         print "Loading %s from %s " % ('LeptonAnalyzer', LeptonAnalyzer)
         self.modules.append(LeptonAnalyzer(Conf, isMC))
 
         ### Jet analyzer
-        from TTH.MEAnalysis.simpleNano.JetAnalyzer import JetAnalyzer
+        from TTH.Analyzer.JetAnalyzer import JetAnalyzer
         print "Loading %s from %s " % ('JetAnalyzer', JetAnalyzer)
         self.modules.append(JetAnalyzer(Conf, isMC))
 
         ### Btag weight analyzer: Stores btag weights
-        #from TTH.MEAnalysis.simpleNano.BtagWeightAnalyzer import BtagWeightAnalyzer
+        #from TTH.Analyzer.BtagWeightAnalyzer import BtagWeightAnalyzer
         #print "Loading %s from %s " % ('BtagWeightAnalyzer', BtagWeightAnalyzer)
         #self.modules.append(BtagWeightAnalyzer(isMC))
 
         ## Computes trigger weight from root files containing the SF (2018/10/25 is not doing anything because calcFHSF is False in MEAnalysis/python/MEAnalysis_cfg_heppy.py)
-        from TTH.MEAnalysis.simpleNano.TriggerWeightAnalyzer import TriggerWeightAnalyzer
+        from TTH.Analyzer.TriggerWeightAnalyzer import TriggerWeightAnalyzer
         print "Loading %s from %s " % ('TriggerWeightAnalyzer', TriggerWeightAnalyzer)
         self.modules.append(TriggerWeightAnalyzer(Conf, isMC))
 
         ## calculates the b-tag likelihood ratio
-        from TTH.MEAnalysis.simpleNano.BTagLRAnalyzer import BTagLRAnalyzer
+        from TTH.Analyzer.BTagLRAnalyzer import BTagLRAnalyzer
         print "Loading %s from %s " % ('BTagLRAnalyzer', BTagLRAnalyzer)
         self.modules.append(BTagLRAnalyzer(Conf, isMC, sample))
 
         ### QG likelihood ratio calculations
-        from TTH.MEAnalysis.simpleNano.QGLRAnalyzer import QGLRAnalyzer
+        from TTH.Analyzer.QGLRAnalyzer import QGLRAnalyzer
         print "Loading %s from %s " % ('QGLRAnalyzer', QGLRAnalyzer)
         self.modules.append(QGLRAnalyzer(Conf))
 
         ### performs W-tag calculation on pairs of untagged jets
-        from TTH.MEAnalysis.simpleNano.WTagAnalyzer import WTagAnalyzer
+        from TTH.Analyzer.WTagAnalyzer import WTagAnalyzer
         print "Loading %s from %s " % ('WTagAnalyzer', WTagAnalyzer)
         self.modules.append(WTagAnalyzer(Conf))
 
         ### assigns the ME category based on leptons, jets and the bLR
-        from TTH.MEAnalysis.simpleNano.MECategoryAnalyzer import MECategoryAnalyzer
+        from TTH.Analyzer.MECategoryAnalyzer import MECategoryAnalyzer
         print "Loading %s from %s " % ('MECategoryAnalyzer', MECategoryAnalyzer)
         self.modules.append(MECategoryAnalyzer(Conf))
 
         ## calculates the number of matched simulated B, C quarks for tt+XY matching
-        from TTH.MEAnalysis.simpleNano.GenRadiationModeAnalyzer import GenRadiationModeAnalyzer
+        from TTH.Analyzer.GenRadiationModeAnalyzer import GenRadiationModeAnalyzer
         print "Loading %s from %s " % ('GenRadiationModeAnalyzer', GenRadiationModeAnalyzer)
         self.modules.append(GenRadiationModeAnalyzer(Conf, isMC))
 
         ### Find the best possible match for each individual jet. Store for each jet, specified by it's index in the jet vector, if it is matched to any gen-level quarks
-        from TTH.MEAnalysis.simpleNano.GenTTHAnalyzer import GenTTHAnalyzer
+        from TTH.Analyzer.GenTTHAnalyzer import GenTTHAnalyzer
         print "Loading %s from %s " % ('GenTTHAnalyzer', GenTTHAnalyzer)
         self.modules.append(GenTTHAnalyzer(Conf, isMC))
 
         ### Calls the C++ MEM integrator with good_jets, good_leptons and the ME category
-        from TTH.MEAnalysis.simpleNano.MEMAnalyzer import MEMAnalyzer
+        from TTH.Analyzer.MEMAnalyzer import MEMAnalyzer
         print "Loading %s from %s " % ('MEMAnalyzer', MEMAnalyzer)
         self.modules.append(MEMAnalyzer(Conf, isMC))
 
         ### inference of ETH DNN
-        #from TTH.MEAnalysis.simpleNano.NNAnalyzer import NNAnalyzer
+        #from TTH.Analyzer.NNAnalyzer import NNAnalyzer
         #print "Loading %s from %s " % ('NNAnalyzer', NNAnalyzer)
         #tag = "0"
         #self.modules.append(NNAnalyzer(tag))
 
         ###
-        #from TTH.MEAnalysis.simpleNano.MVAVarAnalyzer import MVAVarAnalyzer
+        #from TTH.Analyzer.MVAVarAnalyzer import MVAVarAnalyzer
         #print "Loading %s from %s " % ('MVAVarAnalyzer', MVAVarAnalyzer)
         #self.modules.append(MVAVarAnalyzer(Conf))
 
         ###
-        from TTH.MEAnalysis.simpleNano.TreeVarAnalyzer import TreeVarAnalyzer
+        from TTH.Analyzer.TreeVarAnalyzer import TreeVarAnalyzer
         print "Loading %s from %s " % ('TreeVarAnalyzer', TreeVarAnalyzer)
         self.modules.append(TreeVarAnalyzer())
 
 #        #Make the final output tree producer
-#        #from TTH.MEAnalysis.simpleNano.metree import getTreeProducer
+#        #from TTH.Analyzer.metree import getTreeProducer
 #        #treeProducer = getTreeProducer(Conf)

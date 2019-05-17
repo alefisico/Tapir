@@ -6,8 +6,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 import copy, math
 
-from TTH.MEAnalysis.simpleNano.utils import lvec, MET, autolog
-from TTH.MEAnalysis.simpleNano.JetAnalyzer import attach_jet_transfer_function
+from TTH.Analyzer.utils import lvec, MET, autolog
+from TTH.Analyzer.JetAnalyzer import attach_jet_transfer_function
 
 import logging
 LOG_MODULE_NAME = logging.getLogger(__name__)

@@ -63,9 +63,10 @@ if 'pythia' in args.sample: isMC = True
 else: isMC = False
 
 ### Preliminary selection to speed up postProcessing
-if args.sample.startswith( ( 'TTTo2L2Nu', 'MuonEG', 'DoubleMuon' ) ):  ### DL
+if args.sample.startswith( ( 'TTTo2L2Nu', 'MuonEG', 'DoubleMuon', 'ttHTobb_ttTo2L2Nu' ) ):  ### DL
     cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
-elif args.sample.startswith( ( 'ttHTobb', 'EGamma' ) ):   #### looser DL and SL
+#elif args.sample.startswith( ( 'ttHTobb', 'EGamma' ) ):   #### looser DL and SL
+elif args.sample.startswith( ( 'EGamma' ) ):   #### looser DL and SL
     cuts='( nJet>1 ) && ( Jet_pt>20 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'
 else:   ### SL
     cuts='( nJet>3 ) && ( Jet_pt>30 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 )'

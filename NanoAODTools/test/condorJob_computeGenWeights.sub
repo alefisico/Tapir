@@ -1,0 +1,10 @@
+universe    =  vanilla
+executable  =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/NanoAODTools/test/condorJob_computeGenWeights.sh
+log         =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/NanoAODTools/test/computeGenWeights.log
+error       =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/NanoAODTools/test/computeGenWeights.err
+output      =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/NanoAODTools/test/computeGenWeights.out
+initialdir  =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/NanoAODTools/test/
+getenv      =  True
+requirements = (OpSysAndVer =?= "SLCern6")
++JobFlavour = "workday"
+queue 

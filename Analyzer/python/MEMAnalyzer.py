@@ -8,8 +8,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 import numpy as np
 
-from TTH.MEAnalysis.simpleNano.MEMUtils import set_integration_vars, add_obj
-from TTH.MEAnalysis.simpleNano.MEMConfig import MEMConfig
+from TTH.Analyzer.MEMUtils import set_integration_vars, add_obj
+from TTH.Analyzer.MEMConfig import MEMConfig
 
 import logging
 

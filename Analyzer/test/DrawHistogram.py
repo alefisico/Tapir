@@ -119,6 +119,11 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
 
 	hRatio = TGraphAsymmErrors()
 	hRatio.Divide( hData, hBkg, 'pois' )
+	hRatioStatErr = hBkg.Clone()
+	hRatioStatErr.Divide( hBkg )
+        hRatioStatErr.SetFillColor(kBlack)
+        hRatioStatErr.SetFillStyle(3004)
+
 
 	binWidth = histos['Data'].GetBinWidth(1)
 	hData.SetMarkerStyle(8)
@@ -177,6 +182,7 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
 	pad2.Modified()
 	hRatio.SetMarkerStyle(8)
 	hRatio.Draw('P')
+        hRatioStatErr.Draw('same e2')
 	if fitRatio:
 		fitLine = TF1( 'fitLine', 'pol1', 0, 2 ) #800, 5000)
 		hRatio.Fit( 'fitLine', 'MIR')
@@ -230,6 +236,10 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 
 	hRatio = TGraphAsymmErrors()
 	hRatio.Divide( hData, hBkg, 'pois' )
+	hRatioStatErr = hBkg.Clone()
+	hRatioStatErr.Divide( hBkg )
+        hRatioStatErr.SetFillColor(kBlack)
+        hRatioStatErr.SetFillStyle(3004)
 
 	binWidth = histos['Data'].GetBinWidth(1)
 
@@ -243,6 +253,8 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 
 	hBkg.SetLineColor(kRed-4)
 	hBkg.SetLineWidth(2)
+        hBkg.SetFillColor(kBlack)
+        hBkg.SetFillStyle(3004)
 	hData.SetMarkerStyle(8)
 
 	tdrStyle.SetPadRightMargin(0.05)
@@ -256,7 +268,7 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 	pad1.cd()
 	if log: pad1.SetLogy()
 	hData.Draw("E")
-	hBkg.Draw('hist same')
+	hBkg.Draw('hist same e2')
 	hData.SetMaximum( 1.2* max( hData.GetMaximum(), hBkg.GetMaximum() )  )
         if 'pt' in label: hData.SetMinimum( 1 )
 	#hData.GetYaxis().SetTitleOffset(1.2)
@@ -297,6 +309,7 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 	pad2.Modified()
 	hRatio.SetMarkerStyle(8)
 	hRatio.Draw('P')
+        hRatioStatErr.Draw('same e2')
 	if fitRatio:
 		fitLine = TF1( 'fitLine', 'pol1', 0, 2 ) #800, 5000)
 		hRatio.Fit( 'fitLine', 'MIR')
@@ -346,16 +359,16 @@ if __name__ == '__main__':
 	folder = 'root://t3dcachedb03.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/Sparsinator/'+args.version
 
         if args.ttbarDecay.startswith('SL'):
-            dataFiles['EGamma'] = TFile.Open('Rootfiles/EGamma_Run2018All_'+args.version+'.root')
-            dataFiles['SingleMuon'] = TFile.Open('Rootfiles/SingleMuon_Run2018All_'+args.version+'.root')
-            bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/100705000., 'ttbar' ]
+            dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_Run2018All_'+args.version+'.root')
+            dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+args.version+'/SingleMuon_Run2018All_'+args.version+'.root')
+            bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/100705000., 'ttbar' ]
         else:
-            dataFiles['EGamma'] = TFile.Open('Rootfiles/EGamma_Run2018All_'+args.version+'.root')
-            dataFiles['MuonEG'] = TFile.Open('Rootfiles/MuonEG_Run2018All_'+args.version+'.root')
-            dataFiles['DoubleMuon'] = TFile.Open('Rootfiles/DoubleMuon_Run2018All_'+args.version+'.root')
-            bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259)/64310000., 'ttbar' ]
+            dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_Run2018All_'+args.version+'.root')
+            dataFiles['MuonEG'] = TFile.Open('Rootfiles/'+args.version+'/MuonEG_Run2018All_'+args.version+'.root')
+            dataFiles['DoubleMuon'] = TFile.Open('Rootfiles/'+args.version+'/DoubleMuon_Run2018All_'+args.version+'.root')
+            bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259)/64310000., 'ttbar' ]
 
-        signalFiles[ 'ttHTobb' ] = [ TFile.Open('Rootfiles/ttHTobb_'+args.version+'.root'), (args.lumi*0.5071*0.5824/11791999.)*50, 'ttH(bb) (x50)', kBlue-4 ]
+        signalFiles[ 'ttHTobb' ] = [ TFile.Open('Rootfiles/'+args.version+'/ttHTobb_'+args.version+'.root'), (args.lumi*0.5071*0.5824/11791999.)*50, 'ttH(bb) (x50)', kBlue-4 ]
 
 	taulabX = 0.90
 	taulabY = 0.85
@@ -383,13 +396,13 @@ if __name__ == '__main__':
 		[ 'stack', 'lepsByPt_0_pt', '2nd Leading Lepton pT [GeV]', 0, 800, 2, 1, 10e5, 0.90, 0.85, True, False],
 		[ 'stack', 'lepsByPt_0_eta', '2nd Leading Lepton #eta', -2.5, 2.5, 1, 100, 10e6,  0.90, 0.85, True, False],
 		[ 'stack', 'met_pt', 'MET [GeV]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
-		[ 'stack', 'met_phi', 'MET #phi]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
+		[ 'stack', 'met_phi', 'MET #phi]', -3, 3, 1, 10, 10e6, 0.90, 0.85, True, False],
 		[ 'stack', 'Wmass', 'W mass [GeV]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
 		[ 'stack', 'll_mass', 'Dilepton mass [GeV]', 0, 500, 2, 10, 10e6, 0.90, 0.85, True, False],
 		[ 'stack', 'njets', 'Number of jets', 2, 14, 1, 1, 10e6, 0.90, 0.85, True, False],
 		[ 'stack', 'nleps', 'Number of leptons', 0, 5, 1, 1, 10e6, 0.90, 0.85, True, False],
 		[ 'stack', 'nbjets', 'Number of deepCSVM jets', 1, 7, 1, 10, 10e7, 0.90, 0.85, True, False],
-		[ 'stack', 'mem_tth_SL_1w2h2t_p', 'MEM', 0, 1, 1, 100, 10e7, 0.90, 0.85, True, False],
+		[ 'stack', 'mem_tth_SL_1w2h2t_p', 'MEM', 0, 0.00001, 1, 100, 10e7, 0.90, 0.85, True, False],
 	####	[ 'stack', 'ht', 'HT [GeV]', 0, 2000, 5, 10, 10e6, 0.90, 0.85, True, False],
 
 		[ 'qual', 'nPVs', 'Number of PV', 0, 100, 1,  0.85, 0.70, False, False],

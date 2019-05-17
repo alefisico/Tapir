@@ -13,7 +13,7 @@ LOG_MODULE_NAME = logging.getLogger(__name__)
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
-from TTH.MEAnalysis.simpleNano.utils import lvec
+from TTH.Analyzer.utils import lvec
 import copy
 import numpy as np
 
