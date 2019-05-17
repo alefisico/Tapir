@@ -43,7 +43,7 @@ compile:
     - git cms-merge-topic cms-nanoAOD:master-102X   ### merging latest version of cms-nanoAOD
     - git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools 
     - git clone https://gitlab.cern.ch/Zurich_ttH/MEIntegratorStandalone.git -b 10_2_X TTH/MEIntegratorStandalone
-    - git clone ssh://git@gitlab.cern.ch:7999/algomez/CommonClassifier.git TTH/CommonClassifier -b 10_2_X
+    - git clone https://gitlab.cern.ch/algomez/CommonClassifier.git TTH/CommonClassifier -b 10_2_X
     - git clone https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git TTH/RecoLikelihoodReconstruction
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram setup lhapdf
