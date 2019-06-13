@@ -1,0 +1,22 @@
+drop * #remove everything
+keep event
+keep run
+keep luminosityBlock
+keep genTtbarId*
+keep genWeight*
+keep btagWeight*
+keep Pileup*
+keep PV*
+keep PSWeight*
+keep Muon*
+keep MET*
+keep LHEWeight*
+keep LHE*
+keep Jet*
+#keep HTXS*
+keep HLT*
+keep GenPart*
+keep GenJet*
+keep Flag*
+keep Electron*
+keep ChsMET*
