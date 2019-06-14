@@ -90,6 +90,7 @@ if __name__ == '__main__':
 
     ##### Samples
     allSamples = {}
+    allSamples['TTToSemiLeptonic_2016'] = ['/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/NANOAODSIM', dbsglobal ]
     allSamples['TTToSemiLeptonic_2017'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM', dbsglobal ]
     allSamples['TTToSemiLeptonic_2018'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAOD-102X_upgrade2018_realistic_v15-v1/NANOAODSIM', dbsglobal ]
 
@@ -101,6 +102,5 @@ if __name__ == '__main__':
             fileDictList = allSamples[isam][1].listFiles( dataset=allSamples[isam][0], validFileOnly=1 )
             file_names= [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
             #file_names= [ 'nano102x_on_mini102x_2018_mc_NANO_573.root' ]
-            #pdfs( [file_names[0]], presel)
+            pdfs( file_names[:5], presel)
 
-            pdfs( file_names, presel)

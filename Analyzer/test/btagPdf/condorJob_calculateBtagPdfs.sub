@@ -1,0 +1,11 @@
+universe    =  vanilla
+executable  =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/Analyzer/test/btagPdf/condorJob_calculateBtagPdfs.sh
+log         =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/Analyzer/test/btagPdf/log2016.log
+error       =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/Analyzer/test/btagPdf/log2016.err
+output      =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/Analyzer/test/btagPdf/log2016.out
+initialdir  =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/Analyzer/test/btagPdf/
+arguments   = 2016
+getenv      =  True
+requirements = (OpSysAndVer =?= "SLCern6")
++JobFlavour = "testmatch"
+queue 

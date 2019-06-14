@@ -40,6 +40,7 @@ mv python $CMSSW_BASE/python
 echo Found Proxy in: $X509_USER_PROXY
 echo "python simpleJob_nanoAODPostproc_MEAnalysis.py ......."
 python simpleJob_nanoAODPostproc_MEAnalysis.py --sample {datasets} --config {config} --addMEAnalysis
+###python evenSimplerJob_nanoAODPostproc_TEST.py --sample {datasets}
 mv Loop_*/tree.root tree.root
 fi
     '''
@@ -105,6 +106,7 @@ def submitJobs( job, lnfList, unitJobs ):
     #config.Site.blacklist = ['T2_US_Florida','T3_TW_*','T2_BR_*','T2_GR_Ioannina','T2_BR_SPRACE','T2_RU_IHEP','T2_PL_Swierk','T2_KR_KNU','T3_TW_NTU_HEP']
 
     config.JobType.scriptExe = 'runPostProcMEAnalysis.sh'
+    ###config.JobType.inputFiles = [ 'evenSimplerJob_nanoAODPostproc_TEST.py', options.config, 'haddnano.py', 'keep_and_drop.txt']
     config.JobType.inputFiles = [ 'simpleJob_nanoAODPostproc_MEAnalysis.py', options.config, 'haddnano.py', 'keep_and_drop.txt']
     config.JobType.sendPythonFolder  = True
 
@@ -119,6 +121,7 @@ def submitJobs( job, lnfList, unitJobs ):
         config.Data.unitsPerJob = unitJobs
 
     if options.addMEAnalysis: config.JobType.outputFiles = [ 'tree.root' ]
+    else: config.JobType.outputFiles = [ 'nano_postprocessed.root' ]
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoPostMEAnalysis/' if options.addMEAnalysis else '/store/user/'+os.environ['USER']+'/ttH/nanoAODPostproc/'
 
     outputTag = 'tthbb13_PostProcMEAnalysis_withME' if options.addMEAnalysis else 'tthbb13_PostProc'
@@ -177,7 +180,7 @@ if __name__ == '__main__':
             metavar="CONFIG")
     parser.add_option(
             '-a', '--addMEAnalysis',
-            dest="addMEAnalysis", default=False,
+            dest="addMEAnalysis", default=True,
             help=("Including MEAnalysis"),
             metavar="ADDMEANALYSIS")
 
@@ -206,11 +209,12 @@ if __name__ == '__main__':
         dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
         dictSamples['ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
         dictSamples['ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
-        dictSamples['ST_s-channel_top_leptonDecays_13TeV-PSweights_powheg-pythia'] = ['/ST_s-channel_top_leptonDecays_13TeV-PSweights_powheg-pythia/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
-        dictSamples['ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8'] = ['/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
-        dictSamples['ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8'] = ['/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
-        dictSamples['ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8'] = ['/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/NANOAODSIM', dbsglobal, 1 ]
-        dictSamples['ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8'] = ['/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/NANOAODSIM', dbsglobal, 1 ]
+        #####dictSamples['ST_s-channel_top_leptonDecays_13TeV-PSweights_powheg-pythia'] = ['/ST_s-channel_top_leptonDecays_13TeV-PSweights_powheg-pythia/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
+        #dictSamples['ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-madgraph-pythia8'] = ['/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/NANOAODSIM', dbsglobal, 1 ]
+        #dictSamples['ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8'] = ['/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
+        #dictSamples['ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8'] = ['/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsglobal, 1 ]
+        #dictSamples['ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8'] = ['/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/NANOAODSIM', dbsglobal, 1 ]
+        #dictSamples['ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8'] = ['/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/NANOAODSIM', dbsglobal, 1 ]
         #dictSamples[''] = ['', dbsglobal, 1 ]
         #dictSamples[''] = ['', dbsglobal, 1 ]
         #dictSamples[''] = ['', dbsglobal, 1 ]
