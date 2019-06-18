@@ -51,6 +51,7 @@ if __name__ == '__main__':
 
 	Samples = {}
 
+	#Samples[ 'internal name of sample' ] = [ "DATASET name", job_splitting ]
 	Samples[ 'ttHTobb' ] = [ "/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
 	Samples[ 'ttbar_dl' ] = [ "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", 1 ]
 	Samples[ 'ttbar_sl' ] = [ "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", 1 ]
