@@ -45,6 +45,7 @@ scram b -j 8
 ## More information
 
  * For the setup of the previous code, [click here](README_old.md)
+ * For instructions on how to run private nanoAOD samples [click here](NanoAODTools/README.md)
  * For instructions on how to run the simpler version of the code in the Analyzer folder, [click here](Analyzer)
  * To run btag PDFs, follow [this instructions](Analyzer/test/btagPdf/README.md).
  * To run transfer functions, follow [this instructions](Analyzer/test/transferFunctions/README.md).
