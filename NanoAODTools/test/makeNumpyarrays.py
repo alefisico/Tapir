@@ -173,6 +173,9 @@ def convertRootToNumpy( inputFiles, outputName, listOfCuts ):
     #np.save(outputName, finalDict)
     finaldf = pd.DataFrame.from_dict(finalDict)
     finaldf.to_hdf(outputName+'.h5', key='df', format='t', mode='w')
+
+    #leptons = finalDict[] for x,y in finalDict.items() if 'lep' in x
+    #np.save ( 'leptons', leptons)
     print('Done')
 
 #####################################

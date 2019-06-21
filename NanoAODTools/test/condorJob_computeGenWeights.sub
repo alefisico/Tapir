@@ -6,5 +6,5 @@ output      =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH
 initialdir  =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/NanoAODTools/test/
 getenv      =  True
 requirements = (OpSysAndVer =?= "SLCern6")
-+JobFlavour = "workday"
++JobFlavour = "testmatch"
 queue 

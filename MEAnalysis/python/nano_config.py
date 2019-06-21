@@ -81,7 +81,8 @@ class NanoConfig:
                     if name == "btagSFProducer":
                         self.modules.append(getattr(obj,name)(self.eraBtagSF, self.algoBtag))
                     elif name == "jetmetUncertaintiesProducer":
-                        for itypeJet in ['AK4PFchs', 'AK4PFPuppi', 'AK8PFPuppi']:
+                        for itypeJet in ['AK4PFchs']:
+                        #for itypeJet in ['AK4PFchs', 'AK4PFPuppi', 'AK8PFPuppi']:
                             self.modules.append(getattr(obj,name)(self.eraBtagSF, self.jecMC, jesUncertainties=['All'], jetType=itypeJet, redoJEC=True))
                     else:
                         self.modules.append(getattr(obj,name)())

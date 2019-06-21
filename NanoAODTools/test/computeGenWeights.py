@@ -22,6 +22,7 @@ def computeGenWeights( inputFiles, outputName ):
     if isinstance(inputFiles, list):
         for iFile in inputFiles: intree.Add(iFile)
     else: intree.Add(inputFiles)
+    print intree.GetEntries()
 
     ### Convert root tree to numpy array, applying cuts
     arrays = tree2array( intree,
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     dictSamples['TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'] = ['/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsGlobal, 1 ]
     dictSamples['ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsGlobal, 1 ]
     dictSamples['ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8'] = ['/ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsGlobal, 1 ]
-    dictSamples['ST_s-channel_top_leptonDecays_13TeV-PSweights_powheg-pythia'] = ['/ST_s-channel_top_leptonDecays_13TeV-PSweights_powheg-pythia/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsGlobal, 1 ]
+    dictSamples['ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-madgraph-pythia8'] = ['/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/NANOAODSIM', dbsGlobal, 1 ]
     dictSamples['ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8'] = ['/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsGlobal, 1 ]
     dictSamples['ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8'] = ['/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/NANOAODSIM', dbsGlobal, 1 ]
     dictSamples['ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8'] = ['/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/NANOAODSIM', dbsGlobal, 1 ]
