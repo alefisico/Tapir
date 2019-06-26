@@ -4,13 +4,13 @@ import ROOT, sys
 sys.modules["TFClasses"] = TFClasses
 ROOT.gROOT.SetBatch(False)
 
-outfile = ROOT.TFile("transfer.root", "RECREATE")
-
 pickle_fn    = sys.argv[1] # Resolved
 #pickle_fn_sj = sys.argv[2] # Subjets
 
+outfile = ROOT.TFile("transfer_"+(pickle_fn.split('/')[0])+".root", "RECREATE")
+
 #for prefix, fn in zip(["",        "sj"], [pickle_fn, pickle_fn_sj]):
-for prefix, fn in zip([pickle_fn, pickle_fn_sj]):
+for prefix, fn in zip([""], [pickle_fn]):
 
     #Load transfer functions from pickle file
     pi_file = open(fn , 'rb')

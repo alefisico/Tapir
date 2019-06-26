@@ -383,8 +383,8 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     dictSamples = {}
-    dictSamples['2016_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2016_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02-7f2915ee0d1556af91f9c250f54116a8/USER', dbsphys03, 1 ]
-    dictSamples['2016_TTToSemiLeptonic'] = ['/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/algomez-2016_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8_TF_v02-b2d01080ea5ca00716d3d096fb928014/USER', dbsphys03, 1 ]
+    dictSamples['2016_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2016_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02p1-7f2915ee0d1556af91f9c250f54116a8/USER', dbsphys03, 1 ]
+    dictSamples['2016_TTToSemiLeptonic'] = ['/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/algomez-2016_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8_TF_v02p1-b2d01080ea5ca00716d3d096fb928014/USER', dbsphys03, 1 ]
     dictSamples['2017_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2017_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02-588b8cda5ee0c546fc1d2d67d23d6735/USER', dbsphys03, 1 ]
     dictSamples['2017_TTToSemiLeptonic'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-2017_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_TF_v02-588b8cda5ee0c546fc1d2d67d23d6735/USER', dbsphys03, 1 ]
     dictSamples['2018_TTToSemiLeptonic'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_TF_v02-0607c559a339ced63de31d38b5efa1f6/USER', dbsphys03, 1 ]

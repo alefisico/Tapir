@@ -59,7 +59,7 @@ EOF
 
     condorFile=${sample}_condorJob
     echo '''universe    =  vanilla
-arguments   =  '${sample}' $(ProcId)_v02 $(myfile)
+arguments   =  '${sample}' $(ProcId)_v03 $(myfile)
 executable  =  '${PWD}'/condorlogs/'${condorFile}'.sh
 log         =  '${PWD}'/condorlogs/log_'${condorFile}'_$(ClusterId).log
 error       =  '${PWD}'/condorlogs/log_'${condorFile}'_$(ClusterId)-$(ProcId).err
