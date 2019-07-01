@@ -47,7 +47,7 @@ compile:
     - git clone https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git TTH/RecoLikelihoodReconstruction
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram setup lhapdf
-    - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
+    - scram setup TTH/MEIntegratorStandalone/deps/gsl.xml
     - scram b -j4
     - cd $CMSSW_BASE/..
     - tar -czf cmssw.tgz $CMSSW_VERSION
