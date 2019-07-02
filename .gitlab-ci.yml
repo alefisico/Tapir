@@ -16,7 +16,7 @@ before_script:
   - git submodule update --init --recursive
   - export CMSSW_GIT_REFERENCE="/cvmfs/cms.cern.ch/cmssw.git.daily"
   - export SCRAM_ARCH="slc6_amd64_gcc700"
-  - export CMSSW_VERSION="CMSSW_10_2_12"
+  - export CMSSW_VERSION="CMSSW_10_2_15"
   - export CMS_PATH=/cvmfs/cms-ib.cern.ch/week0 #https://gitlab.cern.ch/cms-nanoAOD/nanoAOD-integration/blob/master/scripts/restore_cmssw.sh#L14
   - cd ..
   - cd $CI_HOME
@@ -40,14 +40,13 @@ compile:
     - cd $CMSSW_VERSION/src
     - eval `scramv1 runtime -sh`
     - git cms-init
-    - git cms-merge-topic cms-nanoAOD:master-102X   ### merging latest version of cms-nanoAOD
     - git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools 
     - git clone https://gitlab.cern.ch/Zurich_ttH/MEIntegratorStandalone.git -b 10_2_X TTH/MEIntegratorStandalone
     - git clone https://gitlab.cern.ch/algomez/CommonClassifier.git TTH/CommonClassifier -b 10_2_X
     - git clone https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git TTH/RecoLikelihoodReconstruction
     - cp -R TTH/MEIntegratorStandalone/libs/* $CMSSW_BASE/lib/$SCRAM_ARCH/
     - scram setup lhapdf
-    - scram setup $CI_HOME/MEIntegratorStandalone/deps/gsl.xml
+    - scram setup TTH/MEIntegratorStandalone/deps/gsl.xml
     - scram b -j4
     - cd $CMSSW_BASE/..
     - tar -czf cmssw.tgz $CMSSW_VERSION

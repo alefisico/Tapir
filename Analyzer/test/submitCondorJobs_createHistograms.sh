@@ -24,14 +24,14 @@ except:
 
 ##### Samples
 allSamples = {}
-allSamples[ 'DoubleMuon' ] = [ '/DoubleMuon/algomez-DoubleMuon_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/DoubleMuon/algomez-DoubleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/DoubleMuon/algomez-DoubleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/DoubleMuon/algomez-DoubleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03-8f87a7a44696406b0351f755f100b05c/USER' ]
-allSamples[ 'EGamma' ] = [ '/EGamma/algomez-EGamma_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/EGamma/algomez-EGamma_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/EGamma/algomez-EGamma_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/EGamma/algomez-EGamma_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03-8f87a7a44696406b0351f755f100b05c/USER' ]
-allSamples[ 'MuonEG' ] = [ '/MuonEG/algomez-MuonEG_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/MuonEG/algomez-MuonEG_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/MuonEG/algomez-MuonEG_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER','/MuonEG/algomez-MuonEG_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03-8f87a7a44696406b0351f755f100b05c/USER' ]
-allSamples[ 'SingleMuon' ] = [ '/SingleMuon/algomez-SingleMuon_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/SingleMuon/algomez-SingleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/SingleMuon/algomez-SingleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03-0cddb9e2402d2a936e94a815e9296873/USER', '/SingleMuon/algomez-SingleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03-8f87a7a44696406b0351f755f100b05c/USER' ]
-allSamples[ 'TTTo2L2Nu' ] = [ '/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/algomez-TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03-1c5958aa15d63140fc83aaccef484714/USER' ]
-allSamples[ 'TTToSemiLeptonic' ] = [ '/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03-0607c559a339ced63de31d38b5efa1f6/USER' ]
-allSamples[ 'ttHTobb_ttTo2L2Nu' ] = [ '/ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8/algomez-ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03-ddbc6e4800ee377f7f90aa90b506845b/USER' ]
-allSamples[ 'ttHTobb_ttToSemiLep' ] = [ '/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03-ddbc6e4800ee377f7f90aa90b506845b/USER' ]
+allSamples[ 'DoubleMuon_Run2018' ] = [ '/DoubleMuon/algomez-DoubleMuon_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/DoubleMuon/algomez-DoubleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/DoubleMuon/algomez-DoubleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/DoubleMuon/algomez-DoubleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03p1-8f87a7a44696406b0351f755f100b05c/USER' ]
+allSamples[ 'EGamma_Run2018' ] = [ '/EGamma/algomez-EGamma_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/EGamma/algomez-EGamma_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/EGamma/algomez-EGamma_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/EGamma/algomez-EGamma_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03p1-8f87a7a44696406b0351f755f100b05c/USER' ]
+allSamples[ 'MuonEG_Run2018' ] = [ '/MuonEG/algomez-MuonEG_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/MuonEG/algomez-MuonEG_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/MuonEG/algomez-MuonEG_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/MuonEG/algomez-MuonEG_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03p1-8f87a7a44696406b0351f755f100b05c/USER' ]
+allSamples[ 'SingleMuon_Run2018' ] = [ '/SingleMuon/algomez-SingleMuon_Run2018A_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/SingleMuon/algomez-SingleMuon_Run2018B_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/SingleMuon/algomez-SingleMuon_Run2018C_tthbb13_PostProcMEAnalysis_withME_v03p1-0cddb9e2402d2a936e94a815e9296873/USER', '/SingleMuon/algomez-SingleMuon_Run2018D_tthbb13_PostProcMEAnalysis_withME_v03p1-8f87a7a44696406b0351f755f100b05c/USER' ]
+allSamples[ 'TTTo2L2Nu' ] = [ '/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/algomez-TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03p1-1c5958aa15d63140fc83aaccef484714/USER' ]
+allSamples[ 'TTToSemiLeptonic' ] = [ '/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03p1-0607c559a339ced63de31d38b5efa1f6/USER' ]
+allSamples[ 'ttHTobb_ttTo2L2Nu' ] = [ '/ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8/algomez-ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03p1-ddbc6e4800ee377f7f90aa90b506845b/USER' ]
+allSamples[ 'ttHTobb_ttToSemiLep' ] = [ '/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_tthbb13_PostProcMEAnalysis_withME_v03p1-ddbc6e4800ee377f7f90aa90b506845b/USER' ]
 
 
 ## trick to run only in specific samples
@@ -59,7 +59,7 @@ EOF
 
     condorFile=${sample}_condorJob
     echo '''universe    =  vanilla
-arguments   =  '${sample}' $(ProcId)_v02 $(myfile)
+arguments   =  '${sample}' $(ProcId)_v03 $(myfile)
 executable  =  '${PWD}'/condorlogs/'${condorFile}'.sh
 log         =  '${PWD}'/condorlogs/log_'${condorFile}'_$(ClusterId).log
 error       =  '${PWD}'/condorlogs/log_'${condorFile}'_$(ClusterId)-$(ProcId).err
@@ -85,7 +85,8 @@ cd -
 echo ${PWD}
 ls
 echo "Running: python '${PWD}'/createHistograms.py -d ${1} -v ${2} -s -i ${3}"
-time python '${PWD}'/evenSimpler_createHistograms.py -d ${1} -v ${2} -s -i ${3}
+time python '${PWD}'/createHistograms.py -d ${1} -v ${2} -s -i ${3}
+###time python '${PWD}'/evenSimpler_createHistograms.py -d ${1} -v ${2} -s -i ${3}
 ls
     ''' > condorlogs/${condorFile}.sh
 
