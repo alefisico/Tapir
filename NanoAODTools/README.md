@@ -2,25 +2,43 @@
 
 ## To produce modified nanoAOD
 
-For more information about nanoAOD, please look at the (nanoAOD twiki)[https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD].
+For more information about nanoAOD, read the [twiki](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD). *This step is not needed if you are using centrally produced nanoAOD samples.*
 
 For the nominal analysis, the centrally produced nanoAOD samples are sufficient. 
 The following recipe is to include a different jet collection (ak4 puppi jets) in the nanoAOD samples. 
-For that, the recommendation from JMAR is to use the (jetToolbox)[https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetToolbox]. If you have not clone it before, just run:
+For that, the recommendation from JMAR is to use the [jetToolbox](https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetToolbox). If you have not clone it before, just run:
 
-~~~
+~~~bash
 cd $CMSSW_BASE/src
 git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_102X_v2
 scram b -j 4
 ~~~
 
 In this version of the jetToolbox, a python file is needed to run a different jet collection and produced an output in nanoAOD format. 
-An example of this file is (nanoAOD_jetToolbox_cff.py)[../python/nanoAOD_jetToolbox_cff.py]
-
+An example of this file is [nanoAOD_jetToolbox_cff.py](python/nanoAOD_jetToolbox_cff.py). 
+To run the central produced nanoAOD (v5) with the modifications of the jetToolbox:
+~~~bash
+cmsDriver.py modifiedNanoAOD_MC_2017_cfi -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM   --conditions 102X_mc2017_realistic_v6 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" --filein=/store/mc/RunIIFall17MiniAODv2/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/10000/E40C4367-E4AE-E811-B96D-FA163E4CF25C.root --customise TTH/NanoAODTools/nanoAOD_jetToolbox_cff.nanoJTB_customizeMC -n 10
 ~~~
-cmsDriver.py myNanoProdMc2017 -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM   --conditions 102X_mc2017_realistic_v6 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" --filein=/store/mc/RunIIFall17MiniAODv2/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/10000/E40C4367-E4AE-E811-B96D-FA163E4CF25C.root --customise TTH/NanoAODTools/nanoAOD_jetToolbox_cff.nanoJTB_customizeMC -n 10
+here the `--customise` option points to the function `nanoJTB_customizeMC` inside the `python/nanoAOD_jetToolbox_cff.py`.
+
+
+To test locally the production of the modified nanoAOD samples:
+~~~bash
+cd $CMSSW_BASE/src/TTH/NanoAODTools/test/   ## to go to the test folder
+cmsenv                                      ## in case you haven't set the CMSSW environment
+cmsRun modifiedNanoAOD_MC_2017_cfi.py
 ~~~
 
+
+To submit several crab jobs to produce nanoAOD samples, you can run:
+```
+python multicrab_nanoAOD.py --sample 2017_ttHbb --version v01 
+```
+where `--version` is just a label for your output datasets and `--sample` depends on the name of the sample inside the script in the `Samples` dictionary. To get a list of 2018 miniAOD samples you can use the `dasgoclient` command, for instance:
+```
+dasgoclient --query="/*/RunIIAutumn18MiniAOD*/MINIAODSIM"
+```
 
 ## Training samples
 

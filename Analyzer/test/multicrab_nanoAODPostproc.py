@@ -39,7 +39,8 @@ mv python $CMSSW_BASE/python
 echo Found Proxy in: $X509_USER_PROXY
 
 echo "python simpleJob_nanoAODPostproc.py ......."
-python simpleJob_nanoAODPostproc.py --sample {datasets}
+####python simpleJob_nanoAODPostproc.py --sample {datasets}
+python evenSimplerJob_nanoAODPostproc_TEST.py --sample {datasets}
 fi
     '''
     open('runPostProc.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))
@@ -100,7 +101,8 @@ def submitJobs( job, lnfList, unitJobs ):
 
 
     config.JobType.scriptExe = 'runPostProc.sh'
-    config.JobType.inputFiles = [ 'simpleJob_nanoAODPostproc.py' ,'haddnano.py', 'keep_and_drop.txt']
+    #config.JobType.inputFiles = [ 'simpleJob_nanoAODPostproc.py' ,'haddnano.py', 'keep_and_drop.txt']
+    config.JobType.inputFiles = [ 'evenSimplerJob_nanoAODPostproc_TEST.py' ,'haddnano.py', 'keep_and_drop.txt']
     config.JobType.sendPythonFolder  = True
 
     # following 3 lines are the trick to skip DBS data lookup in CRAB Server
@@ -123,7 +125,7 @@ def submitJobs( job, lnfList, unitJobs ):
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoAODPostproc/'
 
     outputTag = 'tthbb13_PostProc'
-    requestname = outputTag + '_' + job + '_' +options.version
+    requestname = job + '_' +outputTag + '_' + options.version
     print requestname
     if len(requestname) > 100: requestname = (requestname[:95-len(requestname)])
     print 'requestname = ', requestname

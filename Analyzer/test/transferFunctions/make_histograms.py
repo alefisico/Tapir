@@ -93,7 +93,6 @@ def Make_E_axis( input_chain, eta_axis, n_E_bins, E_bounds, particle, config ):
         c1.SetGrid()
 
         E_hist.Draw()
-        c1.SaveAs( 'Ehist_beforecut.png')
         #c1.Print( 'Ehist_beforecut', 'pdf')
         f_pthist_bc = open( 'histogramming_output/pt_hist_bc_{0}{1}.pickle'.format(
             particle, i_eta ), 'wb' )
@@ -464,29 +463,29 @@ def Make_Histograms(conffile):
 
         E_reconstructed = AH.getter( input_chain, config['reco_E_str'] )
 
+        for k in range( len(E_event) ):
+            if E_event[k] >= E_bounds[0] and E_event[k] <= E_bounds[1] and eta_event[k] >= eta_axis[0] and eta_event[k] <= eta_axis[-1]:
 
-        if E_event >= E_bounds[0] and E_event <= E_bounds[1] and eta_event >= eta_axis[0] and eta_event <= eta_axis[-1]:
+                # Keep track of the number of actually used events in the config dict
+                config['events_used'] += 1
 
-            # Keep track of the number of actually used events in the config dict
-            config['events_used'] += 1
+                # Select the right dict
+                if abs(particle_event[k]) == 5:
+                    particle = particles[0]
+                else:
+                    particle = particles[1]
 
-            # Select the right dict
-            if abs(particle_event) == 5:
-                particle = particles[0]
-            else:
-                particle = particles[1]
+                # Get bin numbers
+                eta_bin_nr = 0
+                while abs(eta_event[k]) > dicts[particle]['eta_axis'][eta_bin_nr+1]:
+                    eta_bin_nr += 1
 
-            # Get bin numbers
-            eta_bin_nr = 0
-            while abs(eta_event) > dicts[particle]['eta_axis'][eta_bin_nr+1]:
-                eta_bin_nr += 1
+                E_bin_nr = 0
+                while E_event[k] > dicts[particle]['E_axis'][eta_bin_nr][E_bin_nr+1]:
+                    E_bin_nr += 1
 
-            E_bin_nr = 0
-            while E_event > dicts[particle]['E_axis'][eta_bin_nr][E_bin_nr+1]:
-                E_bin_nr += 1
-
-            # Fill the reconstucted E into the histogram
-            dicts[particle]['hist_mat'][eta_bin_nr][E_bin_nr].Fill( E_reconstructed )
+                # Fill the reconstucted E into the histogram
+                dicts[particle]['hist_mat'][eta_bin_nr][E_bin_nr].Fill( E_reconstructed[k] )
 
     ########## End of event loop ###########
 

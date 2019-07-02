@@ -19,25 +19,25 @@ Variables['nPVs']      = [ 'nPVs', 100, 0, 100 ]
 Variables['met_pt']    = [ 'met_pt', 1000, 0, 1000 ]
 Variables['met_phi']   = [ 'met_phi', 50, -3.0, 3.0 ]
 Variables['Wmass']    = [ 'Wmass', 1000, 0, 1000 ]
-Variables['mbb_closest']    = [ 'mbb_closest', 1000, 0, 1000 ]
-Variables['ll_mass']    = [ 'll_mass', 1000, 0, 1000 ]
-Variables['ll_pt']    = [ 'll_pt', 1000, 0, 1000 ]
-######TMP
+#Variables['mbb_closest']    = [ 'mbb_closest', 1000, 0, 1000 ]
+#Variables['ll_mass']    = [ 'll_mass', 1000, 0, 1000 ]
+#Variables['ll_pt']    = [ 'll_pt', 1000, 0, 1000 ]
+#######TMP
 Variables['is_sl']    = [ 'is_sl', 10, 0, 10 ]
 Variables['is_dl']    = [ 'is_dl', 10, 0, 10 ]
 Variables['triggerDecision']    = [ 'triggerDecision', 3, 0, 3 ]
-Variables['HLT_ttH_SL_el']    = [ 'HLT_ttH_SL_el', 3, 0, 3 ]
-Variables['HLT_ttH_SL_mu']    = [ 'HLT_ttH_SL_mu', 3, 0, 3 ]
-Variables['HLT_ttH_DL_mumu']    = [ 'HLT_ttH_DL_mumu', 3, 0, 3 ]
-Variables['HLT_ttH_DL_elmu']    = [ 'HLT_ttH_DL_elmu', 3, 0, 3 ]
-Variables['HLT_ttH_DL_elel']    = [ 'HLT_ttH_DL_elel', 3, 0, 3 ]
+#Variables['HLT_ttH_SL_el']    = [ 'HLT_ttH_SL_el', 3, 0, 3 ]
+#Variables['HLT_ttH_SL_mu']    = [ 'HLT_ttH_SL_mu', 3, 0, 3 ]
+#Variables['HLT_ttH_DL_mumu']    = [ 'HLT_ttH_DL_mumu', 3, 0, 3 ]
+#Variables['HLT_ttH_DL_elmu']    = [ 'HLT_ttH_DL_elmu', 3, 0, 3 ]
+#Variables['HLT_ttH_DL_elel']    = [ 'HLT_ttH_DL_elel', 3, 0, 3 ]
 Variables['Flag_METFilters']    = [ 'Flag_METFilters', 10, 0, 10 ]
 Variables['passMETFilters']    = [ 'passMETFilters', 10, 0, 10 ]
-Variables['mem_tth_SL_1w2h2t_p']    = [ 'mem_tth_SL_1w2h2t_p', 100, 0, 1 ]
-Variables['(mem_tth_SL_2w2h2t_p)/(mem_tth_SL_2w2h2t_p+0.1*mem_ttbb_SL_2w2h2t_p)']    = [ 'mem_SL_2w2h2t', 100, 0, 1 ]
-
-
-#### Jets
+#Variables['mem_tth_SL_1w2h2t_p']    = [ 'mem_tth_SL_1w2h2t_p', 100, 0, 1 ]
+#Variables['(mem_tth_SL_2w2h2t_p)/(mem_tth_SL_2w2h2t_p+0.1*mem_ttbb_SL_2w2h2t_p)']    = [ 'mem_SL_2w2h2t', 100, 0, 1 ]
+#
+#
+##### Jets
 Variables['njets']      = [ 'njets', 20, 0, 20 ]
 Variables['jets_pt']    = [ 'jets_pt', 100, 0, 1000 ]
 Variables['jets_eta']   = [ 'jets_eta', 50, -3.0, 3.0 ]
@@ -92,6 +92,12 @@ def myPlotAnalyzer( myChain, listCuts, sample, isData, eventCountTree, UNC ):
     ###################### Opening output file
     outputFileName = sample+'_'+args.version+'.root'
     outputFile = TFile( outputFileName, 'RECREATE' )
+
+    ###################### Counting numEvents
+    if not isData:
+        allHistos[ "genEventSumW_"+sample ] = TH1F( "genEventSumw_"+sample, "genEventSumw_"+sample, 1, 0, 1 )
+        eventCountTree.GetEntry(0)
+        allHistos[ "genEventSumW_"+sample ].SetBinContent( 1, eventCountTree.genEventSumw )
 
     ###################### Defining histos
     for sel in listCuts:
@@ -173,14 +179,16 @@ if __name__ == '__main__':
 #    else: print 'Incorrect ttbar decay. Options: SL, DL, FH'
 
     ##### Opening root files
-    eventCount = TChain("Runs")
-    tmpEventCountFile = "root://cms-xrd-global.cern.ch/"+str(args.inputFile) if not args.inputFile.startswith('root') else args.inputFile
-    print 'Adding :', tmpEventCountFile
-    eventCount.Add( tmpEventCountFile )
+    if not isData:
+        eventCount = TChain("Runs")
+        tmpEventCountFile = "root://cms-xrd-global.cern.ch/"+str(args.inputFile) if not args.inputFile.startswith('root') else args.inputFile
+        print 'Adding :', tmpEventCountFile
+        eventCount.Add( tmpEventCountFile )
 
     myChain = TChain("tree")
-    tmpFile = "root://cms-xrd-global.cern.ch/"+str(args.inputFile.replace('nano_postprocessed', 'tree')) if not args.inputFile.startswith('root') else args.inputFile
+    tmpFile = ("root://cms-xrd-global.cern.ch/"+str(args.inputFile) if not args.inputFile.startswith('root') else args.inputFile).replace('nano_postprocessed', 'tree')
     print 'Adding :', tmpFile
     myChain.Add( tmpFile )
 
-    myPlotAnalyzer( myChain, presel, args.dataset, isData, eventCount, '' )
+    allHistos = OrderedDict()
+    myPlotAnalyzer( myChain, presel, args.dataset, isData, ('' if isData else eventCount), '' )

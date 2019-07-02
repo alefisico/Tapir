@@ -59,7 +59,7 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(),
 )
 
 process.source.fileNames = [
-            "root://cms-xrd-global.cern.ch//store/user/algomez/ttH/nanoAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_simpleJobs_v00/190221_170126/0000/myNanoProdMc_NANO_38.root"
+            "root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/102X_upgrade2018_realistic_v15-v1/40000/6801F357-BF95-2E41-BA2D-ABD083577275.root"
 ]
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
@@ -135,11 +135,12 @@ def submitJobs( job, lnfList, unitJobs ):
     print 'Submitting ' + config.General.requestName + ', dataset = ' + job
     print 'Configuration :'
     print config
-    try :
-        crabCommand('submit', config = config)
-        #crabCommand('submit', "--dryrun", config = config)
-    except :
-        print 'Not submitted.'
+    crabCommand('submit', config = config)
+    #try :
+    #    crabCommand('submit', config = config)
+    #    #crabCommand('submit', "--dryrun", config = config)
+    #except :
+    #    print 'Not submitted.'
 
 
 ##########################################
