@@ -15,10 +15,9 @@ config.General.requestName = ''
 config.General.workArea = 'crab_projects'
 
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'simpleJob_nanoAOD_NANO.py'
+config.JobType.psetName = 'modifiedNanoAOD_MC_2017_cfi.py'
 
 config.Data.inputDataset = ''
-##config.Data.inputDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader'
 config.Data.splitting = 'FileBased'
 config.Data.publication = True
 config.Data.unitsPerJob = 1
@@ -52,11 +51,10 @@ if __name__ == '__main__':
 	Samples = {}
 
 	#Samples[ 'internal name of sample' ] = [ "DATASET name", job_splitting ]
-	Samples[ 'ttHTobb' ] = [ "/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
-	Samples[ 'ttbar_dl' ] = [ "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", 1 ]
-	Samples[ 'ttbar_sl' ] = [ "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM", 1 ]
-	#Samples[ 'TTWQQ' ] = [ "/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
-	#Samples[ 'TTZQQ' ] = [ "/TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+	Samples[ '2017_ttHTobb_ttToSemiLep' ] = [ "/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+	Samples[ '2017_TTToSemiLeptonic' ] = [ "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+	#Samples[ '' ] = [ "", 1 ]
+	#Samples[ '' ] = [ "", 1 ]
 	#Samples[ 'empty' ] = [ "", 1 ]
 
 
