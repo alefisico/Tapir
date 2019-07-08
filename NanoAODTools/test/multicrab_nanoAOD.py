@@ -16,6 +16,7 @@ config.General.workArea = 'crab_projects'
 
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'modifiedNanoAOD_MC_2017_cfi.py'
+config.JobType.maxMemoryMB = 3000 # Default is 2500 : Max I have used is 13000
 
 config.Data.inputDataset = ''
 config.Data.splitting = 'FileBased'
