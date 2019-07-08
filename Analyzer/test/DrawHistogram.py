@@ -216,23 +216,26 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 
         for idataLabel, idata in dataFiles.iteritems():
             try:
-                histos[ 'Data' ].Add( idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018' ) )
+                histos[ 'Data' ].Add( idata.Get( 'tthbb13/'+nameInRoot ) )
+                #histos[ 'Data' ].Add( idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018' ) )
             except (KeyError, AttributeError) as e:
-                histos[ 'Data' ] = idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018' )
+                #histos[ 'Data' ] = idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018' )
+                histos[ 'Data' ] = idata.Get( 'tthbb13/'+nameInRoot )
 
         histos[ 'Bkg' ] = histos[ 'Data' ].Clone()
         histos[ 'Bkg' ].Reset()
         for isamLabel, isam in bkgFiles.iteritems():
             #numEventsProc = float(isam[0].Get( 'genEventSumw_'+isamLabel ).GetBinContent(1)/isam[0].Get('genEventSumw_'+isamLabel).GetEntries())
-            if 'TT' in isamLabel:
-                for flaLabel, flaInfo in ttbarComp.iteritems():
-                    histos[ flaLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel+'_'+flaLabel )
-                    histos[ flaLabel ].Scale( isam[1] )
-                    histos[ 'Bkg' ].Add( histos[ flaLabel ] )
-            else:
-                histos[ isamLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel )
-                histos[ isamLabel ].Scale( isam[1] )
-                histos[ 'Bkg' ].Add( histos[ isamLabel ] )
+#            if 'TT' in isamLabel:
+#                for flaLabel, flaInfo in ttbarComp.iteritems():
+#                    histos[ flaLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel+'_'+flaLabel )
+#                    histos[ flaLabel ].Scale( isam[1] )
+#                    histos[ 'Bkg' ].Add( histos[ flaLabel ] )
+#            else:
+            histos[ isamLabel ] = isam[0].Get( 'tthbb13/'+nameInRoot )
+            #histos[ isamLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel )
+            histos[ isamLabel ].Scale( isam[1] )
+            histos[ 'Bkg' ].Add( histos[ isamLabel ] )
 
 	if rebinX != 1:
             histos[ 'Data' ].Rebin( rebinX )
@@ -273,8 +276,8 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 
 	pad1.cd()
 	if log: pad1.SetLogy()
-	hData.Draw("E")
-	hBkg.Draw('hist same e2')
+	hData.DrawNormalized("E")
+	hBkg.DrawNormalized('hist same e2')
 	hData.SetMaximum( 1.2* max( hData.GetMaximum(), hBkg.GetMaximum() )  )
         if 'pt' in label: hData.SetMinimum( 1 )
 	#hData.GetYaxis().SetTitleOffset(1.2)
@@ -293,7 +296,7 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 	CMS_lumi.CMS_lumi(pad1, 4, 0)
 	#labelAxis( name, hData, '' )
 	legend.Draw()
-        setSelection( selection[ args.cut ], labX, labY )
+        #setSelection( selection[ args.ttbarDecay+'_'+args.cut ], labX, labY )
 
 	pad2.cd()
 	gStyle.SetOptFit(1)
@@ -340,7 +343,7 @@ if __name__ == '__main__':
 	parser.add_argument('-p', '--proc', action='store', default='1D', dest='process', help='Process to draw, example: 1D, 2D, MC.' )
         parser.add_argument('-d', '--decay', action='store', default='SL', dest='ttbarDecay', help='ttbar decay channel: SL, DL' )
 	parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
-	parser.add_argument('-c', '--cut', action='store', default='SL_presel', help='cut, example: sl+presel' )
+	parser.add_argument('-c', '--cut', action='store', default='presel', help='cut, example: sl+presel' )
 	parser.add_argument('-s', '--single', action='store', default='all', help='single histogram, example: massAve_cutDijet.' )
 	parser.add_argument('-l', '--lumi', action='store', type=float, default=59215, help='Luminosity, example: 1.' )
 	parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
@@ -362,12 +365,12 @@ if __name__ == '__main__':
 	CMS_lumi.extraText = "Preliminary"
 	CMS_lumi.lumi_13TeV = str( round( (args.lumi/1000.), 2 ) )+" fb^{-1}, 13 TeV, 2018"
 
-	folder = 'root://t3dcachedb03.psi.ch//pnfs/psi.ch/cms/trivcat/store/user/algomez/ttH/Sparsinator/'+args.version
 
         #bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259), 'ttbar' ]
-        bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/100482224., 'ttbar' ]
+        #bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/100482224., 'ttbar' ]
+        bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/101550000,., 'ttbar' ]
         #bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259), 'ttbar' ]
-        bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259)/63767169., 'ttbar' ]
+        #bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259)/63767169., 'ttbar' ]
 
         if args.ttbarDecay.startswith("DL"):
             dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_Run2018All_'+args.version+'.root')
@@ -376,9 +379,11 @@ if __name__ == '__main__':
 
             signalFiles[ 'ttHTobb_ttTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/ttHTobb_ttTo2L2Nu_'+args.version+'.root'), (args.lumi*0.5071 * 0.4176 * 2 * 0.6741 * 0.3259/9524600.)*50, 'ttH(bb) (x50)', kBlue-4 ]
         else:
-            dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_Run2018All_'+args.version+'.root')
-            dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+args.version+'/SingleMuon_Run2018All_'+args.version+'.root')
-            signalFiles[ 'ttHTobb_ttToSemiLep' ] = [ TFile.Open('Rootfiles/'+args.version+'/ttHTobb_ttToSemiLep_'+args.version+'.root'), (args.lumi*0.5071 * 0.4176 * 0.3259* 0.3259/9577300.)*50, 'ttH(bb) (x50)', kBlue-4 ]
+            dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_'+args.version+'.root')
+            dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+args.version+'/SingleMuon_'+args.version+'.root')
+            #dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_Run2018All_'+args.version+'.root')
+            #dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+args.version+'/SingleMuon_Run2018All_'+args.version+'.root')
+            #signalFiles[ 'ttHTobb_ttToSemiLep' ] = [ TFile.Open('Rootfiles/'+args.version+'/ttHTobb_ttToSemiLep_'+args.version+'.root'), (args.lumi*0.5071 * 0.4176 * 0.3259* 0.3259/9577300.)*50, 'ttH(bb) (x50)', kBlue-4 ]
 
 #        bkgFiles[ 'ST_s-channel' ] = [ TFile.Open('Rootfiles/'+args.version+'/ST_s-channel_'+args.version+'.root'), (args.lumi*11.36/12441255.), 'Single top', kBlue-4 ]
 #        bkgFiles[ 'ST_t-channel_antitop' ] = [ TFile.Open('Rootfiles/'+args.version+'/ST_t-channel_antitop_'+args.version+'.root'), (args.lumi*80.95/74188955.), 'Single top', kBlue-4 ]
@@ -432,9 +437,9 @@ if __name__ == '__main__':
 	for i in Plots:
             if ( 'qual' in args.process ):
                 plotQuality(
-                    i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8],
+                    i[0]+"_"+args.cut, i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8],
                     fitRatio=args.addFit )
             elif ( 'stack' in args.process ):
                 stackPlots(
-                    i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10],
+                    i[0]+"_"+args.cut, i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10],
                     fitRatio=args.addFit )
