@@ -220,7 +220,8 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
                 #histos[ 'Data' ].Add( idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018' ) )
             except (KeyError, AttributeError) as e:
                 #histos[ 'Data' ] = idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018' )
-                histos[ 'Data' ] = idata.Get( 'tthbb13/'+nameInRoot )
+                #histos[ 'Data' ] = idata.Get( 'tthbb13/'+nameInRoot )
+                histos[ 'Data' ] = idata.Get( 'tthbb13/'+nameInRoot.split('Total')[0] )
 
         histos[ 'Bkg' ] = histos[ 'Data' ].Clone()
         histos[ 'Bkg' ].Reset()
@@ -276,8 +277,8 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 
 	pad1.cd()
 	if log: pad1.SetLogy()
-	hData.DrawNormalized("E")
-	hBkg.DrawNormalized('hist same e2')
+	hData.Draw("E")
+	hBkg.Draw('hist same e2')
 	hData.SetMaximum( 1.2* max( hData.GetMaximum(), hBkg.GetMaximum() )  )
         if 'pt' in label: hData.SetMinimum( 1 )
 	#hData.GetYaxis().SetTitleOffset(1.2)
@@ -345,7 +346,7 @@ if __name__ == '__main__':
 	parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
 	parser.add_argument('-c', '--cut', action='store', default='presel', help='cut, example: sl+presel' )
 	parser.add_argument('-s', '--single', action='store', default='all', help='single histogram, example: massAve_cutDijet.' )
-	parser.add_argument('-l', '--lumi', action='store', type=float, default=59215, help='Luminosity, example: 1.' )
+	parser.add_argument('-l', '--lumi', action='store', type=float, default=59215., help='Luminosity, example: 1.' )
 	parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
 	parser.add_argument('-u', '--unc', action='store', default='JES', dest='unc',  help='Type of uncertainty' )
 	parser.add_argument('-f', '--final', action='store_true', default=False, dest='final',  help='If plot is final' )
@@ -367,8 +368,8 @@ if __name__ == '__main__':
 
 
         #bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259), 'ttbar' ]
-        #bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/100482224., 'ttbar' ]
-        bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/101550000,., 'ttbar' ]
+        bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/101340000., 'ttbar' ]
+        #bkgFiles[ 'TTToSemiLeptonic' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTToSemiLeptonic_'+args.version+'.root'), args.lumi*(831.76*2*0.6741*0.3259)/101550000., 'ttbar' ]
         #bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259), 'ttbar' ]
         #bkgFiles[ 'TTTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/TTTo2L2Nu_'+args.version+'.root'), args.lumi*(831.76*0.3259*0.3259)/63767169., 'ttbar' ]
 
@@ -379,7 +380,7 @@ if __name__ == '__main__':
 
             signalFiles[ 'ttHTobb_ttTo2L2Nu' ] = [ TFile.Open('Rootfiles/'+args.version+'/ttHTobb_ttTo2L2Nu_'+args.version+'.root'), (args.lumi*0.5071 * 0.4176 * 2 * 0.6741 * 0.3259/9524600.)*50, 'ttH(bb) (x50)', kBlue-4 ]
         else:
-            dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_'+args.version+'.root')
+            #dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_'+args.version+'.root')
             dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+args.version+'/SingleMuon_'+args.version+'.root')
             #dataFiles['EGamma'] = TFile.Open('Rootfiles/'+args.version+'/EGamma_Run2018All_'+args.version+'.root')
             #dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+args.version+'/SingleMuon_Run2018All_'+args.version+'.root')

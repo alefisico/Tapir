@@ -62,15 +62,14 @@ executable  =  '${PWD}'/condorlogs/'${condorFile}'.sh
 log         =  '${PWD}'/condorlogs/log_'${condorFile}'_$(ClusterId).log
 error       =  '${PWD}'/condorlogs/log_'${condorFile}'_$(ClusterId)-$(ProcId).err
 output      =  '${PWD}'/condorlogs/log_'${condorFile}'_$(ClusterId)-$(ProcId).out
-initialdir  = /eos/home-a/algomez/tmpFiles/
+initialdir  = /eos/home-a/algomez/tmpFiles/'${sample}'/
 getenv      =  True
 requirements = (OpSysAndVer =?= "SLCern6")
-+JobFlavour = "workday"
++JobFlavour = "tomorrow"
 queue myfile from '${PWD}'/condorlogs/'${sample}'.txt
-
-
     ''' > condorlogs/${condorFile}.sub
 
+    mkdir /eos/home-a/algomez/tmpFiles/${sample}/
 
     echo '''#!/bin/bash
 export SCRAM_ARCH=slc6_amd64_gcc700
