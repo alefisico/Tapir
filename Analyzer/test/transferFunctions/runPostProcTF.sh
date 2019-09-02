@@ -24,6 +24,6 @@ mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
 echo "python runSkimmerTF.py ......."
-python runSkimmerTF.py --sample 2016_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8
+python runSkimmerTF.py --sample 2018_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8
 fi
     

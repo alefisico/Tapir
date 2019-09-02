@@ -383,12 +383,12 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     dictSamples = {}
-    dictSamples['2016_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2016_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02p1-7f2915ee0d1556af91f9c250f54116a8/USER', dbsphys03, 1 ]
-    dictSamples['2016_TTToSemiLeptonic'] = ['/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/algomez-2016_TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8_TF_v02p1-b2d01080ea5ca00716d3d096fb928014/USER', dbsphys03, 1 ]
-    dictSamples['2017_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2017_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02-588b8cda5ee0c546fc1d2d67d23d6735/USER', dbsphys03, 1 ]
-    dictSamples['2017_TTToSemiLeptonic'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-2017_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_TF_v02-588b8cda5ee0c546fc1d2d67d23d6735/USER', dbsphys03, 1 ]
-    dictSamples['2018_TTToSemiLeptonic'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_TF_v02-0607c559a339ced63de31d38b5efa1f6/USER', dbsphys03, 1 ]
-    dictSamples['2018_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02-ddbc6e4800ee377f7f90aa90b506845b/USER', dbsphys03, 1 ]
+    dictSamples['2016_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2016_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02-f9255f5ef092ed4261a677d1b3d4c5e7/USER', dbsphys03, 1 ]
+    dictSamples['2016_TTToSemiLeptonic'] = ['/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/algomez-2016_TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_TF_v02-f9255f5ef092ed4261a677d1b3d4c5e7/USER', dbsphys03, 1 ]
+    dictSamples['2017_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2017_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02-b20d9b763f2018f94030029e46129b76/USER', dbsphys03, 1 ]
+    dictSamples['2017_TTToSemiLeptonic'] = ['/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/algomez-2017_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_TF_v02-b20d9b763f2018f94030029e46129b76/USER', dbsphys03, 1 ]
+    dictSamples['2018_TTToSemiLeptonic'] = ['/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-2018_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_TF_v02-756bb30e471578c459ee899ddfc51f59/USER', dbsphys03, 1 ]
+    dictSamples['2018_ttHTobb_ttToSemiLep'] = ['/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-2018_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_TF_v02-756bb30e471578c459ee899ddfc51f59/USER', dbsphys03, 1 ]
 
     ### Trick to copy only datasets specified
     processingSamples = {}
@@ -403,7 +403,8 @@ if __name__ == "__main__":
     for isam in processingSamples:
         # DBS client returns a list of dictionaries, but we want a list of Logical File Names
         fileDictList = processingSamples[isam][1].listFiles( dataset=processingSamples[isam][0], validFileOnly=1 )
-        lfnList = [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
+        #lfnList = [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
+        lfnList = [ 'root://xrootd-cms.infn.it/'+dic['logical_file_name'] for dic in fileDictList ]
 
         print ("dataset %s has %d files" % (processingSamples[isam], len(lfnList)))
         Make_config( lfnList, isam )

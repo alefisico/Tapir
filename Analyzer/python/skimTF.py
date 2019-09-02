@@ -27,6 +27,8 @@ class skimTF(Module):
         self.out.branch("Jetmatched_phi", "F", lenVar="nQuarkMatched" )
         self.out.branch("Jetmatched_mass", "F", lenVar="nQuarkMatched" )
         self.out.branch("Jetmatched_btagCSV", "F", lenVar="nQuarkMatched" )
+        self.out.branch("Jetmatched_btagDeepFlav", "F", lenVar="nQuarkMatched" )
+        self.out.branch("Jetmatched_btagDeepCSV", "F", lenVar="nQuarkMatched" )
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
     def analyze(self, event):
@@ -66,6 +68,8 @@ class skimTF(Module):
             quark.match_pdgId = 0
             quark.match_dr = 0
             quark.match_btagCSV = 0
+            quark.match_btagDeepCSV = 0
+            quark.match_btagDeepFlav = 0
 
         for quark_idx in matches_by_quark.keys():
             quark = cleaned_quarks[quark_idx]
@@ -77,7 +81,9 @@ class skimTF(Module):
                 quark.match_eta = best_match.eta
                 quark.match_phi = best_match.phi
                 quark.match_mass = best_match.mass
-                quark.match_btagCSV = best_match.btagDeepB
+                quark.match_btagCSV = best_match.btagCSVV2
+                quark.match_btagDeepCSV = best_match.btagDeepB
+                quark.match_btagDeepFlav = best_match.btagDeepFlavB
                 quark.match_dr = dr
 
         self.out.fillBranch("nQuarkMatched", len(cleaned_quarks))
@@ -93,6 +99,8 @@ class skimTF(Module):
         self.out.fillBranch("Jetmatched_phi", [ quark.match_phi for quark in cleaned_quarks ])
         self.out.fillBranch("Jetmatched_mass", [ quark.match_mass for quark in cleaned_quarks ])
         self.out.fillBranch("Jetmatched_btagCSV", [ quark.match_btagCSV for quark in cleaned_quarks ])
+        self.out.fillBranch("Jetmatched_btagDeepCSV", [ quark.match_btagDeepCSV for quark in cleaned_quarks ])
+        self.out.fillBranch("Jetmatched_btagDeepFlav", [ quark.match_btagDeepFlav for quark in cleaned_quarks ])
 
         return True
 

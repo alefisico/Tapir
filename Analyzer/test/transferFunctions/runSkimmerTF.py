@@ -31,8 +31,9 @@ parser.add_argument(
 parser.add_argument(
     '--numEvents',
     action="store",
+    type=int,
     help="Number of events to process",
-    default=-1,
+    default=10000000,
 )
 parser.add_argument(
     '--loglevel',
@@ -59,11 +60,11 @@ else:
 precuts = PV + " && " + METFilters + " && " + Triggers
 
 ### Preliminary selection to speed up postProcessing
-cuts= precuts + " && ( ( nJet>1 ) && ( Jet_pt>15 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 ) )"
+cuts= precuts + " && ( ( nJet>3 ) && ( Jet_pt>15 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 ) && ( MET_pt>20 ) )"
 
 listOfModules = []
-listOfModules.append( countHistogramsModule() )
-listOfModules.append( puWeight_2018() )
+#listOfModules.append( countHistogramsModule() )
+#listOfModules.append( puWeight_2018() )
 listOfModules.append( skimmerTF() )
 
 p = PostProcessor(
@@ -75,6 +76,8 @@ p = PostProcessor(
     haddFileName = "nano_postprocessed.root",
     jsonInput=runsAndLumis(),
     fwkJobReport=True,
-    ##noOut=False, justcount=False,
+    maxEntries=args.numEvents,
+    prefetch=True,
+    longTermCache=True,
 )
 p.run()
