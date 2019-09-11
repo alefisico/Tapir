@@ -32,8 +32,14 @@ class quickAnalyzer(Module):
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
 
-        self.addObject( ROOT.TH1F('lepWMass',   ';Leptonic W candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('nlooseFatJets',   ';number of loose fatjets',   10, 0, 10) )
+        self.addObject( ROOT.TH1F('nleps',   ';number of leptons',   20, 0, 20) )
+        self.addObject( ROOT.TH1F('nCHSjets',   ';number of CHS jets',   20, 0, 20) )
+        self.addObject( ROOT.TH1F('nCHSBjets',   ';number of CHS b jets',   20, 0, 20) )
+        self.addObject( ROOT.TH1F('lepPt',   ';Lepton p_{T} (GeV)',   500, 0, 5000) )
+        self.addObject( ROOT.TH1F('lepEta',  ';Lepton #eta', 100, -4.0, 4.0 ) )
+        self.addObject( ROOT.TH1F('METPt',   ';MET (GeV)',   500, 0, 5000) )
+        self.addObject( ROOT.TH1F('lepWMass',   ';Leptonic W candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('nbadFatJets',   ';number of bad fatjets',   10, 0, 10) )
         self.addObject( ROOT.TH1F('ngoodEvents',   ';Good Events',   10, 0, 10) )
         self.addObject( ROOT.TH1F('TopCandMass',   ';Top candidate mass', 60, 0, 300) )
@@ -59,9 +65,20 @@ class quickAnalyzer(Module):
         self.addObject( ROOT.TH1F('minDiffLepHadTop',   ';min difference between lep and had Top',   100, 0, 100) )
         self.addObject( ROOT.TH1F('lepTopCandMass_boostedW',   ';leptonic Top candidate masses', 60, 0, 300) )
         self.addObject( ROOT.TH1F('hadTopCandMass_boostedW',   ';hadronic Top candidate masses', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('boostedHiggsCandPt_boostedW',   ';boosted Higgs candidate pt', 1000, 0, 1000) )
         self.addObject( ROOT.TH1F('boostedHiggsCandMass_boostedW',   ';boosted Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('resolvedHiggsCandPt_boostedW',   ';resolved Higgs candidate pt', 1000, 0, 1000) )
         self.addObject( ROOT.TH1F('resolvedHiggsCandMass_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('allResolvedHiggsCandPt_boostedW',   ';resolved Higgs candidate pt', 1000, 0, 1000) )
+        self.addObject( ROOT.TH1F('allResolvedHiggsCandMass_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH2F('allResolvedHiggsCandMassPt_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300, 100, 0, 1000) )
+
+        self.addObject( ROOT.TH1F('leadingBjetPt_boostedW',   ';leading Bjet p_{T} (GeV)',   500, 0, 5000) )
+        self.addObject( ROOT.TH1F('leadingBjetEta_boostedW',  ';leading Bjet #eta', 100, -4.0, 4.0 ) )
+        self.addObject( ROOT.TH1F('leadingBjetBdisc_boostedW', ';leading Bjet Discriminator', 40, -1, 1) )
+        self.addObject( ROOT.TH1F('subleadingBjetPt_boostedW',   ';subleading Bjet p_{T} (GeV)',   500, 0, 5000) )
+        self.addObject( ROOT.TH1F('subleadingBjetEta_boostedW',  ';subleading Bjet #eta', 100, -4.0, 4.0 ) )
+        self.addObject( ROOT.TH1F('subleadingBjetBdisc_boostedW', ';subleading Bjet Discriminator', 40, -1, 1) )
 
         '''
         for icut in ['presel', 'preselWeighted',  'lep', 'lepWeighted', 'met', 'metWeighted', 'jet', 'jetWeighted', 'bDeepCSV', 'bDeepCSVWeighted', 'bDeepFlav', 'bDeepFlavWeighted' ]:
@@ -125,25 +142,65 @@ class quickAnalyzer(Module):
         #print (SFTrigger * SFID * SFISO), SFTrigger , SFID , SFISO, leptonP4.pt, leptonP4.eta
         return [SFTrigger , SFID , SFISO]
 
+    def METzCalculator( self, lepton, MET ):
+        '''Based on https://github.com/VPlusJetsAnalyzers/VPlusJets/blob/master/src/METzCalculator.cc'''
+        M_W = 80.4
+        M_mu = .1056  ## lepton mass
+        emu = lepton.E()
+        pxmu = lepton.Px()
+        pymu = lepton.Py()
+        pzmu = lepton.Pz()
+        pxnu = MET.Px()
+        pynu = MET.Py()
+        pznu = 0
+
+        a = M_W*M_W - M_mu*M_mu + 2.0*pxmu*pxnu + 2.0*pymu*pynu
+        A = 4.0*(emu*emu - pzmu*pzmu)
+        B = -4.0*a*pzmu
+        C = 4.0*emu*emu*(pxnu*pxnu + pynu*pynu) - a*a
+        #print(a, A, B, C)
+        tmproot = B*B - 4.0*A*C
+
+        if tmproot<0: pznu = - B/(2*A)
+        else:
+            tmpsol1 = (-B + ROOT.TMath.Sqrt(tmproot))/(2.0*A)
+            tmpsol2 = (-B - ROOT.TMath.Sqrt(tmproot))/(2.0*A)
+            if (abs(tmpsol2-pzmu) < abs(tmpsol1-pzmu)):
+                pznu = tmpsol2
+                #otherSol_ = tmpsol1
+            else:
+                pznu = tmpsol1
+                #otherSol_ = tmpsol2
+                #### if pznu is > 300 pick the most central root
+                if ( pznu > 300. ):
+                    if (abs(tmpsol1)<abs(tmpsol2) ):
+                        pznu = tmpsol1
+                        #otherSol_ = tmpsol2
+                    else:
+                        pznu = tmpsol2
+                        #otherSol_ = tmpsol1
+
+        return pznu
+
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("totalWeight",  "F");
-        self.out.branch("LeptonSFTrigger",  "F");
-        self.out.branch("LeptonSFISO",  "F");
-        self.out.branch("LeptonSFID",  "F");
-        self.out.branch("nGoodLep",  "I");
-        self.out.branch("GoodLep_pt",  "F", lenVar="nGoodLep");
-        self.out.branch("GoodLep_eta",  "F", lenVar="nGoodLep");
-        self.out.branch("GoodLep_phi",  "F", lenVar="nGoodLep");
-        self.out.branch("GoodLep_mass",  "F", lenVar="nGoodLep");
-        self.out.branch("nGoodJet",  "I");
-        self.out.branch("GoodJet_pt",  "F", lenVar="nGoodJet");
-        self.out.branch("GoodJet_eta",  "F", lenVar="nGoodJet");
-        self.out.branch("GoodJet_phi",  "F", lenVar="nGoodJet");
-        self.out.branch("GoodJet_mass",  "F", lenVar="nGoodJet");
-        self.out.branch("GoodJet_btagDeepCSV",  "F", lenVar="nGoodJet");
-        self.out.branch("GoodJet_btagDeepFlav",  "F", lenVar="nGoodJet");
+#        self.out.branch("LeptonSFTrigger",  "F");
+#        self.out.branch("LeptonSFISO",  "F");
+#        self.out.branch("LeptonSFID",  "F");
+#        self.out.branch("nGoodLep",  "I");
+#        self.out.branch("GoodLep_pt",  "F", lenVar="nGoodLep");
+#        self.out.branch("GoodLep_eta",  "F", lenVar="nGoodLep");
+#        self.out.branch("GoodLep_phi",  "F", lenVar="nGoodLep");
+#        self.out.branch("GoodLep_mass",  "F", lenVar="nGoodLep");
+#        self.out.branch("nGoodJet",  "I");
+#        self.out.branch("GoodJet_pt",  "F", lenVar="nGoodJet");
+#        self.out.branch("GoodJet_eta",  "F", lenVar="nGoodJet");
+#        self.out.branch("GoodJet_phi",  "F", lenVar="nGoodJet");
+#        self.out.branch("GoodJet_mass",  "F", lenVar="nGoodJet");
+#        self.out.branch("GoodJet_btagDeepCSV",  "F", lenVar="nGoodJet");
+#        self.out.branch("GoodJet_btagDeepFlav",  "F", lenVar="nGoodJet");
 
     def analyze(self, event):
 
@@ -171,7 +228,7 @@ class quickAnalyzer(Module):
         vetoElectrons = [ e for e in electrons if (abs(e.eta)<2.4) and (e.pt>15) and not ( abs(e.deltaEtaSC+e.eta)>=1.4442 and abs(e.deltaEtaSC+e.eta)<=1.5660) and (e.cutBased>=4) ]
         goodElectrons = [ e for e in vetoElectrons if e.pt>30 ]
 
-        goodLeptons = goodMuons #+ goodElectrons
+        goodLeptons = goodMuons + goodElectrons
         goodLeptons.sort(key=lambda x:x.pt, reverse=True)
 
         if isMC:
@@ -205,14 +262,25 @@ class quickAnalyzer(Module):
 
 
         #################################### Boosted
-        orthogonalcut = metcut and nlepcut and not (njetscut and nbjetscut)
+        orthogonalcut = metcut and nlepcut #and not (njetscut and nbjetscut)
         if orthogonalcut:
 
             ### General
-            getattr( self, 'nlooseFatJets' ).Fill( len(looseFatJets) )
-            neutrino = ROOT.TLorentzVector()
-            neutrino.SetPtEtaPhiM( MET.pt, 0, MET.phi, 0 )
-            lepW = goodLeptons[0].p4() + neutrino
+            getattr( self, 'nlooseFatJets' ).Fill( len(looseFatJets), weight )
+            getattr( self, 'nleps' ).Fill( len(goodLeptons) )
+            getattr( self, 'nCHSjets' ).Fill( len(goodJetsNoLep) )
+            getattr( self, 'nCHSBjets' ).Fill( len(goodBjetsDeepFlav) )
+            getattr( self, 'lepPt' ).Fill( goodLeptons[0].pt )
+            getattr( self, 'lepEta' ).Fill( goodLeptons[0].eta )
+            getattr( self, 'METPt' ).Fill( MET.pt )
+
+            ### Leptonic W
+            METp4 = ROOT.TLorentzVector()
+            METp4.SetPtEtaPhiM( MET.pt, 0, MET.phi, 0 )#MET.pt )
+            neuPz = self.METzCalculator( goodLeptons[0].p4(), METp4 )
+            neutrinoP4 = ROOT.TLorentzVector()
+            neutrinoP4.SetPxPyPzE( METp4.Px(), METp4.Py(), neuPz, ROOT.TMath.Sqrt( METp4.Px()*METp4.Px() + METp4.Py()*METp4.Py() + neuPz*neuPz )  )
+            lepW = goodLeptons[0].p4() + neutrinoP4
             getattr( self, 'lepWMass' ).Fill( lepW.M() )
 
             ### Puppi Jets
@@ -231,20 +299,24 @@ class quickAnalyzer(Module):
                     looseFatJets.remove(goodHiggsCandidate)
                     #print 'Higgs', goodHiggsCandidate.pt, goodHiggsCandidate.btagHbb, goodHiggsCandidate.mass
 
-                ### Top candidate
-                topCandidates = [ j for j in looseFatJets if (j.tau3/j.tau2 < 0.4) ]
-                goodTopCandidate = min(topCandidates, key=lambda j: j.tau3/j.tau2 ) if len(topCandidates)>0 else None     ## in case there are more than one top Candidate, choose the one with minimum tau32
-                if goodTopCandidate:
-                    looseFatJets.remove(goodTopCandidate)
-                    #print 'Top', goodTopCandidate.pt, goodTopCandidate.tau3/goodTopCandidate.tau2, goodTopCandidate.mass
-
                 ### W candidate
                 wCandidates = [ j for j in looseFatJets if (j.tau2/j.tau1 < 0.4) ]
                 goodWCandidate = min(wCandidates, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates)>0 else None
 
                 if goodWCandidate:
-                    looseFatJets.remove(goodWCandidate)
-                    #print 'W', goodWCandidate.pt, goodWCandidate.tau2/goodWCandidate.tau1, goodWCandidate.mass
+                    if (goodWCandidate.msoftdrop > 50 ) and (goodWCandidate.msoftdrop < 120):
+                        looseFatJets.remove(goodWCandidate)
+                        #print 'W', goodWCandidate.pt, goodWCandidate.tau2/goodWCandidate.tau1, goodWCandidate.mass
+                    else: goodWCandidate = None
+
+                ### Top candidate
+                topCandidates = [ j for j in looseFatJets if (j.tau3/j.tau2 < 0.4) ]
+                goodTopCandidate = min(topCandidates, key=lambda j: j.tau3/j.tau2 ) if len(topCandidates)>0 else None     ## in case there are more than one top Candidate, choose the one with minimum tau32
+                if goodTopCandidate:
+                    if (goodTopCandidate.msoftdrop > 140 ) and (goodTopCandidate.msoftdrop < 200):
+                        looseFatJets.remove(goodTopCandidate)
+                        #print 'Top', goodTopCandidate.pt, goodTopCandidate.tau3/goodTopCandidate.tau2, goodTopCandidate.mass
+                    else: goodTopCandidate = None
 
                 badFatJets = looseFatJets
                 goodCandidates = [ goodHiggsCandidate, goodWCandidate ]
@@ -301,7 +373,9 @@ class quickAnalyzer(Module):
 
                         smallestDiffTop = 9999
                         bFromTop = []
+                        bbCandidates = []
                         for bpair in permutations(goodPuppiBjets, 2):
+                            bbCandidates.append( bpair[0].p4()+bpair[1].p4() )
                             tmplepTop = lepW + bpair[0].p4()
                             tmphadTop = goodWCandidate.p4() + bpair[1].p4()
                             tmpDiff = abs(tmplepTop.M() - tmphadTop.M())
@@ -314,6 +388,7 @@ class quickAnalyzer(Module):
                         getattr( self, 'lepTopCandMass_boostedW' ).Fill( lepTop.M() )
                         getattr( self, 'hadTopCandMass_boostedW' ).Fill( hadTop.M() )
                         getattr( self, 'boostedHiggsCandMass_boostedW' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+                        getattr( self, 'boostedHiggsCandPt_boostedW' ).Fill( goodHiggsCandidate.pt if goodHiggsCandidate else -999 )
 
                         if (lepTop.M() < 200) and (lepTop.M() > 140):
                             goodPuppiBjets.remove(bFromTop[0])
@@ -322,32 +397,36 @@ class quickAnalyzer(Module):
                         if len(goodPuppiBjets)>1:
                             getattr( self, 'leadingBjetPt_boostedW' ).Fill( goodPuppiBjets[0].pt )
                             getattr( self, 'leadingBjetEta_boostedW' ).Fill( goodPuppiBjets[0].eta )
-                            getattr( self, 'leadingBjetBdisc_boostedW' ).Fill( goodPuppiBjets[0].btagDeepB )
+                            getattr( self, 'leadingBjetBdisc_boostedW' ).Fill( (goodPuppiBjets[0].pfDeepCSVJetTags_probb+goodPuppiBjets[0].pfDeepCSVJetTags_probbb) )
                             getattr( self, 'subleadingBjetPt_boostedW' ).Fill( goodPuppiBjets[1].pt )
                             getattr( self, 'subleadingBjetEta_boostedW' ).Fill( goodPuppiBjets[1].eta )
-                            getattr( self, 'subleadingBjetBdisc_boostedW' ).Fill( goodPuppiBjets[1].btagDeepB )
+                            getattr( self, 'subleadingBjetBdisc_boostedW' ).Fill( (goodPuppiBjets[1].pfDeepCSVJetTags_probb+goodPuppiBjets[1].pfDeepCSVJetTags_probbb) )
                             resHiggs = goodPuppiBjets[0].p4() + goodPuppiBjets[1].p4()
                             getattr( self, 'resolvedHiggsCandPt_boostedW' ).Fill( resHiggs.Pt() )
                             getattr( self, 'resolvedHiggsCandMass_boostedW' ).Fill( resHiggs.M() )
+                            for bb in bbCandidates:
+                                getattr( self, 'allResolvedHiggsCandPt_boostedW' ).Fill( bb.Pt() )
+                                getattr( self, 'allResolvedHiggsCandMass_boostedW' ).Fill( bb.M() )
+                                getattr( self, 'allResolvedHiggsCandMassPt_boostedW' ).Fill( bb.M(), bb.Pt() )
 
 
 
         #### FIlling trees
-        self.out.fillBranch('LeptonSFTrigger', leptonWeights[0])
-        self.out.fillBranch('LeptonSFID', leptonWeights[1])
-        self.out.fillBranch('LeptonSFISO', leptonWeights[2])
-        self.out.fillBranch('nGoodLep', len(goodLeptons))
-        self.out.fillBranch('GoodLep_pt', [l.pt for l in goodLeptons] )
-        self.out.fillBranch('GoodLep_eta', [l.eta for l in goodLeptons] )
-        self.out.fillBranch('GoodLep_phi', [l.phi for l in goodLeptons] )
-        self.out.fillBranch('GoodLep_mass', [l.mass for l in goodLeptons] )
-        self.out.fillBranch('nGoodLep', len(goodLeptons))
-        self.out.fillBranch('GoodJet_pt', [j.pt for j in goodJetsNoLep] )
-        self.out.fillBranch('GoodJet_eta', [j.eta for j in goodJetsNoLep] )
-        self.out.fillBranch('GoodJet_phi', [j.phi for j in goodJetsNoLep] )
-        self.out.fillBranch('GoodJet_mass', [j.mass for j in goodJetsNoLep] )
-        self.out.fillBranch('GoodJet_btagDeepCSV', [j.btagDeepB for j in goodJetsNoLep] )
-        self.out.fillBranch('GoodJet_btagDeepFlav', [j.btagDeepFlavB for j in goodJetsNoLep] )
+#        self.out.fillBranch('LeptonSFTrigger', leptonWeights[0])
+#        self.out.fillBranch('LeptonSFID', leptonWeights[1])
+#        self.out.fillBranch('LeptonSFISO', leptonWeights[2])
+#        self.out.fillBranch('nGoodLep', len(goodLeptons))
+#        self.out.fillBranch('GoodLep_pt', [l.pt for l in goodLeptons] )
+#        self.out.fillBranch('GoodLep_eta', [l.eta for l in goodLeptons] )
+#        self.out.fillBranch('GoodLep_phi', [l.phi for l in goodLeptons] )
+#        self.out.fillBranch('GoodLep_mass', [l.mass for l in goodLeptons] )
+#        self.out.fillBranch('nGoodLep', len(goodLeptons))
+#        self.out.fillBranch('GoodJet_pt', [j.pt for j in goodJetsNoLep] )
+#        self.out.fillBranch('GoodJet_eta', [j.eta for j in goodJetsNoLep] )
+#        self.out.fillBranch('GoodJet_phi', [j.phi for j in goodJetsNoLep] )
+#        self.out.fillBranch('GoodJet_mass', [j.mass for j in goodJetsNoLep] )
+#        self.out.fillBranch('GoodJet_btagDeepCSV', [j.btagDeepB for j in goodJetsNoLep] )
+#        self.out.fillBranch('GoodJet_btagDeepFlav', [j.btagDeepFlavB for j in goodJetsNoLep] )
 
 
         '''

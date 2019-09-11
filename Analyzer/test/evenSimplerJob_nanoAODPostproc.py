@@ -85,12 +85,14 @@ p = PostProcessor(
     #branchsel="keep_and_drop.txt",
     modules=listOfModules,
     provenance=True, ### copy MetaData and ParametersSets
-    haddFileName = "nano_postprocessed"+args.oFile+".root",
+    ####haddFileName = "nano_postprocessed"+args.oFile+".root",
     histFileName = "histograms"+args.oFile+".root",
     histDirName = 'tthbb13',
     jsonInput=runsAndLumis(),
-    fwkJobReport=True,
+    #fwkJobReport=True,
     maxEntries=args.numEvents,
+    prefetch=True,
+    longTermCache=True,
     ##noOut=False, justcount=False,
 )
 p.run()
