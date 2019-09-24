@@ -17,8 +17,10 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputF
 ### central nanoAOD modules
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsModule
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight_2018
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017, jetmetUncertainties2017All
 ### other modules
-from TTH.Analyzer.quickAnalyzer import quickAnalyzer
+from TTH.Analyzer.boostedAnalyzer import boostedAnalyzer
+from TTH.Analyzer.resolvedAnalyzer import resolvedAnalyzer
 #from selection import parameters
 import argparse
 
@@ -51,6 +53,12 @@ parser.add_argument(
     default=""
 )
 parser.add_argument(
+    '--process',
+    action="store",
+    help="Run boosted, resolved, or both",
+    default="boosted"
+)
+parser.add_argument(
     '--loglevel',
     action="store",
     help="log level",
@@ -75,9 +83,17 @@ precuts = PV + " && " + METFilters + " && " + Triggers
 cuts= precuts + " && ( ( nJet>1 ) && ( Jet_pt>15 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 ) )"
 
 listOfModules = []
-listOfModules.append( countHistogramsModule() )
-if isMC: listOfModules.append( puAutoWeight_2018() )
-listOfModules.append( quickAnalyzer( args.sample ) )
+#listOfModules.append( countHistogramsModule() )
+if isMC:
+    listOfModules.append( puAutoWeight_2018() )
+if args.process.startswith( ('both', 'resolved') ):
+    print "|----------> RUNNING RESOLVED"
+    listOfModules.append( jetmetUncertainties2017All() )
+    listOfModules.append( resolvedAnalyzer( args.sample ) )
+if args.process.startswith( ('both', 'boosted') ):
+    print "|----------> RUNNING BOOSTED"
+    listOfModules.append( jetmetUncertainties2017() )
+    listOfModules.append( boostedAnalyzer( args.sample ) )
 
 p = PostProcessor(
     '.', (inputFiles() if not args.iFile else [args.iFile]),

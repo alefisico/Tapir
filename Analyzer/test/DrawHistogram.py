@@ -338,13 +338,16 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
 	can.SaveAs( 'Plots/'+ outputFileName.replace('Plots', ( 'Fit' if fitRatio else '') ) )
 	del can
 
-def plotSimple( inFile, sample, name, version, xmin='', xmax='', labX=0.92, labY=0.50, axisX='', axisY='', log=False, ext='png', Norm=False ):
-    """"Take root file, make simple plot"""
+def plotSimpleComparison( inFile1, sample, inFile2, sample2, name, rebinX=1, xmin='', xmax='', labX=0.92, labY=0.50, axisX='', axisY='', log=False, ext='png', Norm=False ):
+    """"Take two root files, make simple comparison plot"""
 
-    outputFileName = name+'_'+sample+'_simplePlot'+version+'.'+ext
+    outputFileName = name+'_'+sample+sample2+'_simpleComparisonPlot'+args.version+'.'+ext
     print('Processing.......', outputFileName)
 
-    histo = inFile.Get( 'tthbb13/'+name )
+    histo = inFile1.Get( 'tthbb13/'+name )
+    if rebinX!=1: histo.Rebin( rebinX )
+    histo2 = inFile2.Get( 'tthbb13/'+name )
+    if rebinX!=1: histo2.Rebin( rebinX )
 
     binWidth = histo.GetBinWidth(1)
 
@@ -357,22 +360,24 @@ def plotSimple( inFile, sample, name, version, xmin='', xmax='', labX=0.92, labY
 
     tdrStyle.SetPadRightMargin(0.05)
     canvas[name] = TCanvas('c1', 'c1',  10, 10, 750, 500 )
-    canvas[name].Draw()
     if log:
         canvas[name].SetLogy()
         outName = outputFileName.replace('_simplePlot','_Log_simplePlot')
     else: outName = outputFileName
 
     legend.AddEntry( histo, sample, 'f' )
+    legend.AddEntry( histo2, sample2, 'f' )
     if xmax and xmin: histo.GetXaxis().SetRangeUser( xmin, xmax )
     histo.GetYaxis().SetTitleOffset(0.90)
-    histo.Draw('hist')
+    histo.SetLineColor(kRed)
+    histo2.SetLineColor(kBlue)
+    histo.DrawNormalized('hist')
+    histo2.DrawNormalized('hist same')
     if not axisY: histo.GetYaxis().SetTitle( 'Events / '+str(binWidth) )
     if axisX: histo.GetXaxis().SetTitle( axisX )
 
     #labelAxis( name, histo, '' )
     legend.Draw()
-    addingText( sample, labX, labY, 'right')
 
     canvas[name].SaveAs( 'Plots/'+outName )
     #del can
@@ -383,6 +388,7 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
 
     outputFileName = name+'_PlusBkg_AnalysisPlots_'+args.version+'.'+ext
     if log: outputFileName = outputFileName.replace('Plots','Plots_Log')
+    if Norm: outputFileName = outputFileName.replace('Plots','Plots_Normalized')
     print('Processing.......', outputFileName)
 
     legend=TLegend(0.60,0.65,0.90,0.90)
@@ -416,7 +422,8 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
             if Norm:
                 bkgHistos[ bkgSamples ].SetLineColor( bkgFiles[ bkgSamples ][2] )
                 bkgHistos[ bkgSamples ].SetLineWidth( 2 )
-                bkgHistos[ bkgSamples ].Scale( 1 / bkgHistos[ bkgSamples ].Integral() )
+                try: bkgHistos[ bkgSamples ].Scale( 1 / bkgHistos[ bkgSamples ].Integral() )
+                except ZeroDivisionError: pass
                 maxList.append( bkgHistos[ bkgSamples ].GetMaximum() )
             else:
                 bkgHistos[ bkgSamples ].SetFillStyle( 1001 )
@@ -659,18 +666,24 @@ if __name__ == '__main__':
 	CMS_lumi.lumi_13TeV = str( round( (args.lumi/1000.), 2 ) )+" fb^{-1}, 13 TeV, 2017"
 
 
-        #bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+args.version+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8.root'), 1 ]
-        #bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+args.version+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8.root'), 1 ]
-        bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root'), args.lumi*88.342/283000430.596, 28 ]
-        #bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8.root'), args.lumi*377.96/1647945788.34, 29 ]
-        bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.root'), args.lumi*365.46/720253370.04, 27 ]
-        #bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8.root'), args.lumi*0.3708/811306, 37  ]
-        #bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8.root'),  args.lumi*0.6012/750000, 35 ]
-        #bkgFiles["WW"] = [ TFile('Rootfiles/'+args.version+'/histograms_WW_TuneCP5_13TeV-pythia8.root'), args.lumi*118.7/7791498, 36 ]
+        bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+args.version+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_boosted.root'), args.lumi*10.3*(1-0.6741)/9883805.,  40 ]
+        bkgFiles["ST_t-channel"] = [ TFile('Rootfiles/'+args.version+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_boosted.root'), args.lumi*136.02/5982064.,  40 ]
+        bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+args.version+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_boosted.root'), args.lumi*35.85/7977430., 40 ]
+        bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+args.version+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_boosted.root'), args.lumi*35.85/7794186., 40 ]
+        bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_boosted.root'), args.lumi*88.342/283000430.596, 28 ]
+        bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8_boosted.root'), args.lumi*377.96/1647945788.34, 29 ]
+        bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_boosted.root'), args.lumi*365.46/720253370.04, 27 ]
+        bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_boosted.root'), args.lumi*0.3708/811306, 37  ]
+        bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8_boosted.root'),  args.lumi*0.6012/750000, 35 ]
+        bkgFiles["WW"] = [ TFile('Rootfiles/'+args.version+'/histograms_WW_TuneCP5_13TeV-pythia8_boosted.root'), args.lumi*118.7/7791498, 36 ]
+        bkgFiles["THW"] = [ TFile('Rootfiles/'+args.version+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8_boosted.root'), args.lumi*0.1475/4719999., 41 ]
+        bkgFiles["TTGJets"] = [ TFile('Rootfiles/'+args.version+'/histograms_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_boosted.root'), args.lumi*3.697/7349100., 42 ]
+        bkgFiles["WJets"] = [ TFile('Rootfiles/'+args.version+'/histograms_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_boosted.root'), args.lumi*61526.7/33073306., 43 ]
+        #bkgFiles[""] = [ TFile('Rootfiles/'+args.version+'/'), 1 ]
         #bkgFiles[""] = [ TFile('Rootfiles/'+args.version+'/'), 1 ]
 
-        #signalFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+args.version+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8.root'), 1 ]
-        signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+args.version+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8.root'), 10*args.lumi*0.2934045/4216319.32, kRed ]
+        #signalFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+args.version+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8_boosted.root'), 1 ]
+        signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+args.version+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8_boosted.root'), 10*args.lumi*0.2934045/4216319.32, kRed ]
         #signalFiles["ttHTobb_ttToSemiLep"] = [ TFile('Rootfiles/'+args.version+'/histograms_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8.root'), args.lumi*0.093/9332943,1 ]
         #signalFiles[""] = [ TFile('Rootfiles/'+args.version+'/'), 1 ]
 
@@ -739,20 +752,62 @@ if __name__ == '__main__':
 		[ 'qual', 'nPVs', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
 		#[ 'qual', 'numJets', 'Number of jets', 2, 14, 1,  0.85, 0.70, True, False],
 		#[ 'qual', 'FatJet_pt_all', 'jet pT [GeV]', 200, 1500, 5,  0.85, 0.70, True, False],
-                [ 'signalBkg', 'HiggsCandMass_WTop', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-                [ 'signalBkg', 'TopCandMass_WTop', 'W candidate mass [GeV]', 30, 200, 1, False ],
-                [ 'signalBkg', 'HiggsCandMass_TopHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-                [ 'signalBkg', 'TopCandMass_TopHiggs', 'W candidate mass [GeV]', 30, 200, 1, False ],
-                [ 'signalBkg', 'HiggsCandMass_WHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-                [ 'signalBkg', 'WCandMass_WHiggs', 'W candidate mass [GeV]', 30, 200, 1, False ],
-                [ 'signalBkg', 'TopCandMass_W', 'W candidate mass [GeV]', 30, 200, 1, False ],
-                [ 'signalBkg', 'HiggsCandMass_W', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-                [ 'signalBkg', 'WCandMass_W', 'W candidate mass [GeV]', 30, 200, 1, False ],
-                [ 'signalBkg', 'HiggsCandMass_PuppiJets', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-                [ 'signalBkg', 'WCandMass_PuppiJets', 'W candidate mass [GeV]', 30, 200, 1, False ],
-                [ 'signalBkg', 'WCandMass', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                #[ 'signalBkg', 'HiggsCandMass_WTop', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                ###[ 'signalBkg', 'TopCandMass_WTop', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                #[ 'signalBkg', 'HiggsCandMass_TopHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                ###[ 'signalBkg', 'TopCandMass_TopHiggs', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                #[ 'signalBkg', 'HiggsCandMass_WHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                #[ 'signalBkg', 'WCandMass_WHiggs', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                ###[ 'signalBkg', 'TopCandMass_W', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                #[ 'signalBkg', 'WCandMass_W', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                #[ 'signalBkg', 'HiggsCandMass_PuppiJets', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                #[ 'signalBkg', 'WCandMass_PuppiJets', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                #[ 'signalBkg', 'WCandMass', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                #[ 'signalBkg', 'boostedHiggsCandMass_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                ###[ 'signalBkg', 'resolvedHiggsCandMass_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'HiggsCandMass_2J_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'HiggsCandMass_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'HiggsCandMass_2J_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'HiggsCandMass_2J2W_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'HiggsCandMass_2JdeltaRlepW_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'HiggsCandMass_A_2J_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+
                 [ 'signalBkg', 'boostedHiggsCandMass_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-                [ 'signalBkg', 'resolvedHiggsCandMass_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'boostedHiggsCandMass_2J_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'signalBkg', 'boostedHiggsCandMass_1B_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+
+                [ 'simple', 'nCleanPuppiJets_boostedHiggs', 'Number of PUPPI jets', 0, 15, 1, False ],
+                [ 'simple', 'nGoodPuppiJets_boostedHiggs', 'Number of PUPPI jets', 0, 15, 1, False ],
+                [ 'simple', 'nGoodPuppiBjets_boostedHiggs', 'Number of PUPPI bjets', 0, 15, 1, False ],
+                [ 'simple', 'HiggsCandMass_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'HiggsCandMass_2J_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'HiggsCandMass_2JdeltaRlepW_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'resolvedRecWCandMass_2J_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'resolvedWCandMass_2J_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'HiggsCandMass_2J1B_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'HiggsCandMass_2J2B_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'HiggsCandMass_1B_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'HiggsCandMass_2B_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'HiggsCandMass_2J2W_boostedHiggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'deltaRhadWHiggs_2J_boostedHiggs', 'DeltaR', 0, 5, 5, False ],
+                [ 'simple', 'deltaRJJ_2J_boostedHiggs', 'DeltaR', 0, 5, 5, False ],
+                [ 'simple', 'deltaRlepWHiggs_2J_boostedHiggs', 'DeltaR', 0, 5, 5, False ],
+                [ 'simple', 'deltaRlepWhadW_2J_boostedHiggs', 'DeltaR', 0, 5, 5, False ],
+                [ 'simple', 'deltaR1BHiggs_2J1B_boostedHiggs', 'DeltaR', 0, 5, 5, False ],
+                [ 'simple', 'deltaR1BHiggs_1B_boostedHiggs', 'DeltaR', 0, 5, 5, False ],
+
+                [ 'simple', 'nGoodPuppiJets_boostedW', 'Number of PUPPI jets', 0, 15, 1, False ],
+                [ 'simple', 'nGoodPuppiBjets_boostedW', 'Number of PUPPI bjets', 0, 15, 1, False ],
+                [ 'simple', 'WCandMass_boostedW', 'W candidate mass [GeV]', 30, 200, 1, False ],
+                [ 'simple', 'lepTopCandMass_2B_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'hadTopCandMass_2B_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'boostedHiggsCandMass_1B_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'boostedHiggsCandMass_2B_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'boostedHiggsCandMass_2J_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'resolvedHiggsCandMass_2B_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'resolvedHiggsCandMass_2BdeltaR_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'allResolvedHiggsCandMass_2B_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
+                [ 'simple', 'deltaR2B_2B_boostedW', 'DeltaR', 0, 5, 5, False ],
 		]
 
 	if 'all' in args.single: Plots = [ x[1:] for x in plotList if ( ( args.process in x[0] ) )  ]
@@ -767,5 +822,7 @@ if __name__ == '__main__':
                 stackPlots(
                     i[0]+"_"+args.cut, i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10],
                     fitRatio=args.addFit )
+            elif ( 'simple' in args.process ):
+                plotSimpleComparison( bkgFiles["TTToSemiLeptonic"][0], "TTToSemiLeptonic", signalFiles["ttHTobb"][0], "ttHTobb", i[0], xmin=i[2], xmax=i[3], rebinX=i[4], log=i[5], axisX=i[1] )
             elif ( 'signalBkg' in args.process ):
-                plotSignalBkg( i[0], i[2], i[3], i[4], log=i[5], axisX=i[1] )
+                plotSignalBkg( i[0], i[2], i[3], i[4], log=True, axisX=i[1], Norm=True)

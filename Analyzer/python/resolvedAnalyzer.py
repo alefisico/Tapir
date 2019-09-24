@@ -5,13 +5,70 @@ from itertools import permutations
 import numpy as np
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-from importlib import import_module
+ROOT.gSystem.Load("libTTHCommonClassifier")
+#ROOT.gSystem.Load("libTTHMEIntegratorStandalone")
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
+
+### Vector definitions for MEM
+CvectorvectorLorentz = getattr(ROOT, "std::vector<vector<TLorentzVector>>")
+CvectorLorentz = getattr(ROOT, "std::vector<TLorentzVector>")
+Cvectordouble = getattr(ROOT, "std::vector<double>")
+Cvectorvectordouble = getattr(ROOT, "std::vector<vector<double>>")
+Cvectorvectorvectordouble = getattr(ROOT, "std::vector<vector<vector<double>>>")
+CvectorJetType = getattr(ROOT, "std::vector<MEMClassifier::JetType>")
+CvectorvectorJetType = getattr(ROOT, "std::vector<vector<MEMClassifier::JetType>>")
+Cvectorbool = getattr(ROOT, "std::vector<bool>")
+CvectorMEMResult = getattr(ROOT, "std::vector<MEMResult>")
+
+##### Vector from list for MEM
+def vec_from_list(vec_type, src):
+    """
+    Creates a std::vector<T> from a python list.
+    vec_type (ROOT type): vector datatype, ex: std::vector<double>
+    src (iterable): python list
+    """
+    v = vec_type()
+    if vec_type == Cvectorvectordouble:
+        for item in src:
+            v2 = Cvectordouble()
+            for item2 in item:
+                v2.push_back(item2)
+            v.push_back(v2)
+    elif vec_type == Cvectorvectorvectordouble:
+        for item in src:
+            v2 = Cvectorvectordouble()
+            for item2 in item:
+                v3 = Cvectordouble()
+                for item3 in item2:
+                    v3.push_back(item3)
+                v2.push_back(v3)
+            v.push_back(v2)
+    elif vec_type == CvectorvectorJetType:
+        for item in src:
+            v2 = CvectorJetType()
+            for item2 in item:
+                v2.push_back(item2)
+            v.push_back(v2)
+    else:
+        for item in src:
+            v.push_back(item)
+
+    return v
+
+#### List of jet corrections for MEM
+jet_corrections = [
+        "jesAbsoluteStat",
+        "jesAbsoluteScale",
+        "jesAbsoluteFlavMap",
+        "jesAbsoluteMPFBias",
+        "jer"
+]
+
 
 ### ttbar classification
 ttCls = OrderedDict()
@@ -22,7 +79,7 @@ ttCls['tt2b'] = '(event.genTtbarId==52)'
 ttCls['ttbb'] = '(event.genTtbarId>52) && (event.genTtbarId<57)'
 
 
-class quickAnalyzer(Module):
+class resolvedAnalyzer(Module):
     def __init__(self, sample="None"):
     #def __init__(self, sample="None", parameters={}):
 	self.writeHistFile=True
@@ -32,68 +89,24 @@ class quickAnalyzer(Module):
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
 
-        self.addObject( ROOT.TH1F('nlooseFatJets',   ';number of loose fatjets',   10, 0, 10) )
-        self.addObject( ROOT.TH1F('nleps',   ';number of leptons',   20, 0, 20) )
-        self.addObject( ROOT.TH1F('nCHSjets',   ';number of CHS jets',   20, 0, 20) )
-        self.addObject( ROOT.TH1F('nCHSBjets',   ';number of CHS b jets',   20, 0, 20) )
-        self.addObject( ROOT.TH1F('lepPt',   ';Lepton p_{T} (GeV)',   500, 0, 5000) )
-        self.addObject( ROOT.TH1F('lepEta',  ';Lepton #eta', 100, -4.0, 4.0 ) )
-        self.addObject( ROOT.TH1F('METPt',   ';MET (GeV)',   500, 0, 5000) )
-        self.addObject( ROOT.TH1F('lepWMass',   ';Leptonic W candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('nbadFatJets',   ';number of bad fatjets',   10, 0, 10) )
-        self.addObject( ROOT.TH1F('ngoodEvents',   ';Good Events',   10, 0, 10) )
-        self.addObject( ROOT.TH1F('TopCandMass',   ';Top candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('WCandMass',   ';W candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('HiggsCandMass',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('TopCandMass_TopHiggs',   ';Top candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('WCandMass_TopHiggs',   ';W candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('HiggsCandMass_TopHiggs',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('TopCandMass_WHiggs',   ';Top candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('WCandMass_WHiggs',   ';W candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('HiggsCandMass_WHiggs',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('TopCandMass_WTop',   ';Top candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('WCandMass_WTop',   ';W candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('HiggsCandMass_WTop',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('TopCandMass_Top',   ';Top candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('WCandMass_W',   ';W candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('HiggsCandMass_Higgs',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('TopCandMass_PuppiJets',   ';Top candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('WCandMass_PuppiJets',   ';W candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('HiggsCandMass_PuppiJets',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('nGoodPuppiBJets',   ';number of good puppi bjets',   10, 0, 10) )
-
-        self.addObject( ROOT.TH1F('minDiffLepHadTop',   ';min difference between lep and had Top',   100, 0, 100) )
-        self.addObject( ROOT.TH1F('lepTopCandMass_boostedW',   ';leptonic Top candidate masses', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('hadTopCandMass_boostedW',   ';hadronic Top candidate masses', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('boostedHiggsCandPt_boostedW',   ';boosted Higgs candidate pt', 1000, 0, 1000) )
-        self.addObject( ROOT.TH1F('boostedHiggsCandMass_boostedW',   ';boosted Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('resolvedHiggsCandPt_boostedW',   ';resolved Higgs candidate pt', 1000, 0, 1000) )
-        self.addObject( ROOT.TH1F('resolvedHiggsCandMass_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('allResolvedHiggsCandPt_boostedW',   ';resolved Higgs candidate pt', 1000, 0, 1000) )
-        self.addObject( ROOT.TH1F('allResolvedHiggsCandMass_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH2F('allResolvedHiggsCandMassPt_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300, 100, 0, 1000) )
-
-        self.addObject( ROOT.TH1F('leadingBjetPt_boostedW',   ';leading Bjet p_{T} (GeV)',   500, 0, 5000) )
-        self.addObject( ROOT.TH1F('leadingBjetEta_boostedW',  ';leading Bjet #eta', 100, -4.0, 4.0 ) )
-        self.addObject( ROOT.TH1F('leadingBjetBdisc_boostedW', ';leading Bjet Discriminator', 40, -1, 1) )
-        self.addObject( ROOT.TH1F('subleadingBjetPt_boostedW',   ';subleading Bjet p_{T} (GeV)',   500, 0, 5000) )
-        self.addObject( ROOT.TH1F('subleadingBjetEta_boostedW',  ';subleading Bjet #eta', 100, -4.0, 4.0 ) )
-        self.addObject( ROOT.TH1F('subleadingBjetBdisc_boostedW', ';subleading Bjet Discriminator', 40, -1, 1) )
-
-        '''
-        for icut in ['presel', 'preselWeighted',  'lep', 'lepWeighted', 'met', 'metWeighted', 'jet', 'jetWeighted', 'bDeepCSV', 'bDeepCSVWeighted', 'bDeepFlav', 'bDeepFlavWeighted' ]:
-            #if self.sample.startswith('TTTo'):
-            #    for ttXX, ttXXcond in ttCls.items():
-            #        self.listOfHistos( '_'+ttXX+'_'+icut )
-            #else:
+        #for icut in ['presel', 'preselWeighted',  'lep', 'lepWeighted', 'met', 'metWeighted', 'jet', 'jetWeighted', 'bDeepCSV', 'bDeepCSVWeighted', 'bDeepFlav', 'bDeepFlavWeighted' ]:
+        for icut in [ 'bDeepFlav', 'bDeepFlavWeighted' ]:
+            if self.sample.startswith('TTTo'):
+                for ttXX, ttXXcond in ttCls.items():
+                    self.listOfHistos( '_'+ttXX+'_'+icut )
+            else:
                 self.listOfHistos( '_'+icut )
-        '''
 
     def listOfHistos(self, t ):
         self.addObject( ROOT.TH1F('nPVs'+t,   ';number of PVs',   100, 0, 100) )
         self.addObject( ROOT.TH1F('njets'+t,   ';number of jets',   20, 0, 20) )
         self.addObject( ROOT.TH1F('nbjetsCSV'+t,   ';number of bjets deepCSV',   20, 0, 20) )
         self.addObject( ROOT.TH1F('nbjetsFlav'+t,   ';number of bjets deepFlav',   20, 0, 20) )
+        self.addObject( ROOT.TH1F('MEM'+t,   ';MEM',   100, 0, 1) )
+        for unc in jet_corrections:
+            for ud in ["Up","Down"]:
+                self.addObject( ROOT.TH1F('MEM'+t+'_'+unc+ud,   ';MEM',   100, 0, 1) )
+        self.addObject( ROOT.TH1F('BLR'+t,   ';BLR',   100, 0, 1) )
         self.addObject( ROOT.TH1F('nleps'+t,   ';number of leptons',   20, 0, 20) )
         self.histnames = ['jet0', 'jet3', 'lep0', 'lep1', 'met']
         for val in self.histnames: self.addP4Hists( val, t )
@@ -142,50 +155,15 @@ class quickAnalyzer(Module):
         #print (SFTrigger * SFID * SFISO), SFTrigger , SFID , SFISO, leptonP4.pt, leptonP4.eta
         return [SFTrigger , SFID , SFISO]
 
-    def METzCalculator( self, lepton, MET ):
-        '''Based on https://github.com/VPlusJetsAnalyzers/VPlusJets/blob/master/src/METzCalculator.cc'''
-        M_W = 80.4
-        M_mu = .1056  ## lepton mass
-        emu = lepton.E()
-        pxmu = lepton.Px()
-        pymu = lepton.Py()
-        pzmu = lepton.Pz()
-        pxnu = MET.Px()
-        pynu = MET.Py()
-        pznu = 0
-
-        a = M_W*M_W - M_mu*M_mu + 2.0*pxmu*pxnu + 2.0*pymu*pynu
-        A = 4.0*(emu*emu - pzmu*pzmu)
-        B = -4.0*a*pzmu
-        C = 4.0*emu*emu*(pxnu*pxnu + pynu*pynu) - a*a
-        #print(a, A, B, C)
-        tmproot = B*B - 4.0*A*C
-
-        if tmproot<0: pznu = - B/(2*A)
-        else:
-            tmpsol1 = (-B + ROOT.TMath.Sqrt(tmproot))/(2.0*A)
-            tmpsol2 = (-B - ROOT.TMath.Sqrt(tmproot))/(2.0*A)
-            if (abs(tmpsol2-pzmu) < abs(tmpsol1-pzmu)):
-                pznu = tmpsol2
-                #otherSol_ = tmpsol1
-            else:
-                pznu = tmpsol1
-                #otherSol_ = tmpsol2
-                #### if pznu is > 300 pick the most central root
-                if ( pznu > 300. ):
-                    if (abs(tmpsol1)<abs(tmpsol2) ):
-                        pznu = tmpsol1
-                        #otherSol_ = tmpsol2
-                    else:
-                        pznu = tmpsol2
-                        #otherSol_ = tmpsol1
-
-        return pznu
 
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("totalWeight",  "F");
+        self.out.branch('MEM', 'F' )
+        for unc in jet_corrections:
+            for ud in ["Up","Down"]:
+                self.out.branch('MEM'+'_'+unc+ud, 'F' )
 #        self.out.branch("LeptonSFTrigger",  "F");
 #        self.out.branch("LeptonSFISO",  "F");
 #        self.out.branch("LeptonSFID",  "F");
@@ -215,8 +193,6 @@ class quickAnalyzer(Module):
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
         jets = Collection(event, "Jet")
-        puppijets = Collection(event, "selectedPatJetsAK4PFPuppi")
-        fatjets = Collection(event, "FatJet")
         PV = Object(event, 'PV')
         MET = Object(event, 'MET')
 
@@ -246,9 +222,6 @@ class quickAnalyzer(Module):
         goodBjetsDeepCSV = [ b for b in goodJetsNoLep if b.btagDeepB>0.4941 ]
         goodBjetsDeepFlav = [ b for b in goodJetsNoLep if b.btagDeepFlavB>0.3033 ]
 
-        ### Fatjets
-        looseFatJets = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
-
         ### Selection
         metcut = (MET.pt>20)
         nlepcut = (len(goodLeptons)>0)
@@ -262,154 +235,149 @@ class quickAnalyzer(Module):
 
 
         #################################### Boosted
-        orthogonalcut = metcut and nlepcut #and not (njetscut and nbjetscut)
-        if orthogonalcut:
+        totalSelection = metcut and nlepcut and njetscut and nbjetscut
 
-            ### General
-            getattr( self, 'nlooseFatJets' ).Fill( len(looseFatJets), weight )
-            getattr( self, 'nleps' ).Fill( len(goodLeptons) )
-            getattr( self, 'nCHSjets' ).Fill( len(goodJetsNoLep) )
-            getattr( self, 'nCHSBjets' ).Fill( len(goodBjetsDeepFlav) )
-            getattr( self, 'lepPt' ).Fill( goodLeptons[0].pt )
-            getattr( self, 'lepEta' ).Fill( goodLeptons[0].eta )
-            getattr( self, 'METPt' ).Fill( MET.pt )
+	if totalSelection:
 
-            ### Leptonic W
-            METp4 = ROOT.TLorentzVector()
-            METp4.SetPtEtaPhiM( MET.pt, 0, MET.phi, 0 )#MET.pt )
-            neuPz = self.METzCalculator( goodLeptons[0].p4(), METp4 )
-            neutrinoP4 = ROOT.TLorentzVector()
-            neutrinoP4.SetPxPyPzE( METp4.Px(), METp4.Py(), neuPz, ROOT.TMath.Sqrt( METp4.Px()*METp4.Px() + METp4.Py()*METp4.Py() + neuPz*neuPz )  )
-            lepW = goodLeptons[0].p4() + neutrinoP4
-            getattr( self, 'lepWMass' ).Fill( lepW.M() )
+	    ##### Calculate the MEM
 
-            ### Puppi Jets
-            loosePuppiJets = [ j for j in puppijets if (abs(j.eta<2.4)) and (j.pt>30) and (j.jetId>=2) ]
-            goodPuppiBjetsNoLep = [ j for j in loosePuppiJets for l in goodLeptons if j.p4().DeltaR(l.p4())>=0.4  ]
+	    ## Put leptons in format for MEM
+	    leps_p4 = CvectorLorentz()
+            lep_charge = []
+	    for ilep in goodLeptons:
+		v = ROOT.TLorentzVector()
+		v.SetPtEtaPhiM(ilep.pt, ilep.eta, ilep.phi, ilep.mass)
+		leps_p4.push_back(v)
+                lep_charge.append(ilep.charge)
+	    leps_charge = vec_from_list(Cvectordouble, lep_charge)
 
-            ### Bjets
-            goodBjetsDeepCSV = [ b for b in goodPuppiBjetsNoLep if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)>0.4941 ]
+	    ## Put MET in format for MEM
+            met = ROOT.TLorentzVector()
+            met.SetPtEtaPhiM(MET.pt, 0, MET.phi, 0)
 
-            if len(looseFatJets)>0:
-                ### Higgs candidates
-                ##higgsCandidates = [ j for j in looseFatJets if ( (j.btagHbb > 0.8 ) and (j.tau2/j.tau1 < 0.4) ) ] if len(looseFatJets)>0 else []
-                higgsCandidates = [ j for j in looseFatJets if ( (j.deepTagMD_HbbvsQCD > 0.8 ) and (j.tau2/j.tau1 < 0.4) ) ] if len(looseFatJets)>0 else []
-                goodHiggsCandidate = max(higgsCandidates, key=lambda j: j.btagHbb ) if len(higgsCandidates)>0 else None
-                if goodHiggsCandidate:
-                    looseFatJets.remove(goodHiggsCandidate)
-                    #print 'Higgs', goodHiggsCandidate.pt, goodHiggsCandidate.btagHbb, goodHiggsCandidate.mass
+	    ## Put jets in format for MEM
+            jets_p4 = CvectorvectorLorentz()
+            jets_p4_nominal = CvectorLorentz()
+            jettypes = []
 
-                ### W candidate
-                wCandidates = [ j for j in looseFatJets if (j.tau2/j.tau1 < 0.4) ]
-                goodWCandidate = min(wCandidates, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates)>0 else None
+            for iJet in goodJetsNoLep:
+                v = ROOT.TLorentzVector()
+		v.SetPtEtaPhiM(iJet.pt, iJet.eta, iJet.phi, iJet.mass)
+                jets_p4_nominal.push_back(v)
+                jettypes.append(0)
 
-                if goodWCandidate:
-                    if (goodWCandidate.msoftdrop > 50 ) and (goodWCandidate.msoftdrop < 120):
-                        looseFatJets.remove(goodWCandidate)
-                        #print 'W', goodWCandidate.pt, goodWCandidate.tau2/goodWCandidate.tau1, goodWCandidate.mass
-                    else: goodWCandidate = None
+            jets_p4.push_back(jets_p4_nominal)
 
-                ### Top candidate
-                topCandidates = [ j for j in looseFatJets if (j.tau3/j.tau2 < 0.4) ]
-                goodTopCandidate = min(topCandidates, key=lambda j: j.tau3/j.tau2 ) if len(topCandidates)>0 else None     ## in case there are more than one top Candidate, choose the one with minimum tau32
-                if goodTopCandidate:
-                    if (goodTopCandidate.msoftdrop > 140 ) and (goodTopCandidate.msoftdrop < 200):
-                        looseFatJets.remove(goodTopCandidate)
-                        #print 'Top', goodTopCandidate.pt, goodTopCandidate.tau3/goodTopCandidate.tau2, goodTopCandidate.mass
-                    else: goodTopCandidate = None
+            changes = []
+            changes.append(False)
+            for unc in jet_corrections:
+                for ud in ["Up","Down"]:
+                    changes.append(False)
+                    jets_p4_syst = CvectorLorentz()
+                    for iJet in goodJetsNoLep:
+                        pt = getattr(iJet,"pt_{a}{b}".format(a = unc, b = ud))
+                        mass = getattr(iJet,"mass_{a}{b}".format(a = unc, b = ud))
+                        v = ROOT.TLorentzVector()
+                        v.SetPtEtaPhiM(pt, iJet.eta, iJet.phi, mass)
+                        jets_p4_syst.push_back(v)
+                    jets_p4.push_back(jets_p4_syst)
 
-                badFatJets = looseFatJets
-                goodCandidates = [ goodHiggsCandidate, goodWCandidate ]
-                goodCandidates = list(filter(None, goodCandidates))
+            changes_jet_category = vec_from_list(Cvectorbool, changes)
 
-                goodEvent = False
-                goodWEvent = False
-                if goodTopCandidate and goodHiggsCandidate and not goodWCandidate:
-                    goodEvents = 1
-                    goodEvent = True
-                    getattr( self, 'TopCandMass_TopHiggs' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                    getattr( self, 'WCandMass_TopHiggs' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                    getattr( self, 'HiggsCandMass_TopHiggs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-                elif goodWCandidate and goodHiggsCandidate and not goodTopCandidate:
-                    goodEvent = goodWEvent = True
-                    goodEvents = 2
-                    getattr( self, 'TopCandMass_WHiggs' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                    getattr( self, 'WCandMass_WHiggs' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                    getattr( self, 'HiggsCandMass_WHiggs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-                elif goodWCandidate and goodTopCandidate and not goodHiggsCandidate:
-                    goodEvents = 3
-                    getattr( self, 'TopCandMass_WTop' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                    getattr( self, 'WCandMass_WTop' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                    getattr( self, 'HiggsCandMass_WTop' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-                elif goodWCandidate and not ( goodTopCandidate and goodHiggsCandidate):
-                    goodEvents = 4
-                    goodWEvent = True
-                    getattr( self, 'WCandMass_W' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                elif goodTopCandidate and not ( goodWCandidate and goodHiggsCandidate):
-                    goodEvents = 5
-                    getattr( self, 'TopCandMass_Top' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                elif goodHiggsCandidate and not ( goodWCandidate and goodTopCandidate):
-                    goodEvents = 6
-                    getattr( self, 'HiggsCandMass_Higgs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-                else: goodEvents = 0
+            jdeepcsvfull = []
+            jtypefull = []
+            jet_deepjet = []
+            for b in goodJetsNoLep: jet_deepjet.append(b.btagDeepFlavB)
+            for i in range(len(jet_corrections)*2+1):
+                jdeepcsvfull.append(jet_deepjet)
+                jtypefull.append(jettypes)
 
-                getattr( self, 'nbadFatJets' ).Fill( len(badFatJets) )
-                getattr( self, 'ngoodEvents' ).Fill( goodEvents )
-                getattr( self, 'TopCandMass' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                getattr( self, 'WCandMass' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                getattr( self, 'HiggsCandMass' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+            jets_type = vec_from_list(CvectorvectorJetType, jtypefull)
+            jets_tagger = vec_from_list(Cvectorvectordouble, jdeepcsvfull)
 
-                if (len(goodBjetsDeepCSV)>0):
+            jv = []
+            for iJet in goodJetsNoLep:
+                l  = []
+                for unc in jet_corrections:
+                    for ud in ["Up","Down"]:
+                        l.append(iJet.corr_JER)
+                jv.append(l)
+            jvfull = []
+            for i in range(len(jet_corrections)*2+1):
+                jvfull.append(jv)
 
-                    goodPuppiBjets = [ j for j in goodBjetsDeepCSV for f in goodCandidates if (j.p4().DeltaR(f.p4())>=1.2)  ]
-                    getattr( self, 'nGoodPuppiBJets' ).Fill( len(goodPuppiBjets) )
+            jets_variations = vec_from_list(Cvectorvectorvectordouble, jvfull)
 
-                    if len(goodPuppiBjets)>1 and goodEvent:
-                        getattr( self, 'TopCandMass_PuppiJets' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                        getattr( self, 'WCandMass_PuppiJets' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                        getattr( self, 'HiggsCandMass_PuppiJets' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+	    ### create the MEM classifier, specifying the verbosity and b-tagger type
+            ### verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
+	    cls_mem = ROOT.MEMClassifier(8, 'btagDeepFlavB_', '2017')
 
-                    if len(goodPuppiBjets)>1 and goodWEvent:
+	    ret = cls_mem.GetOutput(
+		leps_p4,
+		leps_charge,
+		jets_p4,
+		jets_tagger,
+		jets_type,
+		jets_variations,
+		met,
+		changes_jet_category
+	    )
 
-                        smallestDiffTop = 9999
-                        bFromTop = []
-                        bbCandidates = []
-                        for bpair in permutations(goodPuppiBjets, 2):
-                            bbCandidates.append( bpair[0].p4()+bpair[1].p4() )
-                            tmplepTop = lepW + bpair[0].p4()
-                            tmphadTop = goodWCandidate.p4() + bpair[1].p4()
-                            tmpDiff = abs(tmplepTop.M() - tmphadTop.M())
-                            if tmpDiff < smallestDiffTop:
-                                smallestDiffTop = tmpDiff
-                                bFromTop = [ bpair[0], bpair[1] ]
-                        getattr( self, 'minDiffLepHadTop' ).Fill( smallestDiffTop )
-                        lepTop = lepW + bFromTop[0].p4()
-                        hadTop = goodWCandidate.p4() + bFromTop[1].p4()
-                        getattr( self, 'lepTopCandMass_boostedW' ).Fill( lepTop.M() )
-                        getattr( self, 'hadTopCandMass_boostedW' ).Fill( hadTop.M() )
-                        getattr( self, 'boostedHiggsCandMass_boostedW' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-                        getattr( self, 'boostedHiggsCandPt_boostedW' ).Fill( goodHiggsCandidate.pt if goodHiggsCandidate else -999 )
+	    ## save the output
+	    print "mem_p=",ret[0].p
+	    getattr( self, 'MEM_bDeepFlav' ).Fill( ret[0].p )
+            self.out.fillBranch('MEM', ret[0].p )
+	    getattr( self, 'MEM_bDeepFlavWeighted' ).Fill( ret[0].p, weight )
+	    getattr( self, 'BLR_bDeepFlav' ).Fill( ret[0].blr_4b/ (ret[0].blr_4b + ret[0].blr_2b) )
+	    getattr( self, 'BLR_bDeepFlavWeighted' ).Fill( ret[0].blr_4b/ (ret[0].blr_4b + ret[0].blr_2b), weight )
 
-                        if (lepTop.M() < 200) and (lepTop.M() > 140):
-                            goodPuppiBjets.remove(bFromTop[0])
-                            goodPuppiBjets.remove(bFromTop[1])
+            index = 0
+            for unc in jet_corrections:
+                for ud in ["Up","Down"]:
+                    if changes[1+index] == True:
+	                getattr( self, 'MEM_bDeepFlav_'+unc+ud ).Fill( ret[1+index].p_variated[index] )
+                        self.out.fillBranch('MEM_'+unc+ud, ret[1+index].p_variated[index] )
+                    else:
+	                getattr( self, 'MEM_bDeepFlav_'+unc+ud ).Fill( ret[0].p_variated[index] )
+                        self.out.fillBranch('MEM_'+unc+ud, ret[0].p_variated[index] )
+                    index += 1
 
-                        if len(goodPuppiBjets)>1:
-                            getattr( self, 'leadingBjetPt_boostedW' ).Fill( goodPuppiBjets[0].pt )
-                            getattr( self, 'leadingBjetEta_boostedW' ).Fill( goodPuppiBjets[0].eta )
-                            getattr( self, 'leadingBjetBdisc_boostedW' ).Fill( (goodPuppiBjets[0].pfDeepCSVJetTags_probb+goodPuppiBjets[0].pfDeepCSVJetTags_probbb) )
-                            getattr( self, 'subleadingBjetPt_boostedW' ).Fill( goodPuppiBjets[1].pt )
-                            getattr( self, 'subleadingBjetEta_boostedW' ).Fill( goodPuppiBjets[1].eta )
-                            getattr( self, 'subleadingBjetBdisc_boostedW' ).Fill( (goodPuppiBjets[1].pfDeepCSVJetTags_probb+goodPuppiBjets[1].pfDeepCSVJetTags_probbb) )
-                            resHiggs = goodPuppiBjets[0].p4() + goodPuppiBjets[1].p4()
-                            getattr( self, 'resolvedHiggsCandPt_boostedW' ).Fill( resHiggs.Pt() )
-                            getattr( self, 'resolvedHiggsCandMass_boostedW' ).Fill( resHiggs.M() )
-                            for bb in bbCandidates:
-                                getattr( self, 'allResolvedHiggsCandPt_boostedW' ).Fill( bb.Pt() )
-                                getattr( self, 'allResolvedHiggsCandMass_boostedW' ).Fill( bb.M() )
-                                getattr( self, 'allResolvedHiggsCandMassPt_boostedW' ).Fill( bb.M(), bb.Pt() )
+            ################# Rest of sanity plots
+	    getattr( self, 'nPVs_bDeepFlav' ).Fill( PV.npvsGood )
+	    getattr( self, 'njets_bDeepFlav' ).Fill( len(goodJetsNoLep) )
+	    getattr( self, 'nbjetsCSV_bDeepFlav' ).Fill( len(goodBjetsDeepCSV) )
+	    getattr( self, 'nbjetsFlav_bDeepFlav' ).Fill( len(goodBjetsDeepFlav) )
+	    getattr( self, 'nleps_bDeepFlav' ).Fill( len(goodLeptons) )
+	    getattr( self, 'met_pt_bDeepFlav' ).Fill( MET.pt )
+	    getattr( self, 'lep0_pt_bDeepFlav' ).Fill( goodLeptons[0].pt )
+	    getattr( self, 'lep0_eta_bDeepFlav' ).Fill( goodLeptons[0].eta )
+	    getattr( self, 'lep0_phi_bDeepFlav' ).Fill( goodLeptons[0].phi )
+	    getattr( self, 'lep0_mass_bDeepFlav' ).Fill( goodLeptons[0].mass )
+	    getattr( self, 'jet0_pt_bDeepFlav' ).Fill( goodJetsNoLep[0].pt )
+	    getattr( self, 'jet0_eta_bDeepFlav' ).Fill( goodJetsNoLep[0].eta )
+	    getattr( self, 'jet0_phi_bDeepFlav' ).Fill( goodJetsNoLep[0].phi )
+	    getattr( self, 'jet0_mass_bDeepFlav' ).Fill( goodJetsNoLep[0].mass )
+	    getattr( self, 'jet0_bDeepCSV_bDeepFlav' ).Fill( goodJetsNoLep[0].btagDeepB )
+	    getattr( self, 'jet0_bDeepFlav_bDeepFlav' ).Fill( goodJetsNoLep[0].btagDeepFlavB )
+	    getattr( self, 'jet3_pt_bDeepFlav' ).Fill( goodJetsNoLep[3].pt )
+	    getattr( self, 'jet3_eta_bDeepFlav' ).Fill( goodJetsNoLep[3].eta )
+	    getattr( self, 'jet3_phi_bDeepFlav' ).Fill( goodJetsNoLep[3].phi )
+	    getattr( self, 'jet3_mass_bDeepFlav' ).Fill( goodJetsNoLep[3].mass )
+	    getattr( self, 'jet3_bDeepCSV_bDeepFlav' ).Fill( goodJetsNoLep[3].btagDeepB )
+	    getattr( self, 'jet3_bDeepFlav_bDeepFlav' ).Fill( goodJetsNoLep[3].btagDeepFlavB )
 
-
+	    getattr( self, 'nPVs_bDeepFlavWeighted' ).Fill( PV.npvsGood, weight )
+	    getattr( self, 'njets_bDeepFlavWeighted' ).Fill( len(goodJetsNoLep), weight )
+	    getattr( self, 'nbjetsCSV_bDeepFlavWeighted' ).Fill( len(goodBjetsDeepCSV), weight )
+	    getattr( self, 'nbjetsFlav_bDeepFlavWeighted' ).Fill( len(goodBjetsDeepFlav), weight )
+	    getattr( self, 'nleps_bDeepFlavWeighted' ).Fill( len(goodLeptons), weight )
+	    getattr( self, 'met_pt_bDeepFlavWeighted' ).Fill( MET.pt, weight )
+	    getattr( self, 'jet3_pt_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].pt, weight )
+	    getattr( self, 'jet3_eta_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].eta, weight )
+	    getattr( self, 'jet3_phi_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].phi, weight )
+	    getattr( self, 'jet3_mass_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].mass, weight )
+	    getattr( self, 'jet3_bDeepCSV_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].btagDeepB, weight )
+	    getattr( self, 'jet3_bDeepFlav_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].btagDeepFlavB, weight )
 
         #### FIlling trees
 #        self.out.fillBranch('LeptonSFTrigger', leptonWeights[0])
@@ -651,4 +619,4 @@ class quickAnalyzer(Module):
         return True
 
 
-#myquickAnalyzer = lambda : quickAnalyzer()
+#myresolvedAnalyzer = lambda : quickAnalyzer()
