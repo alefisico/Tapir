@@ -1,1 +1,4 @@
-keep * #start with all
+drop Photon
+drop Tau
+drop L1*
+drop Soft*

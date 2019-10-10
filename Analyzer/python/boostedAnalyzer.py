@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sys, copy
+import os, sys
 from collections import OrderedDict
 from itertools import permutations
 import numpy as np
@@ -32,6 +32,7 @@ class boostedAnalyzer(Module):
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
 
+        self.addObject( ROOT.TH1F('nEvents',   ';number of events in category',   10, 0, 10) )
         self.addObject( ROOT.TH1F('nlooseFatJets',   ';number of loose fatjets',   10, 0, 10) )
         self.addObject( ROOT.TH1F('nleps',   ';number of leptons',   20, 0, 20) )
         self.addObject( ROOT.TH1F('nCHSjets',   ';number of CHS jets',   20, 0, 20) )
@@ -61,10 +62,16 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('WCandMass_PuppiJets',   ';W candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_PuppiJets',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('nGoodPuppiBJets',   ';number of good puppi bjets',   10, 0, 10) )
+        self.addObject( ROOT.TH1F('tmpHiggsCandPt_boostedHiggs',   ';Higgs candidate pt', 100, 0, 1000) )
+        self.addObject( ROOT.TH1F('tmpHiggsCandEta_boostedHiggs',   ';Higgs candidate eta', 100, -4, 4) )
+        self.addObject( ROOT.TH1F('tmpHiggsCandTau21_boostedHiggs',   ';Higgs candidate tau21', 40, 0, 1) )
+        self.addObject( ROOT.TH1F('tmpHiggsCandHbb_boostedHiggs',   ';Higgs candidate Hbb', 40, 0, 1) )
+        self.addObject( ROOT.TH1F('tmpHiggsCandN2_boostedHiggs',   ';Higgs candidate N2', 40, 0, 1) )
         self.addObject( ROOT.TH1F('nCleanPuppiJets_boostedHiggs',   ';number of clean puppi jets',   10, 0, 10) )
         self.addObject( ROOT.TH1F('nGoodPuppiJets_boostedHiggs',   ';number of good puppi jets',   10, 0, 10) )
         self.addObject( ROOT.TH1F('nGoodPuppiBjets_boostedHiggs',   ';number of good puppi bjets',   10, 0, 10) )
         self.addObject( ROOT.TH1F('HiggsCandMass_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandPt_boostedHiggs',   ';Higgs candidate pt', 100, 0, 1000) )
         self.addObject( ROOT.TH1F('HiggsCandMass_2J_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('resolvedWCandMass_2J_boostedHiggs',   ';W candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('deltaRJJ_2J_boostedHiggs',   ';deltaR( J, J )', 50, 0, 5 ) )
@@ -85,23 +92,51 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('deltaR1BHiggs_2J1B_boostedHiggs',   ';deltaR( 1b, Higgs )', 50, 0, 5 ) )
         self.addObject( ROOT.TH1F('deltaR1BHiggs_1B_boostedHiggs',   ';deltaR( 1b, Higgs )', 50, 0, 5 ) )
         self.addObject( ROOT.TH1F('minDiffLepHadW',   ';min difference between lep and had W',   100, 0, 100) )
-        self.addObject( ROOT.TH1F('noHiggsCandMass_no2J_boostedHiggs',   ';NO Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('noHiggsCandtau21_no2J_boostedHiggs',   ';#tau_{21}', 20, 0, 1 ) )
-        self.addObject( ROOT.TH2F('HbbvsTau21_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_A_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_B_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_C_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_D_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
         self.addObject( ROOT.TH1F('HiggsCandMass_A_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_B_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_C_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_D_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH2F('HbbvsTau21_2J_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_A_2J_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_B_2J_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_C_2J_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_D_2J_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
         self.addObject( ROOT.TH1F('HiggsCandMass_A_2J_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_B_2J_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_C_2J_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_D_2J_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH2F('HbbvsTau21_2J2W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_A_2J2W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_B_2J2W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_C_2J2W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_D_2J2W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
         self.addObject( ROOT.TH1F('HiggsCandMass_A_2J2W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_B_2J2W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_C_2J2W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('HiggsCandMass_D_2J2W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_A_W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_B_W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_C_W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_D_W_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_A_W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_B_W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_C_W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_D_W_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_W1B_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_A_W1B_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_B_W1B_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_C_W1B_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH2F('HbbvsTau21_D_W1B_boostedHiggs',   ';', 20, 0, 1, 20, 0, 1) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_A_W1B_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_B_W1B_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_C_W1B_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('HiggsCandMass_D_W1B_boostedHiggs',   ';Higgs candidate mass', 60, 0, 300) )
+
+        self.addObject( ROOT.TH1F('WCandMass_W_boostedHiggs',   ';W candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('WCandMass_W1B_boostedHiggs',   ';W candidate mass', 60, 0, 300) )
 
         self.addObject( ROOT.TH1F('nGoodPuppiJets_boostedW',   ';number of good puppi jets',   10, 0, 10) )
         self.addObject( ROOT.TH1F('nGoodPuppiBjets_boostedW',   ';number of good puppi bjets',   10, 0, 10) )
@@ -116,7 +151,7 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('resolvedHiggsCandMass_2B_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('resolvedHiggsCandMass_2BdeltaR_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('resolvedHiggsCandMass_2BSmallR_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
-        self.addObject( ROOT.TH1F('noresolvedHiggsCandMass_2BSmallR_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('noResolvedHiggsCandMass_2BSmallR_boostedW',   ';resolved Higgs candidate mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('simplejjMass_2J_boostedW',   ';resolved dijet mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('simplejjMass_2JSmallR_boostedW',   ';resolved dijet mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('allResolvedHiggsCandPt_2B_boostedW',   ';resolved Higgs candidate pt', 1000, 0, 1000) )
@@ -160,6 +195,7 @@ class boostedAnalyzer(Module):
         if s.startswith('jet'):
             self.addObject( ROOT.TH1F(s+'_bDeepCSV'+t,s+';b deepCSV Discriminator', 40, -1, 1) )
             self.addObject( ROOT.TH1F(s+'_bDeepFlav'+t,s+';b deepFlav Discriminator', 40, -1, 1) )
+
 
     def leptonSF(self, lepton, leptonP4 ):
 
@@ -236,7 +272,6 @@ class boostedAnalyzer(Module):
 
         return pznu
 
-
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("totalWeight",  "F");
@@ -302,6 +337,10 @@ class boostedAnalyzer(Module):
 
         ### Fatjets
         looseFatJets = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
+        ## clones for further studies
+        badFatJets = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
+        allhiggsCandidates = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>250) ]
+        badFatJets_boostedW = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
 
         ### Selection
         metcut = (MET.pt>20)
@@ -314,9 +353,15 @@ class boostedAnalyzer(Module):
         else: weight = 1
         self.out.fillBranch('totalWeight', weight)
 
+        getattr( self, 'nEvents' ).Fill( 0 )
+        if ( metcut and nlepcut ): getattr( self, 'nEvents' ).Fill( 1 )
+        if ( metcut and nlepcut and (njetscut and nbjetscut) ) : getattr( self, 'nEvents' ).Fill( 2 )
+        if ( metcut and nlepcut and not (njetscut and nbjetscut) ) : getattr( self, 'nEvents' ).Fill( 3 )
+        if ( metcut and nlepcut and not (njetscut or nbjetscut) ) : getattr( self, 'nEvents' ).Fill( 4 )
 
         #################################### Boosted
-        orthogonalcut = metcut and nlepcut and not (njetscut and nbjetscut)
+        orthogonalcut = metcut and nlepcut #and not (njetscut and nbjetscut)
+
         if orthogonalcut:
 
             ### General
@@ -348,14 +393,25 @@ class boostedAnalyzer(Module):
 
                 #########################################################################
                 ### Higgs candidates
-                ##higgsCandidates = [ j for j in looseFatJets if ( (j.btagHbb > 0.8 ) and (j.tau2/j.tau1 < 0.4) ) ] if len(looseFatJets)>0 else []
-                higgsCandidates = [ j for j in looseFatJets if ( (j.deepTagMD_HbbvsQCD > 0.8 ) and (j.tau2/j.tau1 < 0.35) and (j.pt > 250) ) ]
+                higgsCandidates = [ j for j in allhiggsCandidates if ( (j.deepTagMD_HbbvsQCD > 0.8 ) and (j.tau2/j.tau1 < 0.35) ) ]
                 goodHiggsCandidate = max(higgsCandidates, key=lambda j: j.btagHbb ) if len(higgsCandidates)>0 else None
-                badFatJets = copy.copy(looseFatJets)
-                noHiggsCandidates = copy.copy(looseFatJets)
                 if goodHiggsCandidate:
                     badFatJets.remove(goodHiggsCandidate)
-                    noHiggsCandidates.remove(goodHiggsCandidate)
+
+                higgsCandidatesBside = [ j for j in allhiggsCandidates if ( (j.deepTagMD_HbbvsQCD > 0.8 ) and (j.tau2/j.tau1 > 0.35) ) ]
+                higgsCandidatesCside = [ j for j in allhiggsCandidates if ( (j.deepTagMD_HbbvsQCD < 0.8 ) and (j.tau2/j.tau1 < 0.35) ) ]
+                higgsCandidatesDside = [ j for j in allhiggsCandidates if ( (j.deepTagMD_HbbvsQCD < 0.8 ) and (j.tau2/j.tau1 > 0.35) ) ]
+
+                ### Higgs candidates basic plots
+                tmphiggsCandidates = [ j for j in looseFatJets if (j.deepTagMD_HbbvsQCD > 0.8 ) ]
+                tmpgoodHiggsCandidate = max(tmphiggsCandidates, key=lambda j: j.btagHbb ) if len(tmphiggsCandidates)>0 else None
+                if tmpgoodHiggsCandidate:
+                    getattr( self, 'tmpHiggsCandPt_boostedHiggs' ).Fill( tmpgoodHiggsCandidate.pt )
+                    getattr( self, 'tmpHiggsCandEta_boostedHiggs' ).Fill( tmpgoodHiggsCandidate.eta )
+                    getattr( self, 'tmpHiggsCandTau21_boostedHiggs' ).Fill( tmpgoodHiggsCandidate.tau2/tmpgoodHiggsCandidate.tau1 )
+                    getattr( self, 'tmpHiggsCandHbb_boostedHiggs' ).Fill( tmpgoodHiggsCandidate.deepTagMD_HbbvsQCD)
+                    getattr( self, 'tmpHiggsCandN2_boostedHiggs' ).Fill( tmpgoodHiggsCandidate.n2b1 )
+
 
                 ### W candidate
                 wCandidates = [ j for j in badFatJets if (j.tau2/j.tau1 < 0.35) ]
@@ -399,12 +455,17 @@ class boostedAnalyzer(Module):
                 elif goodHiggsCandidate and not ( goodWCandidate and goodTopCandidate):
                     goodEvents = 6
                     getattr( self, 'HiggsCandMass_Higgs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+                else: goodEvents = 0
 
                 ######################################################################
+                ######################################################################
                 ### If only boosted Higgs:
-                elif goodHiggsCandidate:
+                if goodHiggsCandidate:
+                    getattr( self, 'nEvents' ).Fill( 5 )
+                    if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 6 )
                     goodEvents = 7
                     getattr( self, 'HiggsCandMass_boostedHiggs' ).Fill( goodHiggsCandidate.msoftdrop )
+                    getattr( self, 'HiggsCandPt_boostedHiggs' ).Fill( goodHiggsCandidate.pt )
 
                     cleanPuppiJets_Hcand = [ j for j in goodPuppiJetsNoLep if (j.p4().DeltaR(goodHiggsCandidate.p4())>=1.2)  ]
                     goodPuppiBjets_Hcand = [ b for b in cleanPuppiJets_Hcand if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)>0.4941 ]
@@ -414,21 +475,24 @@ class boostedAnalyzer(Module):
                     getattr( self, 'nGoodPuppiBjets_boostedHiggs' ).Fill( len(goodPuppiBjets_Hcand) if goodPuppiBjets_Hcand else 0 )
 
                     ##### FOR ABCD
-                    allhiggsCandidates = [ j for j in noHiggsCandidates if (j.pt > 250) ] if len(noHiggsCandidates)>0 else []  #### TEST THIS STATEMENT
-                    for ifj in allhiggsCandidates:
-                        higgsTau21 = ifj.tau2/ifj.tau1
-                        getattr( self, 'HbbvsTau21_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, higgsTau21 )
-                        if ( (ifj.deepTagMD_HbbvsQCD > 0.8) and (higgsTau21 < 0.35 ) ):
-                            getattr( self, 'HiggsCandMass_A_boostedHiggs' ).Fill( ifj.msoftdrop )
-                        elif ( (ifj.deepTagMD_HbbvsQCD > 0.8) and (higgsTau21 > 0.35 ) ):
-                            getattr( self, 'HiggsCandMass_B_boostedHiggs' ).Fill( ifj.msoftdrop )
-                        elif ( (ifj.deepTagMD_HbbvsQCD < 0.8) and (higgsTau21 > 0.35 ) ):
-                            getattr( self, 'HiggsCandMass_C_boostedHiggs' ).Fill( ifj.msoftdrop )
-                        else:
-                            getattr( self, 'HiggsCandMass_D_boostedHiggs' ).Fill( ifj.msoftdrop )
+                    for ifj in higgsCandidates:
+                        getattr( self, 'HbbvsTau21_A_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                        getattr( self, 'HiggsCandMass_A_boostedHiggs' ).Fill( ifj.msoftdrop )
+                    for ifj in higgsCandidatesBside:
+                        getattr( self, 'HbbvsTau21_B_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                        getattr( self, 'HiggsCandMass_B_boostedHiggs' ).Fill( ifj.msoftdrop )
+                    for ifj in higgsCandidatesCside:
+                        getattr( self, 'HbbvsTau21_C_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                        getattr( self, 'HiggsCandMass_C_boostedHiggs' ).Fill( ifj.msoftdrop )
+                    for ifj in higgsCandidatesDside:
+                        getattr( self, 'HbbvsTau21_D_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                        getattr( self, 'HiggsCandMass_D_boostedHiggs' ).Fill( ifj.msoftdrop )
+
 
                     #### check if has jets and later bjets
                     if len(goodPuppiJets_Hcand)>1:
+                        getattr( self, 'nEvents' ).Fill( 7 )
+                        if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 8 )
                         getattr( self, 'HiggsCandMass_2J_boostedHiggs' ).Fill( goodHiggsCandidate.msoftdrop )
 
                         ##### reconstructing WW
@@ -454,20 +518,22 @@ class boostedAnalyzer(Module):
                         deltaRlepWhadW = lepW.DeltaR( hadW )
                         getattr( self, 'deltaRlepWhadW_2J_boostedHiggs' ).Fill( deltaRlepWhadW )
 
-                        allhiggsCandidates = [ j for j in noHiggsCandidates if (j.pt > 250) ] if len(noHiggsCandidates)>0 else []  #### TEST THIS STATEMENT
-                        for ifj in allhiggsCandidates:
-                            higgsTau21 = ifj.tau2/ifj.tau1
-                            getattr( self, 'HbbvsTau21_2J2W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, higgsTau21 )
-                            if ( (ifj.deepTagMD_HbbvsQCD > 0.8) and (higgsTau21 < 0.35 ) ):
-                                getattr( self, 'HiggsCandMass_A_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
-                            elif ( (ifj.deepTagMD_HbbvsQCD > 0.8) and (higgsTau21 > 0.35 ) ):
-                                getattr( self, 'HiggsCandMass_B_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
-                            elif ( (ifj.deepTagMD_HbbvsQCD < 0.8) and (higgsTau21 > 0.35 ) ):
-                                getattr( self, 'HiggsCandMass_C_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
-                            else:
-                                getattr( self, 'HiggsCandMass_D_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                        ##### FOR ABCD
+                        for ifj in higgsCandidates:
+                            getattr( self, 'HbbvsTau21_A_2J_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_A_2J_boostedHiggs' ).Fill( ifj.msoftdrop )
+                        for ifj in higgsCandidatesBside:
+                            getattr( self, 'HbbvsTau21_B_2J_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_B_2J_boostedHiggs' ).Fill( ifj.msoftdrop )
+                        for ifj in higgsCandidatesCside:
+                            getattr( self, 'HbbvsTau21_C_2J_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_C_2J_boostedHiggs' ).Fill( ifj.msoftdrop )
+                        for ifj in higgsCandidatesDside:
+                            getattr( self, 'HbbvsTau21_D_2J_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_D_2J_boostedHiggs' ).Fill( ifj.msoftdrop )
 
 
+                        ############ THIS IS THE "FINAL" SELECTION
                         if (hadW.M()>65 and hadW.M()<105):
                             getattr( self, 'HiggsCandMass_2J2W_boostedHiggs' ).Fill( goodHiggsCandidate.msoftdrop )
                             getattr( self, 'resolvedWCandMass_2J2W_boostedHiggs' ).Fill( hadW.M() )
@@ -476,18 +542,19 @@ class boostedAnalyzer(Module):
                             getattr( self, 'deltaRlepWHiggs_2J2W_boostedHiggs' ).Fill( deltaRlepWHiggs )
                             getattr( self, 'deltaRlepWhadW_2J2W_boostedHiggs' ).Fill( deltaRlepWhadW )
 
-                            allhiggsCandidates = [ j for j in noHiggsCandidates if (j.pt > 250) ] if len(noHiggsCandidates)>0 else []  #### TEST THIS STATEMENT
-                            for ifj in allhiggsCandidates:
-                                higgsTau21 = ifj.tau2/ifj.tau1
-                                getattr( self, 'HbbvsTau21_2J2W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, higgsTau21 )
-                                if ( (ifj.deepTagMD_HbbvsQCD > 0.8) and (higgsTau21 < 0.35 ) ):
-                                    getattr( self, 'HiggsCandMass_A_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
-                                elif ( (ifj.deepTagMD_HbbvsQCD > 0.8) and (higgsTau21 > 0.35 ) ):
-                                    getattr( self, 'HiggsCandMass_B_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
-                                elif ( (ifj.deepTagMD_HbbvsQCD < 0.8) and (higgsTau21 > 0.35 ) ):
-                                    getattr( self, 'HiggsCandMass_C_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
-                                else:
-                                    getattr( self, 'HiggsCandMass_D_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                            ##### FOR ABCD
+                            for ifj in higgsCandidates:
+                                getattr( self, 'HbbvsTau21_A_2J2W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_A_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                            for ifj in higgsCandidatesBside:
+                                getattr( self, 'HbbvsTau21_B_2J2W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_B_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                            for ifj in higgsCandidatesCside:
+                                getattr( self, 'HbbvsTau21_C_2J2W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_C_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                            for ifj in higgsCandidatesDside:
+                                getattr( self, 'HbbvsTau21_D_2J2W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_D_2J2W_boostedHiggs' ).Fill( ifj.msoftdrop )
 
 
                         if deltaRlepWHiggs>1:
@@ -511,15 +578,45 @@ class boostedAnalyzer(Module):
                     if len(goodPuppiBjets_Hcand)>1:
                         getattr( self, 'HiggsCandMass_2B_boostedHiggs' ).Fill( goodHiggsCandidate.msoftdrop )
 
-                    else:
-                        if noHiggsCandidates:
-                            for ifj in noHiggsCandidates:
-                                getattr( self, 'noHiggsCandMass_no2J_boostedHiggs' ).Fill( ifj.msoftdrop )
-                                getattr( self, 'noHiggsCandtau21_no2J_boostedHiggs' ).Fill( ifj.tau2/ifj.tau1 )
+
+                    if goodWCandidate:
+
+                        getattr( self, 'HiggsCandMass_W_boostedHiggs' ).Fill( goodHiggsCandidate.msoftdrop )
+                        getattr( self, 'WCandMass_W_boostedHiggs' ).Fill( goodWCandidate.msoftdrop )
+
+                        ##### FOR ABCD
+                        for ifj in higgsCandidates:
+                            getattr( self, 'HbbvsTau21_A_W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_A_W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                        for ifj in higgsCandidatesBside:
+                            getattr( self, 'HbbvsTau21_B_W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_B_W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                        for ifj in higgsCandidatesCside:
+                            getattr( self, 'HbbvsTau21_C_W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_C_W_boostedHiggs' ).Fill( ifj.msoftdrop )
+                        for ifj in higgsCandidatesDside:
+                            getattr( self, 'HbbvsTau21_D_W_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                            getattr( self, 'HiggsCandMass_D_W_boostedHiggs' ).Fill( ifj.msoftdrop )
+
+                        if len(goodPuppiBjets_Hcand)>0:
+                            getattr( self, 'HiggsCandMass_W1B_boostedHiggs' ).Fill( goodHiggsCandidate.msoftdrop )
+                            getattr( self, 'WCandMass_W1B_boostedHiggs' ).Fill( goodWCandidate.msoftdrop )
+                            ##### FOR ABCD
+                            for ifj in higgsCandidates:
+                                getattr( self, 'HbbvsTau21_A_W1B_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_A_W1B_boostedHiggs' ).Fill( ifj.msoftdrop )
+                            for ifj in higgsCandidatesBside:
+                                getattr( self, 'HbbvsTau21_B_W1B_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_B_W1B_boostedHiggs' ).Fill( ifj.msoftdrop )
+                            for ifj in higgsCandidatesCside:
+                                getattr( self, 'HbbvsTau21_C_W1B_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_C_W1B_boostedHiggs' ).Fill( ifj.msoftdrop )
+                            for ifj in higgsCandidatesDside:
+                                getattr( self, 'HbbvsTau21_D_W1B_boostedHiggs' ).Fill( ifj.deepTagMD_HbbvsQCD, ifj.tau2/ifj.tau1 )
+                                getattr( self, 'HiggsCandMass_D_W1B_boostedHiggs' ).Fill( ifj.msoftdrop )
+
 
                 ######################################################################
-
-                else: goodEvents = 0
 
                 getattr( self, 'nbadFatJets' ).Fill( len(badFatJets) )
                 getattr( self, 'ngoodEvents' ).Fill( goodEvents )
@@ -535,7 +632,6 @@ class boostedAnalyzer(Module):
                 ### W candidate
                 wCandidates_boostedW = [ j for j in looseFatJets if ((j.tau2/j.tau1 < 0.35) and (j.deepTagMD_ZHbbvsQCD<0.8))  ]
                 goodWCandidate_boostedW = min(wCandidates_boostedW, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates_boostedW)>0 else None
-                badFatJets_boostedW = copy.copy(looseFatJets)
                 if goodWCandidate_boostedW: badFatJets_boostedW.remove(goodWCandidate_boostedW)
 
                 ##### FOR ABCD

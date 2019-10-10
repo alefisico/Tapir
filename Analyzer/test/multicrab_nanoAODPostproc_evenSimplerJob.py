@@ -41,10 +41,10 @@ mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
 echo "Running: python evenSimplerJob_nanoAODPostproc.py --sample {datasets} --process resolved"
-python evenSimplerJob_nanoAODPostproc.py --sample {datasets} --process resolved
+python evenSimplerJob_nanoAODPostproc.py --sample {datasets} --process resolved --numEvents 500
 fi
     '''
-    open('runPostProcEvenSimplerJob.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))     ### create file and replace arguments with {THIS}
+    open('runPostProcEvenSimplerJob_'+options.datasets+'.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))     ### create file and replace arguments with {THIS}
 
 ##########################################
 def createPSet():
@@ -88,24 +88,25 @@ def submitJobs( job, lnfList, unitJobs ):
     config.section_("General")
     config.General.workArea = options.dir
     #config.General.transferLogs = True
-    config.General.transferOutputs = True
+    #config.General.transferOutputs = True
 
     config.section_("JobType")
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'PSet.py'
-    #config.JobType.maxJobRuntimeMin = 2750
+    config.JobType.maxJobRuntimeMin = 2750
 
     config.section_("Data")
-    config.Data.ignoreLocality = False
+    config.Data.ignoreLocality = True
     #config.Data.publication = True
     #config.Data.publishDBS = 'phys03'
 
     config.section_("Site")
-    config.Site.storageSite = options.storageSite
-    #config.Site.whitelist = ['T2_CH_CSCS']
+    #config.Site.storageSite = options.storageSite
+    config.Site.storageSite = 'T2_CH_CSCS'
+    config.Site.whitelist = [ 'T2_CH_CSCS' ]
     #config.Site.blacklist = ['T2_US_Florida','T3_TW_*','T2_BR_*','T2_GR_Ioannina','T2_BR_SPRACE','T2_RU_IHEP','T2_PL_Swierk','T2_KR_KNU','T3_TW_NTU_HEP']
 
-    config.JobType.scriptExe = 'runPostProcEvenSimplerJob.sh'
+    config.JobType.scriptExe = 'runPostProcEvenSimplerJob_'+options.datasets+'.sh'
     rootfiles = ['../data/'+f for f in listdir('../data/') if isfile(join('../data/', f))]
     config.JobType.inputFiles = [ 'evenSimplerJob_nanoAODPostproc.py', 'keep_and_drop.txt', 'haddnano.py'] + rootfiles
     config.JobType.sendPythonFolder  = True
@@ -124,7 +125,7 @@ def submitJobs( job, lnfList, unitJobs ):
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoAODPostproc/'
     config.Data.inputDBS = 'phys03'
 
-    outputTag = 'tthbb13_PostProc_evenSimplerJob'
+    outputTag = 'tthbb13_evenSimplerJob'
     requestname = job + '_' +outputTag + '_' + options.version
     print requestname
     if len(requestname) > 100: requestname = (requestname[:95-len(requestname)])
@@ -135,11 +136,11 @@ def submitJobs( job, lnfList, unitJobs ):
     print 'Configuration :'
     print config
     crabCommand('submit', config = config)
-    #try :
-    #    crabCommand('submit', config = config)
-    #    #crabCommand('submit', "--dryrun", config = config)
-    #except :
-    #    print 'Not submitted.'
+#    try :
+#        crabCommand('submit', config = config)
+#        #crabCommand('submit', "--dryrun", config = config)
+#    except :
+#        print 'Not submitted.'
 
 
 ##########################################

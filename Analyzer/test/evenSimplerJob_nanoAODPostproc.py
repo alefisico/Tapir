@@ -59,6 +59,11 @@ parser.add_argument(
     default="boosted"
 )
 parser.add_argument(
+    '--local',
+    action="store_true",
+    help="Run local or condor/crab"
+)
+parser.add_argument(
     '--loglevel',
     action="store",
     help="log level",
@@ -95,20 +100,32 @@ if args.process.startswith( ('both', 'boosted') ):
     listOfModules.append( jetmetUncertainties2017() )
     listOfModules.append( boostedAnalyzer( args.sample ) )
 
-p = PostProcessor(
-    '.', (inputFiles() if not args.iFile else [args.iFile]),
-    cut=cuts,
-    #branchsel="keep_and_drop.txt",
-    modules=listOfModules,
-    provenance=True, ### copy MetaData and ParametersSets
-    ####haddFileName = "nano_postprocessed"+args.oFile+".root",
-    histFileName = "histograms"+args.oFile+".root",
-    histDirName = 'tthbb13',
-    jsonInput=runsAndLumis(),
-    #fwkJobReport=True,
-    maxEntries=args.numEvents,
-    prefetch=True,
-    longTermCache=True,
-    ##noOut=False, justcount=False,
-)
+if args.process.startswith( ('both', 'resolved') ):
+    p = PostProcessor(
+        '.', (inputFiles() if not args.iFile else [args.iFile]),
+        cut=cuts,
+        branchsel="keep_and_drop.txt",
+        modules=listOfModules,
+        provenance=True, ### copy MetaData and ParametersSets
+        haddFileName = "nano_postprocessed"+args.oFile+".root",
+        histFileName = "histograms"+args.oFile+".root",
+        histDirName = 'tthbb13',
+        fwkJobReport=True,
+        maxEntries=args.numEvents,
+        prefetch=args.local,
+        longTermCache=args.local,
+    )
+else:
+    p = PostProcessor(
+        '.', (inputFiles() if not args.iFile else [args.iFile]),
+        cut=cuts,
+        branchsel="keep_and_drop.txt",
+        modules=listOfModules,
+        provenance=True, ### copy MetaData and ParametersSets
+        histFileName = "histograms"+args.oFile+".root",
+        histDirName = 'tthbb13',
+        maxEntries=args.numEvents,
+        prefetch=args.local,
+        longTermCache=args.local,
+    )
 p.run()

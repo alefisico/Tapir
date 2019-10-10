@@ -156,7 +156,6 @@ class resolvedAnalyzer(Module):
         return [SFTrigger , SFID , SFISO]
 
 
-
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("totalWeight",  "F");
@@ -310,38 +309,43 @@ class resolvedAnalyzer(Module):
 
 	    ### create the MEM classifier, specifying the verbosity and b-tagger type
             ### verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
-	    cls_mem = ROOT.MEMClassifier(8, 'btagDeepFlavB_', '2017')
+	    cls_mem = ROOT.MEMClassifier(0, 'btagDeepFlavB_', '2017')
 
-	    ret = cls_mem.GetOutput(
-		leps_p4,
-		leps_charge,
-		jets_p4,
-		jets_tagger,
-		jets_type,
-		jets_variations,
-		met,
-		changes_jet_category
-	    )
+            try:
+                ret = cls_mem.GetOutput(
+                    leps_p4,
+                    leps_charge,
+                    jets_p4,
+                    jets_tagger,
+                    jets_type,
+                    jets_variations,
+                    met,
+                    changes_jet_category
+                )
 
-	    ## save the output
-	    print "mem_p=",ret[0].p
-	    getattr( self, 'MEM_bDeepFlav' ).Fill( ret[0].p )
-            self.out.fillBranch('MEM', ret[0].p )
-	    getattr( self, 'MEM_bDeepFlavWeighted' ).Fill( ret[0].p, weight )
-	    getattr( self, 'BLR_bDeepFlav' ).Fill( ret[0].blr_4b/ (ret[0].blr_4b + ret[0].blr_2b) )
-	    getattr( self, 'BLR_bDeepFlavWeighted' ).Fill( ret[0].blr_4b/ (ret[0].blr_4b + ret[0].blr_2b), weight )
+                ## save the output
+                print "mem_p=",ret[0].p
+                self.out.fillBranch('MEM', ret[0].p )
+                '''
+                getattr( self, 'MEM_bDeepFlav' ).Fill( ret[0].p )
+                getattr( self, 'MEM_bDeepFlavWeighted' ).Fill( ret[0].p, weight )
+                getattr( self, 'BLR_bDeepFlav' ).Fill( ret[0].blr_4b/ (ret[0].blr_4b + ret[0].blr_2b) )
+                getattr( self, 'BLR_bDeepFlavWeighted' ).Fill( ret[0].blr_4b/ (ret[0].blr_4b + ret[0].blr_2b), weight )
+                '''
 
-            index = 0
-            for unc in jet_corrections:
-                for ud in ["Up","Down"]:
-                    if changes[1+index] == True:
-	                getattr( self, 'MEM_bDeepFlav_'+unc+ud ).Fill( ret[1+index].p_variated[index] )
-                        self.out.fillBranch('MEM_'+unc+ud, ret[1+index].p_variated[index] )
-                    else:
-	                getattr( self, 'MEM_bDeepFlav_'+unc+ud ).Fill( ret[0].p_variated[index] )
-                        self.out.fillBranch('MEM_'+unc+ud, ret[0].p_variated[index] )
-                    index += 1
+                index = 0
+                for unc in jet_corrections:
+                    for ud in ["Up","Down"]:
+                        if changes[1+index] == True:
+                            #getattr( self, 'MEM_bDeepFlav_'+unc+ud ).Fill( ret[1+index].p_variated[index] )
+                            self.out.fillBranch('MEM_'+unc+ud, ret[1+index].p_variated[index] )
+                        else:
+                            #getattr( self, 'MEM_bDeepFlav_'+unc+ud ).Fill( ret[0].p_variated[index] )
+                            self.out.fillBranch('MEM_'+unc+ud, ret[0].p_variated[index] )
+                        index += 1
+            except TypeError: pass
 
+            '''
             ################# Rest of sanity plots
 	    getattr( self, 'nPVs_bDeepFlav' ).Fill( PV.npvsGood )
 	    getattr( self, 'njets_bDeepFlav' ).Fill( len(goodJetsNoLep) )
@@ -395,6 +399,7 @@ class resolvedAnalyzer(Module):
 #        self.out.fillBranch('GoodJet_mass', [j.mass for j in goodJetsNoLep] )
 #        self.out.fillBranch('GoodJet_btagDeepCSV', [j.btagDeepB for j in goodJetsNoLep] )
 #        self.out.fillBranch('GoodJet_btagDeepFlav', [j.btagDeepFlavB for j in goodJetsNoLep] )
+            '''
 
 
         '''
