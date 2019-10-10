@@ -1,9 +1,6 @@
 # ttHbb13 nanoAODTools
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 5f66267cf101e1987d58ab477f1667d688f7749d
+
 ## To produce modified nanoAOD
 
 For more information about nanoAOD, read the [twiki](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD). *This step is not needed if you are using centrally produced nanoAOD samples.*
@@ -27,18 +24,12 @@ cmsDriver.py modifiedNanoAOD_MC_2017_cfi -s NANO --mc --eventcontent NANOAODSIM 
 here the `--customise` option points to the function `nanoJTB_customizeMC` inside the `python/nanoAOD_jetToolbox_cff.py`.
 
 
-<<<<<<< HEAD
 To test locally the production of the modified nanoAOD samples:
-~~~bash
-=======
-=======
-## Create nanoAOD
 
 For more information about nanoAOD, read the [twiki](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD). *This step is not needed if you are using centrally produced nanoAOD samples.*
 
 To test local the production of nanoAOD samples:
-```
->>>>>>> 5f66267cf101e1987d58ab477f1667d688f7749d
+~~~
 cd $CMSSW_BASE/src/TTH/NanoAODTools/test/   ## to go to the test folder
 cmsenv                                      ## in case you haven't set the CMSSW environment
 cmsRun modifiedNanoAOD_MC_2017_cfi.py
@@ -53,11 +44,7 @@ where `--version` is just a label for your output datasets and `--sample` depend
 ```
 dasgoclient --query="/*/RunIIAutumn18MiniAOD*/MINIAODSIM"
 ```
-<<<<<<< HEAD
 
-=======
->>>>>>> a6c86809337d59f897d09b594c9774fb1dec2ba3
->>>>>>> 5f66267cf101e1987d58ab477f1667d688f7749d
 ## Training samples
 
 To create numpy arrays directly from nanoAOD files there is an script called `TTH/NanoAODTools/test/makeNumpyarrays.py`. It is fairly simple to run and instructions are included inside the file. 
