@@ -41,7 +41,7 @@ mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
 echo "Running: python evenSimplerJob_nanoAODPostproc.py --sample {datasets} --process resolved"
-python evenSimplerJob_nanoAODPostproc.py --sample {datasets} --process resolved --numEvents 500
+python evenSimplerJob_nanoAODPostproc.py --sample {datasets} --process resolved --numEvents 10000
 fi
     '''
     open('runPostProcEvenSimplerJob_'+options.datasets+'.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))     ### create file and replace arguments with {THIS}
@@ -96,14 +96,14 @@ def submitJobs( job, lnfList, unitJobs ):
     config.JobType.maxJobRuntimeMin = 2750
 
     config.section_("Data")
-    config.Data.ignoreLocality = True
+    #config.Data.ignoreLocality = True
     #config.Data.publication = True
     #config.Data.publishDBS = 'phys03'
 
     config.section_("Site")
     #config.Site.storageSite = options.storageSite
     config.Site.storageSite = 'T2_CH_CSCS'
-    config.Site.whitelist = [ 'T2_CH_CSCS' ]
+    #config.Site.whitelist = [ 'T2_CH_CSCS' ]
     #config.Site.blacklist = ['T2_US_Florida','T3_TW_*','T2_BR_*','T2_GR_Ioannina','T2_BR_SPRACE','T2_RU_IHEP','T2_PL_Swierk','T2_KR_KNU','T3_TW_NTU_HEP']
 
     config.JobType.scriptExe = 'runPostProcEvenSimplerJob_'+options.datasets+'.sh'
@@ -123,7 +123,7 @@ def submitJobs( job, lnfList, unitJobs ):
 
     config.JobType.outputFiles = [ 'nano_postprocessed.root', 'histograms.root' ]
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/ttH/nanoAODPostproc/'
-    config.Data.inputDBS = 'phys03'
+    ##config.Data.inputDBS = 'phys03'
 
     outputTag = 'tthbb13_evenSimplerJob'
     requestname = job + '_' +outputTag + '_' + options.version
@@ -180,6 +180,9 @@ if __name__ == '__main__':
     ### dictionary with datasets
     dictSamples = {}
     if not options.textFile:
+        dictSamples[ 'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8' ] = [ '/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_new_pmx_102X_mc2017_realistic_v7-v1/NANOAODSIM' ]
+
+        '''
         dictSamples[ 'ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8' ] = [ '/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02p1-3ea2ff745e1084ea23260bd2ac726434/USER' ]
         dictSamples[ 'ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8' ] = [ '/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
         dictSamples[ 'ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8' ] = [ '/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
@@ -196,6 +199,8 @@ if __name__ == '__main__':
         dictSamples[ 'TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8' ] = [ '/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
         dictSamples[ 'WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8' ] = [ '/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
         dictSamples[ 'WW_TuneCP5_13TeV-pythia8' ] = [ '/WW_TuneCP5_13TeV-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
+        '''
+
         #dictSamples[''] = ['', dbsglobal, 1 ]
         #dictSamples[''] = ['', dbsglobal, 1 ]
         #dictSamples[''] = ['', dbsglobal, 1 ]

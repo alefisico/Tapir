@@ -1,8 +1,7 @@
 #################################################################
 ## To run:
 ##  - Input file in PSet.py
-##  - python evenSimplerJob_nanoAODPostproc_TEST.py
-##  /store/mc/RunIIAutumn18NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/102X_upgrade2018_realistic_v15-v1/40000/A6521C51-AC51-DD43-9E43-5B06B630B635.root
+##  - Example: python evenSimplerJob_nanoAODPostproc.py --sample ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8  --oFile _TTSemi --local --process boosted --numEvents 1000
 #################################################################
 import os
 from importlib import import_module
@@ -119,7 +118,6 @@ else:
     p = PostProcessor(
         '.', (inputFiles() if not args.iFile else [args.iFile]),
         cut=cuts,
-        branchsel="keep_and_drop.txt",
         modules=listOfModules,
         provenance=True, ### copy MetaData and ParametersSets
         histFileName = "histograms"+args.oFile+".root",
