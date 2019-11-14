@@ -12,7 +12,10 @@ else
         listOfSamples="ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8"
     elif [[ "$sample" == "all" ]]; then
 
-        listOfSamples="ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8 ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8 TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8 TTToHadronic_TuneCP5_13TeV-powheg-pythia8 TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8 ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8 ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8 TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 WW_TuneCP5_13TeV-pythia8"
+        listOfSamples="ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8 TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8 TTToHadronic_TuneCP5_13TeV-powheg-pythia8 TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8 ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8 ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8 TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_13TeV-pythia8"
+    elif [[ "$sample" == "data" ]]; then
+        #listOfSamples="SingleMuon_Run2017B SingleMuon_Run2017C SingleMuon_Run2017D SingleMuon_Run2017E SingleMuon_Run2017F SingleElectron_Run2017B SingleElectron_Run2017C SingleElectron_Run2017D SingleElectron_Run2017E SingleElectron_Run2017F"
+        listOfSamples="SingleElectron_Run2017B SingleElectron_Run2017C SingleElectron_Run2017D SingleElectron_Run2017E SingleElectron_Run2017F"
     else
         listOfSamples="${sample}"
     fi
@@ -69,6 +72,9 @@ allSamples[ 'TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8' ] = [ '/TTGJets
 allSamples[ 'TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8' ] = [ '/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
 allSamples[ 'WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8' ] = [ '/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
 allSamples[ 'WW_TuneCP5_13TeV-pythia8' ] = [ '/WW_TuneCP5_13TeV-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER' ]
+allSamples[ 'WZ_TuneCP5_13TeV-pythia8' ] = [ '/WZ_TuneCP5_13TeV-pythia8/algomez-NANOAOD_v02-5fb730f1ae83631a3be7a3e2c0ea6b8f/USER' ]
+allSamples[ 'ZZ_TuneCP5_13TeV-pythia8' ] = [ '/ZZ_TuneCP5_13TeV-pythia8/algomez-NANOAOD_v02-5fb730f1ae83631a3be7a3e2c0ea6b8f/USER' ]
+allSamples[ 'QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8' ] = [ '/QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8/algomez-NANOAOD_v02-5fb730f1ae83631a3be7a3e2c0ea6b8f/USER' ]
 #allSamples[ '' ] = [ '' ]
 
 
@@ -100,16 +106,19 @@ EOF
 
         condorFile=${isample}_${process}_${version}_condorJob
         echo '''myWD = '${PWD}'/condorlogs/
+logDir = /afs/cern.ch/user/a/algomez/work/tmp/
 universe    =  vanilla
 arguments   =  '${isample}' $(myfile) _$(ProcId)_'${version}'_'${process}'
 executable  =  $(myWD)'${condorFile}'.sh
-log         =  $(myWD)log_'${condorFile}'_$(ClusterId).log
-error       =  $(myWD)log_'${condorFile}'_$(ClusterId)-$(ProcId).err
-output      =  $(myWD)log_'${condorFile}'_$(ClusterId)-$(ProcId).out
-initialdir  = /eos/home-a/algomez/tmpFiles/'${isample}'/
+log         =  $(logDir)log_'${condorFile}'_$(ClusterId).log
+error       =  $(logDir)log_'${condorFile}'_$(ClusterId)-$(ProcId).err
+output      =  $(logDir)log_'${condorFile}'_$(ClusterId)-$(ProcId).out
+initialdir  = $(myWD)
+transfer_output_files = ""
+###initialdir  = /eos/home-a/algomez/tmpFiles/'${isample}'/
 getenv      =  True
-requirements = (OpSysAndVer =?= "SLCern6")
-+JobFlavour = "testmatch"
+###requirements = (OpSysAndVer =?= "SLCern6")
++JobFlavour = "workday"
 queue myfile from $(myWD)'${isample}'.txt
 ''' > condorlogs/${condorFile}.sub
         ##cat condorlogs/${condorFile}.sub
@@ -119,6 +128,7 @@ queue myfile from $(myWD)'${isample}'.txt
         echo '''#!/bin/bash
 export SCRAM_ARCH=slc6_amd64_gcc700
 export X509_USER_PROXY=/afs/cern.ch/user/a/algomez/x509up_u15148
+export EOS_MGM_URL=root://eosuser.cern.ch
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 cd '${CMSSW_BASE}'/src
@@ -130,6 +140,10 @@ cp '${PWD}'/keep_and_drop.txt .
 ls
 echo "Running: python '${PWD}'/evenSimplerJob_nanoAODPostproc.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}'"
 python '${PWD}'/evenSimplerJob_nanoAODPostproc.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}'
+ls
+cp histograms${3}.root /eos/home-a/algomez/tmpFiles/'${isample}'/
+ls /eos/home-a/algomez/tmpFiles/'${isample}'/histograms${3}.root
+xrdcopy -f histograms${3}.root root://eosuser.cern.ch//eos/user/a/algomez/tmpFiles/'${isample}'/histograms${3}.root
 ''' > condorlogs/${condorFile}.sh
 
         condor_submit condorlogs/${condorFile}.sub

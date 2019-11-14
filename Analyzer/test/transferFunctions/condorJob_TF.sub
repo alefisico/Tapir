@@ -1,9 +1,9 @@
 #labelProcess = 2016_TTToSemiLeptonic
-labelProcess = 2016_ttHTobb_ttToSemiLep
+#labelProcess = 2016_ttHTobb_ttToSemiLep
 #labelProcess = 2017_TTToSemiLeptonic
 #labelProcess = 2017_ttHTobb_ttToSemiLep
 #labelProcess = 2018_TTToSemiLeptonic
-#labelProcess = 2018_ttHTobb_ttToSemiLep
+labelProcess = 2018_ttHTobb_ttToSemiLep
 universe    =  vanilla
 executable  =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/Analyzer/test/transferFunctions/condorJob_TF.sh
 log         =  /afs/cern.ch/user/a/algomez/workingArea/ttH/CMSSW_10_2_12/src/TTH/Analyzer/test/transferFunctions/log_$(labelProcess).log

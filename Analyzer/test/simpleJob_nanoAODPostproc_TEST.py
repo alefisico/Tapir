@@ -74,6 +74,8 @@ p=PostProcessor(
     provenance=True, ### copy MetaData and ParametersSets
     haddFileName = "nano_postprocessed.root",
     jsonInput=runsAndLumis(),
+    prefetch=True,
+    maxEntries=1000,
     #fwkJobReport=True,
     #noOut=False, justcount=False,
 )

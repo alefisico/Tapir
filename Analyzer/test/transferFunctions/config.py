@@ -404,7 +404,7 @@ if __name__ == "__main__":
         # DBS client returns a list of dictionaries, but we want a list of Logical File Names
         fileDictList = processingSamples[isam][1].listFiles( dataset=processingSamples[isam][0], validFileOnly=1 )
         #lfnList = [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
-        lfnList = [ 'root://xrootd-cms.infn.it/'+dic['logical_file_name'] for dic in fileDictList ]
+        lfnList = [ 'root://xrootd-cms.infn.it/'+dic['logical_file_name'] for dic in fileDictList ][:20]
 
         print ("dataset %s has %d files" % (processingSamples[isam], len(lfnList)))
         Make_config( lfnList, isam )

@@ -16,7 +16,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputF
 ### central nanoAOD modules
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsModule
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight_2018
-from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017, jetmetUncertainties2017All
+#from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017, jetmetUncertainties2017All
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import *
 ### other modules
 from TTH.Analyzer.boostedAnalyzer import boostedAnalyzer
 from TTH.Analyzer.resolvedAnalyzer import resolvedAnalyzer
@@ -79,7 +80,8 @@ else: isMC = True
 PV = "(PV_npvsGood>0)"
 METFilters = "( (Flag_goodVertices==1) && (Flag_globalSuperTightHalo2016Filter==1) && (Flag_HBHENoiseFilter==1) && (Flag_HBHENoiseIsoFilter==1) && (Flag_EcalDeadCellTriggerPrimitiveFilter==1) && (Flag_BadPFMuonFilter==1) && (Flag_eeBadScFilter==1) )"
 
-Triggers = "( (HLT_Ele35_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) || (HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL==1) || (HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL==1) || (HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8==1) )"
+Triggers = "( (HLT_Ele35_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) || (HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL==1) || (HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ==1) ||  (HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8==1) )"
+##(HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8==1) ||
 
 precuts = PV + " && " + METFilters + " && " + Triggers
 
@@ -90,13 +92,15 @@ listOfModules = []
 #listOfModules.append( countHistogramsModule() )
 if isMC:
     listOfModules.append( puAutoWeight_2018() )
+jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=2017, jesUncert="All", redojec=True)
+listOfModules.append( jetmetCorrector() )
 if args.process.startswith( ('both', 'resolved') ):
     print "|----------> RUNNING RESOLVED"
-    listOfModules.append( jetmetUncertainties2017All() )
     listOfModules.append( resolvedAnalyzer( args.sample ) )
 if args.process.startswith( ('both', 'boosted') ):
     print "|----------> RUNNING BOOSTED"
-    listOfModules.append( jetmetUncertainties2017() )
+    fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=2017, jesUncert="All", redojec=True, jetType = "AK8PFchs")
+    listOfModules.append( fatJetCorrector() )
     listOfModules.append( boostedAnalyzer( args.sample ) )
 
 if args.process.startswith( ('both', 'resolved') ):

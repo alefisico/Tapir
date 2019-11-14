@@ -91,5 +91,5 @@ for genE in range(30,200, 10): #target gen jet pT [GeV]
 #            leg.AddEntry(tf_formulas[names[6]][fl][bin], names[6], "l")
             leg.Draw()
 
-            c1.SaveAs("Plots/TF_{0}GeV_{1}_eta{2}.pdf".format( genE, fl, bin ))
+            c1.SaveAs("Plots/TF_{0}GeV_{1}_eta{2}.png".format( genE, fl, bin ))
 

@@ -50,10 +50,10 @@ if __name__ == '__main__':
 
     #Samples[ 'internal name of sample' ] = [ "DATASET name", job_splitting ]
     #Samples[ '2017_ttHTobb_ttToSemiLep' ] = [ "/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
-    #Samples[ '2017_TTToSemiLeptonic' ] = [ "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
-    #Samples[ '2017_TTTo2L2Nu' ] = [ "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
-    #Samples[ '2017_TTToHadronic' ] = [ "/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
-    #Samples[ '2017_TTZToQQ' ] = [ "/TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
+    Samples[ '2017_TTToSemiLeptonic' ] = [ "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+    Samples[ '2017_TTTo2L2Nu' ] = [ "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+    Samples[ '2017_TTToHadronic' ] = [ "/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
+    Samples[ '2017_TTZToQQ' ] = [ "/TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
     Samples[ '2017_ttHTobb' ] = [ "/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
     Samples[ '2017_ttHNonbb' ] = [ "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v2/MINIAODSIM", 1 ]
     Samples[ '2017_ST_s-channel' ] = [ "/ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
@@ -63,6 +63,9 @@ if __name__ == '__main__':
     Samples[ '2017_ST_tW_antitop' ] = [ "/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
     Samples[ '2017_WJetsToLNu' ] = [ "/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
     Samples[ '2017_WW' ] = [ "/WW_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+    Samples[ '2017_WZ' ] = [ "/WZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
+    Samples[ '2017_ZZ' ] = [ "/ZZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
+    Samples[ '2017_QCD' ] = [ "/QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
     Samples[ '2017_TTWJetsToQQ' ] = [ "/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM", 1 ]
     Samples[ '2017_TTGJets' ] = [ "/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
     Samples[ '2017_THW' ] = [ "/THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", 1 ]
@@ -91,10 +94,10 @@ if __name__ == '__main__':
     for sam in processingSamples:
 
         dataset = processingSamples[sam][0]
-        procName = dataset.split('/')[1].split('-')[0]
+        procName = dataset.split('/')[1].split('-')[0] if dataset.endswith('SIM') else dataset.split('/')[1]+'_'+dataset.split('/')[2]
         config.Data.inputDataset = dataset
         config.Data.unitsPerJob = 1 #processingSamples[sam][1]
-        config.Data.outputDatasetTag = 'NANOAOD_'+args.version
+        config.Data.outputDatasetTag = 'NANOAOD_'+args.version if dataset.endswith('SIM') else dataset.split('/')[2]+'NANOAOD_'+args.version
         config.JobType.psetName = 'modifiedNanoAOD_MC_2017_cfi.py' if dataset.endswith('SIM') else 'modifiedNanoAOD_DATA_2017_cfi.py'
         config.General.requestName = procName+'_NANOAOD'+args.version
         print config

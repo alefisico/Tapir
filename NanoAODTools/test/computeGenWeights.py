@@ -18,7 +18,7 @@ def computeGenWeights( inputFiles, outputName ):
     """docstring for computeGenWeights"""
 
     ### Open root files
-    intree = ROOT.TChain("Events")
+    intree = ROOT.TChain("Runs")
     if isinstance(inputFiles, list):
         for iFile in inputFiles: intree.Add(iFile)
     else: intree.Add(inputFiles)
@@ -26,14 +26,16 @@ def computeGenWeights( inputFiles, outputName ):
 
     ### Convert root tree to numpy array, applying cuts
     arrays = tree2array( intree,
-                            branches=['genWeight'],
+                            branches=['genEventCount'],
                             selection='',
-                            ##stop=1000,  #### to test only, run only 1000 events
+                            #stop=1000,  #### to test only, run only 1000 events
                             )
 
-    tmp = arrays['genWeight']/arrays['genWeight'][0]
-    print 'Total number of events in sample: ', intree.GetEntries()
-    print 'Total sum of genWeights in sample: ', np.sum(tmp, dtype=np.float64)
+    #tmp = arrays['genWeight']/arrays['genWeight'][0]
+    #print 'Total number of events in sample: ', intree.GetEntries()
+    print 'Event weights per file: ', arrays['genEventCount']
+    print 'Total number of events in sample: ', sum(arrays['genEventCount'])
+    #print 'Total sum of genWeights in sample: ', np.sum(tmp, dtype=np.float64)
 
 
 
@@ -78,6 +80,7 @@ if __name__ == '__main__':
         fileDictList = jsample[1].listFiles(dataset=jsample[0],validFileOnly=1)
         print ("dataset %s has %d files" % (jsample[0], len(fileDictList)))
         # DBS client returns a list of dictionaries, but we want a list of Logical File Names
-        allfiles = [ "root://cms-xrd-global.cern.ch/"+dic['logical_file_name'] for dic in fileDictList ]
+        #allfiles = [ "root://cms-xrd-global.cern.ch/"+dic['logical_file_name'] for dic in fileDictList ]
+        allfiles = [ "root://xrootd-cms.infn.it/"+dic['logical_file_name'] for dic in fileDictList ]
 
         computeGenWeights( allfiles, isample )
