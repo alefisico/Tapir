@@ -1,3 +1,0 @@
-[Delphes_ttbb]
-/scratch/algomez/Archive/ttH/DelphesSamples/dileptonicttbar_delphes_newNLOPS.root = 180000
-/scratch/algomez/Archive/ttH/DelphesSamples/semileptonicttbar_delphes_newNLOPS.root = 180000

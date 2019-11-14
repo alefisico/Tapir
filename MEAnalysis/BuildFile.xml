@@ -1,7 +1,0 @@
-<use   name="root"/>
-<use   name="rootgraphics"/>
-<use   name="classlib"/>
-<use   name="boost"/>
-<export>
-  <lib   name="1"/>
-</export>
