@@ -7,6 +7,7 @@ Description: Bkg estimation. Check for options at the end.
 '''
 
 from ROOT import *
+import rootpy.stl as stl
 import time, os, math, sys, copy
 from array import array
 import argparse
@@ -16,6 +17,8 @@ import subprocess
 import CMS_lumi as CMS_lumi
 import tdrstyle as tdrstyle
 #from commonFunctions import *
+MapStrRootPtr = stl.map(stl.string, "TH1*")
+StrHist = stl.pair(stl.string, "TH1*")
 
 ####gReset()
 gROOT.SetBatch()
@@ -28,8 +31,8 @@ yline = array('d', [1,1])
 line = TGraph(2, xline, yline)
 line.SetLineColor(kRed)
 
-#rhalPtList = [ '250', '300', '350', '400', '500', '2000' ]
-rhalPtList = [ '250','2000' ]
+rhalPtList = [ '250', '300', '350', '400', '500', '2000' ]
+#rhalPtList = [ '250','2000' ]
 
 canvas = {}
 
@@ -64,9 +67,160 @@ def buildPolynomialArray( iNVar0, iNVar1, iLabel0, iLabel1, iXMin0, iXMax0 ):
            print pVar,pVal,"!!!!!!!!!!"
            iVars.append(pRooVar)
     return iVars
-
 ######################################################
 
+def computeDDTMap(working_point,deepboosted_rho_pt):
+    """docstring for computeDDTMap based on https://gitlab.cern.ch/abenecke/scripts/blob/master/diboson/taggerstudies/create_2D_decorrelation.py"""
+    ddtMap= deepboosted_rho_pt.Project3D("yx");
+#    ddtMap.SetName(ddtMapName);
+    ddtMap.Reset();
+    ddtMap.SetStats(0);
+    ddtMap.SetDirectory(0);
+    nbins_x = ddtMap.GetNbinsX();
+    nbins_y = ddtMap.GetNbinsY();
+
+    for xbin in range(1, nbins_x):
+        for ybin in range(1,nbins_y):
+            DeepBoostedproj = deepboosted_rho_pt.ProjectionZ("Rho2D", xbin, xbin, ybin, ybin);
+            # Protection against default values
+            # for bin in range(1,DeepBoostedproj.GetNbinsX()):
+                # if DeepBoostedproj.GetBinCenter(bin)<0:
+                #     DeepBoostedproj.SetBinContent(bin,0);
+
+            if DeepBoostedproj.Integral() == 0:
+                xval = deepboosted_rho_pt.GetXaxis().GetBinCenter(xbin)
+                yval = deepboosted_rho_pt.GetYaxis().GetBinCenter(ybin)
+#                print "Caution Integral 0!"
+                ddtMap.SetBinContent(xbin,ybin,0)
+                continue
+
+            wp = array('d',[working_point])
+            quantieles = array('d', [0.])
+            DeepBoostedproj.GetQuantiles(1,quantieles , wp)
+            ddtMap.SetBinContent(xbin,ybin,quantieles[0])
+
+    return ddtMap;
+
+
+######################################################
+def massDecorrelation( name  ):
+    """docstring for massDecorrelation based on https://gitlab.cern.ch/abenecke/scripts/blob/master/diboson/taggerstudies/create_2D_decorrelation.py"""
+
+    bkgHistos = OrderedDict()
+    for bkgSamples in bkgFiles:
+        if not bkgSamples.startswith("TTToSemi"): continue
+        newName = name# .replace('___', ivar+'_').replace('__', '_'+side+'_')
+        bkgHistos[ bkgSamples+'3D' ] = bkgFiles[ bkgSamples ][0].Get( 'tthbb13/'+newName )
+        #bkgHistos[ bkgSamples+'3D' ].SetTitle(bkgSamples+ivar+side)
+        bkgHistos[ bkgSamples+'3D' ].Scale( bkgFiles[ bkgSamples ][1] )
+        #try: bkgHistos[ ivar+side ].Add( bkgHistos[ bkgSamples+ivar+side ].Clone() )
+        #except (KeyError, AttributeError) as e: bkgHistos[ ivar+side ] = bkgHistos[ bkgSamples+ivar+side ].Clone()
+
+        #create 2D projections
+        DeepBoosted_v_rho = TH2D("DeepBoosted_v_rho","DeepBoosted_v_rho",14,-7.0,0,40,0.,1.0);
+        DeepBoosted_v_pt = TH2D("DeepBoosted_v_pt","DeepBoosted_v_pt",150,0,1500,40,0.,1.0);
+        NBins_rho = bkgHistos[ bkgSamples+'3D' ].GetNbinsX();
+        NBins_pt = bkgHistos[ bkgSamples+'3D' ].GetNbinsY();
+        NBins_DeepBoosted = bkgHistos[ bkgSamples+'3D' ].GetNbinsZ();
+
+        print "Bins(x,y,z): " + str(NBins_rho) + "  ,  " + str(NBins_pt) + "  ,  " + str(NBins_DeepBoosted)
+
+        for rhoBin in range(1,NBins_rho):
+            for ptBin in range(1,NBins_pt):
+                for DeepBoostedBin in range(1,NBins_DeepBoosted):
+                    rho = bkgHistos[ bkgSamples+'3D' ].GetXaxis().GetBinCenter(rhoBin)
+                    pt = bkgHistos[ bkgSamples+'3D' ].GetYaxis().GetBinCenter(ptBin)
+                    DeepBoosted = bkgHistos[ bkgSamples+'3D' ].GetZaxis().GetBinCenter(DeepBoostedBin)
+                    DeepBoosted_v_rho.Fill(rho,DeepBoosted,bkgHistos[ bkgSamples+'3D' ].GetBinContent(rhoBin,ptBin,DeepBoostedBin));
+                    DeepBoosted_v_pt.Fill(pt,DeepBoosted,bkgHistos[ bkgSamples+'3D' ].GetBinContent(rhoBin,ptBin,DeepBoostedBin));
+
+        print "Done!"
+
+        canvas['deepBoostedrho'] = TCanvas('deepBoostedrho', 'deepBoostedrho',  10, 10, 750, 750 )
+        DeepBoosted_v_rho.Draw("colz")
+        canvas['deepBoostedrho'].SaveAs('Plots/deepBoostedrho.png')
+
+        canvas['deepBoostedpt'] = TCanvas('deepBoostedpt', 'deepBoostedpt',  10, 10, 750, 750 )
+        DeepBoosted_v_pt.Draw("colz")
+        canvas['deepBoostedpt'].SaveAs('Plots/deepBoostedpt.png')
+
+        for xbin in range(1,DeepBoosted_v_rho.GetNbinsX()+1):
+            proj = DeepBoosted_v_rho.ProjectionY("_y",xbin,xbin)
+            if not proj.Integral() == 0:
+                proj.Scale(1/proj.Integral())
+            if not xbin%10:
+                print "rho bin  " + str(DeepBoosted_v_rho.GetXaxis().GetBinCenter(xbin))
+                c1 = TCanvas("c"+str(xbin), "c"+str(xbin), 600, 600);
+                gStyle.SetOptStat(kFALSE);
+                gStyle.SetPadTickY(1);
+                gStyle.SetPadTickX(1);
+                gStyle.SetLegendBorderSize(0);
+                gPad.SetBottomMargin(.2);
+                gPad.SetRightMargin(.2);
+
+                leg=TLegend(0.2,0.7,0.4,0.9,"","brNDC")
+                leg.SetHeader("#splitline{rho = " + str(DeepBoosted_v_rho.GetXaxis().GetBinCenter(xbin))+"}{averaged in pT}")
+                leg.SetBorderSize(0);
+                leg.SetTextSize(0.035);
+                leg.SetFillColor(0);
+                leg.SetLineColor(1);
+                leg.SetTextFont(42);
+
+
+                proj.GetXaxis().SetRangeUser(0,1)
+                proj.GetXaxis().SetTitle("DeepBoosted")
+                proj.GetYaxis().SetTitle("#Delta N /N")
+                #proj.GetXaxis().SetLabelSize(ldsize)
+
+                proj.Draw()
+
+                txbin_0p02 = -99
+                txbin_0p05 = -99
+                first = True
+                for bin in range(1,proj.GetNbinsX()+1):
+                    inte = proj.Integral(0,bin)
+
+                    if inte >= 0.98:
+                        txbin_0p02 = proj.GetBinCenter(bin)
+                        break
+                    if inte >= 0.95 and first:
+                        txbin_0p05 = proj.GetBinCenter(bin)
+                        first = False
+
+
+                line_0p02 = TLine(txbin_0p02,0,txbin_0p02,1)
+                line_0p02.SetLineColor(kBlue)
+                line_0p02.Draw("same")
+
+                leg.AddEntry(line_0p02,"2% mistag rate","l")
+
+                line_0p05 = TLine(txbin_0p05,0,txbin_0p05,1)
+                line_0p05.SetLineColor(kRed)
+                line_0p05.Draw("same")
+
+                leg.AddEntry(line_0p05,"5% mistag rate","l")
+                leg.Draw()
+                c1.SetLogy()
+                c1.SaveAs("Plots/Proj"+str(xbin)+".png");
+
+        #calculated Map
+        ddt_0p05= computeDDTMap(0.95,bkgHistos[ bkgSamples+'3D' ]);
+
+        ddt_0p05.SetTitle("Simple DeepBoosted-DDT map");
+        ddt_0p05.SetTitle("Rho2D");
+        c1 = TCanvas("c1", "c1", 600, 600);
+        gPad.SetRightMargin(0.2);
+        ddt_0p05.GetXaxis().SetRangeUser(-6.0,-1);
+        ddt_0p05.GetYaxis().SetRangeUser(0,2000);
+        ddt_0p05.GetZaxis().SetRangeUser(0,1);
+        ddt_0p05.Draw("colz");
+        c1.SaveAs("Plots/DDT_0p05.png");
+        ddt_0p05.GetZaxis().SetRangeUser(0.6,1);
+        c1.SaveAs("Plots/DDT_0p05_scale.png");
+
+
+
+######################################################
 def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY=0.50, log=False, ext='png' ):
     """Bkg Estimation with rhalphabet method based on https://github.com/cmantill/ZPrimePlusJet/blob/56818fd461b549863ad56a2ed424c68c46fedff4/fitting/ZqqJet/resultsfeb20/buildRhalphabet.py"""
 
@@ -178,7 +332,7 @@ def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
         pad2.SetBottomMargin(0.3)
         tmpPad2= pad2.DrawFrame(-10, 0, 2, 2)
 
-        tmpPad2.GetXaxis().SetTitle( 'Higgs candidate softdrop mass [GeV]' )
+        tmpPad2.GetXaxis().SetTitle( 'Higgs candidate #rho' )
         tmpPad2.GetYaxis().SetTitle( "Pass/Fail" )
         tmpPad2.GetYaxis().SetTitleOffset( 0.5 )
         tmpPad2.GetYaxis().CenterTitle()
@@ -362,27 +516,31 @@ def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
         canvas['bkgEst'+ptbin].SaveAs( 'Plots/'+ outputFileName )
         ######################
 
-        ### For Roofit creating Roorealvar, datasets, etc..
-        a0 = RooRealVar("a0", "a0", 0, -1, 1)
-        a1 = RooRealVar("a1", "a1", 0, -1, 1)
-        a2 = RooRealVar("a2", "a2", 0, -1, 1)
-        a3 = RooRealVar("a3", "a3", 0, -1, 1)
-        tmpRooArgListMass = RooArgList( a0, a1, a2, a3 )
-        rooDict[ 'BernsteinMass'+ptbin ] = RooBernstein( "bkgMass"+ptbin, "bkgMass"+ptbin, MSD, tmpRooArgListMass )
-        rooDict[ 'PassFailMass'+ptbin ] = RooDataHist( 'PassFailMass'+ptbin, 'PassFailMass'+ptbin, RooArgList(MSD), bkgHistos[ 'MassPt'+ptbin ].GetHistogram() )
-        b0 = RooRealVar("b0", "b0", 0, -1, 1)
-        b1 = RooRealVar("b1", "b1", 0, -1, 1)
-        b2 = RooRealVar("b2", "b2", 0, -1, 1)
-        b3 = RooRealVar("b3", "b3", 0, -1, 1)
-        tmpRooArgListRho = RooArgList( b0, b1, b2, b3 )
-        rooDict[ 'BernsteinRho'+ptbin ] = RooBernstein( "bkgRho"+ptbin, "bkgRho"+ptbin, MSD, tmpRooArgListRho )
-        rooDict[ 'PassFailRho'+ptbin ] = RooDataHist( 'PassFailRho'+ptbin, 'PassFailRho'+ptbin, RooArgList(RHO), bkgHistos[ 'RhoPt'+ptbin ].GetHistogram() )
-
-        combData = RooDataHist("combdata", "combdata", RooArgSet(MSD), RooFit.Index(cats), RooFit.Import("mass", rooDict[ 'PassFailMass'+ptbin ]), RooFit.Import("rho", rooDict[ 'PassFailRho'+ptbin ]) )
-        rooDict[ 'lTot'+ptbin ] = RooSimultaneous( 'tot'+ptbin, 'tot'+ptbin, cats )
-        rooDict[ 'lTot'+ptbin ].addPdf( rooDict[ 'BernsteinMass'+ptbin ], "mass" )
-        rooDict[ 'lTot'+ptbin ].addPdf( rooDict[ 'BernsteinRho'+ptbin ], "rho" )
-        rooDict[ 'lTot'+ptbin ].Print()
+#        ### For Roofit creating Roorealvar, datasets, etc..
+#        a0 = RooRealVar("a0", "a0", 0, -1, 1)
+#        a1 = RooRealVar("a1", "a1", 0, -1, 1)
+#        a2 = RooRealVar("a2", "a2", 0, -1, 1)
+#        a3 = RooRealVar("a3", "a3", 0, -1, 1)
+#        tmpRooArgListMass = RooArgList( a0, a1, a2, a3 )
+#        rooDict[ 'BernsteinMass'+ptbin ] = RooBernstein( "bkgMass"+ptbin, "bkgMass"+ptbin, MSD, tmpRooArgListMass )
+#        rooDict[ 'PassFailMass'+ptbin ] = RooDataHist( 'PassFailMass'+ptbin, 'PassFailMass'+ptbin, RooArgList(MSD), bkgHistos[ 'MassPt'+ptbin ].GetHistogram() )
+#        b0 = RooRealVar("b0", "b0", 0, -1, 1)
+#        b1 = RooRealVar("b1", "b1", 0, -1, 1)
+#        b2 = RooRealVar("b2", "b2", 0, -1, 1)
+#        b3 = RooRealVar("b3", "b3", 0, -1, 1)
+#        tmpRooArgListRho = RooArgList( b0, b1, b2, b3 )
+#        rooDict[ 'BernsteinRho'+ptbin ] = RooBernstein( "bkgRho"+ptbin, "bkgRho"+ptbin, MSD, tmpRooArgListRho )
+#        rooDict[ 'PassFailRho'+ptbin ] = RooDataHist( 'PassFailRho'+ptbin, 'PassFailRho'+ptbin, RooArgList(RHO), bkgHistos[ 'RhoPt'+ptbin ].GetHistogram() )
+#
+#        histosMap = MapStrRootPtr()
+#        histosMap.insert(StrHist("rho", bkgHistos[ 'MassPt'+ptbin ].GetHistogram()))
+#        histosMap.insert(StrHist("mass", bkgHistos[ 'MassPt'+ptbin ].GetHistogram()))
+#        #combData = RooDataHist("combdata", "combdata", RooArgSet(MSD), RooFit.Index(cats), RooFit.Import("mass", rooDict[ 'PassFailMass'+ptbin ]), RooFit.Import("rho", rooDict[ 'PassFailRho'+ptbin ]) )
+#        combData = RooDataHist("combdata", "combdata", RooArgList(MSD), cats, histosMap )
+#        rooDict[ 'lTot'+ptbin ] = RooSimultaneous( 'tot'+ptbin, 'tot'+ptbin, cats )
+#        rooDict[ 'lTot'+ptbin ].addPdf( rooDict[ 'BernsteinMass'+ptbin ], "mass" )
+#        rooDict[ 'lTot'+ptbin ].addPdf( rooDict[ 'BernsteinRho'+ptbin ], "rho" )
+#        rooDict[ 'lTot'+ptbin ].Print()
 
 
         '''
@@ -482,6 +640,6 @@ if __name__ == '__main__':
                 [ 'leadAK8Jet___2JdeltaR2WTau21DDT__boostedHiggs', 'Higgs candidate mass [GeV]', 50, 200, 2, False ],
                 ]
 
-
+        #massDecorrelation( 'leadAK8JetRhoPtHbb_2JdeltaR2WTau21DDT_boostedHiggs' )
 	for i in plotList:
             BkgEstimation( i[0], i[2], i[3], i[4], log=args.log, axisX=i[1])

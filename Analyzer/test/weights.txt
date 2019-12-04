@@ -1,0 +1,134 @@
+dataset /TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/algomez-NANOAOD_v02-3ea2ff745e1084ea23260bd2ac726434/USER has 16 files
+16
+Total number of genEventCount in sample:  750000
+Total number of genEventSumw in sample:  383062.0686438
+Total number of genEventSumw2 in sample:  866965.963875667
+Total sum of genWeights in sample:  383062.0867538452
+Total sum of sign(genWeights) in sample:  356286.0
+dataset /WW_TuneCP5_13TeV-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 93 files
+93
+Total number of genEventCount in sample:  7791498
+Total number of genEventSumw in sample:  7791560.886900297
+Total number of genEventSumw2 in sample:  7791643.3226312725
+Total sum of genWeights in sample:  7791560.886900187
+Total sum of sign(genWeights) in sample:  7791498.0
+dataset /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02-3ea2ff745e1084ea23260bd2ac726434/USER has 706 files
+706
+Total number of genEventCount in sample:  35766813
+Total number of genEventSumw in sample:  10758424549.765732
+Total number of genEventSumw2 in sample:  3288992843305.9976
+Total sum of genWeights in sample:  10758424623.931652
+Total sum of sign(genWeights) in sample:  35477937.0
+dataset /THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 172 files
+172
+Total number of genEventCount in sample:  4719999
+Total number of genEventSumw in sample:  4714331.0
+Total number of genEventSumw2 in sample:  4719999.0
+Total sum of genWeights in sample:  4714331.0
+Total sum of sign(genWeights) in sample:  4714331.0
+dataset /TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 192 files
+192
+Total number of genEventCount in sample:  7339366
+Total number of genEventSumw in sample:  52309926.16826202
+Total number of genEventSumw2 in sample:  2471820726.0029287
+Total sum of genWeights in sample:  52309928.467853546
+Total sum of sign(genWeights) in sample:  2850394.0
+dataset /TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02-3ea2ff745e1084ea23260bd2ac726434/USER has 152 files
+152
+Total number of genEventCount in sample:  8922394
+Total number of genEventSumw in sample:  643135033.87298
+Total number of genEventSumw2 in sample:  47119532918.252144
+Total sum of genWeights in sample:  643135060.1789997
+Total sum of sign(genWeights) in sample:  8850002.0
+dataset /TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 18 files
+18
+Total number of genEventCount in sample:  811306
+Total number of genEventSumw in sample:  560315.13342
+Total number of genEventSumw2 in sample:  1306381.2642131709
+Total sum of genWeights in sample:  560315.1342487335
+Total sum of sign(genWeights) in sample:  441560.0
+dataset /ZZ_TuneCP5_13TeV-pythia8/algomez-NANOAOD_v02-5fb730f1ae83631a3be7a3e2c0ea6b8f/USER has 27 files
+27
+Total number of genEventCount in sample:  1925931
+Total number of genEventSumw in sample:  1925931.0
+Total number of genEventSumw2 in sample:  1925931.0
+Total sum of genWeights in sample:  1925931.0
+Total sum of sign(genWeights) in sample:  1925931.0
+dataset /TTToHadronic_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02-3ea2ff745e1084ea23260bd2ac726434/USER has 656 files
+656
+Total number of genEventCount in sample:  41084368
+Total number of genEventSumw in sample:  41084368.0
+Total number of genEventSumw2 in sample:  41084368.0
+Total sum of genWeights in sample:  41084368.0
+Total sum of sign(genWeights) in sample:  41084368.0
+dataset /ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 114 files
+114
+Total number of genEventCount in sample:  7945242
+Total number of genEventSumw in sample:  277241050.84022224
+Total number of genEventSumw2 in sample:  9823995766.508371
+Total sum of genWeights in sample:  277241042.3379413
+Total sum of sign(genWeights) in sample:  7884388.0
+dataset /ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 146 files
+146
+Total number of genEventCount in sample:  9842738
+Total number of genEventSumw in sample:  36781553.9269421
+Total number of genEventSumw2 in sample:  353211884.3199695
+Total sum of genWeights in sample:  36781554.20269465
+Total sum of sign(genWeights) in sample:  6139912.0
+dataset /WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 514 files
+514
+Total number of genEventCount in sample:  33073306
+Total number of genEventSumw in sample:  33043732.0
+Total number of genEventSumw2 in sample:  33073306.0
+Total sum of genWeights in sample:  33043732.0
+Total sum of sign(genWeights) in sample:  33043732.0
+dataset /ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 173 files
+173
+Total number of genEventCount in sample:  8000000
+Total number of genEventSumw in sample:  4216319.315883996
+Total number of genEventSumw2 in sample:  2317497.816607995
+Total sum of genWeights in sample:  4216319.381806612
+Total sum of sign(genWeights) in sample:  7833734.0
+dataset /ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02p1-3ea2ff745e1084ea23260bd2ac726434/USER has 191 files
+191
+Total number of genEventCount in sample:  9332943
+Total number of genEventSumw in sample:  2215145.853338999
+Total number of genEventSumw2 in sample:  526777.723818994
+Total sum of genWeights in sample:  2215145.9113413244
+Total sum of sign(genWeights) in sample:  9323907.0
+dataset /ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 267 files
+267
+Total number of genEventCount in sample:  5499293
+Total number of genEventSumw in sample:  3095197.811741999
+Total number of genEventSumw2 in sample:  1810610.020811623
+Total sum of genWeights in sample:  3095197.8161249757
+Total sum of sign(genWeights) in sample:  5394229.0
+dataset /ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 91 files
+91
+Total number of genEventCount in sample:  5863722
+Total number of genEventSumw in sample:  5863722.0
+Total number of genEventSumw2 in sample:  5863722.0
+Total sum of genWeights in sample:  5863722.0
+Total sum of sign(genWeights) in sample:  5863722.0
+dataset /ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/algomez-NANOAOD_v02-5157e087a222b5255c63dabe0cebaee6/USER has 150 files
+150
+Total number of genEventCount in sample:  7745276
+Total number of genEventSumw in sample:  270762750.17252463
+Total number of genEventSumw2 in sample:  9611964941.797768
+Total sum of genWeights in sample:  270762756.8502283
+Total sum of sign(genWeights) in sample:  7686032.0
+dataset /WZ_TuneCP5_13TeV-pythia8/algomez-NANOAOD_v02-5fb730f1ae83631a3be7a3e2c0ea6b8f/USER has 50 files
+50
+Total number of genEventCount in sample:  3928630
+Total number of genEventSumw in sample:  3928630.0
+Total number of genEventSumw2 in sample:  3928630.0
+Total sum of genWeights in sample:  3928630.0
+Total sum of sign(genWeights) in sample:  3928630.0
+dataset /QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8/algomez-NANOAOD_v02-5fb730f1ae83631a3be7a3e2c0ea6b8f/USER has 247 files
+247
+Total number of genEventCount in sample:  18288989
+Total number of genEventSumw in sample:  307747.49194707954
+Total number of genEventSumw2 in sample:  131196.42043271175
+Total sum of genWeights in sample:  307747.4919412293
+Total sum of sign(genWeights) in sample:  18288989.0
+

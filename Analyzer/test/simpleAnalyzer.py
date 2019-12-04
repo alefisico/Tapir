@@ -1,7 +1,7 @@
 #################################################################
 ## To run:
 ##  - Input file in PSet.py
-##  - Example: python evenSimplerJob_nanoAODPostproc.py --sample ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8  --oFile _TTSemi --local --process boosted --numEvents 1000
+##  - Example: python simpleAnalyzer.py --sample ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8  --oFile _TTSemi --local --process boosted --numEvents 1000
 #################################################################
 import os
 from importlib import import_module
@@ -15,8 +15,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles, runsAndLumis
 ### central nanoAOD modules
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsModule
-from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight_2018
-#from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017, jetmetUncertainties2017All
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight_2016, puAutoWeight_2017, puAutoWeight_2018
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import *
 ### other modules
 from TTH.Analyzer.boostedAnalyzer import boostedAnalyzer
@@ -89,9 +88,9 @@ precuts = PV + " && " + METFilters + " && " + Triggers
 cuts= precuts + " && ( ( nJet>1 ) && ( Jet_pt>15 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 ) )"
 
 listOfModules = []
-#listOfModules.append( countHistogramsModule() )
+listOfModules.append( countHistogramsModule() )
 if isMC:
-    listOfModules.append( puAutoWeight_2018() )
+    listOfModules.append( puAutoWeight_2017() )
 jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=2017, jesUncert="All", redojec=True)
 listOfModules.append( jetmetCorrector() )
 if args.process.startswith( ('both', 'resolved') ):
