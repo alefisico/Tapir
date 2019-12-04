@@ -10,7 +10,7 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 
 
 ### adding all the packages needed
-git clone ssh://git@gitlab.cern.ch:7999/algomez/tthbb13.git TTH --branch 10_6_5
+git clone git@github.com:alefisico/Tapir.git TTH --branch 10_6_5
 git clone https://gitlab.cern.ch/Zurich_ttH/MEIntegratorStandalone.git -b 10_2_X TTH/MEIntegratorStandalone
 git clone ssh://git@gitlab.cern.ch:7999/ttH/CommonClassifier.git TTH/CommonClassifier -b 10_2X_MVAvars
 git clone https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git TTH/RecoLikelihoodReconstruction

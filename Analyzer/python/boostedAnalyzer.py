@@ -32,7 +32,55 @@ class boostedAnalyzer(Module):
 	Module.beginJob(self,histFile,histDirName)
 
         self.addObject( ROOT.TH1F('nEvents',   ';number of events in category',   10, 0, 10) )
+        self.addObject( ROOT.TH1F('cutFlow',   ';number of events in selection',   10, 0, 10) )
+        self.addObject( ROOT.TH1F('cutFlow_weight',   ';number of events in selection',   10, 0, 10) )
+        self.addObject( ROOT.TH1F('cutFlow_genWeight',   ';number of events in selection',   10, 0, 10) )
+        #### general selection
+        for isel in [ '', '_2JNoWeight', '_2J',  '_2J2W', '_2J2WdeltaR', '_2J2WdeltaRTau21' ]:
+            self.addObject( ROOT.TH1F('nPVs'+isel,   ';number of PVs',   100, 0, 100) )
+            self.addObject( ROOT.TH1F('nleps'+isel,   ';number of leptons',   20, 0, 20) )
+            self.addP4Hists( 'lepton', isel )
+            self.addObject( ROOT.TH1F('njets'+isel,   ';number of AK4 jets',   20, 0, 20) )
+            self.addP4Hists( 'jets', isel )
+            self.addObject( ROOT.TH1F('nBjets'+isel,   ';number of AK4 b jets',   20, 0, 20) )
+            self.addObject( ROOT.TH1F('nAK8jets'+isel,   ';number of AK8 jets',   20, 0, 20) )
+            self.addObject( ROOT.TH1F('METPt'+isel,   ';MET (GeV)',   500, 0, 5000) )
+
+            self.addObject( ROOT.TH1F('lepWMass'+isel,   ';Leptonic W candidate mass', 60, 0, 300) )
+            self.addObject( ROOT.TH1F('lepWPt'+isel,   ';Leptonic W candidate pt ', 60, 0, 300) )
+            self.addObject( ROOT.TH1F('leadAK8JetMass'+isel,   ';Leading AK8 jet mass', 60, 0, 300) )
+            self.addObject( ROOT.TH1F('leadAK8JetPt'+isel,   ';Leading AK8 jet mass', 150, 0, 1500) )
+            self.addObject( ROOT.TH1F('leadAK8JetRho'+isel,   ';#rho', 40, -10, 10) )
+            self.addObject( ROOT.TH1F('leadAK8JetTau21'+isel,   ';#tau_{21}', 40, 0, 1) )
+            self.addObject( ROOT.TH1F('leadAK8JetHbb'+isel,   ';Hbb discriminator', 40, 0, 1) )
+            self.addObject( ROOT.TH1F('resolvedWCandMass'+isel,   ';W candidate mass', 60, 0, 300) )
+            self.addObject( ROOT.TH1F('resolvedWCandPt'+isel,   ';W candidate pt', 60, 0, 300) )
+            #self.addObject( ROOT.TH1F('boostedWCandMass'+isel,   ';W candidate mass', 60, 0, 300) )
+            #self.addObject( ROOT.TH1F('boostedWCandPt'+isel,   ';W candidate pt', 60, 0, 300) )
+            self.addObject( ROOT.TH1F('noHiggsCandMass'+isel,   ';Leading AK8 jet mass', 60, 0, 300) )
+            self.addObject( ROOT.TH3F('leadAK8JetRhoPtHbb'+isel,   ';Leading AK8 jet rho; Leading AK8 jet pt; Hbb discriminator', 40, -10, 10, 150, 0, 1500, 40, 0, 1) )
+
+            #### For ABCD
+            #for side in [ 'A', 'B', 'C', 'D' ]:
+            #    self.addObject( ROOT.TH2F('HbbvsTau21_'+side+isel,   ';', 20, 0, 1, 20, 0, 1) )
+            #    self.addObject( ROOT.TH1F('leadAK8JetMass_'+side+isel,   ';Leading AK8 jet mass', 60, 0, 300) )
+
+        #### For rhalphabet
+        for isel in [ '2J2WdeltaRTau21_', '2J2WdeltaR_' ]:
+            for ipass in [ 'Pass', 'Fail' ]:
+                self.addObject( ROOT.TH1F('leadAK8JetMass_'+isel+ipass,   ';Leading AK8 jet mass', 60, 0, 300) )
+                self.addObject( ROOT.TH1F('resolvedWCandMass_'+isel+ipass,   ';W candidate mass', 60, 0, 300) )
+                self.addObject( ROOT.TH1F('leadAK8JetRho_'+isel+ipass,   ';Leading AK8 jet #rho', 40, -10, 10) )
+                self.addObject( ROOT.TH1F('leadAK8JetTau21_'+isel+ipass,   ';#Leading AK8 jet tau_{21}', 40, 0, 1) )
+                self.addObject( ROOT.TH1F('leadAK8JetHbb_'+isel+ipass,   ';Leading AK8 jet Hbb discriminator', 40, 0, 1) )
+                self.addObject( ROOT.TH2F('leadAK8JetMassPt_'+isel+ipass,   ';Leading AK8 jet mass;Leading AK8 jet pt', 60, 0, 300,  1500, 0, 1500) )
+                self.addObject( ROOT.TH2F('leadAK8JetRhoPt_'+isel+ipass,   ';Leading AK8 jet #rho;Leading AK8 jet pt', 40, -10, 10,  1500, 0, 1500) )
+                self.addObject( ROOT.TH3F('leadAK8JetRhoPtMass_'+isel+ipass,   ';Leading AK8 jet #rho;Leading AK8 jet pt;Leading AK8 jet mass', 60, 0, 300,  1500, 0, 1500, 60, 0, 300) )
+
+
+        ### additional single plots
         self.addObject( ROOT.TH1F('leadAK8JetN2',   ';#rho', 40, 0, 1) )
+        self.addObject( ROOT.TH1F('leadAK8JetTau21DDT',   ';#tau_{21}^{DDT}', 40, 0, 1) )
         self.addObject( ROOT.TH2F('leadAK8JetdeepAK8HbbMDTop',   '', 40, 0, 1, 40, 0, 1) )
         self.addObject( ROOT.TH2F('leadAK8JetdeepAK8HbbMDDDB',   '', 40, 0, 1, 40, 0, 1) )
         self.addObject( ROOT.TH2F('resolvedWCandHiggsCandMass_2J',   ';W candidate mass', 60, 0, 300, 60, 0, 300) )
@@ -48,7 +96,6 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('leadAK8JetPt_2J2W1B',   ';Leading AK8 jet mass', 150, 0, 1500) )
         self.addObject( ROOT.TH1F('leadAK8JetMass_2J2W2B',   ';Leading AK8 jet mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('leadAK8JetPt_2J2W2B',   ';Leading AK8 jet mass', 150, 0, 1500) )
-        self.addObject( ROOT.TH2F('leadAK8JetRhoHbb_2J2W',   ';#rho', 40, -10, 10, 40, 0, 1) )
         self.addObject( ROOT.TH2F('leadAK8JetRhoTau21_2J2W',   ';#rho', 40, -10, 10, 40, 0, 1) )
         self.addObject( ROOT.TH3F('leadAK8JetPtMassHbb_2J2W',   ';#rho', 50, 100, 600, 30, 0, 300, 40, 0, 1) )
         self.addObject( ROOT.TH2F('resolvedWCandHiggsCandMass_2J2W',   ';W candidate mass', 60, 0, 300, 60, 0, 300) )
@@ -67,47 +114,18 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('leadAK8JetMass_1B',   ';Leading AK8 jet mass', 60, 0, 300) )
         self.addObject( ROOT.TH1F('deltaR1BHiggs_1B',   ';deltaR( 1b, Higgs )', 50, 0, 5 ) )
         self.addObject( ROOT.TH1F('leadAK8JetMass_2B',   ';Leading AK8 jet mass', 60, 0, 300) )
-
-
-        #### general selection
-        for isel in [ '',  '_2J',  '_2J2W', '_2JdeltaR', '_2JdeltaR2W', '_2JdeltaR2W1B', '_2JdeltaR2W2B', '_W', '_W1B', '_2JdeltaR2WTau21DDT' ]:
-            self.addObject( ROOT.TH1F('nPVs'+isel,   ';number of PVs',   100, 0, 100) )
-            self.addObject( ROOT.TH1F('nleps'+isel,   ';number of leptons',   20, 0, 20) )
-            self.addP4Hists( 'lepton', isel )
-            self.addObject( ROOT.TH1F('njets'+isel,   ';number of AK4 jets',   20, 0, 20) )
-            self.addP4Hists( 'jet', isel )
-            self.addObject( ROOT.TH1F('nBjets'+isel,   ';number of AK4 b jets',   20, 0, 20) )
-            self.addObject( ROOT.TH1F('METPt'+isel,   ';MET (GeV)',   500, 0, 5000) )
-            self.addObject( ROOT.TH1F('lepWMass'+isel,   ';Leptonic W candidate mass', 60, 0, 300) )
-            self.addObject( ROOT.TH1F('leadAK8JetMass'+isel,   ';Leading AK8 jet mass', 60, 0, 300) )
-            self.addObject( ROOT.TH1F('leadAK8JetPt'+isel,   ';Leading AK8 jet mass', 150, 0, 1500) )
-            self.addObject( ROOT.TH1F('resolvedWCandMass'+isel,   ';W candidate mass', 60, 0, 300) )
-            self.addObject( ROOT.TH1F('boostedWCandMass'+isel,   ';W candidate mass', 60, 0, 300) )
-            self.addObject( ROOT.TH1F('leadAK8JetRho'+isel,   ';#rho', 40, -10, 10) )
-            self.addObject( ROOT.TH1F('leadAK8JetTau21'+isel,   ';#tau_{21}', 40, 0, 1) )
-            self.addObject( ROOT.TH1F('leadAK8JetTau21DDT'+isel,   ';#tau_{21}^{DDT}', 40, 0, 1) )
-            self.addObject( ROOT.TH1F('leadAK8JetHbb'+isel,   ';Hbb discriminator', 40, 0, 1) )
-            self.addObject( ROOT.TH2F('HbbvsTau21'+isel,   ';', 20, 0, 1, 20, 0, 1) )
-            self.addObject( ROOT.TH1F('noHiggsCandMass'+isel,   ';Leading AK8 jet mass', 60, 0, 300) )
-            self.addObject( ROOT.TH3F('leadAK8JetRhoPtHbb'+isel,   ';Leading AK8 jet rho; Leading AK8 jet pt; Hbb discriminator', 40, -10, 10, 150, 0, 1500, 40, 0, 1) )
-
-            #### For ABCD
-            #for side in [ 'A', 'B', 'C', 'D' ]:
-            #    self.addObject( ROOT.TH2F('HbbvsTau21_'+side+isel,   ';', 20, 0, 1, 20, 0, 1) )
-            #    self.addObject( ROOT.TH1F('leadAK8JetMass_'+side+isel,   ';Leading AK8 jet mass', 60, 0, 300) )
-
-        #### For rhalphabet
-        for isel in [ '2JdeltaR2WTau21DDT_' ]:
-            for ipass in [ 'Pass', 'Fail' ]:
-                self.addObject( ROOT.TH1F('leadAK8JetHbb_'+isel+ipass,   ';Leading AK8 jet Hbb discriminator', 40, 0, 1) )
-                self.addObject( ROOT.TH1F('leadAK8JetMass_'+isel+ipass,   ';Leading AK8 jet mass', 60, 0, 300) )
-                self.addObject( ROOT.TH1F('resolvedWCandMass_'+isel+ipass,   ';W candidate mass', 60, 0, 300) )
-                self.addObject( ROOT.TH1F('leadAK8JetRho_'+isel+ipass,   ';Leading AK8 jet #rho', 40, -10, 10) )
-                self.addObject( ROOT.TH1F('leadAK8JetTau21_'+isel+ipass,   ';#Leading AK8 jet tau_{21}', 40, 0, 1) )
-                self.addObject( ROOT.TH1F('leadAK8JetTau21DDT_'+isel+ipass,   ';#Leading AK8 jet tau_{21}^{DDT}', 40, 0, 1) )
-                self.addObject( ROOT.TH2F('leadAK8JetMassPt_'+isel+ipass,   ';Leading AK8 jet mass;Leading AK8 jet pt', 60, 0, 300,  1500, 0, 1500) )
-                self.addObject( ROOT.TH2F('leadAK8JetRhoPt_'+isel+ipass,   ';Leading AK8 jet #rho;Leading AK8 jet pt', 40, -10, 10,  1500, 0, 1500) )
-                self.addObject( ROOT.TH3F('leadAK8JetRhoPtMass_'+isel+ipass,   ';Leading AK8 jet #rho;Leading AK8 jet pt;Leading AK8 jet mass', 60, 0, 300,  1500, 0, 1500, 60, 0, 300) )
+        self.addObject( ROOT.TH1F('leadAK8JetMass_2J2WdeltaR1B',   ';Leading AK8 jet mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('resolvedWCandMass_2J2WdeltaR1B',   ';W candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('leadAK8JetRho_2J2WdeltaR1B',   ';#rho', 40, -10, 10) )
+        self.addObject( ROOT.TH1F('leadAK8JetTau21_2J2WdeltaR1B',   ';#tau_{21}', 40, 0, 1) )
+        self.addObject( ROOT.TH1F('leadAK8JetHbb_2J2WdeltaR1B',   ';Hbb discriminator', 40, 0, 1) )
+        self.addObject( ROOT.TH1F('noHiggsCandMass_2J2WdeltaR1B',   ';Leading AK8 jet mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('leadAK8JetMass_2J2WdeltaR2B',   ';Leading AK8 jet mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('resolvedWCandMass_2J2WdeltaR2B',   ';W candidate mass', 60, 0, 300) )
+        self.addObject( ROOT.TH1F('leadAK8JetRho_2J2WdeltaR2B',   ';#rho', 40, -10, 10) )
+        self.addObject( ROOT.TH1F('leadAK8JetTau21_2J2WdeltaR2B',   ';#tau_{21}', 40, 0, 1) )
+        self.addObject( ROOT.TH1F('leadAK8JetHbb_2J2WdeltaR2B',   ';Hbb discriminator', 40, 0, 1) )
+        self.addObject( ROOT.TH1F('noHiggsCandMass_2J2WdeltaR2B',   ';Leading AK8 jet mass', 60, 0, 300) )
 
 
         ###### OLD plots, just for archive
@@ -302,7 +320,6 @@ class boostedAnalyzer(Module):
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
         jets = Collection(event, "Jet")
-        puppijets = Collection(event, "selectedPatJetsAK4PFPuppi")
         fatjets = Collection(event, "FatJet")
         PV = Object(event, 'PV')
         MET = Object(event, 'MET')
@@ -325,7 +342,7 @@ class boostedAnalyzer(Module):
         else: leptonWeights = [1, 1, 1]
 
         ### Jets
-        looseJets = [ j for j in jets if (abs(j.eta<2.4)) and (j.pt>20) and (j.jetId>=2) and (j.puId>=4) ]
+        looseJets = [ j for j in jets if (abs(j.eta<2.4)) and (j.pt>20) and ( (j.jetId>=2) and (j.puId>=4) and (j.pt<50) ) ]
         goodJets = looseJets if (len(looseJets)>0) and (looseJets[0].pt>30) else []
         goodJetsNoLep = [ j for j in goodJets for l in goodLeptons if j.p4().DeltaR(l.p4())>=0.4  ]
 
@@ -338,7 +355,7 @@ class boostedAnalyzer(Module):
         ## clones for further studies
         badFatJets = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
         allhiggsCandidates = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>250) ]
-        badFatJets_boostedW = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
+        #badFatJets_boostedW = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
 
         ### Selection
         metcut = (MET.pt>20)
@@ -352,6 +369,10 @@ class boostedAnalyzer(Module):
         else: weight = 1
         #self.out.fillBranch('totalWeight', weight)
 
+        getattr( self, 'cutFlow' ).Fill( 1 )
+        getattr( self, 'cutFlow_weight' ).Fill( 1, weight )
+        getattr( self, 'cutFlow_genWeight' ).Fill( 1, event.genWeight )
+
         getattr( self, 'nEvents' ).Fill( 0 )
         if ( metcut and nlepcut ): getattr( self, 'nEvents' ).Fill( 1 )
         if ( metcut and nlepcut and (njetscut and nbjetscut) ) : getattr( self, 'nEvents' ).Fill( 2 )
@@ -359,17 +380,25 @@ class boostedAnalyzer(Module):
         if ( metcut and nlepcut and not (njetscut or nbjetscut) ) : getattr( self, 'nEvents' ).Fill( 4 )
 
         #################################### Boosted
-        orthogonalcut = metcut and nlepcut #and not (njetscut and nbjetscut)
+        if metcut and nlepcut and (len(allhiggsCandidates)>0):
 
-        if orthogonalcut:
+            getattr( self, 'cutFlow' ).Fill( 2 )
+            getattr( self, 'cutFlow_weight' ).Fill( 2, weight )
+            getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
 
             ### General
-            getattr( self, 'nleps' ).Fill( len(goodLeptons) )
-            getattr( self, 'njets' ).Fill( len(goodJetsNoLep) )
-            getattr( self, 'nBjets' ).Fill( len(goodBjetsDeepFlav) )
-            getattr( self, 'lepton_pt' ).Fill( goodLeptons[0].pt )
-            getattr( self, 'lepton_eta' ).Fill( goodLeptons[0].eta )
-            getattr( self, 'METPt' ).Fill( MET.pt )
+            getattr( self, 'nPVs' ).Fill( event.puWeight, weight )
+            getattr( self, 'nleps' ).Fill( len(goodLeptons), weight )
+            getattr( self, 'lepton_pt' ).Fill( goodLeptons[0].pt, weight )
+            getattr( self, 'lepton_eta' ).Fill( goodLeptons[0].eta, weight )
+            getattr( self, 'lepton_phi' ).Fill( goodLeptons[0].phi, weight )
+            getattr( self, 'njets' ).Fill( len(goodJetsNoLep), weight )
+            for ijet in goodJetsNoLep:
+                getattr( self, 'jets_pt' ).Fill( ijet.pt, weight )
+                getattr( self, 'jets_eta' ).Fill( ijet.eta, weight )
+                getattr( self, 'jets_phi' ).Fill( ijet.phi, weight )
+            getattr( self, 'nBjets' ).Fill( len(goodBjetsDeepFlav), weight )
+            getattr( self, 'METPt' ).Fill( MET.pt, weight )
 
             ### Leptonic W
             METp4 = ROOT.TLorentzVector()
@@ -378,392 +407,485 @@ class boostedAnalyzer(Module):
             neutrinoP4 = ROOT.TLorentzVector()
             neutrinoP4.SetPxPyPzE( METp4.Px(), METp4.Py(), neuPz, ROOT.TMath.Sqrt( METp4.Px()*METp4.Px() + METp4.Py()*METp4.Py() + neuPz*neuPz )  )
             lepW = goodLeptons[0].p4() + neutrinoP4
-            getattr( self, 'lepWMass' ).Fill( lepW.M() )
+            getattr( self, 'lepWMass' ).Fill( lepW.M(), weight )
+            getattr( self, 'lepWPt' ).Fill( lepW.Pt(), weight )
 
-            ### Puppi Jets
-            loosePuppiJets = [ j for j in puppijets if (abs(j.eta<2.4)) and (j.pt>30) and (j.jetId>=2) ]
-            goodPuppiJetsNoLep = [ j for j in loosePuppiJets for l in goodLeptons if j.p4().DeltaR(l.p4())>=0.4  ]
+            ### Leading AK8 jet (higgs candidate) without Higgs conditions yet
+            Hbbcut = 0.8945 ## L: 0.6795 M: 0.8945 T: 0.9805
+            tau21cut = 0.45
+            tau21DDTcut = 0.43
+            FatJet_msoftdrop = allhiggsCandidates[0].msoftdrop
+            FatJet_pt = allhiggsCandidates[0].pt
+            #FatJet_Hbb = allhiggsCandidates[0].btagDDBvL
+            #FatJet_Hbb = allhiggsCandidates[0].deepTag_H
+            FatJet_Hbb = allhiggsCandidates[0].deepTagMD_ZHbbvsQCD
+            FatJet_Top = allhiggsCandidates[0].deepTagMD_TvsQCD
+            FatJet_tau21 = allhiggsCandidates[0].tau2/allhiggsCandidates[0].tau1
+            FatJet_rho = ROOT.TMath.Log( FatJet_msoftdrop*FatJet_msoftdrop/(FatJet_pt*FatJet_pt) )
+            FatJet_tau21DDT = FatJet_tau21 + 0.08 * ROOT.TMath.Log( FatJet_msoftdrop*FatJet_msoftdrop/(FatJet_pt) )
+            getattr( self, 'leadAK8JetMass' ).Fill( FatJet_msoftdrop, weight )
+            getattr( self, 'leadAK8JetPt' ).Fill( FatJet_pt, weight )
+            getattr( self, 'leadAK8JetRho' ).Fill( FatJet_rho, weight )
+            getattr( self, 'leadAK8JetTau21' ).Fill( FatJet_tau21, weight )
+            getattr( self, 'leadAK8JetTau21DDT' ).Fill( FatJet_tau21DDT, weight )
+            getattr( self, 'leadAK8JetN2' ).Fill( allhiggsCandidates[0].n2b1, weight )
+            getattr( self, 'leadAK8JetHbb' ).Fill( FatJet_Hbb, weight )
+            getattr( self, 'leadAK8JetdeepAK8HbbMDTop' ).Fill( FatJet_Hbb, allhiggsCandidates[0].deepTagMD_TvsQCD, weight )
+            getattr( self, 'leadAK8JetdeepAK8HbbMDDDB' ).Fill( FatJet_Hbb, allhiggsCandidates[0].btagDDBvL, weight )
 
-            ### Bjets
-            goodBjetsDeepCSV = [ b for b in goodPuppiJetsNoLep if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)>0.4941 ]
-            #goodBjetsDeepCSV = [ b for b in goodPuppiJetsNoLep if (b.btagDeepB>0.4941) ]
+            ### AK4 jets without overlap of leading AK8 jet
+            cleanJets_Hcand = [ j for j in goodJetsNoLep if (j.p4().DeltaR(allhiggsCandidates[0].p4())>=1.2)  ]
+            goodBjets_Hcand = [ j for j in goodBjetsDeepFlav if (j.p4().DeltaR(allhiggsCandidates[0].p4())>=1.2)  ]
+            goodJets_Hcand = [ q for q in cleanJets_Hcand if q not in goodBjets_Hcand ]
 
-            if len(allhiggsCandidates)>0:
-            #if len(looseFatJets)>0:
+            #### At least 2 jets for hadronic W
+            if len(goodJets_Hcand)>1:
+                getattr( self, 'cutFlow' ).Fill( 3 )
+                getattr( self, 'cutFlow_weight' ).Fill( 3, weight )
+                getattr( self, 'cutFlow_genWeight' ).Fill( 3, event.genWeight )
 
-                ######################################################################
-                ######################################################################
-                ### If only boosted Higgs:
-                Hbbcut = 0.8945 ## L: 0.6795 M: 0.8945 T: 0.9805
-                tau21cut = 0.45
-                tau21DDTcut = 0.43
-                FatJet_msoftdrop = allhiggsCandidates[0].msoftdrop
-                FatJet_pt = allhiggsCandidates[0].pt
-                #FatJet_Hbb = allhiggsCandidates[0].btagDDBvL
-                #FatJet_Hbb = allhiggsCandidates[0].deepTag_H
-                FatJet_Hbb = allhiggsCandidates[0].deepTagMD_ZHbbvsQCD
-                FatJet_Top = allhiggsCandidates[0].deepTagMD_TvsQCD
-                FatJet_tau21 = allhiggsCandidates[0].tau2/allhiggsCandidates[0].tau1
-                FatJet_rho = ROOT.TMath.Log( FatJet_msoftdrop*FatJet_msoftdrop/(FatJet_pt*FatJet_pt) )
-                FatJet_tau21DDT = FatJet_tau21 + 0.08 * ROOT.TMath.Log( FatJet_msoftdrop*FatJet_msoftdrop/(FatJet_pt) )
-                getattr( self, 'leadAK8JetMass' ).Fill( FatJet_msoftdrop )
-                getattr( self, 'leadAK8JetPt' ).Fill( FatJet_pt )
-                getattr( self, 'leadAK8JetRho' ).Fill( FatJet_rho )
-                getattr( self, 'leadAK8JetTau21' ).Fill( FatJet_tau21 )
-                getattr( self, 'leadAK8JetTau21DDT' ).Fill( FatJet_tau21DDT )
-                getattr( self, 'leadAK8JetN2' ).Fill( allhiggsCandidates[0].n2b1 )
-                getattr( self, 'leadAK8JetHbb' ).Fill( FatJet_Hbb )
-                getattr( self, 'leadAK8JetdeepAK8HbbMDTop' ).Fill( FatJet_Hbb, allhiggsCandidates[0].deepTagMD_TvsQCD )
-                getattr( self, 'leadAK8JetdeepAK8HbbMDDDB' ).Fill( FatJet_Hbb, allhiggsCandidates[0].btagDDBvL )
+                getattr( self, 'nEvents' ).Fill( 7 )
+                if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 8 )
+                getattr( self, 'nPVs_2J').Fill( event.puWeight, weight )
+                getattr( self, 'nleps_2J').Fill( len(goodLeptons), weight )
+                getattr( self, 'lepton_pt_2J').Fill( goodLeptons[0].pt, weight )
+                getattr( self, 'lepton_eta_2J').Fill( goodLeptons[0].eta, weight )
+                getattr( self, 'lepton_phi_2J').Fill( goodLeptons[0].phi, weight )
+                getattr( self, 'njets_2J').Fill( len(goodJets_Hcand), weight )
+                for ijet in goodJets_Hcand:
+                    getattr( self, 'jets_pt_2J').Fill( ijet.pt, weight )
+                    getattr( self, 'jets_eta_2J').Fill( ijet.eta, weight )
+                    getattr( self, 'jets_phi_2J').Fill( ijet.phi, weight )
+                getattr( self, 'nBjets_2J').Fill( len(goodBjets_Hcand), weight )
+                getattr( self, 'METPt_2J').Fill( MET.pt, weight )
+                getattr( self, 'lepWMass_2J').Fill( lepW.M(), weight )
+                getattr( self, 'lepWPt_2J').Fill( lepW.Pt(), weight )
+                getattr( self, 'leadAK8JetMass_2J').Fill( FatJet_msoftdrop, weight )
+                getattr( self, 'leadAK8JetPt_2J').Fill( FatJet_pt, weight )
+                getattr( self, 'leadAK8JetRho_2J').Fill( FatJet_rho, weight )
+                getattr( self, 'leadAK8JetTau21_2J').Fill( FatJet_tau21, weight )
+                getattr( self, 'leadAK8JetHbb_2J').Fill( FatJet_Hbb, weight )
+
+                #### test without weights
+                getattr( self, 'nPVs_2JNoWeight').Fill( event.puWeight )
+                getattr( self, 'nleps_2JNoWeight').Fill( len(goodLeptons) )
+                getattr( self, 'lepton_pt_2JNoWeight').Fill( goodLeptons[0].pt )
+                getattr( self, 'lepton_eta_2JNoWeight').Fill( goodLeptons[0].eta )
+                getattr( self, 'lepton_phi_2JNoWeight').Fill( goodLeptons[0].phi )
+                getattr( self, 'njets_2JNoWeight').Fill( len(goodJets_Hcand) )
+                for ijet in goodJets_Hcand:
+                    getattr( self, 'jets_pt_2JNoWeight').Fill( ijet.pt )
+                    getattr( self, 'jets_eta_2JNoWeight').Fill( ijet.eta )
+                    getattr( self, 'jets_phi_2JNoWeight').Fill( ijet.phi )
+                getattr( self, 'nBjets_2JNoWeight').Fill( len(goodBjets_Hcand) )
+                getattr( self, 'METPt_2JNoWeight').Fill( MET.pt )
+                getattr( self, 'lepWMass_2JNoWeight').Fill( lepW.M() )
+                getattr( self, 'lepWPt_2JNoWeight').Fill( lepW.Pt() )
+                getattr( self, 'leadAK8JetMass_2JNoWeight').Fill( FatJet_msoftdrop )
+                getattr( self, 'leadAK8JetPt_2JNoWeight').Fill( FatJet_pt )
+                getattr( self, 'leadAK8JetRho_2JNoWeight').Fill( FatJet_rho )
+                getattr( self, 'leadAK8JetTau21_2JNoWeight').Fill( FatJet_tau21 )
+                getattr( self, 'leadAK8JetHbb_2JNoWeight').Fill( FatJet_Hbb )
+
+                ##### reconstructing WW
+                smallestDiffW = 9999
+                jFromW = []
+                jjCandidates = []
+                for jpair in permutations(goodJets_Hcand, 2):
+                    jjCandidates.append( jpair[0].p4()+jpair[1].p4() )
+                    tmphadW = jpair[0].p4()+jpair[1].p4()
+                    tmpDiff = abs(lepW.M() - tmphadW.M())
+                    if tmpDiff < smallestDiffW:
+                        smallestDiffW = tmpDiff
+                        jFromW = [ jpair[0], jpair[1] ]
+                getattr( self, 'minDiffLepHadW' ).Fill( smallestDiffW, weight )
+                hadW = jFromW[0].p4() + jFromW[1].p4()
+                getattr( self, 'resolvedWCandMass_2J' ).Fill( hadW.M(), weight )
+                getattr( self, 'resolvedWCandHiggsCandMass_2J' ).Fill( hadW.M(), FatJet_msoftdrop, weight )
+                deltaRWHiggs = hadW.DeltaR( allhiggsCandidates[0].p4() )
+                getattr( self, 'deltaRhadWHiggs_2J' ).Fill( deltaRWHiggs, weight )
+                getattr( self, 'deltaRhadWHiggsMass_2J' ).Fill( deltaRWHiggs, FatJet_msoftdrop, weight )
+                deltaRJJ = jFromW[0].p4().DeltaR( jFromW[1].p4() )
+                getattr( self, 'deltaRJJ_2J' ).Fill( deltaRJJ, weight )
+                deltaRlepWHiggs = lepW.DeltaR( allhiggsCandidates[0].p4() )
+                getattr( self, 'deltaRlepWHiggs_2J' ).Fill( deltaRlepWHiggs, weight )
+                getattr( self, 'deltaRlepWHiggsMass_2J' ).Fill( deltaRlepWHiggs, FatJet_msoftdrop, weight )
+                getattr( self, 'deltaRlepWHiggsdeltaRhadWHiggs_2J' ).Fill( deltaRlepWHiggs, deltaRWHiggs, weight )
+                deltaRlepWhadW = lepW.DeltaR( hadW )
+                getattr( self, 'deltaRlepWhadW_2J' ).Fill( deltaRlepWhadW, weight )
+                getattr( self, 'deltaRlepWhadWHiggsMass_2J' ).Fill( deltaRlepWhadW, FatJet_msoftdrop, weight )
 
 
-                cleanPuppiJets_Hcand = [ j for j in goodPuppiJetsNoLep if (j.p4().DeltaR(allhiggsCandidates[0].p4())>=1.2)  ]
-                goodPuppiBjets_Hcand = [ b for b in cleanPuppiJets_Hcand if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)>0.4941 ]
-                goodPuppiJets_Hcand = goodPuppiJetsNoLep #[ b for b in cleanPuppiJets_Hcand if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)<0.4941 ]
-                #goodPuppiBjets_Hcand = [ b for b in cleanPuppiJets_Hcand if (b.btagDeepB>0.4941) ]
-                #goodPuppiJets_Hcand = [ b for b in cleanPuppiJets_Hcand if (b.btagDeepB<0.4941) ]
-                #getattr( self, 'nCleanPuppiJets' ).Fill( len(cleanPuppiJets_Hcand) if cleanPuppiJets_Hcand else 0 )
-                #getattr( self, 'nGoodPuppiJets' ).Fill( len(goodPuppiJets_Hcand) if goodPuppiJets_Hcand else 0 )
+                #### "Good hadronic W candidate"
+                if (hadW.M()>65 and hadW.M()<105):
+                    getattr( self, 'cutFlow' ).Fill( 4 )
+                    getattr( self, 'cutFlow_weight' ).Fill( 4, weight )
+                    getattr( self, 'cutFlow_genWeight' ).Fill( 4, event.genWeight )
 
-                #### check if has jets and later bjets
-                if len(goodPuppiJets_Hcand)>1:
-                    getattr( self, 'nEvents' ).Fill( 7 )
-                    if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 8 )
-                    getattr( self, 'leadAK8JetMass_2J' ).Fill( FatJet_msoftdrop )
-                    getattr( self, 'leadAK8JetPt_2J' ).Fill( FatJet_pt )
+                    getattr( self, 'nPVs_2J2W').Fill( event.puWeight, weight )
+                    getattr( self, 'nleps_2J2W').Fill( len(goodLeptons), weight )
+                    getattr( self, 'lepton_pt_2J2W').Fill( goodLeptons[0].pt, weight )
+                    getattr( self, 'lepton_eta_2J2W').Fill( goodLeptons[0].eta, weight )
+                    getattr( self, 'lepton_phi_2J2W').Fill( goodLeptons[0].phi, weight )
+                    getattr( self, 'njets_2J2W').Fill( len(goodJets_Hcand), weight )
+                    for ijet in goodJets_Hcand:
+                        getattr( self, 'jets_pt_2J2W').Fill( ijet.pt, weight )
+                        getattr( self, 'jets_eta_2J2W').Fill( ijet.eta, weight )
+                        getattr( self, 'jets_phi_2J2W').Fill( ijet.phi, weight )
+                    getattr( self, 'nBjets_2J2W').Fill( len(goodBjets_Hcand), weight )
+                    getattr( self, 'METPt_2J2W').Fill( MET.pt, weight )
+                    getattr( self, 'lepWMass_2J2W').Fill( lepW.M(), weight )
+                    getattr( self, 'lepWPt_2J2W').Fill( lepW.Pt(), weight )
+                    getattr( self, 'leadAK8JetMass_2J2W').Fill( FatJet_msoftdrop, weight )
+                    getattr( self, 'leadAK8JetPt_2J2W').Fill( FatJet_pt, weight )
+                    getattr( self, 'leadAK8JetRho_2J2W').Fill( FatJet_rho, weight )
+                    getattr( self, 'leadAK8JetTau21_2J2W').Fill( FatJet_tau21, weight )
+                    getattr( self, 'leadAK8JetHbb_2J2W').Fill( FatJet_Hbb, weight )
+                    getattr( self, 'resolvedWCandMass_2J2W' ).Fill( hadW.M(), weight )
+                    getattr( self, 'resolvedWCandPt_2J2W' ).Fill( hadW.Pt(), weight )
+                    getattr( self, 'resolvedWCandHiggsCandMass_2J2W' ).Fill( hadW.M(), FatJet_msoftdrop, weight )
+                    getattr( self, 'deltaRhadWHiggs_2J2W' ).Fill( deltaRWHiggs, weight )
+                    getattr( self, 'deltaRhadWHiggsMass_2J2W' ).Fill( deltaRWHiggs, FatJet_msoftdrop, weight )
+                    getattr( self, 'deltaRJJ_2J2W' ).Fill( deltaRJJ, weight )
+                    getattr( self, 'deltaRlepWHiggs_2J2W' ).Fill( deltaRlepWHiggs, weight )
+                    getattr( self, 'deltaRlepWHiggsMass_2J2W' ).Fill( deltaRlepWHiggs, FatJet_msoftdrop, weight )
+                    getattr( self, 'deltaRlepWHiggsdeltaRhadWHiggs_2J2W' ).Fill( deltaRlepWHiggs, deltaRWHiggs, weight )
+                    getattr( self, 'deltaRlepWhadW_2J2W' ).Fill( deltaRlepWhadW, weight )
+                    getattr( self, 'deltaRlepWhadWHiggsMass_2J2W' ).Fill( deltaRlepWhadW, FatJet_msoftdrop, weight )
 
+                    getattr( self, 'leadAK8JetRhoTau21_2J2W' ).Fill( FatJet_rho, FatJet_tau21, weight )
+                    getattr( self, 'leadAK8JetRhoPtHbb_2J2W' ).Fill( FatJet_rho, FatJet_pt, FatJet_Hbb, weight )
 
-                    ##### reconstructing WW
-                    smallestDiffW = 9999
-                    jFromW = []
-                    jjCandidates = []
-                    for jpair in permutations(goodPuppiJets_Hcand, 2):
-                        jjCandidates.append( jpair[0].p4()+jpair[1].p4() )
-                        tmphadW = jpair[0].p4()+jpair[1].p4()
-                        tmpDiff = abs(lepW.M() - tmphadW.M())
-                        if tmpDiff < smallestDiffW:
-                            smallestDiffW = tmpDiff
-                            jFromW = [ jpair[0], jpair[1] ]
-                    getattr( self, 'minDiffLepHadW' ).Fill( smallestDiffW )
-                    hadW = jFromW[0].p4() + jFromW[1].p4()
-                    getattr( self, 'resolvedWCandMass_2J' ).Fill( hadW.M() )
-                    getattr( self, 'resolvedWCandHiggsCandMass_2J' ).Fill( hadW.M(), FatJet_msoftdrop )
-                    deltaRWHiggs = hadW.DeltaR( allhiggsCandidates[0].p4() )
-                    getattr( self, 'deltaRhadWHiggs_2J' ).Fill( deltaRWHiggs )
-                    getattr( self, 'deltaRhadWHiggsMass_2J' ).Fill( deltaRWHiggs, FatJet_msoftdrop )
-                    deltaRJJ = jFromW[0].p4().DeltaR( jFromW[1].p4() )
-                    getattr( self, 'deltaRJJ_2J' ).Fill( deltaRJJ )
-                    deltaRlepWHiggs = lepW.DeltaR( allhiggsCandidates[0].p4() )
-                    getattr( self, 'deltaRlepWHiggs_2J' ).Fill( deltaRlepWHiggs )
-                    getattr( self, 'deltaRlepWHiggsMass_2J' ).Fill( deltaRlepWHiggs, FatJet_msoftdrop )
-                    getattr( self, 'deltaRlepWHiggsdeltaRhadWHiggs_2J' ).Fill( deltaRlepWHiggs, deltaRWHiggs )
-                    deltaRlepWhadW = lepW.DeltaR( hadW )
-                    getattr( self, 'deltaRlepWhadW_2J' ).Fill( deltaRlepWhadW )
-                    getattr( self, 'deltaRlepWhadWHiggsMass_2J' ).Fill( deltaRlepWhadW, FatJet_msoftdrop )
+                    #### just checking how does it look with additional btagging
+                    if len(goodBjets_Hcand)>0:
+                        getattr( self, 'leadAK8JetMass_2J2W1B' ).Fill( FatJet_msoftdrop, weight )
+                        getattr( self, 'leadAK8JetPt_2J2W1B' ).Fill( FatJet_pt, weight )
+                    if len(goodBjets_Hcand)>1:
+                        getattr( self, 'leadAK8JetMass_2J2W2B' ).Fill( FatJet_msoftdrop, weight )
+                        getattr( self, 'leadAK8JetPt_2J2W2B' ).Fill( FatJet_pt, weight )
 
-
-                    if (hadW.M()>65 and hadW.M()<105):
-                        getattr( self, 'leadAK8JetMass_2J2W' ).Fill( FatJet_msoftdrop )
-                        getattr( self, 'leadAK8JetPt_2J2W' ).Fill( FatJet_pt )
-                        getattr( self, 'resolvedWCandMass_2J2W' ).Fill( hadW.M() )
-                        getattr( self, 'resolvedWCandHiggsCandMass_2J2W' ).Fill( hadW.M(), FatJet_msoftdrop )
-                        getattr( self, 'deltaRhadWHiggs_2J2W' ).Fill( deltaRWHiggs )
-                        getattr( self, 'deltaRhadWHiggsMass_2J2W' ).Fill( deltaRWHiggs, FatJet_msoftdrop )
-                        getattr( self, 'deltaRJJ_2J2W' ).Fill( deltaRJJ )
-                        getattr( self, 'deltaRlepWHiggs_2J2W' ).Fill( deltaRlepWHiggs )
-                        getattr( self, 'deltaRlepWHiggsMass_2J2W' ).Fill( deltaRlepWHiggs, FatJet_msoftdrop )
-                        getattr( self, 'deltaRlepWHiggsdeltaRhadWHiggs_2J2W' ).Fill( deltaRlepWHiggs, deltaRWHiggs )
-                        getattr( self, 'deltaRlepWhadW_2J2W' ).Fill( deltaRlepWhadW )
-                        getattr( self, 'deltaRlepWhadWHiggsMass_2J2W' ).Fill( deltaRlepWhadW, FatJet_msoftdrop )
-
-                        ### rhalphabet
-                        getattr( self, 'leadAK8JetRho_2J2W' ).Fill( FatJet_rho )
-                        getattr( self, 'leadAK8JetTau21_2J2W' ).Fill( FatJet_tau21 )
-                        getattr( self, 'leadAK8JetHbb_2J2W' ).Fill( FatJet_Hbb )
-                        getattr( self, 'leadAK8JetRhoHbb_2J2W' ).Fill( FatJet_rho, FatJet_Hbb )
-                        getattr( self, 'leadAK8JetRhoTau21_2J2W' ).Fill( FatJet_rho, FatJet_tau21 )
-                        getattr( self, 'leadAK8JetPtMassHbb_2J2W' ).Fill( FatJet_msoftdrop, FatJet_pt, FatJet_Hbb )
-
-                        if len(goodPuppiBjets_Hcand)>0:
-                            getattr( self, 'leadAK8JetMass_2J2W1B' ).Fill( FatJet_msoftdrop )
-                            getattr( self, 'leadAK8JetPt_2J2W1B' ).Fill( FatJet_pt )
-                        if len(goodPuppiBjets_Hcand)>1:
-                            getattr( self, 'leadAK8JetMass_2J2W2B' ).Fill( FatJet_msoftdrop )
-                            getattr( self, 'leadAK8JetPt_2J2W2B' ).Fill( FatJet_pt )
-
+                    ############ THIS IS THE "FINAL" SELECTION
+                    #### Asking for Ws and Higgs to be apart
                     if (deltaRlepWHiggs>1) and (deltaRWHiggs>1):
-                        getattr( self, 'leadAK8JetMass_2JdeltaR' ).Fill( FatJet_msoftdrop )
-                        getattr( self, 'leadAK8JetPt_2JdeltaR' ).Fill( FatJet_pt )
-                        getattr( self, 'resolvedWCandMass_2JdeltaR' ).Fill( hadW.M() )
-                        getattr( self, 'leadAK8JetRho_2JdeltaR' ).Fill( FatJet_rho )
-                        getattr( self, 'leadAK8JetTau21_2JdeltaR' ).Fill( FatJet_tau21 )
-                        getattr( self, 'leadAK8JetTau21DDT_2JdeltaR' ).Fill( FatJet_tau21DDT )
-                        getattr( self, 'leadAK8JetHbb_2JdeltaR' ).Fill( FatJet_Hbb )
+                        getattr( self, 'cutFlow' ).Fill( 5 )
+                        getattr( self, 'cutFlow_weight' ).Fill( 5, weight )
+                        getattr( self, 'cutFlow_genWeight' ).Fill( 5, event.genWeight )
 
-                        ############ THIS IS THE "FINAL" SELECTION
-                        if (hadW.M()>65 and hadW.M()<105):
-                            getattr( self, 'leadAK8JetMass_2JdeltaR2W' ).Fill( FatJet_msoftdrop )
-                            getattr( self, 'leadAK8JetPt_2JdeltaR2W' ).Fill( FatJet_pt )
-                            getattr( self, 'resolvedWCandMass_2JdeltaR2W' ).Fill( hadW.M() )
-                            getattr( self, 'leadAK8JetRho_2JdeltaR2W' ).Fill( FatJet_rho )
-                            getattr( self, 'leadAK8JetTau21_2JdeltaR2W' ).Fill( FatJet_tau21 )
-                            getattr( self, 'leadAK8JetTau21DDT_2JdeltaR2W' ).Fill( FatJet_tau21DDT )
-                            getattr( self, 'leadAK8JetHbb_2JdeltaR2W' ).Fill( FatJet_Hbb )
-                            ##### FOR Rhalphabet
-                            if (FatJet_tau21<tau21cut):
-                            #if (FatJet_tau21DDT<tau21DDTcut):
-                                getattr( self, 'leadAK8JetMass_2JdeltaR2WTau21DDT' ).Fill( FatJet_msoftdrop )
-                                getattr( self, 'leadAK8JetMass_2JdeltaR2WTau21DDT' ).Fill( FatJet_msoftdrop )
-                                getattr( self, 'resolvedWCandMass_2JdeltaR2WTau21DDT' ).Fill( hadW.M() )
-                                getattr( self, 'leadAK8JetRho_2JdeltaR2WTau21DDT' ).Fill( FatJet_rho )
-                                getattr( self, 'leadAK8JetTau21_2JdeltaR2WTau21DDT' ).Fill( FatJet_tau21 )
-                                getattr( self, 'leadAK8JetTau21DDT_2JdeltaR2WTau21DDT' ).Fill( FatJet_tau21DDT )
-                                getattr( self, 'leadAK8JetHbb_2JdeltaR2WTau21DDT' ).Fill( FatJet_Hbb )
-                                getattr( self, 'leadAK8JetRhoPtHbb_2JdeltaR2WTau21DDT' ).Fill( FatJet_rho, FatJet_pt, FatJet_Hbb )
+                        getattr( self, 'nPVs_2J2WdeltaR').Fill( event.puWeight, weight )
+                        getattr( self, 'nleps_2J2WdeltaR').Fill( len(goodLeptons), weight )
+                        getattr( self, 'lepton_pt_2J2WdeltaR').Fill( goodLeptons[0].pt, weight )
+                        getattr( self, 'lepton_eta_2J2WdeltaR').Fill( goodLeptons[0].eta, weight )
+                        getattr( self, 'lepton_phi_2J2WdeltaR').Fill( goodLeptons[0].phi, weight )
+                        getattr( self, 'njets_2J2WdeltaR').Fill( len(goodJets_Hcand), weight )
+                        for ijet in goodJets_Hcand:
+                            getattr( self, 'jets_pt_2J2WdeltaR').Fill( ijet.pt, weight )
+                            getattr( self, 'jets_eta_2J2WdeltaR').Fill( ijet.eta, weight )
+                            getattr( self, 'jets_phi_2J2WdeltaR').Fill( ijet.phi, weight )
+                        getattr( self, 'nBjets_2J2WdeltaR').Fill( len(goodBjets_Hcand), weight )
+                        getattr( self, 'METPt_2J2WdeltaR').Fill( MET.pt, weight )
+                        getattr( self, 'lepWMass_2J2WdeltaR').Fill( lepW.M(), weight )
+                        getattr( self, 'lepWPt_2J2WdeltaR').Fill( lepW.Pt(), weight )
+                        getattr( self, 'leadAK8JetMass_2J2WdeltaR').Fill( FatJet_msoftdrop, weight )
+                        getattr( self, 'leadAK8JetPt_2J2WdeltaR').Fill( FatJet_pt, weight )
+                        getattr( self, 'leadAK8JetRho_2J2WdeltaR').Fill( FatJet_rho, weight )
+                        getattr( self, 'leadAK8JetTau21_2J2WdeltaR').Fill( FatJet_tau21, weight )
+                        getattr( self, 'leadAK8JetHbb_2J2WdeltaR').Fill( FatJet_Hbb, weight )
+                        getattr( self, 'resolvedWCandMass_2J2WdeltaR' ).Fill( hadW.M(), weight )
+                        getattr( self, 'resolvedWCandPt_2J2WdeltaR' ).Fill( hadW.Pt(), weight )
+                        getattr( self, 'leadAK8JetRhoPtHbb_2J2WdeltaR' ).Fill( FatJet_rho, FatJet_pt, FatJet_Hbb, weight )
 
-                                if (FatJet_Hbb>Hbbcut):
-                                    getattr( self, 'leadAK8JetMass_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_msoftdrop )
-                                    getattr( self, 'resolvedWCandMass_2JdeltaR2WTau21DDT_Pass' ).Fill( hadW.M() )
-                                    getattr( self, 'leadAK8JetRho_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_rho )
-                                    getattr( self, 'leadAK8JetTau21_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_tau21 )
-                                    getattr( self, 'leadAK8JetTau21DDT_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_tau21DDT )
-                                    getattr( self, 'leadAK8JetHbb_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_Hbb )
-                                    getattr( self, 'leadAK8JetMassPt_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_msoftdrop, FatJet_pt )
-                                    getattr( self, 'leadAK8JetRhoPt_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_rho, FatJet_pt )
-                                    getattr( self, 'leadAK8JetRhoPtMass_2JdeltaR2WTau21DDT_Pass' ).Fill( FatJet_rho, FatJet_pt, FatJet_msoftdrop )
+                        ##### Start asking for boosted Higgs
+                        if (FatJet_tau21<tau21cut):
+                            getattr( self, 'cutFlow' ).Fill( 6 )
+                            getattr( self, 'cutFlow_weight' ).Fill( 6, weight )
+                            getattr( self, 'cutFlow_genWeight' ).Fill( 6, event.genWeight )
 
-                                else:
-                                    getattr( self, 'leadAK8JetMass_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_msoftdrop )
-                                    getattr( self, 'resolvedWCandMass_2JdeltaR2WTau21DDT_Fail' ).Fill( hadW.M() )
-                                    getattr( self, 'leadAK8JetRho_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_rho )
-                                    getattr( self, 'leadAK8JetTau21_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_tau21 )
-                                    getattr( self, 'leadAK8JetTau21DDT_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_tau21DDT )
-                                    getattr( self, 'leadAK8JetHbb_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_Hbb )
-                                    getattr( self, 'leadAK8JetMassPt_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_msoftdrop, FatJet_pt )
-                                    getattr( self, 'leadAK8JetRhoPt_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_rho, FatJet_pt )
-                                    getattr( self, 'leadAK8JetRhoPtMass_2JdeltaR2WTau21DDT_Fail' ).Fill( FatJet_rho, FatJet_pt, FatJet_msoftdrop )
+                            getattr( self, 'nPVs_2J2WdeltaRTau21').Fill( event.puWeight, weight )
+                            getattr( self, 'nleps_2J2WdeltaRTau21').Fill( len(goodLeptons), weight )
+                            getattr( self, 'lepton_pt_2J2WdeltaRTau21').Fill( goodLeptons[0].pt, weight )
+                            getattr( self, 'lepton_eta_2J2WdeltaRTau21').Fill( goodLeptons[0].eta, weight )
+                            getattr( self, 'lepton_phi_2J2WdeltaRTau21').Fill( goodLeptons[0].phi, weight )
+                            getattr( self, 'njets_2J2WdeltaRTau21').Fill( len(goodJets_Hcand), weight )
+                            for ijet in goodJets_Hcand:
+                                getattr( self, 'jets_pt_2J2WdeltaRTau21').Fill( ijet.pt, weight )
+                                getattr( self, 'jets_eta_2J2WdeltaRTau21').Fill( ijet.eta, weight )
+                                getattr( self, 'jets_phi_2J2WdeltaRTau21').Fill( ijet.phi, weight )
+                            getattr( self, 'nBjets_2J2WdeltaRTau21').Fill( len(goodBjets_Hcand), weight )
+                            getattr( self, 'METPt_2J2WdeltaRTau21').Fill( MET.pt, weight )
+                            getattr( self, 'lepWMass_2J2WdeltaRTau21').Fill( lepW.M(), weight )
+                            getattr( self, 'lepWPt_2J2WdeltaRTau21').Fill( lepW.Pt(), weight )
+                            getattr( self, 'leadAK8JetMass_2J2WdeltaRTau21').Fill( FatJet_msoftdrop, weight )
+                            getattr( self, 'leadAK8JetPt_2J2WdeltaRTau21').Fill( FatJet_pt, weight )
+                            getattr( self, 'leadAK8JetRho_2J2WdeltaRTau21').Fill( FatJet_rho, weight )
+                            getattr( self, 'leadAK8JetTau21_2J2WdeltaRTau21').Fill( FatJet_tau21, weight )
+                            getattr( self, 'leadAK8JetHbb_2J2WdeltaRTau21').Fill( FatJet_Hbb, weight )
+                            getattr( self, 'resolvedWCandMass_2J2WdeltaRTau21' ).Fill( hadW.M(), weight )
+                            getattr( self, 'resolvedWCandPt_2J2WdeltaRTau21' ).Fill( hadW.Pt(), weight )
+                            getattr( self, 'leadAK8JetRhoPtHbb_2J2WdeltaRTau21' ).Fill( FatJet_rho, FatJet_pt, FatJet_Hbb, weight )
 
+                            if (FatJet_Hbb>Hbbcut):
+                                getattr( self, 'cutFlow' ).Fill( 7 )
+                                getattr( self, 'cutFlow_weight' ).Fill( 7, weight )
+                                getattr( self, 'cutFlow_genWeight' ).Fill( 7, event.genWeight )
 
+                                getattr( self, 'leadAK8JetMass_2J2WdeltaRTau21_Pass' ).Fill( FatJet_msoftdrop, weight )
+                                getattr( self, 'resolvedWCandMass_2J2WdeltaRTau21_Pass' ).Fill( hadW.M(), weight )
+                                getattr( self, 'leadAK8JetRho_2J2WdeltaRTau21_Pass' ).Fill( FatJet_rho, weight )
+                                getattr( self, 'leadAK8JetTau21_2J2WdeltaRTau21_Pass' ).Fill( FatJet_tau21, weight )
+                                getattr( self, 'leadAK8JetHbb_2J2WdeltaRTau21_Pass' ).Fill( FatJet_Hbb, weight )
+                                getattr( self, 'leadAK8JetMassPt_2J2WdeltaRTau21_Pass' ).Fill( FatJet_msoftdrop, FatJet_pt, weight )
+                                getattr( self, 'leadAK8JetRhoPt_2J2WdeltaRTau21_Pass' ).Fill( FatJet_rho, FatJet_pt, weight )
+                                getattr( self, 'leadAK8JetRhoPtMass_2J2WdeltaRTau21_Pass' ).Fill( FatJet_rho, FatJet_pt, FatJet_msoftdrop, weight )
 
-                            if len(goodPuppiBjets_Hcand)>0:
-                                getattr( self, 'leadAK8JetMass_2JdeltaR2W1B' ).Fill( FatJet_msoftdrop )
-                                getattr( self, 'resolvedWCandMass_2JdeltaR2W1B' ).Fill( hadW.M() )
-                                getattr( self, 'leadAK8JetRho_2JdeltaR2W1B' ).Fill( FatJet_rho )
-                                getattr( self, 'leadAK8JetTau21_2JdeltaR2W1B' ).Fill( FatJet_tau21 )
-                                getattr( self, 'leadAK8JetHbb_2JdeltaR2W1B' ).Fill( FatJet_Hbb )
                             else:
-                                getattr( self, 'noHiggsCandMass_2JdeltaR2W1B' ).Fill( FatJet_msoftdrop )
+                                getattr( self, 'leadAK8JetMass_2J2WdeltaRTau21_Fail' ).Fill( FatJet_msoftdrop, weight )
+                                getattr( self, 'resolvedWCandMass_2J2WdeltaRTau21_Fail' ).Fill( hadW.M(), weight )
+                                getattr( self, 'leadAK8JetRho_2J2WdeltaRTau21_Fail' ).Fill( FatJet_rho, weight )
+                                getattr( self, 'leadAK8JetTau21_2J2WdeltaRTau21_Fail' ).Fill( FatJet_tau21, weight )
+                                getattr( self, 'leadAK8JetHbb_2J2WdeltaRTau21_Fail' ).Fill( FatJet_Hbb, weight )
+                                getattr( self, 'leadAK8JetMassPt_2J2WdeltaRTau21_Fail' ).Fill( FatJet_msoftdrop, FatJet_pt, weight )
+                                getattr( self, 'leadAK8JetRhoPt_2J2WdeltaRTau21_Fail' ).Fill( FatJet_rho, FatJet_pt, weight )
+                                getattr( self, 'leadAK8JetRhoPtMass_2J2WdeltaRTau21_Fail' ).Fill( FatJet_rho, FatJet_pt, FatJet_msoftdrop, weight )
 
-                            if len(goodPuppiBjets_Hcand)>1:
-                                getattr( self, 'leadAK8JetMass_2JdeltaR2W2B' ).Fill( FatJet_msoftdrop )
-                                getattr( self, 'resolvedWCandMass_2JdeltaR2W2B' ).Fill( hadW.M() )
-                                getattr( self, 'leadAK8JetRho_2JdeltaR2W2B' ).Fill( FatJet_rho )
-                                getattr( self, 'leadAK8JetTau21_2JdeltaR2W2B' ).Fill( FatJet_tau21 )
-                                getattr( self, 'leadAK8JetHbb_2JdeltaR2W2B' ).Fill( FatJet_Hbb )
-                            else:
-                                getattr( self, 'noHiggsCandMass_2JdeltaR2W2B' ).Fill( FatJet_msoftdrop )
+
+                        #### Just testing without Tau21
+                        if (FatJet_Hbb>Hbbcut):
+                            getattr( self, 'cutFlow' ).Fill( 9 )
+                            getattr( self, 'cutFlow_weight' ).Fill( 9, weight )
+                            getattr( self, 'cutFlow_genWeight' ).Fill( 9, event.genWeight )
+
+                            getattr( self, 'leadAK8JetMass_2J2WdeltaR_Pass' ).Fill( FatJet_msoftdrop, weight )
+                            getattr( self, 'resolvedWCandMass_2J2WdeltaR_Pass' ).Fill( hadW.M(), weight )
+                            getattr( self, 'leadAK8JetRho_2J2WdeltaR_Pass' ).Fill( FatJet_rho, weight )
+                            getattr( self, 'leadAK8JetTau21_2J2WdeltaR_Pass' ).Fill( FatJet_tau21, weight )
+                            getattr( self, 'leadAK8JetHbb_2J2WdeltaR_Pass' ).Fill( FatJet_Hbb, weight )
+                            getattr( self, 'leadAK8JetMassPt_2J2WdeltaR_Pass' ).Fill( FatJet_msoftdrop, FatJet_pt, weight )
+                            getattr( self, 'leadAK8JetRhoPt_2J2WdeltaR_Pass' ).Fill( FatJet_rho, FatJet_pt, weight )
+                            getattr( self, 'leadAK8JetRhoPtMass_2J2WdeltaR_Pass' ).Fill( FatJet_rho, FatJet_pt, FatJet_msoftdrop, weight )
 
                         else:
-                            getattr( self, 'noHiggsCandMass_2JdeltaR2W' ).Fill( FatJet_msoftdrop )
+                            getattr( self, 'leadAK8JetMass_2J2WdeltaR_Fail' ).Fill( FatJet_msoftdrop, weight )
+                            getattr( self, 'resolvedWCandMass_2J2WdeltaR_Fail' ).Fill( hadW.M(), weight )
+                            getattr( self, 'leadAK8JetRho_2J2WdeltaR_Fail' ).Fill( FatJet_rho, weight )
+                            getattr( self, 'leadAK8JetTau21_2J2WdeltaR_Fail' ).Fill( FatJet_tau21, weight )
+                            getattr( self, 'leadAK8JetHbb_2J2WdeltaR_Fail' ).Fill( FatJet_Hbb, weight )
+                            getattr( self, 'leadAK8JetMassPt_2J2WdeltaR_Fail' ).Fill( FatJet_msoftdrop, FatJet_pt, weight )
+                            getattr( self, 'leadAK8JetRhoPt_2J2WdeltaR_Fail' ).Fill( FatJet_rho, FatJet_pt, weight )
+                            getattr( self, 'leadAK8JetRhoPtMass_2J2WdeltaR_Fail' ).Fill( FatJet_rho, FatJet_pt, FatJet_msoftdrop, weight )
 
+                        ###### Checking if extra bjets help
+                        if len(goodBjets_Hcand)>0:
+                            getattr( self, 'leadAK8JetMass_2J2WdeltaR1B' ).Fill( FatJet_msoftdrop, weight )
+                            getattr( self, 'resolvedWCandMass_2J2WdeltaR1B' ).Fill( hadW.M(), weight )
+                            getattr( self, 'leadAK8JetRho_2J2WdeltaR1B' ).Fill( FatJet_rho, weight )
+                            getattr( self, 'leadAK8JetTau21_2J2WdeltaR1B' ).Fill( FatJet_tau21, weight )
+                            getattr( self, 'leadAK8JetHbb_2J2WdeltaR1B' ).Fill( FatJet_Hbb, weight )
+                        else:
+                            getattr( self, 'noHiggsCandMass_2J2WdeltaR1B' ).Fill( FatJet_msoftdrop, weight )
+
+                        if len(goodBjets_Hcand)>1:
+                            getattr( self, 'leadAK8JetMass_2J2WdeltaR2B' ).Fill( FatJet_msoftdrop, weight )
+                            getattr( self, 'resolvedWCandMass_2J2WdeltaR2B' ).Fill( hadW.M(), weight )
+                            getattr( self, 'leadAK8JetRho_2J2WdeltaR2B' ).Fill( FatJet_rho, weight )
+                            getattr( self, 'leadAK8JetTau21_2J2WdeltaR2B' ).Fill( FatJet_tau21, weight )
+                            getattr( self, 'leadAK8JetHbb_2J2WdeltaR2B' ).Fill( FatJet_Hbb, weight )
+                        else:
+                            getattr( self, 'noHiggsCandMass_2J2WdeltaR2B' ).Fill( FatJet_msoftdrop, weight )
                     else:
-                        getattr( self, 'noHiggsCandMass_2JdeltaR' ).Fill( FatJet_msoftdrop )
-
-
-                    if len(goodPuppiBjets_Hcand)>0:
-                        getattr( self, 'leadAK8JetMass_2J1B' ).Fill( FatJet_msoftdrop )
-                        deltaR1BHiggs = goodPuppiBjets_Hcand[0].p4().DeltaR( allhiggsCandidates[0].p4() )
-                        getattr( self, 'deltaR1BHiggs_2J1B' ).Fill( deltaR1BHiggs )
-                    if len(goodPuppiBjets_Hcand)>1:
-                        getattr( self, 'leadAK8JetMass_2J2B' ).Fill( FatJet_msoftdrop )
+                        getattr( self, 'noHiggsCandMass_2J2WdeltaR' ).Fill( FatJet_msoftdrop, weight )
 
 
 
-                #### check if has only bjets
+                if len(goodBjets_Hcand)>0:
+                    getattr( self, 'leadAK8JetMass_2J1B' ).Fill( FatJet_msoftdrop, weight )
+                    deltaR1BHiggs = goodBjets_Hcand[0].p4().DeltaR( allhiggsCandidates[0].p4() )
+                    getattr( self, 'deltaR1BHiggs_2J1B' ).Fill( deltaR1BHiggs, weight )
+                if len(goodBjets_Hcand)>1:
+                    getattr( self, 'leadAK8JetMass_2J2B' ).Fill( FatJet_msoftdrop, weight )
+
+
+
+            #### check if has only bjets
+            if len(goodBjets_Hcand)>0:
+                getattr( self, 'leadAK8JetMass_1B' ).Fill( FatJet_msoftdrop, weight )
+                deltaR1BHiggs = goodBjets_Hcand[0].p4().DeltaR( allhiggsCandidates[0].p4() )
+                getattr( self, 'deltaR1BHiggs_1B' ).Fill( deltaR1BHiggs, weight )
+            if len(goodBjets_Hcand)>1:
+                getattr( self, 'leadAK8JetMass_2B' ).Fill( FatJet_msoftdrop, weight )
+
+            ### For boosted W: good idea, it didn't work
+            '''
+            if len(looseFatJets)>0: looseFatJets.remove(allhiggsCandidates[0])
+            goodWCandidate = looseFatJets[0] if (len(looseFatJets)>0) and ((looseFatJets[0].tau2/looseFatJets[0].tau1)<tau21cut) else None
+            if goodWCandidate:
+                getattr( self, 'leadAK8JetMass_W' ).Fill( FatJet_msoftdrop )
+                getattr( self, 'boostedWCandMass_W' ).Fill( goodWCandidate.msoftdrop )
                 if len(goodPuppiBjets_Hcand)>0:
-                    getattr( self, 'leadAK8JetMass_1B' ).Fill( FatJet_msoftdrop )
-                    deltaR1BHiggs = goodPuppiBjets_Hcand[0].p4().DeltaR( allhiggsCandidates[0].p4() )
-                    getattr( self, 'deltaR1BHiggs_1B' ).Fill( deltaR1BHiggs )
-                if len(goodPuppiBjets_Hcand)>1:
-                    getattr( self, 'leadAK8JetMass_2B' ).Fill( FatJet_msoftdrop )
+                    getattr( self, 'leadAK8JetMass_W1B' ).Fill( FatJet_msoftdrop )
+                    getattr( self, 'boostedWCandMass_W1B' ).Fill( goodWCandidate.msoftdrop )
+            '''
+            ######################################################################
 
-                ### For boosted W:
-                if len(looseFatJets)>0: looseFatJets.remove(allhiggsCandidates[0])
+            ######################################################################
+            ######################################################################
+            ### only boosted W
 
-                goodWCandidate = looseFatJets[0] if (len(looseFatJets)>0) and ((looseFatJets[0].tau2/looseFatJets[0].tau1)<tau21cut) else None
+            '''
+            ### W candidate
+            wCandidates_boostedW = [ j for j in looseFatJets if ((j.tau2/j.tau1 < tau21cut) and (j.deepTagMD_ZHbbvsQCD<Hbbcut))  ]
+            goodWCandidate_boostedW = min(wCandidates_boostedW, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates_boostedW)>0 else None
+            if goodWCandidate_boostedW: badFatJets_boostedW.remove(goodWCandidate_boostedW)
 
-                if goodWCandidate:
+            ##### FOR ABCD
+            for ifj in badFatJets_boostedW:
+                getattr( self, 'nJetsvsTau21_boostedW' ).Fill( len(badFatJets_boostedW), ifj.tau2/ifj.tau1 )
 
-                    getattr( self, 'leadAK8JetMass_W' ).Fill( FatJet_msoftdrop )
-                    getattr( self, 'boostedWCandMass_W' ).Fill( goodWCandidate.msoftdrop )
+            if goodWCandidate_boostedW:
+                isolatedPuppiJets_boostedW = [ j for j in goodPuppiJetsNoLep if (j.p4().DeltaR(goodWCandidate_boostedW.p4())>=1.2)  ]
+                goodPuppiJets_boostedW = [ b for b in isolatedPuppiJets_boostedW if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)<0.4941 ]
+                goodPuppiBjets_boostedW = [ b for b in isolatedPuppiJets_boostedW if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)>0.4941 ]
+                getattr( self, 'nGoodPuppiBjets_boostedW' ).Fill( len(goodPuppiBjets_boostedW) if goodPuppiBjets_boostedW else 0 )
+                getattr( self, 'nGoodPuppiJets_boostedW' ).Fill( len(goodPuppiJets_boostedW) if goodPuppiJets_boostedW else 0 )
+                getattr( self, 'WCandMass_boostedW' ).Fill( goodWCandidate_boostedW.msoftdrop )
+                getattr( self, 'boostedHiggsCandMass_boostedW' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
 
-                    if len(goodPuppiBjets_Hcand)>0:
-                        getattr( self, 'leadAK8JetMass_W1B' ).Fill( FatJet_msoftdrop )
-                        getattr( self, 'boostedWCandMass_W1B' ).Fill( goodWCandidate.msoftdrop )
+                if len(goodPuppiBjets_boostedW)>1:
 
-                ######################################################################
+                    ##### reconstructing ttbar
+                    smallestDiffTop = 9999
+                    bFromTop = []
+                    bbCandidates = []
+                    for bpair in permutations(goodPuppiBjets_boostedW, 2):
+                        bbCandidates.append( bpair[0].p4()+bpair[1].p4() )
+                        tmplepTop = lepW + bpair[0].p4()
+                        tmphadTop = goodWCandidate_boostedW.p4() + bpair[1].p4()
+                        tmpDiff = abs(tmplepTop.M() - tmphadTop.M())
+                        if tmpDiff < smallestDiffTop:
+                            smallestDiffTop = tmpDiff
+                            bFromTop = [ bpair[0], bpair[1] ]
+                    getattr( self, 'minDiffLepHadTop' ).Fill( smallestDiffTop )
+                    lepTop = lepW + bFromTop[0].p4()
+                    hadTop = goodWCandidate_boostedW.p4() + bFromTop[1].p4()
+                    getattr( self, 'lepTopCandMass_2B_boostedW' ).Fill( lepTop.M() )
+                    getattr( self, 'hadTopCandMass_2B_boostedW' ).Fill( hadTop.M() )
+                    getattr( self, 'boostedHiggsCandMass_2B_boostedW' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+                    getattr( self, 'boostedHiggsCandPt_2B_boostedW' ).Fill( goodHiggsCandidate.pt if goodHiggsCandidate else -999 )
 
-                ######################################################################
-                ######################################################################
-                ### only boosted W
+                    getattr( self, 'leadingBjetPt_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[0].pt )
+                    getattr( self, 'leadingBjetEta_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[0].eta )
+                    getattr( self, 'leadingBjetBdisc_2B_boostedW' ).Fill( (goodPuppiBjets_boostedW[0].pfDeepCSVJetTags_probb+goodPuppiBjets_boostedW[0].pfDeepCSVJetTags_probbb) )
+                    getattr( self, 'subleadingBjetPt_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[1].pt )
+                    getattr( self, 'subleadingBjetEta_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[1].eta )
+                    getattr( self, 'subleadingBjetBdisc_2B_boostedW' ).Fill( (goodPuppiBjets_boostedW[1].pfDeepCSVJetTags_probb+goodPuppiBjets_boostedW[1].pfDeepCSVJetTags_probbb) )
 
-                '''
-                ### W candidate
-                wCandidates_boostedW = [ j for j in looseFatJets if ((j.tau2/j.tau1 < tau21cut) and (j.deepTagMD_ZHbbvsQCD<Hbbcut))  ]
-                goodWCandidate_boostedW = min(wCandidates_boostedW, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates_boostedW)>0 else None
-                if goodWCandidate_boostedW: badFatJets_boostedW.remove(goodWCandidate_boostedW)
+                    ##### reconstructing Higgs
+                    resHiggs = goodPuppiBjets_boostedW[0].p4() + goodPuppiBjets_boostedW[1].p4()
+                    deltaResHiggs = goodPuppiBjets_boostedW[0].pt + goodPuppiBjets_boostedW[1].pt - resHiggs.M()
+                    getattr( self, 'deltaResHiggs_2B_boostedW' ).Fill( resHiggs.M(), deltaResHiggs )
+                    getattr( self, 'ptMassResHiggs_2B_boostedW' ).Fill( resHiggs.M(), (resHiggs.M()-resHiggs.Pt()))
+                    deltaR2B = goodPuppiBjets_boostedW[0].p4().DeltaR( goodPuppiBjets_boostedW[1].p4() )
+                    getattr( self, 'deltaR2B_2B_boostedW' ).Fill( deltaR2B )
+                    getattr( self, 'resolvedHiggsCandPt_2B_boostedW' ).Fill( resHiggs.Pt() )
+                    getattr( self, 'resolvedHiggsCandMass_2B_boostedW' ).Fill( resHiggs.M() )
+                    if (resHiggs.Pt()>100):
+                        getattr( self, 'resolvedHiggsCandMass_2Bpt_boostedW' ).Fill( resHiggs.M() )
 
-                ##### FOR ABCD
-                for ifj in badFatJets_boostedW:
-                    getattr( self, 'nJetsvsTau21_boostedW' ).Fill( len(badFatJets_boostedW), ifj.tau2/ifj.tau1 )
+                    if (deltaR2B < 2): getattr( self, 'resolvedHiggsCandMass_2BdeltaR_boostedW' ).Fill( resHiggs.M() )
 
-                if goodWCandidate_boostedW:
-                    isolatedPuppiJets_boostedW = [ j for j in goodPuppiJetsNoLep if (j.p4().DeltaR(goodWCandidate_boostedW.p4())>=1.2)  ]
-                    goodPuppiJets_boostedW = [ b for b in isolatedPuppiJets_boostedW if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)<0.4941 ]
-                    goodPuppiBjets_boostedW = [ b for b in isolatedPuppiJets_boostedW if (b.pfDeepCSVJetTags_probb+b.pfDeepCSVJetTags_probbb)>0.4941 ]
-                    getattr( self, 'nGoodPuppiBjets_boostedW' ).Fill( len(goodPuppiBjets_boostedW) if goodPuppiBjets_boostedW else 0 )
-                    getattr( self, 'nGoodPuppiJets_boostedW' ).Fill( len(goodPuppiJets_boostedW) if goodPuppiJets_boostedW else 0 )
-                    getattr( self, 'WCandMass_boostedW' ).Fill( goodWCandidate_boostedW.msoftdrop )
-                    getattr( self, 'boostedHiggsCandMass_boostedW' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+                    smallestDistancebb = 99999
+                    bbCandidatesSmallR = []
+                    for bpair in permutations(goodPuppiBjets_boostedW, 2):
+                        deltaRbb = bpair[0].p4().DeltaR( bpair[1].p4() )
+                        if deltaRbb < smallestDistancebb:
+                            smallestDistancebb = deltaRbb
+                            bbCandidatesSmallR = [ bpair[0], bpair[1] ]
 
-                    if len(goodPuppiBjets_boostedW)>1:
+                    getattr( self, 'resolvedHiggsCandMass_2BSmallR_boostedW' ).Fill( ( bpair[0].p4() + bpair[1].p4() ).M() )
+                    goodPuppiBjets_noHiggs_boostedW = goodPuppiBjets_boostedW
+                    goodPuppiBjets_noHiggs_boostedW.remove( bpair[0] )
+                    goodPuppiBjets_noHiggs_boostedW.remove( bpair[1] )
+                    if len(goodPuppiBjets_noHiggs_boostedW)>1:
+                        for nobpair in permutations(goodPuppiBjets_noHiggs_boostedW, 2):
+                            getattr( self, 'noResolvedHiggsCandMass_2BSmallR_boostedW' ).Fill( ( bpair[0].p4() + bpair[1].p4() ).M() )
 
-                        ##### reconstructing ttbar
-                        smallestDiffTop = 9999
-                        bFromTop = []
-                        bbCandidates = []
-                        for bpair in permutations(goodPuppiBjets_boostedW, 2):
-                            bbCandidates.append( bpair[0].p4()+bpair[1].p4() )
-                            tmplepTop = lepW + bpair[0].p4()
-                            tmphadTop = goodWCandidate_boostedW.p4() + bpair[1].p4()
-                            tmpDiff = abs(tmplepTop.M() - tmphadTop.M())
-                            if tmpDiff < smallestDiffTop:
-                                smallestDiffTop = tmpDiff
-                                bFromTop = [ bpair[0], bpair[1] ]
-                        getattr( self, 'minDiffLepHadTop' ).Fill( smallestDiffTop )
-                        lepTop = lepW + bFromTop[0].p4()
-                        hadTop = goodWCandidate_boostedW.p4() + bFromTop[1].p4()
-                        getattr( self, 'lepTopCandMass_2B_boostedW' ).Fill( lepTop.M() )
-                        getattr( self, 'hadTopCandMass_2B_boostedW' ).Fill( hadTop.M() )
-                        getattr( self, 'boostedHiggsCandMass_2B_boostedW' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-                        getattr( self, 'boostedHiggsCandPt_2B_boostedW' ).Fill( goodHiggsCandidate.pt if goodHiggsCandidate else -999 )
+                    if len(goodPuppiJets_boostedW)>1:
+                        getattr( self, 'simplejjMass_2J_boostedW' ).Fill( ( goodPuppiJets_boostedW[0].p4() + goodPuppiJets_boostedW[1].p4() ).M() )
+                        smallestDistancejj = 99999
+                        jjCandidatesSmallR = []
+                        for jpair in permutations(goodPuppiJets_boostedW, 2):
+                            deltaRjj = jpair[0].p4().DeltaR( jpair[1].p4() )
+                            if deltaRjj < smallestDistancejj:
+                                smallestDistancejj = deltaRjj
+                                jjCandidatesSmallR = [ jpair[0], jpair[1] ]
+                        getattr( self, 'simplejjMass_2JSmallR_boostedW' ).Fill( ( jjCandidatesSmallR[0].p4() + jjCandidatesSmallR[1].p4() ).M() )
 
-                        getattr( self, 'leadingBjetPt_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[0].pt )
-                        getattr( self, 'leadingBjetEta_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[0].eta )
-                        getattr( self, 'leadingBjetBdisc_2B_boostedW' ).Fill( (goodPuppiBjets_boostedW[0].pfDeepCSVJetTags_probb+goodPuppiBjets_boostedW[0].pfDeepCSVJetTags_probbb) )
-                        getattr( self, 'subleadingBjetPt_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[1].pt )
-                        getattr( self, 'subleadingBjetEta_2B_boostedW' ).Fill( goodPuppiBjets_boostedW[1].eta )
-                        getattr( self, 'subleadingBjetBdisc_2B_boostedW' ).Fill( (goodPuppiBjets_boostedW[1].pfDeepCSVJetTags_probb+goodPuppiBjets_boostedW[1].pfDeepCSVJetTags_probbb) )
+                    for bb in bbCandidates:
+                        getattr( self, 'allResolvedHiggsCandPt_2B_boostedW' ).Fill( bb.Pt() )
+                        getattr( self, 'allResolvedHiggsCandMass_2B_boostedW' ).Fill( bb.M() )
+                        getattr( self, 'allResolvedHiggsCandMassPt_2B_boostedW' ).Fill( bb.M(), bb.Pt() )
 
-                        ##### reconstructing Higgs
-                        resHiggs = goodPuppiBjets_boostedW[0].p4() + goodPuppiBjets_boostedW[1].p4()
-                        deltaResHiggs = goodPuppiBjets_boostedW[0].pt + goodPuppiBjets_boostedW[1].pt - resHiggs.M()
-                        getattr( self, 'deltaResHiggs_2B_boostedW' ).Fill( resHiggs.M(), deltaResHiggs )
-                        getattr( self, 'ptMassResHiggs_2B_boostedW' ).Fill( resHiggs.M(), (resHiggs.M()-resHiggs.Pt()))
-                        deltaR2B = goodPuppiBjets_boostedW[0].p4().DeltaR( goodPuppiBjets_boostedW[1].p4() )
-                        getattr( self, 'deltaR2B_2B_boostedW' ).Fill( deltaR2B )
-                        getattr( self, 'resolvedHiggsCandPt_2B_boostedW' ).Fill( resHiggs.Pt() )
-                        getattr( self, 'resolvedHiggsCandMass_2B_boostedW' ).Fill( resHiggs.M() )
-                        if (resHiggs.Pt()>100):
-                            getattr( self, 'resolvedHiggsCandMass_2Bpt_boostedW' ).Fill( resHiggs.M() )
+            '''
+            ######################################################################
+            ######################################################################
 
-                        if (deltaR2B < 2): getattr( self, 'resolvedHiggsCandMass_2BdeltaR_boostedW' ).Fill( resHiggs.M() )
+            #### Just to see categories
+            higgsCandidates = [ j for j in allhiggsCandidates if ( (j.deepTagMD_HbbvsQCD > Hbbcut ) and (j.tau2/j.tau1 < tau21cut) ) ]
+            goodHiggsCandidate = max(higgsCandidates, key=lambda j: j.deepTagMD_HbbvsQCD) if len(higgsCandidates)>0 else None
+            if goodHiggsCandidate:
+                badFatJets.remove(goodHiggsCandidate)
 
-                        smallestDistancebb = 99999
-                        bbCandidatesSmallR = []
-                        for bpair in permutations(goodPuppiBjets_boostedW, 2):
-                            deltaRbb = bpair[0].p4().DeltaR( bpair[1].p4() )
-                            if deltaRbb < smallestDistancebb:
-                                smallestDistancebb = deltaRbb
-                                bbCandidatesSmallR = [ bpair[0], bpair[1] ]
+            ### W candidate
+            wCandidates = [ j for j in badFatJets if (j.tau2/j.tau1 < tau21cut) ]
+            goodWCandidate = min(wCandidates, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates)>0 else None
+            if goodWCandidate: badFatJets.remove(goodWCandidate)
 
-                        getattr( self, 'resolvedHiggsCandMass_2BSmallR_boostedW' ).Fill( ( bpair[0].p4() + bpair[1].p4() ).M() )
-                        goodPuppiBjets_noHiggs_boostedW = goodPuppiBjets_boostedW
-                        goodPuppiBjets_noHiggs_boostedW.remove( bpair[0] )
-                        goodPuppiBjets_noHiggs_boostedW.remove( bpair[1] )
-                        if len(goodPuppiBjets_noHiggs_boostedW)>1:
-                            for nobpair in permutations(goodPuppiBjets_noHiggs_boostedW, 2):
-                                getattr( self, 'noResolvedHiggsCandMass_2BSmallR_boostedW' ).Fill( ( bpair[0].p4() + bpair[1].p4() ).M() )
+            ### Top candidate
+            topCandidates = [ j for j in badFatJets if (j.tau3/j.tau2 < 0.4) ]
+            goodTopCandidate = min(topCandidates, key=lambda j: j.tau3/j.tau2 ) if len(topCandidates)>0 else None     ## in case there are more than one top Candidate, choose the one with minimum tau32
+            if goodTopCandidate: badFatJets.remove(goodTopCandidate)
 
-                        if len(goodPuppiJets_boostedW)>1:
-                            getattr( self, 'simplejjMass_2J_boostedW' ).Fill( ( goodPuppiJets_boostedW[0].p4() + goodPuppiJets_boostedW[1].p4() ).M() )
-                            smallestDistancejj = 99999
-                            jjCandidatesSmallR = []
-                            for jpair in permutations(goodPuppiJets_boostedW, 2):
-                                deltaRjj = jpair[0].p4().DeltaR( jpair[1].p4() )
-                                if deltaRjj < smallestDistancejj:
-                                    smallestDistancejj = deltaRjj
-                                    jjCandidatesSmallR = [ jpair[0], jpair[1] ]
-                            getattr( self, 'simplejjMass_2JSmallR_boostedW' ).Fill( ( jjCandidatesSmallR[0].p4() + jjCandidatesSmallR[1].p4() ).M() )
+            #### Best case scenario (unrealistic) just compute mass for comparison
+            if goodTopCandidate and goodHiggsCandidate and not goodWCandidate:
+                goodEvents = 1
+                getattr( self, 'TopCandMass_TopHiggs' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
+                getattr( self, 'WCandMass_TopHiggs' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
+                getattr( self, 'leadAK8JetMass_TopHiggs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
 
-                        for bb in bbCandidates:
-                            getattr( self, 'allResolvedHiggsCandPt_2B_boostedW' ).Fill( bb.Pt() )
-                            getattr( self, 'allResolvedHiggsCandMass_2B_boostedW' ).Fill( bb.M() )
-                            getattr( self, 'allResolvedHiggsCandMassPt_2B_boostedW' ).Fill( bb.M(), bb.Pt() )
+            #### Best boosted case scenario
+            elif goodWCandidate and goodHiggsCandidate and not goodTopCandidate:
+                goodEvents = 2
+                getattr( self, 'TopCandMass_WHiggs' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
+                getattr( self, 'WCandMass_WHiggs' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
+                getattr( self, 'leadAK8JetMass_WHiggs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
 
-                '''
-                ######################################################################
-                ######################################################################
+            #### Wrong reconstruction, this category cannot exist
+            elif goodWCandidate and goodTopCandidate and not goodHiggsCandidate:
+                goodEvents = 3
+                getattr( self, 'TopCandMass_WTop' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
+                getattr( self, 'WCandMass_WTop' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
+                getattr( self, 'leadAK8JetMass_WTop' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
 
-                #### Just to see categories
-                higgsCandidates = [ j for j in allhiggsCandidates if ( (j.deepTagMD_HbbvsQCD > Hbbcut ) and (j.tau2/j.tau1 < tau21cut) ) ]
-                goodHiggsCandidate = max(higgsCandidates, key=lambda j: j.deepTagMD_HbbvsQCD) if len(higgsCandidates)>0 else None
-                if goodHiggsCandidate:
-                    badFatJets.remove(goodHiggsCandidate)
+            #### Following categories just to know
+            elif goodWCandidate and not ( goodTopCandidate and goodHiggsCandidate):
+                goodEvents = 4
+                getattr( self, 'WCandMass_W' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
+            elif goodTopCandidate and not ( goodWCandidate and goodHiggsCandidate):
+                goodEvents = 5
+                getattr( self, 'TopCandMass_Top' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
+            elif goodHiggsCandidate and not ( goodWCandidate and goodTopCandidate):
+                goodEvents = 6
+                getattr( self, 'leadAK8JetMass_Higgs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+            else: goodEvents = 0
 
-                ### W candidate
-                wCandidates = [ j for j in badFatJets if (j.tau2/j.tau1 < tau21cut) ]
-                goodWCandidate = min(wCandidates, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates)>0 else None
-                if goodWCandidate: badFatJets.remove(goodWCandidate)
+            if goodHiggsCandidate:
+                getattr( self, 'nEvents' ).Fill( 5 )
+                if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 6 )
+                goodEvents = 7
 
-                ### Top candidate
-                topCandidates = [ j for j in badFatJets if (j.tau3/j.tau2 < 0.4) ]
-                goodTopCandidate = min(topCandidates, key=lambda j: j.tau3/j.tau2 ) if len(topCandidates)>0 else None     ## in case there are more than one top Candidate, choose the one with minimum tau32
-                if goodTopCandidate: badFatJets.remove(goodTopCandidate)
-
-                #### Best case scenario (unrealistic) just compute mass for comparison
-                if goodTopCandidate and goodHiggsCandidate and not goodWCandidate:
-                    goodEvents = 1
-                    getattr( self, 'TopCandMass_TopHiggs' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                    getattr( self, 'WCandMass_TopHiggs' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                    getattr( self, 'leadAK8JetMass_TopHiggs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-
-                #### Best boosted case scenario
-                elif goodWCandidate and goodHiggsCandidate and not goodTopCandidate:
-                    goodEvents = 2
-                    getattr( self, 'TopCandMass_WHiggs' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                    getattr( self, 'WCandMass_WHiggs' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                    getattr( self, 'leadAK8JetMass_WHiggs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-
-                #### Wrong reconstruction, this category cannot exist
-                elif goodWCandidate and goodTopCandidate and not goodHiggsCandidate:
-                    goodEvents = 3
-                    getattr( self, 'TopCandMass_WTop' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                    getattr( self, 'WCandMass_WTop' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                    getattr( self, 'leadAK8JetMass_WTop' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-
-                #### Following categories just to know
-                elif goodWCandidate and not ( goodTopCandidate and goodHiggsCandidate):
-                    goodEvents = 4
-                    getattr( self, 'WCandMass_W' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                elif goodTopCandidate and not ( goodWCandidate and goodHiggsCandidate):
-                    goodEvents = 5
-                    getattr( self, 'TopCandMass_Top' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                elif goodHiggsCandidate and not ( goodWCandidate and goodTopCandidate):
-                    goodEvents = 6
-                    getattr( self, 'leadAK8JetMass_Higgs' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
-                else: goodEvents = 0
-
-                if goodHiggsCandidate:
-                    getattr( self, 'nEvents' ).Fill( 5 )
-                    if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 6 )
-                    goodEvents = 7
-
-                getattr( self, 'nbadFatJets' ).Fill( len(badFatJets) )
-                getattr( self, 'ngoodEvents' ).Fill( goodEvents )
-                getattr( self, 'TopCandMass' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
-                getattr( self, 'WCandMass' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
-                getattr( self, 'leadAK8JetMass' ).Fill( goodHiggsCandidate.msoftdrop if goodHiggsCandidate else -999 )
+            getattr( self, 'nbadFatJets' ).Fill( len(badFatJets) )
+            getattr( self, 'ngoodEvents' ).Fill( goodEvents )
+            getattr( self, 'TopCandMass' ).Fill( goodTopCandidate.msoftdrop if goodTopCandidate else -999 )
+            getattr( self, 'WCandMass' ).Fill( goodWCandidate.msoftdrop if goodWCandidate else -999 )
 
 
 
