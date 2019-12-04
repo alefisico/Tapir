@@ -45,10 +45,69 @@ selection['DL_presel'] = [ 'DL Preselection' ]
 #selection['SL_presel'] = [ 'nlep > 0', 'nJets > 3', 'nDeepCSVM > 1' ]
 
 canvas = {}
-dataFiles = OrderedDict()
-bkgFiles = OrderedDict()
-signalFiles = OrderedDict()
 
+def rootHistograms( version, lumi, tmp ):
+    """docstring for rootHistograms"""
+
+    dataFiles = OrderedDict()
+    bkgFiles = OrderedDict()
+    signalFiles = OrderedDict()
+    '''
+    bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'), args.lumi*10.3*.3259/9914948.,  40, 'Single top' ]
+    bkgFiles["ST_t-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*136.02/5982064.,  40, 'Single top' ]
+    bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*35.85/7745276., 40, 'Single top' ]
+    bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*35.85/7945242., 40, 'Single top' ]
+    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+VER+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*88.342/283000430.596, 29, 'Dileptonic tt' ]
+#    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+VER+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*377.96/1647945788.34, 19, 'Hadronic tt' ]
+    bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+VER+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*365.46/43732445., 27, 'Semileptonic tt' ]
+    bkgFiles["WW"] = [ TFile('Rootfiles/'+VER+'/histograms_WW_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*118.7/7791498., 38, 'Dibosons' ]
+    bkgFiles["WZ"] = [ TFile('Rootfiles/'+VER+'/histograms_WZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*27.6/73928630., 39, 'Dibosons' ]
+    bkgFiles["ZZ"] = [ TFile('Rootfiles/'+VER+'/histograms_ZZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*12.14/1925931., 36, 'Dibosons' ]
+#    bkgFiles["QCD"] = [ TFile('Rootfiles/'+VER+'/histograms_QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8_'+tmp+'boosted.root'), args.lumi*1370000000./18455107., 6 , 'QCD']
+    bkgFiles["TTGJets"] = [ TFile('Rootfiles/'+VER+'/histograms_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*3.697/7349100., 12, 'ttGluon' ]
+#    bkgFiles["WJets"] = [ TFile('Rootfiles/'+VER+'/histograms_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_'+tmp+'boosted.root'), args.lumi*52850.0/33073306., 33, 'WJets' ]
+    bkgFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.5071*(1-.5824)/5499293., kBlue, 'ttH, non-H(bb)' ]
+    #bkgFiles[""] = [ TFile('Rootfiles/'+VER+'/'), 1 ]
+    #bkgFiles[""] = [ TFile('Rootfiles/'+VER+'/'), 1 ]
+
+    bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+VER+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*0.3708/811306., 37, 'ttW'  ]
+    bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+VER+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'),  args.lumi*0.6012/750000., 46, 'ttZ' ]
+    signalFiles["THW"] = [ TFile('Rootfiles/'+VER+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8_'+tmp+'boosted.root'), args.lumi*0.1475/4719999., 46, 'tHW' ]
+    signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.2934045/4216319.32, kRed, 'ttH(bb)' ]
+    ####signalFiles["ttHTobb_ttToSemiLep"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.093/9332943, kRed ]
+
+    '''
+    bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+version+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'), lumi*10.3*.3259/6139912.0,  40, 'Single top' ]
+    bkgFiles["ST_t-channel"] = [ TFile('Rootfiles/'+version+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_'+tmp+'boosted.root'), lumi*136.02/5863722.0,  40, 'Single top' ]
+    bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+version+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*35.85/7686032.0, 40, 'Single top' ]
+    bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+version+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*35.85/7884388.0, 40, 'Single top' ]
+    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+version+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*88.342/8850002.0, 29, 'Dileptonic tt' ]
+    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*377.96/41084368.0, 19, 'Hadronic tt' ]
+    bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*365.46/35477937.0, 27, 'Semileptonic tt' ]
+    bkgFiles["WW"] = [ TFile('Rootfiles/'+version+'/histograms_WW_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), lumi*118.7/7791498.0, 38, 'Dibosons' ]
+    bkgFiles["WZ"] = [ TFile('Rootfiles/'+version+'/histograms_WZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), lumi*27.6/3928630.0, 39, 'Dibosons' ]
+    bkgFiles["ZZ"] = [ TFile('Rootfiles/'+version+'/histograms_ZZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), lumi*12.14/1925931.0, 36, 'Dibosons' ]
+    #bkgFiles["QCD"] = [ TFile('Rootfiles/'+version+'/histograms_QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8_'+tmp+'boosted.root'), lumi*1370000000./18288989.0, 6 , 'QCD']
+    bkgFiles["TTGJets"] = [ TFile('Rootfiles/'+version+'/histograms_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), lumi*3.697/2850394.0, 12, 'ttGluon' ]
+    bkgFiles["WJets"] = [ TFile('Rootfiles/'+version+'/histograms_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_'+tmp+'boosted.root'), lumi*52850.0/33043732.0, 33, 'WJets' ]
+    bkgFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+version+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*0.5071*(1-.5824)/5394229.0, kBlue, 'ttH, non-H(bb)' ]
+    #bkgFiles[""] = [ TFile('Rootfiles/'+version+'/'), 1 ]
+    #bkgFiles[""] = [ TFile('Rootfiles/'+version+'/'), 1 ]
+
+    bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+version+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), lumi*0.3708/441560.0, 37, 'ttW'  ]
+    bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+version+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'),  lumi*0.6012/356286.0, 46, 'ttZ' ]
+    signalFiles["THW"] = [ TFile('Rootfiles/'+version+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8_'+tmp+'boosted.root'), lumi*0.1475/4714331.0, 46, 'tHW' ]
+    signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+version+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*0.2934045/7833734.0, kRed, 'ttH(bb)' ]
+    ####signalFiles["ttHTobb_ttToSemiLep"] = [ TFile('Rootfiles/'+version+'/histograms_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), lumi*0.093/9323907.0, kRed ]
+    #signalFiles[""] = [ TFile('Rootfiles/'+version+'/'), 1 ]
+
+    #if args.ttbarDecay.startswith("DL"):
+    dataFiles['SingleElectron'] = TFile.Open('Rootfiles/'+version+'/histograms_SingleElectron_Run2017ALL_boosted.root')
+    dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+version+'/histograms_SingleMuon_Run2017ALL_boosted.root')
+
+    return bkgFiles, signalFiles, dataFiles
+
+##########################################################
 def setSelection( listSel, xMin=0.65, yMax=0.65, align='right' ):
 
     for i in range( len( listSel ) ):
@@ -679,58 +738,7 @@ if __name__ == '__main__':
 
     tmp = 'noOrthogonal_' if '_' in args.version else ''
     VER = args.version.split('_')[1] if '_' in args.version else args.version
-    '''
-    bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'), args.lumi*10.3*.3259/9914948.,  40, 'Single top' ]
-    bkgFiles["ST_t-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*136.02/5982064.,  40, 'Single top' ]
-    bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*35.85/7745276., 40, 'Single top' ]
-    bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*35.85/7945242., 40, 'Single top' ]
-    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+VER+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*88.342/283000430.596, 29, 'Dileptonic tt' ]
-#    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+VER+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*377.96/1647945788.34, 19, 'Hadronic tt' ]
-    bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+VER+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*365.46/43732445., 27, 'Semileptonic tt' ]
-    bkgFiles["WW"] = [ TFile('Rootfiles/'+VER+'/histograms_WW_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*118.7/7791498., 38, 'Dibosons' ]
-    bkgFiles["WZ"] = [ TFile('Rootfiles/'+VER+'/histograms_WZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*27.6/73928630., 39, 'Dibosons' ]
-    bkgFiles["ZZ"] = [ TFile('Rootfiles/'+VER+'/histograms_ZZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*12.14/1925931., 36, 'Dibosons' ]
-#    bkgFiles["QCD"] = [ TFile('Rootfiles/'+VER+'/histograms_QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8_'+tmp+'boosted.root'), args.lumi*1370000000./18455107., 6 , 'QCD']
-    bkgFiles["TTGJets"] = [ TFile('Rootfiles/'+VER+'/histograms_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*3.697/7349100., 12, 'ttGluon' ]
-#    bkgFiles["WJets"] = [ TFile('Rootfiles/'+VER+'/histograms_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_'+tmp+'boosted.root'), args.lumi*52850.0/33073306., 33, 'WJets' ]
-    bkgFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.5071*(1-.5824)/5499293., kBlue, 'ttH, non-H(bb)' ]
-    #bkgFiles[""] = [ TFile('Rootfiles/'+VER+'/'), 1 ]
-    #bkgFiles[""] = [ TFile('Rootfiles/'+VER+'/'), 1 ]
-
-    bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+VER+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*0.3708/811306., 37, 'ttW'  ]
-    bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+VER+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'),  args.lumi*0.6012/750000., 46, 'ttZ' ]
-    signalFiles["THW"] = [ TFile('Rootfiles/'+VER+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8_'+tmp+'boosted.root'), args.lumi*0.1475/4719999., 46, 'tHW' ]
-    signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.2934045/4216319.32, kRed, 'ttH(bb)' ]
-    ####signalFiles["ttHTobb_ttToSemiLep"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.093/9332943, kRed ]
-
-    '''
-    bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'), args.lumi*10.3*.3259/6139912.0,  40, 'Single top' ]
-    bkgFiles["ST_t-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*136.02/5863722.0,  40, 'Single top' ]
-    bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*35.85/7686032.0, 40, 'Single top' ]
-    bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*35.85/7884388.0, 40, 'Single top' ]
-    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+VER+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*88.342/8850002.0, 29, 'Dileptonic tt' ]
-    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+VER+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*377.96/41084368.0, 19, 'Hadronic tt' ]
-    bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+VER+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*365.46/35477937.0, 27, 'Semileptonic tt' ]
-    bkgFiles["WW"] = [ TFile('Rootfiles/'+VER+'/histograms_WW_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*118.7/7791498.0, 38, 'Dibosons' ]
-    bkgFiles["WZ"] = [ TFile('Rootfiles/'+VER+'/histograms_WZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*27.6/3928630.0, 39, 'Dibosons' ]
-    bkgFiles["ZZ"] = [ TFile('Rootfiles/'+VER+'/histograms_ZZ_TuneCP5_13TeV-pythia8_'+tmp+'boosted.root'), args.lumi*12.14/1925931.0, 36, 'Dibosons' ]
-    #bkgFiles["QCD"] = [ TFile('Rootfiles/'+VER+'/histograms_QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8_'+tmp+'boosted.root'), args.lumi*1370000000./18288989.0, 6 , 'QCD']
-    bkgFiles["TTGJets"] = [ TFile('Rootfiles/'+VER+'/histograms_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*3.697/2850394.0, 12, 'ttGluon' ]
-    bkgFiles["WJets"] = [ TFile('Rootfiles/'+VER+'/histograms_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_'+tmp+'boosted.root'), args.lumi*52850.0/33043732.0, 33, 'WJets' ]
-    bkgFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.5071*(1-.5824)/5394229.0, kBlue, 'ttH, non-H(bb)' ]
-    #bkgFiles[""] = [ TFile('Rootfiles/'+VER+'/'), 1 ]
-    #bkgFiles[""] = [ TFile('Rootfiles/'+VER+'/'), 1 ]
-
-    bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+VER+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_'+tmp+'boosted.root'), args.lumi*0.3708/441560.0, 37, 'ttW'  ]
-    bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+VER+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8_'+tmp+'boosted.root'),  args.lumi*0.6012/356286.0, 46, 'ttZ' ]
-    signalFiles["THW"] = [ TFile('Rootfiles/'+VER+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8_'+tmp+'boosted.root'), args.lumi*0.1475/4714331.0, 46, 'tHW' ]
-    signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.2934045/7833734.0, kRed, 'ttH(bb)' ]
-    ####signalFiles["ttHTobb_ttToSemiLep"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_'+tmp+'boosted.root'), args.lumi*0.093/9323907.0, kRed ]
-    #signalFiles[""] = [ TFile('Rootfiles/'+VER+'/'), 1 ]
-
-    #if args.ttbarDecay.startswith("DL"):
-    dataFiles['SingleElectron'] = TFile.Open('Rootfiles/'+VER+'/histograms_SingleElectron_Run2017ALL_boosted.root')
-    dataFiles['SingleMuon'] = TFile.Open('Rootfiles/'+VER+'/histograms_SingleMuon_Run2017ALL_boosted.root')
+    bkgFiles, signalFiles, dataFiles = rootHistograms( VER, args.lumi, tmp )
 
     if args.norm:
         bkgFiles.pop('TTTo2L2Nu', None)

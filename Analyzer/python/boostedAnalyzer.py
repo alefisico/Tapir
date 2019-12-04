@@ -44,7 +44,7 @@ class boostedAnalyzer(Module):
             self.addP4Hists( 'jets', isel )
             self.addObject( ROOT.TH1F('nBjets'+isel,   ';number of AK4 b jets',   20, 0, 20) )
             self.addObject( ROOT.TH1F('nAK8jets'+isel,   ';number of AK8 jets',   20, 0, 20) )
-            self.addObject( ROOT.TH1F('METPt'+isel,   ';MET (GeV)',   500, 0, 5000) )
+            self.addObject( ROOT.TH1F('METPt'+isel,   ';MET (GeV)',   200, 0, 2000) )
 
             self.addObject( ROOT.TH1F('lepWMass'+isel,   ';Leptonic W candidate mass', 60, 0, 300) )
             self.addObject( ROOT.TH1F('lepWPt'+isel,   ';Leptonic W candidate pt ', 60, 0, 300) )
@@ -188,12 +188,12 @@ class boostedAnalyzer(Module):
         '''
 
     def addP4Hists(self, s, t ):
-        self.addObject( ROOT.TH1F(s+'_pt'+t,  s+';p_{T} (GeV)',   500, 0, 5000) )
+        self.addObject( ROOT.TH1F(s+'_pt'+t,  s+';p_{T} (GeV)',   200, 0, 2000) )
         self.addObject( ROOT.TH1F(s+'_eta'+t, s+';#eta', 100, -4.0, 4.0 ) )
         self.addObject( ROOT.TH1F(s+'_phi'+t, s+';#phi', 100, -3.14259, 3.14159) )
         self.addObject( ROOT.TH1F(s+'_mass'+t,s+';mass (GeV)', 100, 0, 1000) )
         if s.startswith('jet'):
-            self.addObject( ROOT.TH1F(s+'_bDeepFlav'+t, s+';b Discriminator', 40, -1, 1) )
+            self.addObject( ROOT.TH1F(s+'_bDeepFlav'+t, s+';b Discriminator', 40, 0, 1) )
 
     def leptonSF(self, lepton, leptonP4 ):
 
@@ -342,7 +342,7 @@ class boostedAnalyzer(Module):
         else: leptonWeights = [1, 1, 1]
 
         ### Jets
-        looseJets = [ j for j in jets if (abs(j.eta<2.4)) and (j.pt>20) and ( (j.jetId>=2) and (j.puId>=4) and (j.pt<50) ) ]
+        looseJets = [ j for j in jets if (abs(j.eta)<2.4) and (j.pt>20) and (j.jetId>=2) and ( (j.puId>=4) if (j.pt<50) else True ) ]
         goodJets = looseJets if (len(looseJets)>0) and (looseJets[0].pt>30) else []
         goodJetsNoLep = [ j for j in goodJets for l in goodLeptons if j.p4().DeltaR(l.p4())>=0.4  ]
 
@@ -387,7 +387,7 @@ class boostedAnalyzer(Module):
             getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
 
             ### General
-            getattr( self, 'nPVs' ).Fill( event.puWeight, weight )
+            getattr( self, 'nPVs' ).Fill( PV.npvsGood, weight )
             getattr( self, 'nleps' ).Fill( len(goodLeptons), weight )
             getattr( self, 'lepton_pt' ).Fill( goodLeptons[0].pt, weight )
             getattr( self, 'lepton_eta' ).Fill( goodLeptons[0].eta, weight )
@@ -397,7 +397,9 @@ class boostedAnalyzer(Module):
                 getattr( self, 'jets_pt' ).Fill( ijet.pt, weight )
                 getattr( self, 'jets_eta' ).Fill( ijet.eta, weight )
                 getattr( self, 'jets_phi' ).Fill( ijet.phi, weight )
+                getattr( self, 'jets_bDeepFlav' ).Fill( ijet.btagDeepFlavB, weight )
             getattr( self, 'nBjets' ).Fill( len(goodBjetsDeepFlav), weight )
+            getattr( self, 'nAK8jets' ).Fill( len(allhiggsCandidates), weight )
             getattr( self, 'METPt' ).Fill( MET.pt, weight )
 
             ### Leptonic W
@@ -446,7 +448,7 @@ class boostedAnalyzer(Module):
 
                 getattr( self, 'nEvents' ).Fill( 7 )
                 if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 8 )
-                getattr( self, 'nPVs_2J').Fill( event.puWeight, weight )
+                getattr( self, 'nPVs_2J').Fill( PV.npvsGood, weight )
                 getattr( self, 'nleps_2J').Fill( len(goodLeptons), weight )
                 getattr( self, 'lepton_pt_2J').Fill( goodLeptons[0].pt, weight )
                 getattr( self, 'lepton_eta_2J').Fill( goodLeptons[0].eta, weight )
@@ -456,7 +458,9 @@ class boostedAnalyzer(Module):
                     getattr( self, 'jets_pt_2J').Fill( ijet.pt, weight )
                     getattr( self, 'jets_eta_2J').Fill( ijet.eta, weight )
                     getattr( self, 'jets_phi_2J').Fill( ijet.phi, weight )
+                    getattr( self, 'jets_bDeepFlav_2J' ).Fill( ijet.btagDeepFlavB, weight )
                 getattr( self, 'nBjets_2J').Fill( len(goodBjets_Hcand), weight )
+                getattr( self, 'nAK8jets_2J' ).Fill( len(allhiggsCandidates), weight )
                 getattr( self, 'METPt_2J').Fill( MET.pt, weight )
                 getattr( self, 'lepWMass_2J').Fill( lepW.M(), weight )
                 getattr( self, 'lepWPt_2J').Fill( lepW.Pt(), weight )
@@ -467,7 +471,7 @@ class boostedAnalyzer(Module):
                 getattr( self, 'leadAK8JetHbb_2J').Fill( FatJet_Hbb, weight )
 
                 #### test without weights
-                getattr( self, 'nPVs_2JNoWeight').Fill( event.puWeight )
+                getattr( self, 'nPVs_2JNoWeight').Fill( PV.npvsGood )
                 getattr( self, 'nleps_2JNoWeight').Fill( len(goodLeptons) )
                 getattr( self, 'lepton_pt_2JNoWeight').Fill( goodLeptons[0].pt )
                 getattr( self, 'lepton_eta_2JNoWeight').Fill( goodLeptons[0].eta )
@@ -477,7 +481,9 @@ class boostedAnalyzer(Module):
                     getattr( self, 'jets_pt_2JNoWeight').Fill( ijet.pt )
                     getattr( self, 'jets_eta_2JNoWeight').Fill( ijet.eta )
                     getattr( self, 'jets_phi_2JNoWeight').Fill( ijet.phi )
+                    getattr( self, 'jets_bDeepFlav_2JNoWeight' ).Fill( ijet.btagDeepFlavB )
                 getattr( self, 'nBjets_2JNoWeight').Fill( len(goodBjets_Hcand) )
+                getattr( self, 'nAK8jets_2JNoWeight' ).Fill( len(allhiggsCandidates) )
                 getattr( self, 'METPt_2JNoWeight').Fill( MET.pt )
                 getattr( self, 'lepWMass_2JNoWeight').Fill( lepW.M() )
                 getattr( self, 'lepWPt_2JNoWeight').Fill( lepW.Pt() )
@@ -522,7 +528,7 @@ class boostedAnalyzer(Module):
                     getattr( self, 'cutFlow_weight' ).Fill( 4, weight )
                     getattr( self, 'cutFlow_genWeight' ).Fill( 4, event.genWeight )
 
-                    getattr( self, 'nPVs_2J2W').Fill( event.puWeight, weight )
+                    getattr( self, 'nPVs_2J2W').Fill( PV.npvsGood, weight )
                     getattr( self, 'nleps_2J2W').Fill( len(goodLeptons), weight )
                     getattr( self, 'lepton_pt_2J2W').Fill( goodLeptons[0].pt, weight )
                     getattr( self, 'lepton_eta_2J2W').Fill( goodLeptons[0].eta, weight )
@@ -532,7 +538,9 @@ class boostedAnalyzer(Module):
                         getattr( self, 'jets_pt_2J2W').Fill( ijet.pt, weight )
                         getattr( self, 'jets_eta_2J2W').Fill( ijet.eta, weight )
                         getattr( self, 'jets_phi_2J2W').Fill( ijet.phi, weight )
+                        getattr( self, 'jets_bDeepFlav_2J2W' ).Fill( ijet.btagDeepFlavB, weight )
                     getattr( self, 'nBjets_2J2W').Fill( len(goodBjets_Hcand), weight )
+                    getattr( self, 'nAK8jets_2J2W' ).Fill( len(allhiggsCandidates), weight )
                     getattr( self, 'METPt_2J2W').Fill( MET.pt, weight )
                     getattr( self, 'lepWMass_2J2W').Fill( lepW.M(), weight )
                     getattr( self, 'lepWPt_2J2W').Fill( lepW.Pt(), weight )
@@ -571,7 +579,7 @@ class boostedAnalyzer(Module):
                         getattr( self, 'cutFlow_weight' ).Fill( 5, weight )
                         getattr( self, 'cutFlow_genWeight' ).Fill( 5, event.genWeight )
 
-                        getattr( self, 'nPVs_2J2WdeltaR').Fill( event.puWeight, weight )
+                        getattr( self, 'nPVs_2J2WdeltaR').Fill( PV.npvsGood, weight )
                         getattr( self, 'nleps_2J2WdeltaR').Fill( len(goodLeptons), weight )
                         getattr( self, 'lepton_pt_2J2WdeltaR').Fill( goodLeptons[0].pt, weight )
                         getattr( self, 'lepton_eta_2J2WdeltaR').Fill( goodLeptons[0].eta, weight )
@@ -581,7 +589,9 @@ class boostedAnalyzer(Module):
                             getattr( self, 'jets_pt_2J2WdeltaR').Fill( ijet.pt, weight )
                             getattr( self, 'jets_eta_2J2WdeltaR').Fill( ijet.eta, weight )
                             getattr( self, 'jets_phi_2J2WdeltaR').Fill( ijet.phi, weight )
+                            getattr( self, 'jets_bDeepFlav_2J2WdeltaR' ).Fill( ijet.btagDeepFlavB, weight )
                         getattr( self, 'nBjets_2J2WdeltaR').Fill( len(goodBjets_Hcand), weight )
+                        getattr( self, 'nAK8jets_2J2WdeltaR' ).Fill( len(allhiggsCandidates), weight )
                         getattr( self, 'METPt_2J2WdeltaR').Fill( MET.pt, weight )
                         getattr( self, 'lepWMass_2J2WdeltaR').Fill( lepW.M(), weight )
                         getattr( self, 'lepWPt_2J2WdeltaR').Fill( lepW.Pt(), weight )
@@ -600,7 +610,7 @@ class boostedAnalyzer(Module):
                             getattr( self, 'cutFlow_weight' ).Fill( 6, weight )
                             getattr( self, 'cutFlow_genWeight' ).Fill( 6, event.genWeight )
 
-                            getattr( self, 'nPVs_2J2WdeltaRTau21').Fill( event.puWeight, weight )
+                            getattr( self, 'nPVs_2J2WdeltaRTau21').Fill( PV.npvsGood, weight )
                             getattr( self, 'nleps_2J2WdeltaRTau21').Fill( len(goodLeptons), weight )
                             getattr( self, 'lepton_pt_2J2WdeltaRTau21').Fill( goodLeptons[0].pt, weight )
                             getattr( self, 'lepton_eta_2J2WdeltaRTau21').Fill( goodLeptons[0].eta, weight )
@@ -610,7 +620,9 @@ class boostedAnalyzer(Module):
                                 getattr( self, 'jets_pt_2J2WdeltaRTau21').Fill( ijet.pt, weight )
                                 getattr( self, 'jets_eta_2J2WdeltaRTau21').Fill( ijet.eta, weight )
                                 getattr( self, 'jets_phi_2J2WdeltaRTau21').Fill( ijet.phi, weight )
+                                getattr( self, 'jets_bDeepFlav_2J2WdeltaRTau21' ).Fill( ijet.btagDeepFlavB, weight )
                             getattr( self, 'nBjets_2J2WdeltaRTau21').Fill( len(goodBjets_Hcand), weight )
+                            getattr( self, 'nAK8jets_2J2WdeltaRTau21' ).Fill( len(allhiggsCandidates), weight )
                             getattr( self, 'METPt_2J2WdeltaRTau21').Fill( MET.pt, weight )
                             getattr( self, 'lepWMass_2J2WdeltaRTau21').Fill( lepW.M(), weight )
                             getattr( self, 'lepWPt_2J2WdeltaRTau21').Fill( lepW.Pt(), weight )
