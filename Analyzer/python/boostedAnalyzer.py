@@ -371,7 +371,7 @@ class boostedAnalyzer(Module):
 
         getattr( self, 'cutFlow' ).Fill( 1 )
         getattr( self, 'cutFlow_weight' ).Fill( 1, weight )
-        getattr( self, 'cutFlow_genWeight' ).Fill( 1, event.genWeight )
+        if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 1, event.genWeight )
 
         getattr( self, 'nEvents' ).Fill( 0 )
         if ( metcut and nlepcut ): getattr( self, 'nEvents' ).Fill( 1 )
@@ -384,7 +384,7 @@ class boostedAnalyzer(Module):
 
             getattr( self, 'cutFlow' ).Fill( 2 )
             getattr( self, 'cutFlow_weight' ).Fill( 2, weight )
-            getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
+            if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
 
             ### General
             getattr( self, 'nPVs' ).Fill( PV.npvsGood, weight )
@@ -444,7 +444,7 @@ class boostedAnalyzer(Module):
             if len(goodJets_Hcand)>1:
                 getattr( self, 'cutFlow' ).Fill( 3 )
                 getattr( self, 'cutFlow_weight' ).Fill( 3, weight )
-                getattr( self, 'cutFlow_genWeight' ).Fill( 3, event.genWeight )
+                if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 3, event.genWeight )
 
                 getattr( self, 'nEvents' ).Fill( 7 )
                 if not (njetscut and nbjetscut): getattr( self, 'nEvents' ).Fill( 8 )
@@ -526,7 +526,7 @@ class boostedAnalyzer(Module):
                 if (hadW.M()>65 and hadW.M()<105):
                     getattr( self, 'cutFlow' ).Fill( 4 )
                     getattr( self, 'cutFlow_weight' ).Fill( 4, weight )
-                    getattr( self, 'cutFlow_genWeight' ).Fill( 4, event.genWeight )
+                    if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 4, event.genWeight )
 
                     getattr( self, 'nPVs_2J2W').Fill( PV.npvsGood, weight )
                     getattr( self, 'nleps_2J2W').Fill( len(goodLeptons), weight )
@@ -577,7 +577,7 @@ class boostedAnalyzer(Module):
                     if (deltaRlepWHiggs>1) and (deltaRWHiggs>1):
                         getattr( self, 'cutFlow' ).Fill( 5 )
                         getattr( self, 'cutFlow_weight' ).Fill( 5, weight )
-                        getattr( self, 'cutFlow_genWeight' ).Fill( 5, event.genWeight )
+                        if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 5, event.genWeight )
 
                         getattr( self, 'nPVs_2J2WdeltaR').Fill( PV.npvsGood, weight )
                         getattr( self, 'nleps_2J2WdeltaR').Fill( len(goodLeptons), weight )
@@ -608,7 +608,7 @@ class boostedAnalyzer(Module):
                         if (FatJet_tau21<tau21cut):
                             getattr( self, 'cutFlow' ).Fill( 6 )
                             getattr( self, 'cutFlow_weight' ).Fill( 6, weight )
-                            getattr( self, 'cutFlow_genWeight' ).Fill( 6, event.genWeight )
+                            if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 6, event.genWeight )
 
                             getattr( self, 'nPVs_2J2WdeltaRTau21').Fill( PV.npvsGood, weight )
                             getattr( self, 'nleps_2J2WdeltaRTau21').Fill( len(goodLeptons), weight )
@@ -638,7 +638,7 @@ class boostedAnalyzer(Module):
                             if (FatJet_Hbb>Hbbcut):
                                 getattr( self, 'cutFlow' ).Fill( 7 )
                                 getattr( self, 'cutFlow_weight' ).Fill( 7, weight )
-                                getattr( self, 'cutFlow_genWeight' ).Fill( 7, event.genWeight )
+                                if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 7, event.genWeight )
 
                                 getattr( self, 'leadAK8JetMass_2J2WdeltaRTau21_Pass' ).Fill( FatJet_msoftdrop, weight )
                                 getattr( self, 'resolvedWCandMass_2J2WdeltaRTau21_Pass' ).Fill( hadW.M(), weight )
@@ -664,7 +664,7 @@ class boostedAnalyzer(Module):
                         if (FatJet_Hbb>Hbbcut):
                             getattr( self, 'cutFlow' ).Fill( 9 )
                             getattr( self, 'cutFlow_weight' ).Fill( 9, weight )
-                            getattr( self, 'cutFlow_genWeight' ).Fill( 9, event.genWeight )
+                            if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 9, event.genWeight )
 
                             getattr( self, 'leadAK8JetMass_2J2WdeltaR_Pass' ).Fill( FatJet_msoftdrop, weight )
                             getattr( self, 'resolvedWCandMass_2J2WdeltaR_Pass' ).Fill( hadW.M(), weight )
