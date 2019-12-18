@@ -98,7 +98,6 @@ def rootHistograms( version, lumi, tmp ):
     bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+version+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8'+tmp+'.root'),  lumi*0.6012/356286.0, 46, 'ttZ' ]
     signalFiles["THW"] = [ TFile('Rootfiles/'+version+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8'+tmp+'.root'), lumi*0.1475/4714331.0, 46, 'tHW' ]
     signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+version+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8'+tmp+'.root'), lumi*0.2934045/7833734.0, kRed, 'ttH(bb)' ]
-    ####signalFiles["ttHTobb_ttToSemiLep"] = [ TFile('Rootfiles/'+version+'/histograms_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8'+tmp+'.root'), lumi*0.093/9323907.0, kRed ]
     #signalFiles[""] = [ TFile('Rootfiles/'+version+'/'), 1 ]
 
     #if args.ttbarDecay.startswith("DL"):
@@ -123,7 +122,7 @@ def setSelection( listSel, xMin=0.65, yMax=0.65, align='right' ):
 def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, log, moveCMSlogo=False, fitRatio=False ):
     """docstring for stacked plot"""
 
-    outputFileName = nameInRoot+'_'+args.cut+'_stackPlots_'+args.version+'.'+args.ext
+    outputFileName = nameInRoot+'_stackPlots_'+args.version+'.'+args.ext
     print 'Processing.......', outputFileName
 
     #if (labY < 0.5) and ( labX < 0.5 ): legend=TLegend(0.20,0.50,0.50,0.62)
@@ -146,30 +145,14 @@ def stackPlots( nameInRoot, label, xmin, xmax, rebinX, ymin, ymax, labX, labY, l
     hBkg.Reset()
     tmpHistos = {}
     for isamLabel, isam in bkgFiles.iteritems():
-        #numEventsProc = isam[0].Get( 'eventProcessed_'+isamLabel ).GetEntries()
-        if 'TT' in isamLabel:
-            for flaLabel, flaInfo in ttbarComp.iteritems():
-                tmpHistos[ flaLabel+'_'+isamLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel+'_'+flaLabel )
-                tmpHistos[ flaLabel+'_'+isamLabel ].Scale( isam[1] )
-                tmpHistos[ flaLabel+'_'+isamLabel ].SetFillStyle( 1001 )
-                tmpHistos[ flaLabel+'_'+isamLabel ].SetFillColor( flaInfo[1] )
-                hBkg.Add( tmpHistos[ flaLabel+'_'+isamLabel ].Clone() )
-                if rebinX != 1: tmpHistos[ flaLabel+'_'+isamLabel ].Rebin( rebinX )
-                if flaLabel in histos:
-                    histos[ flaLabel ].Add(tmpHistos[ flaLabel+'_'+isamLabel ])
-                    hBkgStack.Add( histos[ flaLabel ].Clone() )
-                else:
-                    histos[ flaLabel ] = tmpHistos[ flaLabel+'_'+isamLabel ]
-                    legend.AddEntry( histos[ flaLabel ], flaInfo[0], 'f' )
-        else:
-            histos[ isamLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel )
-            histos[ isamLabel ].Scale( isam[1] )
-            histos[ isamLabel ].SetFillStyle( 1001 )
-            histos[ isamLabel ].SetFillColor( flaInfo[1] )
-            legend.AddEntry( histos[ isamLabel ], flaInfo[0], 'f' )
-            if rebinX != 1: histos[ isamLabel ].Rebin( rebinX )
-            hBkg.Add( histos[ isamLabel ].Clone() )
-            hBkgStack.Add( histos[ isamLabel ].Clone() )
+        histos[ isamLabel ] = isam[0].Get( args.ttbarDecay+'_'+nameInRoot+'_'+isamLabel )
+        histos[ isamLabel ].Scale( isam[1] )
+        histos[ isamLabel ].SetFillStyle( 1001 )
+        histos[ isamLabel ].SetFillColor( flaInfo[1] )
+        legend.AddEntry( histos[ isamLabel ], flaInfo[0], 'f' )
+        if rebinX != 1: histos[ isamLabel ].Rebin( rebinX )
+        hBkg.Add( histos[ isamLabel ].Clone() )
+        hBkgStack.Add( histos[ isamLabel ].Clone() )
 
 
     for isignalLabel, isig in signalFiles.iteritems():
@@ -474,7 +457,6 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
     if len(bkgFiles) > 0:
         for bkgSamples in bkgFiles:
             bkgHistos[ bkgSamples ] = bkgFiles[ bkgSamples ][0].Get( 'tthbb13/'+name )
-            print bkgSamples, bkgHistos[ bkgSamples ]
             bkgHistos[ bkgSamples ].SetTitle(bkgSamples)
             if bkgFiles[ bkgSamples ][1] != 1: bkgHistos[ bkgSamples ].Scale( bkgFiles[ bkgSamples ][1] )
             print(bkgSamples, round(bkgHistos[ bkgSamples ].Integral(), 2) )
@@ -717,7 +699,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--proc', action='store', default='1D', dest='process', help='Process to draw, example: 1D, 2D, MC.' )
     parser.add_argument('-d', '--decay', action='store', default='SL', dest='ttbarDecay', help='ttbar decay channel: SL, DL' )
     parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
-    parser.add_argument('-c', '--cut', action='store', default='presel', help='cut, example: sl+presel' )
+    parser.add_argument('-c', '--cut', action='store', nargs='+', default='2J2WdeltaR', help='cut, example: "2J 2J2W"' )
     parser.add_argument('-s', '--single', action='store', default='all', help='single histogram, example: massAve_cutDijet.' )
     parser.add_argument('-l', '--lumi', action='store', type=float, default=41530., help='Luminosity, example: 1.' )
     parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
@@ -756,66 +738,48 @@ if __name__ == '__main__':
     massMaxX = 400
 
     plotList = [
-        ##[ '2D', 'Boosted', 'leadMassHT', 'Leading Jet Mass [GeV]', 'HT [GeV]', 0, massMaxX, 1, 100, 1300, 1, jetMassHTlabX, jetMassHTlabY],
-        ##[ '2DResolved', 'Resolved', 'etas', '#eta_{jj1}', '#eta_{jj2}', -3.0, 3.0, 10, -3.0, 3.0, 10, jetMassHTlabX, jetMassHTlabY],
+            [ 'qual', 'nPVs', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
+            [ 'qual', 'nleps', 'Number of leptons', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'qual', 'lepton_pt', 'Lepton pT [GeV]', 0, 500, 2,  0.85, 0.70, True, False],
+            [ 'qual', 'lepton_eta', 'Lepton #eta', -3, 3, 2,  0.85, 0.70, False, False],
+            [ 'qual', 'lepton_phi', 'Lepton #phi', -3, 3, 4,  0.85, 0.70, False, False],
+            [ 'qual', 'njets', 'Number of AK4 jets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'qual', 'jets_pt', 'AK4 jets pT [GeV]', 0, 500, 1,  0.85, 0.70, True, False],
+            [ 'qual', 'jets_eta', 'AK4 jets #eta', -3, 3, 2,  0.85, 0.70, False, False],
+            [ 'qual', 'jets_phi', 'AK4 jets #phi', -3, 3, 2,  0.85, 0.70, True, False],
+            [ 'qual', 'nBjets', 'Number of AK4 bjets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'qual', 'nAK8jets', 'Number of AK8 jets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'qual', 'METPt', 'MET [GeV]', 0, 800, 2,  0.85, 0.70, True, False],
+            [ 'qual', 'lepWMass', 'Leptonic W mass [GeV]', 50, 250, 1,  0.85, 0.70, True, False],
+            [ 'qual', 'lepWPt', 'Leptonic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
+            [ 'qual', 'resolvedWCandMass', 'Hadronic W mass [GeV]', 0, 200, 1,  0.85, 0.70, False, False],
+            [ 'qual', 'resolvedWCandPt', 'Hadronic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
+            [ 'qual', 'leadAK8JetPt', 'Leading AK8 jet pT [GeV]', 100, 1500, 5, 0.85, 0.70, True, False],
+            [ 'qual', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, 0.85, 0.70, True, False ],
+            [ 'qual', 'leadAK8JetTau21', 'Leading AK8 jet #tau_{21}', 0, 1, 2, 0.85, 0.70, True, False ],
+            [ 'qual', 'leadAK8JetHbb', 'Leading AK8 jet Hbb', 0, 1, 2, 0.85, 0.70, True, False ],
 
+            [ 'signalBkg', 'nleps', 'Number of leptons', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'lepton_pt', 'Lepton pT [GeV]', 0, 500, 2,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'lepton_eta', 'Lepton #eta', -3, 3, 2,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'lepton_phi', 'Lepton #phi', -3, 3, 4,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'njets', 'Number of AK4 jets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'jets_pt', 'AK4 jets pT [GeV]', 0, 500, 1,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'jets_eta', 'AK4 jets #eta', -3, 3, 2,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'jets_phi', 'AK4 jets #phi', -3, 3, 2,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'nBjets', 'Number of AK4 bjets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'nAK8jets', 'Number of AK8 jets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'METPt', 'MET [GeV]', 0, 800, 2,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'lepWMass', 'Leptonic W mass [GeV]', 50, 250, 1,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'lepWPt', 'Leptonic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'resolvedWCandMass', 'Hadronic W mass [GeV]', 0, 200, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'resolvedWCandPt', 'Hadronic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'leadAK8JetPt', 'Leading AK8 jet pT [GeV]', 100, 1500, 5, 0.85, 0.70, True, False],
+            [ 'signalBkg', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, 0.85, 0.70, True, False ],
+            [ 'signalBkg', 'leadAK8JetTau21', 'Leading AK8 jet #tau_{21}', 0, 1, 2, 0.85, 0.70, True, False ],
+            [ 'signalBkg', 'leadAK8JetHbb', 'Leading AK8 jet Hbb', 0, 1, 2, 0.85, 0.70, True, False ],
 
-#        [ 'qual', 'nPVs_2J', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
-#        [ 'qual', 'nPVs_2JNoWeight', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
-#        [ 'qual', 'nPVs_2J2W', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
-#        [ 'qual', 'nPVs_2J2WdeltaR', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
-#        [ 'qual', 'nPVs_2J2WdeltaRTau21', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
-#        [ 'qual', 'nPVs_2J2WdeltaRTau21_Pass', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
-#        [ 'qual', 'nleps_2J2W', 'Number of leptons', 0, 10, 1,  0.85, 0.70, False, False],
-#        [ 'qual', 'lepton_pt_2J2W', 'Lepton pT [GeV]', 0, 150, 1,  0.85, 0.70, True, False],
-#        [ 'qual', 'lepton_eta_2J2W', 'Lepton pT [GeV]', -3, 3, 2,  0.85, 0.70, True, False],
-#        [ 'qual', 'lepton_phi_2J2W', 'Lepton pT [GeV]', -3, 3, 2,  0.85, 0.70, True, False],
-        [ 'qual', 'leadAK8JetPt_2J2W', 'Leading AK8 jet pT [GeV]', 100, 1500, 5, 0.85, 0.70, True, False],
-        #[ 'qual', 'leadAK8JetMass_2J2W', 'Leading AK8 jet softdrop mass [GeV]', 0, 250, 1,  0.85, 0.70, True, False],
-        #[ 'signalBkg', 'leadAK8JetMass_WTop', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-        ###[ 'signalBkg', 'TopCandMass_WTop', 'W candidate mass [GeV]', 30, 200, 1, False ],
-        #[ 'signalBkg', 'leadAK8JetMass_Topetaggs', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-        ###[ 'signalBkg', 'TopCandMass_TopHiggs', 'W candidate mass [GeV]', 30, 200, 1, False ],
-        #[ 'signalBkg', 'leadAK8JetMass_WHiggs', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        #[ 'signalBkg', 'WCandMass_WHiggs', 'W candidate mass [GeV]', 30, 200, 2, False ],
-        ###[ 'signalBkg', 'TopCandMass_W', 'W candidate mass [GeV]', 30, 200, 1, False ],
-        #[ 'signalBkg', 'WCandMass_W', 'W candidate mass [GeV]', 30, 200, 1, False ],
-        #[ 'signalBkg', 'leadAK8JetMass_PuppiJets', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-        #[ 'signalBkg', 'WCandMass_PuppiJets', 'W candidate mass [GeV]', 30, 200, 1, False ],
-        #[ 'signalBkg', 'WCandMass', 'W candidate mass [GeV]', 30, 200, 1, False ],
-        #[ 'signalBkg', 'boostedleadAK8JetMass_boostedW', 'Higgs candidate mass [GeV]', 30, 250, 1, False ],
-        [ 'signalBkg', 'leadAK8JetPt', 'Leading AK8 jet pt [GeV]', 200, 600, 2, False ],
-        ##[ 'signalBkg', 'leadAK8JetEta', 'Leading AK8 jet mass [GeV]', -3, 3, 2, False ],
-        [ 'signalBkg', 'leadAK8JetTau21', 'Leading AK8 jet #tau_{21}', 0, 1, 2, False ],
-        [ 'signalBkg', 'leadAK8JetTau21DDT', 'Leading AK8 jet #tau_{21}^{DDT}', 0, 1, 2, False ],
-        [ 'signalBkg', 'leadAK8JetHbb', 'Leading AK8 jet Hbb discriminator', 0, 1, 2, False ],
-        [ 'signalBkg', 'leadAK8JetN2', 'Leading AK8 jet N2', 0, 1, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_2J', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_2J2W', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_2J1B', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_2J2B', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'resolvedWCandMass_2J', 'W candidate mass [GeV]', 30, 150, 1, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_2J', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_W1B', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_W', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        ##[ 'signalBkg', 'leadleadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        ##[ 'signalBkg', 'leadleadAK8JetPt', 'Leading AK8 jet mass [GeV]', 0, 600, 10, False ],
-        [ 'signalBkg', 'leadAK8JetMass_W', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_2J2W', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'resolvedWCandMass_2J2W', 'W candidate mass [GeV]', 30, 150, 1, False ],
-        [ 'signalBkg', 'leadAK8JetMass_2JdeltaR', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_2JdeltaR', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_2JdeltaR2W', 'Leading AK8 jet mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_2JdeltaR2W', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_2JdeltaR2W1B', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_2JdeltaR2W2B', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'deltaRhadWHiggs_2J2W', 'deltaR( hadW, Higgs )', 0, 5, 2, False ],
-        [ 'signalBkg', 'deltaRlepWHiggs_2J2W', 'deltaR( lepW, Higgs )', 0, 5, 2, False ],
-        [ 'signalBkg', 'deltaRlepWhadW_2J2W', 'deltaR( lepW, hadW )', 0, 5, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_A_2Jno2W', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-        [ 'signalBkg', 'leadAK8JetMass_2JdeltaR2WTau21DDT_Pass', 'Higgs candidate mass [GeV]', 30, 250, 2, False ],
-
+            [ 'stack', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, 0.85, 0.70, True, False ],
 
         [ 'simple', 'nCleanPuppiJets', 'Number of PUPPI jets', 0, 15, 1, False ],
         [ 'simple', 'nGoodPuppiJets', 'Number of PUPPI jets', 0, 15, 1, False ],
@@ -846,13 +810,15 @@ if __name__ == '__main__':
 
     for i in Plots:
         if ( 'qual' in args.process ):
-            plotQuality(
-                i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8],
-                fitRatio=args.addFit )
+            for icut in args.cut:
+                plotQuality(
+                    i[0]+'_'+icut, i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8],
+                    fitRatio=args.addFit )
         elif ( 'stack' in args.process ):
-            stackPlots(
-                i[0]+"_"+args.cut, i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10],
-                fitRatio=args.addFit )
+            for icut in args.cut:
+                stackPlots(
+                    i[0]+"_"+icut, i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10],
+                    fitRatio=args.addFit )
         elif ( 'simple' in args.process ):
             plotSimpleComparison(
                     ###bkgFiles["TTToSemiLeptonic"][0], "TTToSemiLeptonic", signalFiles["ttHTobb"][0], "ttHTobb",
@@ -864,4 +830,5 @@ if __name__ == '__main__':
                     #TFile('Rootfiles/'+VER+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_boosted.root'), "Nominal",
                     i[0], xmin=i[2], xmax=i[3], rebinX=i[4], log=i[5], axisX=i[1] )
         elif ( 'signalBkg' in args.process ):
-            plotSignalBkg( i[0], i[2], i[3], i[4], log=args.log, axisX=i[1], Norm=args.norm)
+            for icut in args.cut:
+                plotSignalBkg( i[0]+'_'+icut, i[2], i[3], i[4], log=args.log, axisX=i[1], Norm=args.norm)
