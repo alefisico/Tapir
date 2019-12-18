@@ -12,21 +12,21 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 ### ttbar classification
-ttCls = OrderedDict()
-ttCls['ttll'] = '(event.genTtbarId<1)'
-ttCls['ttcc'] = '(event.genTtbarId>40) && (event.genTtbarId<50)'
-ttCls['ttb'] = '(event.genTtbarId==51)'
-ttCls['tt2b'] = '(event.genTtbarId==52)'
-ttCls['ttbb'] = '(event.genTtbarId>52) && (event.genTtbarId<57)'
+#ttCls = OrderedDict()
+#ttCls['ttll'] = '(event.genTtbarId<1)'
+#ttCls['ttcc'] = '(event.genTtbarId>40) && (event.genTtbarId<50)'
+#ttCls['ttb'] = '(event.genTtbarId==51)'
+#ttCls['tt2b'] = '(event.genTtbarId==52)'
+#ttCls['ttbb'] = '(event.genTtbarId>52) && (event.genTtbarId<57)'
 
 rhalPtList = [ 250, 300, 350, 400, 450, 500, 550, 600, 700, 800, 1000, 10000 ]
 
 class boostedAnalyzer(Module):
-    def __init__(self, sample="None"):
-    #def __init__(self, sample="None", parameters={}):
+    def __init__(self, sample="None", leptonSFhelper={}):
 	self.writeHistFile=True
-        self.sample= sample
-        #self.parameters = parameters
+        self.sample = sample
+        self.leptonSFhelper = leptonSFhelper
+        print(self.leptonSFhelper)
 
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
@@ -203,38 +203,26 @@ class boostedAnalyzer(Module):
 
     def leptonSF(self, lepton, leptonP4 ):
 
-        if lepton.startswith("muon"):
-            SFFileTrigger = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root" )
-            histoSFTrigger = SFFileTrigger.Get("IsoMu27_PtEtaBins/pt_abseta_ratio")
-            SFTrigger = histoSFTrigger.GetBinContent( histoSFTrigger.GetXaxis().FindBin( leptonP4.pt ), histoSFTrigger.GetYaxis().FindBin( abs(leptonP4.eta ) ) )
+        SFFileTrigger = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/"+self.leptonSFhelper[lepton]['Trigger'][0] )
+        histoSFTrigger = SFFileTrigger.Get( self.leptonSFhelper[lepton]['Trigger'][1] )
+        SFTrigger = histoSFTrigger.GetBinContent( histoSFTrigger.GetXaxis().FindBin( leptonP4.pt ), histoSFTrigger.GetYaxis().FindBin( abs(leptonP4.eta ) ) )
 
-            SFFileID = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/MuonID_2017_RunBCDEF_SF_ID.root" )
-            histoSFID = SFFileID.Get("NUM_TightID_DEN_genTracks_pt_abseta")
-            SFID = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4.pt ), histoSFID.GetYaxis().FindBin( abs(leptonP4.eta ) ) ) if (leptonP4.pt < 120) else 1
+        if lepton.startswith("electron") and leptonP4.pt>500: leptonP4pt = 500
+        else: leptonP4pt = leptonP4.pt
 
-            SFFileISO = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/MuonID_2017_RunBCDEF_SF_ISO.root" )
-            histoSFISO = SFFileISO.Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta")
-            SFISO = histoSFISO.GetBinContent( histoSFISO.GetXaxis().FindBin( leptonP4.pt ), histoSFISO.GetYaxis().FindBin( abs(leptonP4.eta ) ) ) if (leptonP4.pt < 120) else 1
+        SFFileID = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/"+self.leptonSFhelper[lepton]['ID'][0] )
+        histoSFID = SFFileID.Get( self.leptonSFhelper[lepton]['ID'][1] )
+        SFID = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4.eta ), histoSFID.GetYaxis().FindBin( leptonP4pt ) )
+        SFFileISO = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/"+self.leptonSFhelper[lepton]['ISO'][0] )
+        histoSFISO = SFFileISO.Get( self.leptonSFhelper[lepton]['ISO'][1] )
+        SFISO = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4.eta ), histoSFID.GetYaxis().FindBin( leptonP4pt ) )
 
-        elif lepton.startswith("electron"):
+        if self.leptonSFhelper[lepton]['ID'][2]: SFID = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4pt ), histoSFID.GetYaxis().FindBin( abs(leptonP4.eta ) ) )
+        if self.leptonSFhelper[lepton]['ISO'][2]: SFISO = histoSFISO.GetBinContent( histoSFISO.GetXaxis().FindBin( leptonP4pt ), histoSFISO.GetYaxis().FindBin( abs(leptonP4.eta ) ) )
 
-            if leptonP4.pt>500: leptonP4pt = 500
-            else: leptonP4pt = leptonP4.pt
-            SFFileTrigger = ROOT.TFile(os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/SingleEG_JetHT_Trigger_Scale_Factors_ttHbb_Data_MC_v5.0.histo.root")
-            histoSFTrigger = SFFileTrigger.Get("SFs_ele_pt_ele_sceta_ele28_ht150_OR_ele35_2017BCDEF")
-            SFTrigger = histoSFTrigger.GetBinContent( histoSFTrigger.GetXaxis().FindBin( leptonP4pt ), histoSFTrigger.GetYaxis().FindBin( leptonP4.eta ) )
-
-            SFFileID = ROOT.TFile(os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root")
-            histoSFID = SFFileID.Get("EGamma_SF2D")
-            SFID = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4.eta ), histoSFID.GetYaxis().FindBin( leptonP4pt ) )
-
-            SFFileISO = ROOT.TFile(os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/2017_ElectronTight.root")
-            histoSFISO = SFFileISO.Get("EGamma_SF2D")
-            SFISO = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4.eta ), histoSFID.GetYaxis().FindBin( leptonP4pt ) )
-        else:
-            SFTrigger = 0
-            SFISO = 0
-            SFID = 0
+        if (leptonP4.pt < 120) and lepton.startswith('muon'):
+            SFISO = 1
+            SFID = 1
 
         #print (SFTrigger * SFID * SFISO), SFTrigger , SFID , SFISO, leptonP4.pt, leptonP4.eta
         return [SFTrigger , SFID , SFISO]

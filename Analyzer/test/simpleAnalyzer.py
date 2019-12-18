@@ -97,6 +97,46 @@ precuts = PV + " && " + METFilters + " && " + Triggers
 ### Preliminary selection to speed up postProcessing
 cuts= precuts + " && ( ( nJet>1 ) && ( Jet_pt>15 ) && ( abs(Jet_eta)<2.4 ) && ( (nElectron>0) || (nMuon>0) ) && ( abs(Muon_eta)<2.4 ) && ( abs(Electron_eta)<2.4 ) )"
 
+### lepton scale factors files. This assumes that the files are stored in TTH/Analyzer/data/
+LeptonSF = {
+    '2016' : {
+        'muon' : {
+            'Trigger' : [ "EfficienciesAndSF_RunBtoF.root", "IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio" ],
+            'ID' : [ "MuonID_2016_RunBCDEF_SF_ID.root", "NUM_TightID_DEN_genTracks_eta_pt", True ],  ### last option eta/pt True, pt/abs(eta) False
+            'ISO' : [ "MuonID_2016_RunBCDEF_SF_ISO.root", "NUM_TightRelIso_DEN_TightIDandIPCut_eta_pt", True ],
+        },
+        'electron' : {
+            'Trigger' : [ "TriggerSF_Run2016All_v1.root", "Ele27_WPTight_Gsf" ],
+            'ID' : [ "2016LegacyReReco_ElectronTight_Fall17V2.root", "EGamma_SF2D", True ],
+            'ISO' : [ "EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root", "EGamma_SF2D", True ],
+        },
+    },
+    '2017' : {
+        'muon' : {
+            'Trigger' : [ "EfficienciesAndSF_RunBtoF_Nov17Nov2017.root", "IsoMu27_PtEtaBins/pt_abseta_ratio" ],
+            'ID' : [ "MuonID_2017_RunBCDEF_SF_ID.root", "NUM_TightID_DEN_genTracks_pt_abseta", False ],
+            'ISO' : [ "MuonID_2017_RunBCDEF_SF_ISO.root", "NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta", False ],
+        },
+        'electron' : {
+            'Trigger' : [ "SingleEG_JetHT_Trigger_Scale_Factors_ttHbb_Data_MC_v5.0.histo.root", "SFs_ele_pt_ele_sceta_ele28_ht150_OR_ele35_2017BCDEF" ],
+            'ID' : [ "egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root", "EGamma_SF2D", True ],
+            'ISO' : [ "2017_ElectronTight.root", "EGamma_SF2D", True ],
+        },
+    },
+    '2018' : {
+        'muon' : {
+            'Trigger' : [ "EfficienciesAndSF_RunBtoF_Nov17Nov2017.root", "IsoMu27_PtEtaBins/pt_abseta_ratio" ],
+            'ID' : [ "MuonID_2018_RunABCD_SF_ID.root", "NUM_TightID_DEN_TrackerMuons_pt_abseta", False ],
+            'ISO' : [ "MuonID_2018_RunABCD_SF_ISO.root", "NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta", False ],
+        },
+        'electron' : {
+            'Trigger' : [ "SingleEG_JetHT_Trigger_Scale_Factors_ttHbb_Data_MC_v5.0.root", "SFs_ele_pt_ele_sceta_ele28_ht150_OR_ele35_2017BCDEF" ],
+            'ID' : [ "egammaEffi.txt_EGM2D_updatedAll.root", "EGamma_SF2D", True ],
+            'ISO' : [ "2018_ElectronTight.root", "EGamma_SF2D", True ],
+        },
+    },
+}
+
 listOfModules = []
 listOfModules.append( countHistogramsModule() )
 if isMC:
@@ -112,7 +152,7 @@ if args.process.startswith( ('both', 'boosted') ):
     print "|----------> RUNNING BOOSTED"
     fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert="All", redojec=True, jetType = "AK8PFPuppi")
     listOfModules.append( fatJetCorrector() )
-    listOfModules.append( boostedAnalyzer( args.sample ) )
+    listOfModules.append( boostedAnalyzer( args.sample, LeptonSF[args.year] ) )
 
 if args.process.startswith( ('both', 'resolved') ):
     p = PostProcessor(
