@@ -39,6 +39,8 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('muon_eta', ';#eta', 100, -4.0, 4.0 ) )
         self.addObject( ROOT.TH1F('ele_pt',  ';p_{T} (GeV)',   200, 0, 2000) )
         self.addObject( ROOT.TH1F('ele_eta', ';#eta', 100, -4.0, 4.0 ) )
+        self.addObject( ROOT.TH1F('nleps_2J2WNoWeight',   ';number of leptons',   20, 0, 20) )
+        self.addObject( ROOT.TH1F('leadAK8JetPt_2J2WNoWeight',   ';Leading AK8 jet mass', 150, 0, 1500) )
         #### general selection
         for isel in [ '', '_2JNoWeight', '_2J',  '_2J2W', '_2J2WdeltaR', '_2J2WdeltaRTau21' ]:
             self.addObject( ROOT.TH1F('nPVs'+isel,   ';number of PVs',   100, 0, 100) )
@@ -200,8 +202,6 @@ class boostedAnalyzer(Module):
             self.addObject( ROOT.TH1F(s+'_bDeepFlav'+t, s+';b Discriminator', 40, 0, 1) )
 
     def leptonSF(self, lepton, leptonP4 ):
-
-        print('LEPTON ', lepton)
 
         if lepton.startswith("muon"):
             SFFileTrigger = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root" )
@@ -381,7 +381,7 @@ class boostedAnalyzer(Module):
 
         ### Selection
         metcut = (MET.pt>20)
-        nlepcut = (len(goodLeptons)>0)
+        nlepcut = (len(goodLeptons)==1)
         njetscut = (len(goodJetsNoLep)>3)
         nbjetscut = (len(goodBjetsDeepFlav)>1)
 
@@ -404,7 +404,6 @@ class boostedAnalyzer(Module):
         #################################### Boosted
         if trigger and metcut and nlepcut and (len(goodFatJets)>0):
 
-            print( event.event, goodLeptons[0].pt, goodLeptons[0].eta,  leptonWeights, np.prod(leptonWeights) )
             getattr( self, 'cutFlow' ).Fill( 2 )
             getattr( self, 'cutFlow_weight' ).Fill( 2, weight )
             if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
@@ -437,7 +436,7 @@ class boostedAnalyzer(Module):
 
             ### Leading AK8 jet (higgs candidate) without Higgs conditions yet
             Hbbcut = 0.8945 ## L: 0.6795 M: 0.8945 T: 0.9805
-            tau21cut = 0.45
+            tau21cut = 0.35 ## L: 0.55 M: 0.45 T: 0.35
             tau21DDTcut = 0.43
             FatJet_msoftdrop = goodFatJets[0].msoftdrop
             FatJet_pt = goodFatJets[0].pt
@@ -546,13 +545,14 @@ class boostedAnalyzer(Module):
 
 
                 #### "Good hadronic W candidate"
-                if (hadW.M()>65 and hadW.M()<105):
+                if (hadW.M()>65 and hadW.M()<105) and (lepW.M()>65 and lepW.M()<105):
                     getattr( self, 'cutFlow' ).Fill( 4 )
                     getattr( self, 'cutFlow_weight' ).Fill( 4, weight )
                     if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 4, event.genWeight )
 
                     getattr( self, 'nPVs_2J2W').Fill( PV.npvsGood, weight )
                     getattr( self, 'nleps_2J2W').Fill( len(goodLeptons), weight )
+                    getattr( self, 'nleps_2J2WNoWeight').Fill( len(goodLeptons) )
                     getattr( self, 'lepton_pt_2J2W').Fill( goodLeptons[0].pt, weight )
                     getattr( self, 'lepton_eta_2J2W').Fill( goodLeptons[0].eta, weight )
                     getattr( self, 'lepton_phi_2J2W').Fill( goodLeptons[0].phi, weight )
@@ -569,6 +569,7 @@ class boostedAnalyzer(Module):
                     getattr( self, 'lepWPt_2J2W').Fill( lepW.Pt(), weight )
                     getattr( self, 'leadAK8JetMass_2J2W').Fill( FatJet_msoftdrop, weight )
                     getattr( self, 'leadAK8JetPt_2J2W').Fill( FatJet_pt, weight )
+                    getattr( self, 'leadAK8JetPt_2J2WNoWeight').Fill( FatJet_pt )
                     getattr( self, 'leadAK8JetRho_2J2W').Fill( FatJet_rho, weight )
                     getattr( self, 'leadAK8JetTau21_2J2W').Fill( FatJet_tau21, weight )
                     getattr( self, 'leadAK8JetHbb_2J2W').Fill( FatJet_Hbb, weight )

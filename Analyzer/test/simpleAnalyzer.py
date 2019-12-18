@@ -63,6 +63,14 @@ parser.add_argument(
     help="Run local or condor/crab"
 )
 parser.add_argument(
+    '--year',
+    action="store",
+    help="year of data",
+    choices=["2016", "2017", "2018"],
+    default="2017",
+    required=False
+)
+parser.add_argument(
     '--loglevel',
     action="store",
     help="log level",
@@ -77,11 +85,12 @@ else: isMC = True
 
 ### General selections:
 PV = "(PV_npvsGood>0)"
-METFilters = "( (Flag_goodVertices==1) && (Flag_globalSuperTightHalo2016Filter==1) && (Flag_HBHENoiseFilter==1) && (Flag_HBHENoiseIsoFilter==1) && (Flag_EcalDeadCellTriggerPrimitiveFilter==1) && (Flag_BadPFMuonFilter==1) && (Flag_eeBadScFilter==1) )"
+METFilters = "( (Flag_goodVertices==1) && (Flag_globalSuperTightHalo2016Filter==1) && (Flag_HBHENoiseFilter==1) && (Flag_HBHENoiseIsoFilter==1) && (Flag_EcalDeadCellTriggerPrimitiveFilter==1) && (Flag_BadPFMuonFilter==1) )"
+if not isMC: METFilters = METFilters + ' && (Flag_eeBadScFilter==1)'
 
-Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) )"
-##|| (HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL==1) || (HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ==1) ||  (HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8==1) )"
-##(HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL==1) || (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8==1) ||
+if args.year.startswith('2016'): Triggers = "( (HLT_Ele27_WPTight_Gsf==1) || (HLT_IsoMu24==1) || (HLT_IsoTkMu24==1) )"
+elif args.year.startswith('2017'): Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) )"
+elif args.year.startswith('2018'): Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24==1) )"
 
 precuts = PV + " && " + METFilters + " && " + Triggers
 
@@ -91,15 +100,17 @@ cuts= precuts + " && ( ( nJet>1 ) && ( Jet_pt>15 ) && ( abs(Jet_eta)<2.4 ) && ( 
 listOfModules = []
 listOfModules.append( countHistogramsModule() )
 if isMC:
-    listOfModules.append( puAutoWeight_2017() )
-jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=2017, jesUncert="All", redojec=True)
+    if args.year.startswith('2016'): listOfModules.append( puAutoWeight_2016() )
+    elif args.year.startswith('2017'): listOfModules.append( puAutoWeight_2017() )
+    elif args.year.startswith('2018'): listOfModules.append( puAutoWeight_2018() )
+jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert="All", redojec=True)
 listOfModules.append( jetmetCorrector() )
 if args.process.startswith( ('both', 'resolved') ):
     print "|----------> RUNNING RESOLVED"
     listOfModules.append( resolvedAnalyzer( args.sample ) )
 if args.process.startswith( ('both', 'boosted') ):
     print "|----------> RUNNING BOOSTED"
-    fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=2017, jesUncert="All", redojec=True, jetType = "AK8PFchs")
+    fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert="All", redojec=True, jetType = "AK8PFPuppi")
     listOfModules.append( fatJetCorrector() )
     listOfModules.append( boostedAnalyzer( args.sample ) )
 
@@ -124,7 +135,7 @@ else:
         cut=cuts,
         modules=listOfModules,
         provenance=True, ### copy MetaData and ParametersSets
-        histFileName = "histograms"+args.oFile+".root",
+        histFileName = "histograms_"+args.year+args.oFile+".root",
         histDirName = 'tthbb13',
         maxEntries=args.numEvents,
         prefetch=args.local,
