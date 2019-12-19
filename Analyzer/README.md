@@ -12,8 +12,9 @@ where the input root file is specified in [PSet.py](test/PSet.py).
 
 To run many jobs, in the HTCondor system, the script [submitCondorJobsAnalyzer.sh](test/submitCondorJobsAnalyzer.sh) can be used. For instance:
 ```bash
-source submitCondorJobsAnalyzer.sh Muon 2017_boosted v10
+source submitCondorJobsAnalyzer.sh Muon boosted v10 2017
 ```
+
 The output of these jobs needs to be merged, for that we can use the script [massiveHadd.sh](test/massiveHadd.sh):
 ```bash
 source massiveHadd.sh simple 
@@ -30,3 +31,11 @@ To run simple fit of the workspaces and datacards created in the previous step:
 ```bash
 combine -M FitDiagnostics datacard.txt  --robustFit 1 --setRobustFitAlgo Minuit2,Migrad --saveNormalizations --plot --saveShapes --saveWorkspace 
 ```
+
+## Simple plotting
+
+For plotting, the script [DrawHistogram.py](test/DrawHistogram.py) contains several options, for instance:
+```bash
+./DrawHistogram.py -p qual -v v09 -c 2J2W 2J2WdeltaR -s lepWMass
+```
+it will create data/MC comparison plots (`-p qual`) with the version v09 of the rootfiles (`-v v09`), plotting the histogram call `-s lepWMass` with different cuts: `-c 2J2W 2J2WdetaR`. This script only takes already created histograms, scaled them with respect to the luminosity and number of events and make nice plots. No analysis processing is done here.
