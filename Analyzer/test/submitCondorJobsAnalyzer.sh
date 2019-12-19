@@ -132,7 +132,7 @@ transfer_output_files = ""
 ###initialdir  = /eos/home-a/algomez/tmpFiles/'${isample}'/
 getenv      =  True
 ###requirements = (OpSysAndVer =?= "SLCern6")
-+JobFlavour = "testmatch"
++JobFlavour = "tomorrow"
 queue myfile from $(myWD)'${isample}'.txt
 ''' > condorlogs/${condorFile}.sub
         ##cat condorlogs/${condorFile}.sub
@@ -153,7 +153,7 @@ echo ${PWD}
 cp '${PWD}'/keep_and_drop.txt .
 ls
 echo "Running: python '${PWD}'/simpleAnalyzer.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}'"
-python '${PWD}'/simpleAnalyzer.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}'
+time python '${PWD}'/simpleAnalyzer.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}'
 ls
 cp histograms${3}.root /eos/home-a/algomez/tmpFiles/'${isample}'/
 ls /eos/home-a/algomez/tmpFiles/'${isample}'/histograms${3}.root
