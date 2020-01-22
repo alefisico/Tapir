@@ -152,7 +152,7 @@ if args.process.startswith( ('both', 'boosted') ):
     print "|----------> RUNNING BOOSTED"
     fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert="All", redojec=True, jetType = "AK8PFPuppi")
     listOfModules.append( fatJetCorrector() )
-    listOfModules.append( boostedAnalyzer( args.sample, LeptonSF[args.year] ) )
+    listOfModules.append( boostedAnalyzer( args.sample, LeptonSF[args.year], args.year ) )
 
 if args.process.startswith( ('both', 'resolved') ):
     p = PostProcessor(
@@ -175,7 +175,7 @@ else:
         cut=cuts,
         modules=listOfModules,
         provenance=True, ### copy MetaData and ParametersSets
-        histFileName = "histograms_"+args.year+args.oFile+".root",
+        histFileName = "histograms"+args.oFile+".root",
         histDirName = 'tthbb13',
         maxEntries=args.numEvents,
         prefetch=args.local,

@@ -116,13 +116,12 @@ EOF
     for isample in $listOfSamples; do
 
         python condorlogs/samples.py -d ${isample} -y ${year}
-        version=${version}_${year}
 
-        condorFile=${isample}_${process}_${version}_condorJob
+        condorFile=${isample}_${process}_${version}_${year}_condorJob
         echo '''myWD = '${PWD}'/condorlogs/
 ##logDir = /afs/cern.ch/user/a/algomez/work/tmp/
 universe    =  vanilla
-arguments   =  '${isample}' $(myfile) _$(ProcId)_'${version}'_'${process}'
+arguments   =  '${isample}' $(myfile) _$(ProcId)_'${version}'_'${process}'_'${year}' '${year}'
 executable  =  $(myWD)'${condorFile}'.sh
 log         =  $(myWD)log_'${condorFile}'_$(ClusterId).log
 error       =  $(myWD)log_'${condorFile}'_$(ClusterId)-$(ProcId).err
@@ -152,8 +151,8 @@ cd -
 echo ${PWD}
 cp '${PWD}'/keep_and_drop.txt .
 ls
-echo "Running: python '${PWD}'/simpleAnalyzer.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}'"
-time python '${PWD}'/simpleAnalyzer.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}'
+echo "Running: python '${PWD}'/simpleAnalyzer.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}' --year ${4}"
+time python '${PWD}'/simpleAnalyzer.py --sample ${1} --iFile ${2} --oFile ${3} --process '${process}' --year ${4}
 ls
 cp histograms${3}.root /eos/home-a/algomez/tmpFiles/'${isample}'/
 ls /eos/home-a/algomez/tmpFiles/'${isample}'/histograms${3}.root

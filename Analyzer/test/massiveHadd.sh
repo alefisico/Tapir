@@ -1,5 +1,6 @@
 version=v10
-boosted='_boosted'
+year='2016'
+boosted='_boosted_'${year}
 
 if [[ $# -eq 0 ]] ; then
     echo 'First argument, name of sample, is needed. Have a good day :)'
@@ -32,21 +33,21 @@ else
 
     elif [[ "$sample" == "Muon" ]]; then
 
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run2017B${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run2017B/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run2017C${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run2017C/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run2017D${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run2017D/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run2017E${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run2017E/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run2017F${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run2017F/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run2017ALL${boosted}.root Rootfiles/${version}/histograms_SingleMuon_Run2017*${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}B${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}B/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}C${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}C/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}D${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}D/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}E${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}E/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}F${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}F/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}ALL${boosted}.root Rootfiles/${version}/histograms_SingleMuon_Run${year}*${boosted}.root
 
     elif [[ "$sample" == "Electron" ]]; then
 
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run2017B${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run2017B/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run2017C${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run2017C/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run2017D${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run2017D/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run2017E${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run2017E/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run2017F${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run2017F/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run2017ALL${boosted}.root Rootfiles/${version}/histograms_SingleElectron_Run2017*${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}B${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}B/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}C${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}C/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}D${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}D/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}E${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}E/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}F${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}F/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}ALL${boosted}.root Rootfiles/${version}/histograms_SingleElectron_Run${year}*${boosted}.root
     fi
 
 fi

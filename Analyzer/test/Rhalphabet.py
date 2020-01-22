@@ -4,6 +4,7 @@ File: BkgEstimation.py
 Author: Alejandro Gomez Espinosa
 Email: alejandro.gomez@cern.ch
 Description: Bkg estimation. Check for options at the end.
+./Rhalphabet.py -v v09 && combine -M FitDiagnostics datacard.txt  --robustFit 1 --setRobustFitAlgo Minuit2,Migrad --saveNormalizations --plot --saveShapes --saveWorkspace
 '''
 
 from ROOT import *
@@ -320,6 +321,20 @@ def accessHistos( nameOfHisto, listOfFiles, minMass, maxMass, rebinMass ):
                             histos[ isam+ivar+side ].SetBinError(ibin, 0)
                 try: histos[ ivar+side ].Add( histos[ isam+ivar+side ].Clone() )
                 except (KeyError, AttributeError) as e: histos[ ivar+side ] = histos[ isam+ivar+side ].Clone()
+                '''
+                    newTotalBin = (maxMass-minMass)/histos[isam+ivar+side].GetBinWidth(1)
+                    histos[ isam+ivar+side+'NewBin' ] = TH1F( isam+ivar+side+'NewBin', isam+ivar+side+'NewBin', int(newTotalBin), minMass, maxMass )
+                    tmpibin = 1
+                    for ibin in range(1, histos[isam+ivar+side].GetNbinsX()+1):
+                        iCenter = histos[isam+ivar+side].GetXaxis().GetBinCenter(ibin)
+                        if (iCenter<minMass) or (iCenter>maxMass):
+                            histos[ isam+ivar+side+'NewBin' ].SetBinContent(tmpibin, histos[isam+ivar+side].GetBinContent(ibin))
+                            histos[ isam+ivar+side+'NewBin' ].SetBinError(tmpibin, histos[isam+ivar+side].GetBinError(ibin))
+                            tmpibin = tmpibin+1
+                            print tmpibin
+                try: histos[ ivar+side ].Add( histos[ isam+ivar+side+'NewBin' ].Clone() )
+                except (KeyError, AttributeError) as e: histos[ ivar+side ] = histos[ isam+ivar+side+'NewBin' ].Clone()
+                '''
 
             ### Making the 1D plots binned in Pt
             if ivar.endswith('Pt'):
@@ -343,32 +358,20 @@ def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
     ### Initializing RooFit variables
     MSD = RooRealVar( 'msd', 'msd', xmin, xmax )
     MSD.Print()
-    #MSD.setBins( 5 )
-    PT = RooRealVar( 'pt', 'pt', 0, 1500 )
-    #PT.setBins( 1500 )
-    RHO = RooFormulaVar( "rho", "log(msd*msd/pt/pt)", RooArgList( MSD, PT ) )
-    #RHO = RooRealVar( "rho", "rho", -6., -4. )
-    EFF = RooRealVar( "veff", "veff", 0.5, 0., 1.0)
-    QCDEFF = RooRealVar( "qcdeff", "qcdeff", 0.01, 0., 10.)
-    DM = RooRealVar("dm","dm", 0.,-10,10)
-    SHIFT = RooFormulaVar( "shift", "msd-dm", RooArgList( MSD, DM ) )
-
     rooDict = OrderedDict()     ## dict of roofit objects
 
     ##############################
     ### Alphabet
+    QCDEFF = RooRealVar( "qcdeff", "qcdeff", 0.01, 0., 10.)
     QCDEFF.setVal( bkgHistos['MassPass'].Integral()/bkgHistos['MassFail'].Integral() )
     QCDEFF.setConstant(True)
     QCDEFF.Print()
 
     ### polynomial
-    rooDict[ 'a0' ] = RooRealVar('a0', 'a0', 0.01, -10, 10 )
-    rooDict[ 'a1' ] = RooRealVar('a1', 'a1', 0.001, -10, 10 )
-    rooDict[ 'a2' ] = RooRealVar('a2', 'a2', 0.0001, -10, 10 )
-    rooDict[ 'a3' ] = RooRealVar('a3', 'a3', 0.00001, -10, 10 )
-    #rooDict[ 'a4' ] = RooRealVar('a4', 'a4', 0.00001, -10, 10 )
-    #rooDict[ 'a5' ] = RooRealVar('a5', 'a5', 0.000001, -10, 10 )
-    polyArgList = RooArgList( rooDict['a0'], rooDict['a1'], rooDict['a2'], rooDict['a3'] )
+    polyArgList = RooArgList( )
+    for i in range( int(args.degreePoly) ):
+        rooDict[ 'a'+str(i) ] = RooRealVar('a'+str(i), 'a'+str(i), 0.00001, -10, 10 )
+        polyArgList.add( rooDict[ 'a'+str(i) ] )
 
     rooDict[ 'bkg_fail_bins' ] = RooArgList( )
     rooDict[ 'bkg_pass_bins' ] = RooArgList( )
@@ -390,9 +393,11 @@ def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
 
         ### Pass workspace
         iCenter = bkgHistos['MassFail'].GetXaxis().GetBinCenter(ibin)
-        rooDict[ 'Var_Mass_bin'+str(ibin) ] = RooConstVar('Var_Mass_bin'+str(ibin), 'Var_Mass_bin'+str(ibin), iCenter)
-        rooDict[ 'poly_bin'+str(ibin) ] = RooPolyVar("poly_bin"+str(ibin),"poly_bin"+str(ibin), rooDict[ 'Var_Mass_bin'+str(ibin) ], polyArgList )
-        #rooDict[ 'poly_bin'+str(ibin) ] = RooBernstein("poly_bin"+str(ibin),"poly_bin"+str(ibin), rooDict[ 'Var_Mass_bin'+str(ibin) ], polyArgList )
+        ###rooDict[ 'Var_Mass_bin'+str(ibin) ] = RooConstVar('Var_Mass_bin'+str(ibin), 'Var_Mass_bin'+str(ibin), iCenter)
+        ###rooDict[ 'poly_bin'+str(ibin) ] = RooPolyVar("poly_bin"+str(ibin),"poly_bin"+str(ibin), rooDict[ 'Var_Mass_bin'+str(ibin) ], polyArgList )
+        rooDict[ 'Var_Mass_bin'+str(ibin) ] = RooRealVar('Var_Mass_bin'+str(ibin), 'Var_Mass_bin'+str(ibin), iCenter)
+        #rooDict[ 'poly_bin'+str(ibin) ] = RooChebychev("poly_bin"+str(ibin),"poly_bin"+str(ibin), rooDict[ 'Var_Mass_bin'+str(ibin) ], polyArgList )
+        rooDict[ 'poly_bin'+str(ibin) ] = RooBernstein("poly_bin"+str(ibin),"poly_bin"+str(ibin), rooDict[ 'Var_Mass_bin'+str(ibin) ], polyArgList )
         rooDict[ 'poly_bin'+str(ibin) ].Print()
         rooDict[ 'bkg_pass_bin'+str(ibin) ] = RooFormulaVar( 'bkg_pass_bin'+str(ibin), 'bkg_pass_bin'+str(ibin), "@0*max(@1,0)*@2", RooArgList( rooDict[ 'bkg_fail_bin'+str(ibin) ], rooDict[ 'poly_bin'+str(ibin) ], QCDEFF ) )
         rooDict[ 'bkg_pass_bin'+str(ibin) ].Print()
@@ -459,7 +464,6 @@ def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
     for q, k in rooDict.iteritems():
         if q.startswith('a'): datacard.write(q+"    flatParam\n")
         if q.startswith('bkg_fail_bin') and not q.endswith(('func', 'In', 'unc', 's')):
-        #if q.endswith(('func')):
             datacard.write(q+"    flatParam\n")
     datacard.close()
     ##############################
@@ -802,42 +806,31 @@ def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
 
 if __name__ == '__main__':
 
-	parser = argparse.ArgumentParser()
-	parser.add_argument('-p', '--proc', action='store', default='1D', dest='process', help='Process to draw, example: 1D, 2D, MC.' )
-        parser.add_argument('-d', '--decay', action='store', default='SL', dest='ttbarDecay', help='ttbar decay channel: SL, DL' )
-	parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
-	parser.add_argument('-c', '--cut', action='store', default='presel', help='cut, example: sl+presel' )
-	parser.add_argument('-s', '--single', action='store', default='all', help='single histogram, example: massAve_cutDijet.' )
-	parser.add_argument('-l', '--lumi', action='store', type=float, default=41530., help='Luminosity, example: 1.' )
-	parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
-	parser.add_argument('-u', '--unc', action='store', default='JES', dest='unc',  help='Type of uncertainty' )
-	parser.add_argument('-L', '--log', action='store_true', default=False, dest='log',  help='Plot in log scale (true) or not (false)' )
-	parser.add_argument('-n', '--norm', action='store_true', default=False, dest='norm',  help='Normalized plot (true) or not (false)' )
-	parser.add_argument('-f', '--final', action='store_true', default=False, dest='final',  help='If plot is final' )
-	parser.add_argument('-F', '--addFit', action='store_true', default=False, dest='addFit',  help='Plot fit in ratio plot.' )
-	parser.add_argument('-B', '--batchSys', action='store_true',  dest='batchSys', default=False, help='Process: all or single.' )
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--proc', action='store', default='1D', dest='process', help='Process to draw, example: 1D, 2D, MC.' )
+    parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
+    parser.add_argument('-d', '--degreePoly', action='store', default='4', help='Degree of polynominal.' )
+    parser.add_argument('-l', '--lumi', action='store', type=float, default=41530., help='Luminosity, example: 1.' )
+    parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
+    parser.add_argument('-u', '--unc', action='store', default='JES', dest='unc',  help='Type of uncertainty' )
 
-	try:
-		args = parser.parse_args()
-	except:
-		parser.print_help()
-		sys.exit(0)
+    try: args = parser.parse_args()
+    except:
+        parser.print_help()
+        sys.exit(0)
 
-        if not os.path.exists('Plots/'): os.makedirs('Plots/')
-	dataFiles = OrderedDict()
-	bkgFiles = OrderedDict()
-	signalFiles = OrderedDict()
-	CMS_lumi.extraText = "Preliminary Simulation"
-	#CMS_lumi.lumi_13TeV = str( round( (args.lumi/1000.), 2 ) )+" fb^{-1}, 13 TeV, 2017"
-	CMS_lumi.lumi_13TeV = "13 TeV, 2017"
+    if not os.path.exists('Plots/'): os.makedirs('Plots/')
+    CMS_lumi.extraText = "Preliminary Simulation"
+    #CMS_lumi.lumi_13TeV = str( round( (args.lumi/1000.), 2 ) )+" fb^{-1}, 13 TeV, 2017"
+    CMS_lumi.lumi_13TeV = "13 TeV, 2017"
 
-        VER = args.version.split('_')[1] if '_' in args.version else args.version
-        bkgFiles, signalFiles, dataFiles = rootHistograms( VER, args.lumi, '_boosted' )
+    VER = args.version.split('_')[1] if '_' in args.version else args.version
+    bkgFiles, signalFiles, dataFiles = rootHistograms( VER, args.lumi, '_boosted' )
 
-	plotList = [
-                [ 'leadAK8Jet___2J2WdeltaRTau21__', 'Higgs candidate mass [GeV]', 50, 250, 1, False ],
-                ]
+    plotList = [
+            [ 'leadAK8Jet___2J2WdeltaRTau21__', 'Higgs candidate mass [GeV]', 50, 250, 1, False ],
+            ]
 
-        #massDecorrelation( 'leadAK8JetRhoPtHbb_2JdeltaR2WTau21DDT_boostedHiggs' )
-	for i in plotList:
-            BkgEstimation( i[0], i[2], i[3], i[4], axisX=i[1])
+    #massDecorrelation( 'leadAK8JetRhoPtHbb_2JdeltaR2WTau21DDT_boostedHiggs' )
+    for i in plotList:
+        BkgEstimation( i[0], i[2], i[3], i[4], axisX=i[1])

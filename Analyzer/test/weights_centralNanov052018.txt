@@ -1,0 +1,99 @@
+dataset /ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 13 files
+13
+Total number of genEventCount in sample:  9580000
+Total number of genEventSumw in sample:  5046714.409729376
+Total number of genEventSumw2 in sample:  2772927.6295548966
+Total sum of genWeights in sample:  5046714.495926973
+Total sum of sign(genWeights) in sample:  9380450.0
+dataset /ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 12 files
+12
+Total number of genEventCount in sample:  7525991
+Total number of genEventSumw in sample:  3963935.7881921693
+Total number of genEventSumw2 in sample:  2178117.375385425
+Total sum of genWeights in sample:  3963935.856732454
+Total sum of sign(genWeights) in sample:  7368333.0
+dataset /WW_TuneCP5_13TeV-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 22 files
+22
+Total number of genEventCount in sample:  7815000
+Total number of genEventSumw in sample:  7811153.439281905
+Total number of genEventSumw2 in sample:  7807388.794845784
+Total sum of genWeights in sample:  7811153.442455929
+Total sum of sign(genWeights) in sample:  7815000.0
+dataset /WZ_TuneCP5_13TeV-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 5 files
+5
+Total number of genEventCount in sample:  3885000
+Total number of genEventSumw in sample:  3884167.004738384
+Total number of genEventSumw2 in sample:  3883352.3401498017
+Total sum of genWeights in sample:  3884167.0054633906
+Total sum of sign(genWeights) in sample:  3885000.0
+dataset /WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 49 files
+49
+Total number of genEventCount in sample:  71026861
+Total number of genEventSumw in sample:  70962105.74151348
+Total number of genEventSumw2 in sample:  71017900.35620016
+Total sum of genWeights in sample:  70962105.74554455
+Total sum of sign(genWeights) in sample:  70966439.0
+dataset /ZZ_TuneCP5_13TeV-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 3 files
+3
+Total number of genEventCount in sample:  1979000
+Total number of genEventSumw in sample:  1978776.7517366218
+Total number of genEventSumw2 in sample:  1978563.8613364846
+Total sum of genWeights in sample:  1978776.7519285486
+Total sum of sign(genWeights) in sample:  1979000.0
+dataset /TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 3 files
+3
+Total number of genEventCount in sample:  750000
+Total number of genEventSumw in sample:  381537.24336000404
+Total number of genEventSumw2 in sample:  865192.9435981128
+Total sum of genWeights in sample:  381537.2590721705
+Total sum of sign(genWeights) in sample:  355226.0
+dataset /TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 8 files
+8
+Total number of genEventCount in sample:  4691915
+Total number of genEventSumw in sample:  33778755.65431488
+Total number of genEventSumw2 in sample:  1577163837.6156957
+Total sum of genWeights in sample:  33778756.95148434
+Total sum of sign(genWeights) in sample:  1842387.0
+dataset /TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 3 files
+3
+Total number of genEventCount in sample:  835296
+Total number of genEventSumw in sample:  580758.8456673448
+Total number of genEventSumw2 in sample:  1341706.5632768497
+Total sum of genWeights in sample:  580758.8452619885
+Total sum of sign(genWeights) in sample:  458226.0
+dataset /ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19_ext1-v1/NANOAODSIM has 11 files
+11
+Total number of genEventCount in sample:  7623000
+Total number of genEventSumw in sample:  266470421.96568546
+Total number of genEventSumw2 in sample:  9400494838.44275
+Total sum of genWeights in sample:  266470418.05411544
+Total sum of sign(genWeights) in sample:  7588180.0
+dataset /ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19_ext1-v1/NANOAODSIM has 10 files
+10
+Total number of genEventCount in sample:  9598000
+Total number of genEventSumw in sample:  334874722.2088432
+Total number of genEventSumw2 in sample:  11791930647.416348
+Total sum of genWeights in sample:  334874732.00012773
+Total sum of sign(genWeights) in sample:  9553912.0
+dataset /ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19_ext1-v1/NANOAODSIM has 21 files
+21
+Total number of genEventCount in sample:  19965000
+Total number of genEventSumw in sample:  74634736.73188996
+Total number of genEventSumw2 in sample:  716456677.03434
+Total sum of genWeights in sample:  74634737.4723079
+Total sum of sign(genWeights) in sample:  12458638.0
+dataset /TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 125 files
+125
+Total number of genEventCount in sample:  133664000
+Total number of genEventSumw in sample:  41941959327.8072
+Total number of genEventSumw2 in sample:  13376408562231.035
+Total sum of genWeights in sample:  41941959719.179276
+Total sum of sign(genWeights) in sample:  132582832.0
+dataset /TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM has 57 files
+57
+Total number of genEventCount in sample:  64310000
+Total number of genEventSumw in sample:  4635769336.539396
+Total number of genEventSumw2 in sample:  339624321999.92773
+Total sum of genWeights in sample:  4635769526.20038
+Total sum of sign(genWeights) in sample:  63791484.0
+

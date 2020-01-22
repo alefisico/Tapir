@@ -22,10 +22,11 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 rhalPtList = [ 250, 300, 350, 400, 450, 500, 550, 600, 700, 800, 1000, 10000 ]
 
 class boostedAnalyzer(Module):
-    def __init__(self, sample="None", leptonSFhelper={}):
+    def __init__(self, sample="None", leptonSFhelper={}, year='2017'):
 	self.writeHistFile=True
         self.sample = sample
         self.leptonSFhelper = leptonSFhelper
+        self.year = year
         print(self.leptonSFhelper)
 
     def beginJob(self,histFile=None,histDirName=None):
@@ -311,13 +312,28 @@ class boostedAnalyzer(Module):
         isSLmu = False
         isDLmumu = False
         trigger = False
-        if (event.HLT_IsoMu24_eta2p1==1) or (event.HLT_IsoMu27==1):
-            isSLmu = True
-            trigger = True
-        elif (event.HLT_Ele35_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
-            isSLmu = False
-            trigger = True
-        else: isDLmumu = False
+        if self.year.startswith('2016'):
+            if (event.HLT_IsoMu24==1) or (event.HLT_IsoTkMu24==1):
+                isSLmu = True
+                trigger = True
+            elif (event.HLT_Ele27_WPTight_Gsf==1):
+                isSLmu = False
+                trigger = True
+        elif self.year.startswith('2017'):
+            if (event.HLT_IsoMu24_eta2p1==1) or (event.HLT_IsoMu27==1):
+                isSLmu = True
+                trigger = True
+            elif (event.HLT_Ele35_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
+                isSLmu = False
+                trigger = True
+        elif self.year.startswith('2018'):
+            if (event.HLT_IsoMu24==1):
+                isSLmu = True
+                trigger = True
+            elif (event.HLT_Ele32_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
+                isSLmu = False
+                trigger = True
+        ##else: isDLmumu = False
 
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
@@ -432,7 +448,7 @@ class boostedAnalyzer(Module):
             #FatJet_Hbb = goodFatJets[0].deepTag_H
             FatJet_Hbb = goodFatJets[0].deepTagMD_ZHbbvsQCD
             FatJet_Top = goodFatJets[0].deepTagMD_TvsQCD
-            FatJet_tau21 = goodFatJets[0].tau2/goodFatJets[0].tau1
+            FatJet_tau21 = goodFatJets[0].tau2/goodFatJets[0].tau1 if goodFatJets[0].tau1>0 else -9999
             FatJet_rho = ROOT.TMath.Log( FatJet_msoftdrop*FatJet_msoftdrop/(FatJet_pt*FatJet_pt) )
             FatJet_tau21DDT = FatJet_tau21 + 0.08 * ROOT.TMath.Log( FatJet_msoftdrop*FatJet_msoftdrop/(FatJet_pt) )
             getattr( self, 'leadAK8JetMass' ).Fill( FatJet_msoftdrop, weight )
@@ -859,12 +875,12 @@ class boostedAnalyzer(Module):
                 badFatJets.remove(goodHiggsCandidate)
 
             ### W candidate
-            wCandidates = [ j for j in badFatJets if (j.tau2/j.tau1 < tau21cut) ]
+            wCandidates = [ j for j in badFatJets if (( j.tau1>0 ) and (j.tau2/j.tau1 < tau21cut)) ]
             goodWCandidate = min(wCandidates, key=lambda j: j.tau2/j.tau1 ) if len(wCandidates)>0 else None
             if goodWCandidate: badFatJets.remove(goodWCandidate)
 
             ### Top candidate
-            topCandidates = [ j for j in badFatJets if (j.tau3/j.tau2 < 0.4) ]
+            topCandidates = [ j for j in badFatJets if ((j.tau2>0) and (j.tau3/j.tau2 < 0.4)) ]
             goodTopCandidate = min(topCandidates, key=lambda j: j.tau3/j.tau2 ) if len(topCandidates)>0 else None     ## in case there are more than one top Candidate, choose the one with minimum tau32
             if goodTopCandidate: badFatJets.remove(goodTopCandidate)
 
