@@ -825,7 +825,7 @@ if __name__ == '__main__':
     CMS_lumi.lumi_13TeV = "13 TeV, 2017"
 
     VER = args.version.split('_')[1] if '_' in args.version else args.version
-    bkgFiles, signalFiles, dataFiles = rootHistograms( VER, args.lumi, '_boosted' )
+    bkgFiles, signalFiles, dataFiles = rootHistograms( VER, args.lumi, '2017' )
 
     plotList = [
             [ 'leadAK8Jet___2J2WdeltaRTau21__', 'Higgs candidate mass [GeV]', 50, 250, 1, False ],

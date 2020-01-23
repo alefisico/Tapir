@@ -43,7 +43,7 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('nleps_2J2WNoWeight',   ';number of leptons',   20, 0, 20) )
         self.addObject( ROOT.TH1F('leadAK8JetPt_2J2WNoWeight',   ';Leading AK8 jet mass', 150, 0, 1500) )
         #### general selection
-        for isel in [ '', '_2JNoWeight', '_2J',  '_2J2W', '_2J2WdeltaR', '_2J2WdeltaRTau21' ]:
+        for isel in [ '', '_noWeight', '_2JNoWeight', '_2J',  '_2J2W', '_2J2WdeltaR', '_2J2WdeltaRTau21' ]:
             self.addObject( ROOT.TH1F('nPVs'+isel,   ';number of PVs',   100, 0, 100) )
             self.addObject( ROOT.TH1F('nleps'+isel,   ';number of leptons',   20, 0, 20) )
             self.addP4Hists( 'lepton', isel )
@@ -86,6 +86,7 @@ class boostedAnalyzer(Module):
 
 
         ### additional single plots
+        self.addObject( ROOT.TH1F('PUweight',   ';PUWeight',   100, 0, 100) )
         self.addObject( ROOT.TH1F('leadAK8JetN2',   ';#rho', 40, 0, 1) )
         self.addObject( ROOT.TH1F('leadAK8JetTau21DDT',   ';#tau_{21}^{DDT}', 40, 0, 1) )
         self.addObject( ROOT.TH2F('leadAK8JetdeepAK8HbbMDTop',   '', 40, 0, 1, 40, 0, 1) )
@@ -204,26 +205,27 @@ class boostedAnalyzer(Module):
 
     def leptonSF(self, lepton, leptonP4 ):
 
+        if lepton.startswith("muon"): leptonP4eta = abs(leptonP4.eta)
+        else: leptonP4eta = leptonP4.eta
+
         SFFileTrigger = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/"+self.leptonSFhelper[lepton]['Trigger'][0] )
         histoSFTrigger = SFFileTrigger.Get( self.leptonSFhelper[lepton]['Trigger'][1] )
-        SFTrigger = histoSFTrigger.GetBinContent( histoSFTrigger.GetXaxis().FindBin( leptonP4.pt ), histoSFTrigger.GetYaxis().FindBin( abs(leptonP4.eta ) ) )
-
-        if lepton.startswith("electron") and leptonP4.pt>500: leptonP4pt = 500
-        else: leptonP4pt = leptonP4.pt
+        SFTrigger = histoSFTrigger.GetBinContent( histoSFTrigger.GetXaxis().FindBin( leptonP4.pt ), histoSFTrigger.GetYaxis().FindBin( leptonP4eta ) )
 
         SFFileID = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/"+self.leptonSFhelper[lepton]['ID'][0] )
         histoSFID = SFFileID.Get( self.leptonSFhelper[lepton]['ID'][1] )
-        SFID = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4.eta ), histoSFID.GetYaxis().FindBin( leptonP4pt ) )
+        histoSFID_X = histoSFID.GetXaxis().FindBin( leptonP4.pt if self.leptonSFhelper[lepton]['ID'][2] else leptonP4eta )
+        histoSFID_Y = histoSFID.GetYaxis().FindBin( leptonP4eta if self.leptonSFhelper[lepton]['ID'][2] else leptonP4.pt )
+        SFID = histoSFID.GetBinContent( histoSFID_X, histoSFID_Y )
+        SFID = SFID if SFID>0 else 1
+
+        if self.year.startswith('2016') and lepton.startswith("muon"): leptonP4eta = leptonP4.eta    #### stupid fix for the stupid SF file
         SFFileISO = ROOT.TFile( os.environ['CMSSW_BASE']+"/src/TTH/Analyzer/data/"+self.leptonSFhelper[lepton]['ISO'][0] )
         histoSFISO = SFFileISO.Get( self.leptonSFhelper[lepton]['ISO'][1] )
-        SFISO = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4.eta ), histoSFID.GetYaxis().FindBin( leptonP4pt ) )
-
-        if self.leptonSFhelper[lepton]['ID'][2]: SFID = histoSFID.GetBinContent( histoSFID.GetXaxis().FindBin( leptonP4pt ), histoSFID.GetYaxis().FindBin( abs(leptonP4.eta ) ) )
-        if self.leptonSFhelper[lepton]['ISO'][2]: SFISO = histoSFISO.GetBinContent( histoSFISO.GetXaxis().FindBin( leptonP4pt ), histoSFISO.GetYaxis().FindBin( abs(leptonP4.eta ) ) )
-
-        if (leptonP4.pt < 120) and lepton.startswith('muon'):
-            SFISO = 1
-            SFID = 1
+        histoSFISO_X = histoSFISO.GetXaxis().FindBin( leptonP4.pt if self.leptonSFhelper[lepton]['ISO'][2] else leptonP4eta )
+        histoSFISO_Y = histoSFISO.GetYaxis().FindBin( leptonP4eta if self.leptonSFhelper[lepton]['ISO'][2] else leptonP4.pt )
+        SFISO = histoSFISO.GetBinContent( histoSFISO_X, histoSFISO_Y )
+        SFISO = SFISO if SFISO>0 else 1
 
         #print (SFTrigger * SFID * SFISO), SFTrigger , SFID , SFISO, leptonP4.pt, leptonP4.eta
         return [SFTrigger , SFID , SFISO]
@@ -323,7 +325,7 @@ class boostedAnalyzer(Module):
             if (event.HLT_IsoMu24_eta2p1==1) or (event.HLT_IsoMu27==1):
                 isSLmu = True
                 trigger = True
-            elif (event.HLT_Ele35_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
+            elif (event.HLT_Ele32_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
                 isSLmu = False
                 trigger = True
         elif self.year.startswith('2018'):
@@ -367,7 +369,7 @@ class boostedAnalyzer(Module):
         else: leptonWeights = [1, 1, 1]
 
         ### Jets
-        looseJets = [ j for j in jets if (abs(j.eta)<2.4) and (j.pt>20) and (j.jetId>=2) and ( (j.puId>=4) if (j.pt<50) else True ) ]
+        looseJets = [ j for j in jets if (abs(j.eta)<2.4) and (j.pt>30) and (j.jetId>=2) and ( (j.puId>=4) if (j.pt<50) else True ) ]
         goodJets = looseJets if (len(looseJets)>0) and (looseJets[0].pt>30) else []
         goodJetsNoLep = [ j for j in goodJets for l in goodLeptons if j.p4().DeltaR(l.p4())>=0.4  ]
 
@@ -376,10 +378,10 @@ class boostedAnalyzer(Module):
         goodBjetsDeepFlav = [ b for b in goodJetsNoLep if b.btagDeepFlavB>0.3033 ]
 
         ### Fatjets
-        looseFatJets = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
+        looseFatJets = [ j for j in fatjets if (abs(j.eta)<2.4) and (j.pt>200) ]
         ## clones for further studies
-        badFatJets = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
-        allFatJets = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>250) and (j.jetId>=2) ]
+        badFatJets = [ j for j in fatjets if (abs(j.eta)<2.4) and (j.pt>200) ]
+        allFatJets = [ j for j in fatjets if (abs(j.eta)<2.4) and (j.pt>250) and (j.jetId>=2) ]
         goodFatJets = [ j for j in allFatJets for l in goodLeptons if j.p4().DeltaR(l.p4())>=0.8  ]
         #badFatJets_boostedW = [ j for j in fatjets if (abs(j.eta<2.4)) and (j.pt>200) ]
 
@@ -408,11 +410,13 @@ class boostedAnalyzer(Module):
         #################################### Boosted
         if trigger and metcut and nlepcut and (len(goodFatJets)>0):
 
+            #print event.event, isSLmu, ' trigger/met/nlep/nAK8 : ', 'nleptons ', len(goodLeptons), ' nAK4jets ', len(goodJetsNoLep), ' nAK8jets ', len(goodFatJets), ' pt/mass AK8jet ', goodFatJets[0].pt, goodFatJets[0].mass, goodFatJets[0].msoftdrop, goodFatJets[0].eta,' pt/eta lepton ', goodLeptons[0].pt, goodLeptons[0].eta, MET.pt, ' weights ', event.puWeight, np.prod(leptonWeights), leptonWeights, weight
             getattr( self, 'cutFlow' ).Fill( 2 )
             getattr( self, 'cutFlow_weight' ).Fill( 2, weight )
             if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
 
             ### General
+            getattr( self, 'PUweight' ).Fill( event.puWeight )
             getattr( self, 'nPVs' ).Fill( PV.npvsGood, weight )
             getattr( self, 'nleps' ).Fill( len(goodLeptons), weight )
             getattr( self, 'lepton_pt' ).Fill( goodLeptons[0].pt, weight )
@@ -460,6 +464,27 @@ class boostedAnalyzer(Module):
             getattr( self, 'leadAK8JetHbb' ).Fill( FatJet_Hbb, weight )
             getattr( self, 'leadAK8JetdeepAK8HbbMDTop' ).Fill( FatJet_Hbb, goodFatJets[0].deepTagMD_TvsQCD, weight )
             getattr( self, 'leadAK8JetdeepAK8HbbMDDDB' ).Fill( FatJet_Hbb, goodFatJets[0].btagDDBvL, weight )
+
+            #### test NO weight
+            getattr( self, 'nPVs_noWeight' ).Fill( PV.npvsGood, weight )
+            getattr( self, 'nleps_noWeight' ).Fill( len(goodLeptons), weight )
+            getattr( self, 'lepton_pt_noWeight' ).Fill( goodLeptons[0].pt, weight )
+            getattr( self, 'lepton_eta_noWeight' ).Fill( goodLeptons[0].eta, weight )
+            getattr( self, 'lepton_phi_noWeight' ).Fill( goodLeptons[0].phi, weight )
+            getattr( self, 'njets_noWeight' ).Fill( len(goodJetsNoLep), weight )
+            for ijet in goodJetsNoLep:
+                getattr( self, 'jets_pt_noWeight' ).Fill( ijet.pt, weight )
+                getattr( self, 'jets_eta_noWeight' ).Fill( ijet.eta, weight )
+                getattr( self, 'jets_phi_noWeight' ).Fill( ijet.phi, weight )
+                getattr( self, 'jets_bDeepFlav_noWeight' ).Fill( ijet.btagDeepFlavB, weight )
+            getattr( self, 'nBjets_noWeight' ).Fill( len(goodBjetsDeepFlav), weight )
+            getattr( self, 'nAK8jets_noWeight' ).Fill( len(goodFatJets), weight )
+            getattr( self, 'METPt_noWeight' ).Fill( MET.pt, weight )
+            getattr( self, 'leadAK8JetMass_noWeight' ).Fill( FatJet_msoftdrop, weight )
+            getattr( self, 'leadAK8JetPt_noWeight' ).Fill( FatJet_pt, weight )
+            getattr( self, 'leadAK8JetRho_noWeight' ).Fill( FatJet_rho, weight )
+            getattr( self, 'leadAK8JetTau21_noWeight' ).Fill( FatJet_tau21, weight )
+            getattr( self, 'leadAK8JetHbb_noWeight' ).Fill( FatJet_Hbb, weight )
 
             ### AK4 jets without overlap of leading AK8 jet
             cleanJets_Hcand = [ j for j in goodJetsNoLep if (j.p4().DeltaR(goodFatJets[0].p4())>=1.2)  ]
