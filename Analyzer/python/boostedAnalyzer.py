@@ -86,7 +86,9 @@ class boostedAnalyzer(Module):
 
 
         ### additional single plots
-        self.addObject( ROOT.TH1F('PUweight',   ';PUWeight',   100, 0, 100) )
+        self.addObject( ROOT.TH1F('PUweight',   ';PUWeight',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight',   ';LepWeight',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Totalweight',   ';TotalWeight',   20, 0, 2) )
         self.addObject( ROOT.TH1F('leadAK8JetN2',   ';#rho', 40, 0, 1) )
         self.addObject( ROOT.TH1F('leadAK8JetTau21DDT',   ';#tau_{21}^{DDT}', 40, 0, 1) )
         self.addObject( ROOT.TH2F('leadAK8JetdeepAK8HbbMDTop',   '', 40, 0, 1, 40, 0, 1) )
@@ -417,6 +419,8 @@ class boostedAnalyzer(Module):
 
             ### General
             getattr( self, 'PUweight' ).Fill( event.puWeight )
+            getattr( self, 'Lepweight' ).Fill( np.prod(leptonWeights) )
+            getattr( self, 'Totalweight' ).Fill( weight )
             getattr( self, 'nPVs' ).Fill( PV.npvsGood, weight )
             getattr( self, 'nleps' ).Fill( len(goodLeptons), weight )
             getattr( self, 'lepton_pt' ).Fill( goodLeptons[0].pt, weight )
@@ -466,25 +470,25 @@ class boostedAnalyzer(Module):
             getattr( self, 'leadAK8JetdeepAK8HbbMDDDB' ).Fill( FatJet_Hbb, goodFatJets[0].btagDDBvL, weight )
 
             #### test NO weight
-            getattr( self, 'nPVs_noWeight' ).Fill( PV.npvsGood, weight )
-            getattr( self, 'nleps_noWeight' ).Fill( len(goodLeptons), weight )
-            getattr( self, 'lepton_pt_noWeight' ).Fill( goodLeptons[0].pt, weight )
-            getattr( self, 'lepton_eta_noWeight' ).Fill( goodLeptons[0].eta, weight )
-            getattr( self, 'lepton_phi_noWeight' ).Fill( goodLeptons[0].phi, weight )
-            getattr( self, 'njets_noWeight' ).Fill( len(goodJetsNoLep), weight )
+            getattr( self, 'nPVs_noWeight' ).Fill( PV.npvsGood )
+            getattr( self, 'nleps_noWeight' ).Fill( len(goodLeptons) )
+            getattr( self, 'lepton_pt_noWeight' ).Fill( goodLeptons[0].pt )
+            getattr( self, 'lepton_eta_noWeight' ).Fill( goodLeptons[0].eta )
+            getattr( self, 'lepton_phi_noWeight' ).Fill( goodLeptons[0].phi )
+            getattr( self, 'njets_noWeight' ).Fill( len(goodJetsNoLep) )
             for ijet in goodJetsNoLep:
-                getattr( self, 'jets_pt_noWeight' ).Fill( ijet.pt, weight )
-                getattr( self, 'jets_eta_noWeight' ).Fill( ijet.eta, weight )
-                getattr( self, 'jets_phi_noWeight' ).Fill( ijet.phi, weight )
-                getattr( self, 'jets_bDeepFlav_noWeight' ).Fill( ijet.btagDeepFlavB, weight )
-            getattr( self, 'nBjets_noWeight' ).Fill( len(goodBjetsDeepFlav), weight )
-            getattr( self, 'nAK8jets_noWeight' ).Fill( len(goodFatJets), weight )
-            getattr( self, 'METPt_noWeight' ).Fill( MET.pt, weight )
-            getattr( self, 'leadAK8JetMass_noWeight' ).Fill( FatJet_msoftdrop, weight )
-            getattr( self, 'leadAK8JetPt_noWeight' ).Fill( FatJet_pt, weight )
-            getattr( self, 'leadAK8JetRho_noWeight' ).Fill( FatJet_rho, weight )
-            getattr( self, 'leadAK8JetTau21_noWeight' ).Fill( FatJet_tau21, weight )
-            getattr( self, 'leadAK8JetHbb_noWeight' ).Fill( FatJet_Hbb, weight )
+                getattr( self, 'jets_pt_noWeight' ).Fill( ijet.pt )
+                getattr( self, 'jets_eta_noWeight' ).Fill( ijet.eta )
+                getattr( self, 'jets_phi_noWeight' ).Fill( ijet.phi )
+                getattr( self, 'jets_bDeepFlav_noWeight' ).Fill( ijet.btagDeepFlavB )
+            getattr( self, 'nBjets_noWeight' ).Fill( len(goodBjetsDeepFlav) )
+            getattr( self, 'nAK8jets_noWeight' ).Fill( len(goodFatJets) )
+            getattr( self, 'METPt_noWeight' ).Fill( MET.pt )
+            getattr( self, 'leadAK8JetMass_noWeight' ).Fill( FatJet_msoftdrop )
+            getattr( self, 'leadAK8JetPt_noWeight' ).Fill( FatJet_pt )
+            getattr( self, 'leadAK8JetRho_noWeight' ).Fill( FatJet_rho )
+            getattr( self, 'leadAK8JetTau21_noWeight' ).Fill( FatJet_tau21 )
+            getattr( self, 'leadAK8JetHbb_noWeight' ).Fill( FatJet_Hbb )
 
             ### AK4 jets without overlap of leading AK8 jet
             cleanJets_Hcand = [ j for j in goodJetsNoLep if (j.p4().DeltaR(goodFatJets[0].p4())>=1.2)  ]
