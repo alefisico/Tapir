@@ -314,33 +314,30 @@ def accessHistos( nameOfHisto, listOfFiles, minMass, maxMass, rebinMass ):
                 histos[ isam+ivar+side ].SetTitle(isam+ivar+side)
                 if ivar=='Mass':
                     histos[ isam+ivar+side ].Rebin(rebinMass)
-                    for ibin in range(1, histos[isam+ivar+side].GetNbinsX()+1):
-                        iCenter = histos[isam+ivar+side].GetXaxis().GetBinCenter(ibin)
-                        if (iCenter<minMass) or (iCenter>maxMass):
-                            histos[ isam+ivar+side ].SetBinContent(ibin, 0)
-                            histos[ isam+ivar+side ].SetBinError(ibin, 0)
-                try: histos[ ivar+side ].Add( histos[ isam+ivar+side ].Clone() )
-                except (KeyError, AttributeError) as e: histos[ ivar+side ] = histos[ isam+ivar+side ].Clone()
-                '''
-                    newTotalBin = (maxMass-minMass)/histos[isam+ivar+side].GetBinWidth(1)
-                    histos[ isam+ivar+side+'NewBin' ] = TH1F( isam+ivar+side+'NewBin', isam+ivar+side+'NewBin', int(newTotalBin), minMass, maxMass )
-                    tmpibin = 1
-                    for ibin in range(1, histos[isam+ivar+side].GetNbinsX()+1):
-                        iCenter = histos[isam+ivar+side].GetXaxis().GetBinCenter(ibin)
-                        if (iCenter<minMass) or (iCenter>maxMass):
-                            histos[ isam+ivar+side+'NewBin' ].SetBinContent(tmpibin, histos[isam+ivar+side].GetBinContent(ibin))
-                            histos[ isam+ivar+side+'NewBin' ].SetBinError(tmpibin, histos[isam+ivar+side].GetBinError(ibin))
-                            tmpibin = tmpibin+1
-                            print tmpibin
-                try: histos[ ivar+side ].Add( histos[ isam+ivar+side+'NewBin' ].Clone() )
-                except (KeyError, AttributeError) as e: histos[ ivar+side ] = histos[ isam+ivar+side+'NewBin' ].Clone()
-                '''
+                    #for ibin in range(1, histos[isam+ivar+side].GetNbinsX()+1):
+                    #    iCenter = histos[isam+ivar+side].GetXaxis().GetBinCenter(ibin)
+                    #    if (iCenter<minMass) or (iCenter>maxMass):
+                    #        histos[ isam+ivar+side ].SetBinContent(ibin, 0)
+                    #        histos[ isam+ivar+side ].SetBinError(ibin, 0)
+                try: histos[ ivar+side+'OldBin' ].Add( histos[ isam+ivar+side ].Clone() )
+                except (KeyError, AttributeError) as e: histos[ ivar+side+'OldBin' ] = histos[ isam+ivar+side ].Clone()
 
             ### Making the 1D plots binned in Pt
             if ivar.endswith('Pt'):
                 for ptbin in range(len(rhalPtList)-1):
                     histos[ ivar+side+rhalPtList[ptbin] ] = histos[ ivar+side ].ProjectionX( ivar+side+rhalPtList[ptbin], int(rhalPtList[ptbin]), int(rhalPtList[ptbin+1]) )
                     histos[ ivar+side+rhalPtList[ptbin] ].Rebin(2)
+
+    newTotalBin = (maxMass-minMass)/histos['MassPassOldBin'].GetBinWidth(1)
+    histos[ 'MassPass' ] = TH1F( 'MassPass', 'MassPass', int(newTotalBin), minMass, maxMass )
+    histos[ 'MassFail' ] = TH1F( 'MassFail', 'MassFail', int(newTotalBin), minMass, maxMass )
+    for ibin in range(1, histos['MassPassOldBin'].GetNbinsX()+1):
+        for jbin in range(1, histos['MassPass'].GetNbinsX()+1):
+            if (histos['MassPassOldBin'].GetXaxis().GetBinLowEdge(ibin)== histos['MassPass'].GetXaxis().GetBinLowEdge(jbin)):
+                histos['MassPass'].SetBinContent( jbin, histos['MassPassOldBin'].GetBinContent(ibin) )
+                histos['MassPass'].SetBinError( jbin, histos['MassPassOldBin'].GetBinError(ibin) )
+                histos['MassFail'].SetBinContent( jbin, histos['MassFailOldBin'].GetBinContent(ibin) )
+                histos['MassFail'].SetBinError( jbin, histos['MassFailOldBin'].GetBinError(ibin) )
     return histos
 
 ######################################################
@@ -828,7 +825,7 @@ if __name__ == '__main__':
     bkgFiles, signalFiles, dataFiles = rootHistograms( VER, args.lumi, '2017' )
 
     plotList = [
-            [ 'leadAK8Jet___2J2WdeltaRTau21__', 'Higgs candidate mass [GeV]', 50, 250, 1, False ],
+            [ 'leadAK8Jet___2J2WdeltaRTau21__', 'Higgs candidate mass [GeV]', 100, 160, 1, False ],
             ]
 
     #massDecorrelation( 'leadAK8JetRhoPtHbb_2JdeltaR2WTau21DDT_boostedHiggs' )

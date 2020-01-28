@@ -12,7 +12,7 @@ else
     if [[ "$sample" == "simple" ]]; then
         listOfSamples="ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8"
     elif [[ "$sample" == "MC" ]]; then
-        listOfSamples="ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8 TTToHadronic_TuneCP5_13TeV-powheg-pythia8 TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8 ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8 ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8 TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_13TeV-pythia8 QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8"
+        listOfSamples="ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8 TTToHadronic_TuneCP5_13TeV-powheg-pythia8 TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8 ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8 ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8 ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8 THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8 TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8 WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_13TeV-pythia8 QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8 WJetsToQQ_HT400to600_qc19_3j_TuneCP5_13TeV-madgraphMLM-pythia8 WJetsToQQ_HT600to800_qc19_3j_TuneCP5_13TeV-madgraphMLM-pythia8 WJetsToQQ_HT-800toInf_qc19_3j_TuneCP5_13TeV-madgraphMLM-pythia8"
     elif [[ "$sample" == "Muon" ]]; then
         if [[ "$year" == "2017" ]]; then
             listOfSamples="SingleMuon_Run2017B SingleMuon_Run2017C SingleMuon_Run2017D SingleMuon_Run2017E SingleMuon_Run2017F"
@@ -38,7 +38,9 @@ else
 import sys,os,time
 import argparse, shutil
 from dbs.apis.dbsClient import DbsApi
-from computeGenWeights import dictSamples as allSamples
+#from computeGenWeights import dictSamples as allSamples
+sys.path.insert(0,'..')
+from datasets import dictSamples, checkDict
 dbsPhys03 = DbsApi('https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader')
 dbsglobal = DbsApi('https://cmsweb.cern.ch/dbs/prod/global/DBSReader')
 
@@ -53,6 +55,7 @@ except:
     sys.exit(0)
 
 ##### Samples
+allSamples = {}
 allSamples['SingleMuon_Run2016Bv1']  = '/SingleMuon/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD'
 allSamples['SingleMuon_Run2016Bv2']  = '/SingleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD'
 allSamples['SingleMuon_Run2016C']  = '/SingleMuon/Run2016C-Nano1June2019-v1/NANOAOD'
@@ -90,14 +93,15 @@ allSamples['SingleElectron_Run2018D']  = '/EGamma/Run2018D-Nano1June2019-v1/NANO
 
 
 ## trick to run only in specific samples
-dictSamples = {}
-for sam in allSamples:
-    if sam.startswith( args.dataset ) and sam.startswith('Single') and sam.split('Run')[1].startswith(args.year): dictSamples[ sam ] = allSamples[ sam ]
-    elif sam.startswith( args.dataset ): dictSamples[ sam ] = allSamples[ sam ][ 0 if args.year.startswith('2016') else ( 1 if args.year.startswith('2017') else 2 ) ]
-    #else: dictSamples = allSamples
+processingSamples = {}
+if args.dataset.startswith('Single'):
+    for sam in allSamples:
+        if sam.startswith( args.dataset ) and sam.startswith('Single') and sam.split('Run')[1].startswith(args.year): processingSamples[ sam ] = allSamples[ sam ]
+else:
+    processingSamples[ args.dataset ] = checkDict( args.dataset, dictSamples )[args.year][0]
 
-print dictSamples
-for sample, jsample in dictSamples.items():
+print processingSamples
+for sample, jsample in processingSamples.items():
 
     ##### Create a list from the dataset
     lfnList = []

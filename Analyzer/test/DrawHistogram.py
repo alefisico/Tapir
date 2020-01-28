@@ -16,6 +16,7 @@ import subprocess
 #from histoLabels import labels, labelAxis, finalLabels
 import CMS_lumi as CMS_lumi
 import tdrstyle as tdrstyle
+from datasets import dictSamples, checkDict
 #from commonFunctions import *
 
 ####gReset()
@@ -52,8 +53,8 @@ def rootHistograms( version, lumi, year):
     dataFiles = OrderedDict()
     bkgFiles = OrderedDict()
     signalFiles = OrderedDict()
-    #extra='_boosted_'+year
-    extra='_boosted'
+    extra='_boosted_'+year
+    #extra='_boosted'
     '''
     bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_'+extra+'boosted.root'), args.lumi*10.3*.3259/9914948.,  40, 'Single top' ]
     bkgFiles["ST_t-channel"] = [ TFile('Rootfiles/'+VER+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_'+extra+'boosted.root'), args.lumi*136.02/5982064.,  40, 'Single top' ]
@@ -79,27 +80,27 @@ def rootHistograms( version, lumi, year):
     ####signalFiles["ttHTobb_ttToSemiLep"] = [ TFile('Rootfiles/'+VER+'/histograms_ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8_'+extra+'boosted.root'), args.lumi*0.093/9332943, kRed ]
 
     '''
-    bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+version+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8'+extra+'.root'), lumi*10.3*.3259/6139912.0,  40, 'Single top' ]
-    bkgFiles["ST_t-channel"] = [ TFile('Rootfiles/'+version+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8'+extra+'.root'), lumi*136.02/5863722.0,  40, 'Single top' ]
-    bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+version+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8'+extra+'.root'), lumi*35.85/7686032.0, 40, 'Single top' ]
-    bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+version+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8'+extra+'.root'), lumi*35.85/7884388.0, 40, 'Single top' ]
-    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+version+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*88.342/8850002.0, 29, 'Dileptonic tt' ]
-    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*377.96/41084368.0, 19, 'Hadronic tt' ]
-    bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*365.46/35477937.0, 27, 'Semileptonic tt' ]
-    bkgFiles["WW"] = [ TFile('Rootfiles/'+version+'/histograms_WW_TuneCP5_13TeV-pythia8'+extra+'.root'), lumi*118.7/7791498.0, 38, 'Dibosons' ]
-    bkgFiles["WZ"] = [ TFile('Rootfiles/'+version+'/histograms_WZ_TuneCP5_13TeV-pythia8'+extra+'.root'), lumi*27.6/3928630.0, 39, 'Dibosons' ]
-    bkgFiles["ZZ"] = [ TFile('Rootfiles/'+version+'/histograms_ZZ_TuneCP5_13TeV-pythia8'+extra+'.root'), lumi*12.14/1925931.0, 36, 'Dibosons' ]
-    #bkgFiles["QCD"] = [ TFile('Rootfiles/'+version+'/histograms_QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8'+extra+'.root'), lumi*1370000000./18288989.0, 6 , 'QCD']
-    bkgFiles["TTGJets"] = [ TFile('Rootfiles/'+version+'/histograms_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8'+extra+'.root'), lumi*3.697/2850394.0, 12, 'ttGluon' ]
-    bkgFiles["WJets"] = [ TFile('Rootfiles/'+version+'/histograms_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8'+extra+'.root'), lumi*52850.0/33043732.0, 33, 'WJets' ]
-    bkgFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+version+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*0.5071*(1-.5824)/5394229.0, kBlue, 'ttH, non-H(bb)' ]
-    #bkgFiles[""] = [ TFile('Rootfiles/'+version+'/'), 1 ]
+    bkgFiles["ST_s-channel"] = [ TFile('Rootfiles/'+version+'/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8'+extra+'.root'), lumi*checkDict( 'ST_s-channel', dictSamples )['XS']/checkDict( 'ST_s-channel', dictSamples )[year][1],  40, 'Single top' ]
+    bkgFiles["ST_t-channel_top"] = [ TFile('Rootfiles/'+version+'/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8'+extra+'.root'), lumi*checkDict( 'ST_t-channel_top', dictSamples )['XS']/checkDict( 'ST_t-channel_top', dictSamples )[year][1],  40, 'Single top' ]
+    #bkgFiles["ST_t-channel_antitop"] = [ TFile('Rootfiles/'+version+'/histograms_ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8'+extra+'.root'), lumi*checkDict( 'ST_t-channel_antitop', dictSamples )['XS']/checkDict( 'ST_t-channel_antitop', dictSamples )[year][1],  40, 'Single antitop' ]
+    bkgFiles["ST_tW_antitop"] = [ TFile('Rootfiles/'+version+'/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8'+extra+'.root'), lumi*checkDict( 'ST_tW_antitop', dictSamples )['XS']/checkDict( 'ST_tW_antitop', dictSamples )[year][1], 40, 'Single top' ]
+    bkgFiles["ST_tW_top"] = [ TFile('Rootfiles/'+version+'/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8'+extra+'.root'), lumi*checkDict( 'ST_tW_top', dictSamples )['XS']/checkDict( 'ST_tW_top', dictSamples )[year][1], 40, 'Single top' ]
+    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+version+'/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*checkDict( 'TTTo2L', dictSamples )['XS']/checkDict( 'TTTo2L', dictSamples )[year][1], 29, 'Dileptonic tt' ]
+    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToHadronic_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*checkDict( 'TTToHad', dictSamples )['XS']/checkDict( 'TTToHad', dictSamples )[year][1], 19, 'Hadronic tt' ]
+    bkgFiles["TTToSemiLeptonic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*checkDict( 'TTToSemi', dictSamples )['XS']/checkDict( 'TTToSemi', dictSamples )[year][1], 27, 'Semileptonic tt' ]
+    bkgFiles["WW"] = [ TFile('Rootfiles/'+version+'/histograms_WW_TuneCP5_13TeV-pythia8'+extra+'.root'), lumi*checkDict( 'WW', dictSamples )['XS']/checkDict( 'WW', dictSamples )[year][1], 38, 'Dibosons' ]
+    #bkgFiles["WZ"] = [ TFile('Rootfiles/'+version+'/histograms_WZ_TuneCP5_13TeV-pythia8'+extra+'.root'), lumi*checkDict( 'WZ', dictSamples )['XS']/checkDict( 'WZ', dictSamples )[year][1], 39, 'Dibosons' ]
+    #bkgFiles["ZZ"] = [ TFile('Rootfiles/'+version+'/histograms_ZZ_TuneCP5_13TeV-pythia8'+extra+'.root'), lumi*checkDict( 'ZZ', dictSamples )['XS']/checkDict( 'ZZ', dictSamples )[year][1], 36, 'Dibosons' ]
+    #bkgFiles["QCD"] = [ TFile('Rootfiles/'+version+'/histograms_QCD_Pt-15to7000_TuneCP5_Flat_13TeV_pythia8'+extra+'.root'), lumi*checkDict( 'QCD', dictSamples )['XS']/checkDict( 'QCD', dictSamples )[year][1], 6 , 'QCD']
+    bkgFiles["TTGJets"] = [ TFile('Rootfiles/'+version+'/histograms_TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8'+extra+'.root'), lumi*checkDict( 'TTG', dictSamples )['XS']/checkDict( 'TTG', dictSamples )[year][1], 12, 'ttGluon' ]
+    bkgFiles["WJetsToLNu"] = [ TFile('Rootfiles/'+version+'/histograms_WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8'+extra+'.root'), lumi*checkDict( 'WJetsToLNu', dictSamples )['XS']/checkDict( 'WJetsToLNu', dictSamples )[year][1], 33, 'WJets' ]
+    bkgFiles["ttHToNonbb"] = [ TFile('Rootfiles/'+version+'/histograms_ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*checkDict( 'ttHToNonbb', dictSamples )['XS']/checkDict( 'ttHToNonbb', dictSamples )[year][1], kBlue, 'ttH, non-H(bb)' ]
+    bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+version+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8'+extra+'.root'), lumi*checkDict( 'TTW', dictSamples )['XS']/checkDict( 'TTW', dictSamples )[year][1], 37, 'ttW'  ]
+    bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+version+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8'+extra+'.root'),  lumi*checkDict( 'TTZ', dictSamples )['XS']/checkDict( 'TTZ', dictSamples )[year][1], 46, 'ttZ' ]
     #bkgFiles[""] = [ TFile('Rootfiles/'+version+'/'), 1 ]
 
-    bkgFiles["TTWJetsToQQ"] = [ TFile('Rootfiles/'+version+'/histograms_TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8'+extra+'.root'), lumi*0.3708/441560.0, 37, 'ttW'  ]
-    bkgFiles["TTZToQQ"] = [ TFile('Rootfiles/'+version+'/histograms_TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8'+extra+'.root'),  lumi*0.6012/356286.0, 46, 'ttZ' ]
-    signalFiles["THW"] = [ TFile('Rootfiles/'+version+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8'+extra+'.root'), lumi*0.1475/4714331.0, 46, 'tHW' ]
-    signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+version+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*0.2934045/7833734.0, kRed, 'ttH(bb)' ]
+    signalFiles["THW"] = [ TFile('Rootfiles/'+version+'/histograms_THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8'+extra+'.root'), lumi*checkDict( 'THW', dictSamples )['XS']/checkDict( 'THW', dictSamples )[year][1], 46, 'tHW' ]
+    signalFiles["ttHTobb"] = [ TFile('Rootfiles/'+version+'/histograms_ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8'+extra+'.root'), lumi*checkDict( 'ttHTobb', dictSamples )['XS']/checkDict( 'ttHTobb', dictSamples )[year][1], kRed, 'ttH(bb)' ]
     #signalFiles[""] = [ TFile('Rootfiles/'+version+'/'), 1 ]
 
     #if args.ttbarDecay.startswith("DL"):
@@ -269,6 +270,7 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
             #histos[ 'Data' ] = idata.Get( args.ttbarDecay+'_'+nameInRoot+'_'+idataLabel+'_Run2018' )
             #histos[ 'Data' ] = idata.Get( 'tthbb13/'+nameInRoot )
             histos[ 'Data' ] = idata.Get( 'tthbb13/'+nameInRoot.split('Total')[0] )
+    print histos['Data'].Integral()
 
     histos[ 'Bkg' ] = histos[ 'Data' ].Clone()
     histos[ 'Bkg' ].Reset()
@@ -333,7 +335,7 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
     if xmax: hData.GetXaxis().SetRangeUser( xmin, xmax )
     #hData.GetYaxis().SetTitle( 'Normalized' )
     #hData.GetYaxis().SetTitle( 'Normalized / '+str(int(binWidth))+' GeV' )
-    hData.GetYaxis().SetTitle( ( 'Events / '+str(int(binWidth))+' GeV' if nameInRoot in [ 'massAve', 'HT', 'jet1Pt', 'jet2Pt', 'MET' ] else 'Events' ) )
+    hData.GetYaxis().SetTitle(  'Events / '+str(int(binWidth))+' GeV' )
 
     #CMS_lumi.relPosX = 0.13
     if moveCMSlogo:
@@ -460,7 +462,7 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
         for bkgSamples in bkgFiles:
             bkgHistos[ bkgSamples ] = bkgFiles[ bkgSamples ][0].Get( 'tthbb13/'+name )
             bkgHistos[ bkgSamples ].SetTitle(bkgSamples)
-            if bkgFiles[ bkgSamples ][1] != 1: bkgHistos[ bkgSamples ].Scale( bkgFiles[ bkgSamples ][1] )
+            #if bkgFiles[ bkgSamples ][1] != 1: bkgHistos[ bkgSamples ].Scale( bkgFiles[ bkgSamples ][1] )
             print(bkgSamples, round(bkgHistos[ bkgSamples ].Integral(), 2) )
             if rebinX > 1: bkgHistos[ bkgSamples ] = bkgHistos[ bkgSamples ].Rebin( rebinX )
 
@@ -479,7 +481,7 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
         dummySig=0
         for sigSamples in signalFiles:
             signalHistos[ sigSamples ] = signalFiles[ sigSamples ][0].Get( 'tthbb13/'+name )
-            if signalFiles[ sigSamples ][1] != 1: signalHistos[ sigSamples ].Scale( signalFiles[ sigSamples ][1] )
+            #if signalFiles[ sigSamples ][1] != 1: signalHistos[ sigSamples ].Scale( signalFiles[ sigSamples ][1] )
             print(sigSamples, round(signalHistos[ sigSamples ].Integral(), 2) )
             legend.AddEntry( signalHistos[ sigSamples ], sigSamples, 'l' if Norm else 'f' )
 #           if 'massAve' in nameInRoot:
@@ -589,7 +591,7 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
             tmpHisto[ sample ].SetFillColor(0)
             tmpHisto[ sample ].SetLineStyle(2)
             tmpHisto[ sample ].SetLineWidth(3)
-            tmpHisto[ sample ].Draw("hist same")
+            #tmpHisto[ sample ].Draw("hist same")
 
         #CMS_lumi.relPosX = 0.14
         CMS_lumi.CMS_lumi( canvas[outputFileName], 4, 0)
@@ -762,6 +764,7 @@ if __name__ == '__main__':
             [ 'qual', 'leadAK8JetTau21', 'Leading AK8 jet #tau_{21}', 0, 1, 2, 0.85, 0.70, True, False ],
             [ 'qual', 'leadAK8JetHbb', 'Leading AK8 jet Hbb', 0, 1, 2, 0.85, 0.70, True, False ],
 
+            [ 'signalBkg', 'nPVs', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
             [ 'signalBkg', 'nleps', 'Number of leptons', 0, 10, 1,  0.85, 0.70, False, False],
             [ 'signalBkg', 'lepton_pt', 'Lepton pT [GeV]', 0, 500, 2,  0.85, 0.70, True, False],
             [ 'signalBkg', 'lepton_eta', 'Lepton #eta', -3, 3, 2,  0.85, 0.70, False, False],
@@ -777,7 +780,7 @@ if __name__ == '__main__':
             [ 'signalBkg', 'lepWPt', 'Leptonic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
             [ 'signalBkg', 'resolvedWCandMass', 'Hadronic W mass [GeV]', 0, 200, 1,  0.85, 0.70, False, False],
             [ 'signalBkg', 'resolvedWCandPt', 'Hadronic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
-            [ 'signalBkg', 'leadAK8JetPt', 'Leading AK8 jet pT [GeV]', 100, 1500, 5, 0.85, 0.70, True, False],
+            [ 'signalBkg', 'leadAK8JetPt', 'Leading AK8 jet pT [GeV]', 100, 1500, 1, 0.85, 0.70, True, False],
             [ 'signalBkg', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, 0.85, 0.70, True, False ],
             [ 'signalBkg', 'leadAK8JetTau21', 'Leading AK8 jet #tau_{21}', 0, 1, 2, 0.85, 0.70, True, False ],
             [ 'signalBkg', 'leadAK8JetHbb', 'Leading AK8 jet Hbb', 0, 1, 2, 0.85, 0.70, True, False ],

@@ -27,7 +27,6 @@ class boostedAnalyzer(Module):
         self.sample = sample
         self.leptonSFhelper = leptonSFhelper
         self.year = year
-        print(self.leptonSFhelper)
 
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
@@ -43,7 +42,7 @@ class boostedAnalyzer(Module):
         self.addObject( ROOT.TH1F('nleps_2J2WNoWeight',   ';number of leptons',   20, 0, 20) )
         self.addObject( ROOT.TH1F('leadAK8JetPt_2J2WNoWeight',   ';Leading AK8 jet mass', 150, 0, 1500) )
         #### general selection
-        for isel in [ '', '_noWeight', '_2JNoWeight', '_2J',  '_2J2W', '_2J2WdeltaR', '_2J2WdeltaRTau21' ]:
+        for isel in [ '', '_noWeight', '_2J', '_2JNoWeight', '_2JMuon', '_2JElectron', '_2J2W', '_2J2WdeltaR', '_2J2WdeltaRTau21' ]:
             self.addObject( ROOT.TH1F('nPVs'+isel,   ';number of PVs',   100, 0, 100) )
             self.addObject( ROOT.TH1F('nleps'+isel,   ';number of leptons',   20, 0, 20) )
             self.addP4Hists( 'lepton', isel )
@@ -86,9 +85,18 @@ class boostedAnalyzer(Module):
 
 
         ### additional single plots
+        self.addObject( ROOT.TH1F('Trigger',   ';Trigger',   10, 0, 10) )
         self.addObject( ROOT.TH1F('PUweight',   ';PUWeight',   20, 0, 2) )
         self.addObject( ROOT.TH1F('Lepweight',   ';LepWeight',   20, 0, 2) )
         self.addObject( ROOT.TH1F('Totalweight',   ';TotalWeight',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_2JMuon',   ';Lepweight_2JMuon',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_Trigger_2JMuon',   ';Lepweight_Trigger_2JMuon',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_ID_2JMuon',   ';Lepweight_ID_2JMuon',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_ISO_2JMuon',   ';Lepweight_ISO_2JMuon',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_2JElectron',   ';Lepweight_2JElectron',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_Trigger_2JElectron',   ';Lepweight_Trigger_2JElectron',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_ID_2JElectron',   ';Lepweight_ID_2JElectron',   20, 0, 2) )
+        self.addObject( ROOT.TH1F('Lepweight_ISO_2JElectron',   ';Lepweight_ISO_2JElectron',   20, 0, 2) )
         self.addObject( ROOT.TH1F('leadAK8JetN2',   ';#rho', 40, 0, 1) )
         self.addObject( ROOT.TH1F('leadAK8JetTau21DDT',   ';#tau_{21}^{DDT}', 40, 0, 1) )
         self.addObject( ROOT.TH2F('leadAK8JetdeepAK8HbbMDTop',   '', 40, 0, 1, 40, 0, 1) )
@@ -318,26 +326,42 @@ class boostedAnalyzer(Module):
         trigger = False
         if self.year.startswith('2016'):
             if (event.HLT_IsoMu24==1) or (event.HLT_IsoTkMu24==1):
+                getattr( self, 'Trigger' ).Fill( 1 )
                 isSLmu = True
                 trigger = True
+                if (event.HLT_IsoMu24==1): getattr( self, 'Trigger' ).Fill( 2 )
+                else: getattr( self, 'Trigger' ).Fill( 3 )
             elif (event.HLT_Ele27_WPTight_Gsf==1):
+                getattr( self, 'Trigger' ).Fill( 5 )
                 isSLmu = False
                 trigger = True
         elif self.year.startswith('2017'):
             if (event.HLT_IsoMu24_eta2p1==1) or (event.HLT_IsoMu27==1):
+                getattr( self, 'Trigger' ).Fill( 1 )
                 isSLmu = True
                 trigger = True
-            elif (event.HLT_Ele32_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
+                if (event.HLT_IsoMu24_eta2p1==1): getattr( self, 'Trigger' ).Fill( 2 )
+                else: getattr( self, 'Trigger' ).Fill( 3 )
+            elif (event.HLT_Ele35_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
+                getattr( self, 'Trigger' ).Fill( 5 )
                 isSLmu = False
                 trigger = True
+                if (event.HLT_Ele35_WPTight_Gsf==1): getattr( self, 'Trigger' ).Fill( 6 )
+                else: getattr( self, 'Trigger' ).Fill( 7 )
         elif self.year.startswith('2018'):
             if (event.HLT_IsoMu24==1):
+                getattr( self, 'Trigger' ).Fill( 1 )
                 isSLmu = True
                 trigger = True
             elif (event.HLT_Ele32_WPTight_Gsf==1) or (event.HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1):
+                getattr( self, 'Trigger' ).Fill( 3 )
                 isSLmu = False
                 trigger = True
-        ##else: isDLmumu = False
+                if (event.HLT_Ele32_WPTight_Gsf==1): getattr( self, 'Trigger' ).Fill( 4 )
+                else: getattr( self, 'Trigger' ).Fill( 5 )
+        else:
+            getattr( self, 'Trigger' ).Fill( 10 )
+            isDLmumu = False
 
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
@@ -365,6 +389,7 @@ class boostedAnalyzer(Module):
         goodLeptons.sort(key=lambda x:x.pt, reverse=True)
 
         if isMC:
+            print(self.leptonSFhelper)
             if len(goodMuons)>0 and len(goodElectrons)==0 and isSLmu: leptonWeights= self.leptonSF( "muon", goodMuons[0] )
             elif len(goodMuons)==0 and len(goodElectrons)>0 and not isSLmu: leptonWeights = self.leptonSF( "electron", goodElectrons[0] )
             else: leptonWeights = [0, 0, 0]
@@ -412,14 +437,15 @@ class boostedAnalyzer(Module):
         #################################### Boosted
         if trigger and metcut and nlepcut and (len(goodFatJets)>0):
 
-            #print event.event, isSLmu, ' trigger/met/nlep/nAK8 : ', 'nleptons ', len(goodLeptons), ' nAK4jets ', len(goodJetsNoLep), ' nAK8jets ', len(goodFatJets), ' pt/mass AK8jet ', goodFatJets[0].pt, goodFatJets[0].mass, goodFatJets[0].msoftdrop, goodFatJets[0].eta,' pt/eta lepton ', goodLeptons[0].pt, goodLeptons[0].eta, MET.pt, ' weights ', event.puWeight, np.prod(leptonWeights), leptonWeights, weight
+            print( 'basic', event.run, event.luminosityBlock, int(event.event) )
             getattr( self, 'cutFlow' ).Fill( 2 )
             getattr( self, 'cutFlow_weight' ).Fill( 2, weight )
             if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
 
             ### General
-            getattr( self, 'PUweight' ).Fill( event.puWeight )
-            getattr( self, 'Lepweight' ).Fill( np.prod(leptonWeights) )
+            if isMC:
+                getattr( self, 'PUweight' ).Fill( event.puWeight )
+                getattr( self, 'Lepweight' ).Fill( np.prod(leptonWeights) )
             getattr( self, 'Totalweight' ).Fill( weight )
             getattr( self, 'nPVs' ).Fill( PV.npvsGood, weight )
             getattr( self, 'nleps' ).Fill( len(goodLeptons), weight )
@@ -497,6 +523,8 @@ class boostedAnalyzer(Module):
 
             #### At least 2 jets for hadronic W
             if len(goodJets_Hcand)>1:
+                #print event.event, ( 'Muon' if isSLmu else 'Ele'), 'nleptons ', len(goodLeptons), ' nAK4jets ', len(goodJetsNoLep), ' nAK8jets ', len(goodFatJets), '  good nAK4jets ', len(goodJets_Hcand), ' pt/mass/msoftdrop/eta AK8jet ', goodFatJets[0].pt, goodFatJets[0].mass, goodFatJets[0].msoftdrop, goodFatJets[0].eta,' pt/eta lepton ', goodLeptons[0].pt, goodLeptons[0].eta, ' MET ', MET.pt, ' weights ', event.puWeight, np.prod(leptonWeights), leptonWeights, weight
+                print( '2J', event.run, event.luminosityBlock, int(event.event) )
                 getattr( self, 'cutFlow' ).Fill( 3 )
                 getattr( self, 'cutFlow_weight' ).Fill( 3, weight )
                 if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 3, event.genWeight )
@@ -525,6 +553,62 @@ class boostedAnalyzer(Module):
                 getattr( self, 'leadAK8JetTau21_2J').Fill( FatJet_tau21, weight )
                 getattr( self, 'leadAK8JetHbb_2J').Fill( FatJet_Hbb, weight )
 
+                #### test only Muons
+                if isSLmu:
+                    if isMC:
+                        getattr( self, 'Lepweight_2JMuon' ).Fill( np.prod(leptonWeights) )
+                        getattr( self, 'Lepweight_Trigger_2JMuon' ).Fill( leptonWeights[0] )
+                        getattr( self, 'Lepweight_ID_2JMuon' ).Fill( leptonWeights[1] )
+                        getattr( self, 'Lepweight_ISO_2JMuon' ).Fill( leptonWeights[2] )
+                    getattr( self, 'nPVs_2JMuon').Fill( PV.npvsGood, weight )
+                    getattr( self, 'nleps_2JMuon').Fill( len(goodLeptons), weight )
+                    getattr( self, 'lepton_pt_2JMuon').Fill( goodLeptons[0].pt, weight )
+                    getattr( self, 'lepton_eta_2JMuon').Fill( goodLeptons[0].eta, weight )
+                    getattr( self, 'lepton_phi_2JMuon').Fill( goodLeptons[0].phi, weight )
+                    getattr( self, 'njets_2JMuon').Fill( len(goodJets_Hcand), weight )
+                    for ijet in goodJets_Hcand:
+                        getattr( self, 'jets_pt_2JMuon').Fill( ijet.pt, weight )
+                        getattr( self, 'jets_eta_2JMuon').Fill( ijet.eta, weight )
+                        getattr( self, 'jets_phi_2JMuon').Fill( ijet.phi, weight )
+                        getattr( self, 'jets_bDeepFlav_2JMuon' ).Fill( ijet.btagDeepFlavB, weight )
+                    getattr( self, 'nBjets_2JMuon').Fill( len(goodBjets_Hcand), weight )
+                    getattr( self, 'nAK8jets_2JMuon' ).Fill( len(goodFatJets), weight )
+                    getattr( self, 'METPt_2JMuon').Fill( MET.pt, weight )
+                    getattr( self, 'lepWMass_2JMuon').Fill( lepW.M(), weight )
+                    getattr( self, 'lepWPt_2JMuon').Fill( lepW.Pt(), weight )
+                    getattr( self, 'leadAK8JetMass_2JMuon').Fill( FatJet_msoftdrop, weight )
+                    getattr( self, 'leadAK8JetPt_2JMuon').Fill( FatJet_pt, weight )
+                    getattr( self, 'leadAK8JetRho_2JMuon').Fill( FatJet_rho, weight )
+                    getattr( self, 'leadAK8JetTau21_2JMuon').Fill( FatJet_tau21, weight )
+                    getattr( self, 'leadAK8JetHbb_2JMuon').Fill( FatJet_Hbb, weight )
+                #### test only electrons
+                else:
+                    if isMC:
+                        getattr( self, 'Lepweight_2JElectron' ).Fill( np.prod(leptonWeights) )
+                        getattr( self, 'Lepweight_Trigger_2JElectron' ).Fill( leptonWeights[0] )
+                        getattr( self, 'Lepweight_ID_2JElectron' ).Fill( leptonWeights[1] )
+                        getattr( self, 'Lepweight_ISO_2JElectron' ).Fill( leptonWeights[2] )
+                    getattr( self, 'nPVs_2JElectron').Fill( PV.npvsGood, weight )
+                    getattr( self, 'nleps_2JElectron').Fill( len(goodLeptons), weight )
+                    getattr( self, 'lepton_pt_2JElectron').Fill( goodLeptons[0].pt, weight )
+                    getattr( self, 'lepton_eta_2JElectron').Fill( goodLeptons[0].eta, weight )
+                    getattr( self, 'lepton_phi_2JElectron').Fill( goodLeptons[0].phi, weight )
+                    getattr( self, 'njets_2JElectron').Fill( len(goodJets_Hcand), weight )
+                    for ijet in goodJets_Hcand:
+                        getattr( self, 'jets_pt_2JElectron').Fill( ijet.pt, weight )
+                        getattr( self, 'jets_eta_2JElectron').Fill( ijet.eta, weight )
+                        getattr( self, 'jets_phi_2JElectron').Fill( ijet.phi, weight )
+                        getattr( self, 'jets_bDeepFlav_2JElectron' ).Fill( ijet.btagDeepFlavB, weight )
+                    getattr( self, 'nBjets_2JElectron').Fill( len(goodBjets_Hcand), weight )
+                    getattr( self, 'nAK8jets_2JElectron' ).Fill( len(goodFatJets), weight )
+                    getattr( self, 'METPt_2JElectron').Fill( MET.pt, weight )
+                    getattr( self, 'lepWMass_2JElectron').Fill( lepW.M(), weight )
+                    getattr( self, 'lepWPt_2JElectron').Fill( lepW.Pt(), weight )
+                    getattr( self, 'leadAK8JetMass_2JElectron').Fill( FatJet_msoftdrop, weight )
+                    getattr( self, 'leadAK8JetPt_2JElectron').Fill( FatJet_pt, weight )
+                    getattr( self, 'leadAK8JetRho_2JElectron').Fill( FatJet_rho, weight )
+                    getattr( self, 'leadAK8JetTau21_2JElectron').Fill( FatJet_tau21, weight )
+                    getattr( self, 'leadAK8JetHbb_2JElectron').Fill( FatJet_Hbb, weight )
                 #### test without weights
                 getattr( self, 'nPVs_2JNoWeight').Fill( PV.npvsGood )
                 getattr( self, 'nleps_2JNoWeight').Fill( len(goodLeptons) )

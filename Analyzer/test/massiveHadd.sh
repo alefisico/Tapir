@@ -1,11 +1,20 @@
-version=v10
-year='2016'
-boosted='_boosted_'${year}
 
 if [[ $# -eq 0 ]] ; then
     echo 'First argument, name of sample, is needed. Have a good day :)'
 else
     sample=$1
+    version=$2
+    year=$3
+    boosted='_boosted_'${year}
+
+    if [[ ${year} == "2016" ]]; then
+        ERAlist="Bv1 Bv2 C D E F G H"
+    elif [[ ${year} == "2017" ]]; then
+        ERAlist="B C D E F"
+    elif [[ ${year} == "2018" ]]; then
+        ERAlist="A B C D"
+    fi
+
 
     if [[ "$sample" == "simple" ]]; then
 
@@ -16,6 +25,7 @@ else
 
         hadd -f Rootfiles/${version}/histograms_ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8${boosted}.root ~/cernbox/tmpFiles/ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8/histograms_*${version}${boosted}.root
         hadd -f Rootfiles/${version}/histograms_ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8${boosted}.root ~/cernbox/tmpFiles/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/histograms_*${version}${boosted}.root
+        hadd -f Rootfiles/${version}/histograms_ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8${boosted}.root ~/cernbox/tmpFiles/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/histograms_*${version}${boosted}.root
         hadd -f Rootfiles/${version}/histograms_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8${boosted}.root ~/cernbox/tmpFiles/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/histograms_*${version}${boosted}.root
         hadd -f Rootfiles/${version}/histograms_ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8${boosted}.root ~/cernbox/tmpFiles/ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/histograms_*${version}${boosted}.root
         hadd -f Rootfiles/${version}/histograms_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8${boosted}.root ~/cernbox/tmpFiles/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/histograms_*${version}${boosted}.root
@@ -33,21 +43,19 @@ else
 
     elif [[ "$sample" == "Muon" ]]; then
 
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}B${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}B/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}C${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}C/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}D${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}D/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}E${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}E/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}F${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}F/histograms_*${version}${boosted}.root
+        for era in $ERAlist; do
+            hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}${era}${boosted}.root ~/cernbox/tmpFiles/SingleMuon_Run${year}${era}/histograms_*${version}${boosted}.root
+        done
         hadd -f Rootfiles/${version}/histograms_SingleMuon_Run${year}ALL${boosted}.root Rootfiles/${version}/histograms_SingleMuon_Run${year}*${boosted}.root
 
     elif [[ "$sample" == "Electron" ]]; then
 
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}B${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}B/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}C${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}C/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}D${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}D/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}E${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}E/histograms_*${version}${boosted}.root
-        hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}F${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}F/histograms_*${version}${boosted}.root
+        for era in $ERAlist; do
+            hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}${era}${boosted}.root ~/cernbox/tmpFiles/SingleElectron_Run${year}${era}/histograms_*${version}${boosted}.root
+        done
         hadd -f Rootfiles/${version}/histograms_SingleElectron_Run${year}ALL${boosted}.root Rootfiles/${version}/histograms_SingleElectron_Run${year}*${boosted}.root
+    else
+        hadd -f Rootfiles/${version}/histograms_${sample}${boosted}.root ~/cernbox/tmpFiles/${sample}/histograms_*${version}${boosted}.root
     fi
 
 fi

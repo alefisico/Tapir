@@ -15,7 +15,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles, runsAndLumis
 ### central nanoAOD modules
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsModule
-from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight_2016, puAutoWeight_2017, puAutoWeight_2018
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight_2016, puAutoWeight_2017, puAutoWeight_2018, puWeight_2017
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import *
 ### other modules
 from TTH.Analyzer.boostedAnalyzer import boostedAnalyzer
@@ -89,11 +89,11 @@ METFilters = "( (Flag_goodVertices==1) && (Flag_globalSuperTightHalo2016Filter==
 if not isMC: METFilters = METFilters + ' && (Flag_eeBadScFilter==1)'
 
 if args.year.startswith('2016'): Triggers = "( (HLT_Ele27_WPTight_Gsf==1) || (HLT_IsoMu24==1) || (HLT_IsoTkMu24==1) )"
-elif args.year.startswith('2017'): Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) )"
+elif args.year.startswith('2017'): Triggers = "( (HLT_Ele35_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) )"
 elif args.year.startswith('2018'): Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24==1) )"
 
 cuts = PV + " && " + METFilters + " && " + Triggers
-#cuts= precuts+' && ( (event==1550213) ) || (event==1550290) || (event==1550342) || (event==1550361) || (event==1550369) || (event==1550387) || (event==1550396) || (event==1550467) || (event==1550502) || (event==1550566) )'
+#cuts= precuts+' && ( (event==1550290) || (event==1550342) || (event==1550361) || (event==1550387) || (event==1550467) || (event==1550502) || (event==1550607) || (event==1550660) )'
 
 ### lepton scale factors files. This assumes that the files are stored in TTH/Analyzer/data/
 LeptonSF = {
@@ -123,7 +123,7 @@ LeptonSF = {
     },
     '2018' : {
         'muon' : {
-            'Trigger' : [ "EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root", "IsoMu27_PtEtaBins/pt_abseta_ratio" ],
+            'Trigger' : [ "EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root", "IsoMu24_PtEtaBins/pt_abseta_ratio" ],
             'ID' : [ "MuonID_2018_RunABCD_SF_ID.root", "NUM_TightID_DEN_TrackerMuons_pt_abseta", True ],
             'ISO' : [ "MuonID_2018_RunABCD_SF_ISO.root", "NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta", True ],
         },
@@ -139,6 +139,7 @@ listOfModules = []
 listOfModules.append( countHistogramsModule() )
 if isMC:
     if args.year.startswith('2016'): listOfModules.append( puAutoWeight_2016() )
+    #elif args.year.startswith('2017'): listOfModules.append( puWeight_2017() )
     elif args.year.startswith('2017'): listOfModules.append( puAutoWeight_2017() )
     elif args.year.startswith('2018'): listOfModules.append( puAutoWeight_2018() )
 jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert="All", redojec=True)
@@ -159,10 +160,10 @@ if args.process.startswith( ('both', 'resolved') ):
         branchsel="keep_and_drop.txt",
         modules=listOfModules,
         provenance=True, ### copy MetaData and ParametersSets
-        haddFileName = "nano_postprocessed"+args.oFile+".root",
+        #haddFileName = "nano_postprocessed"+args.oFile+".root",
         histFileName = "histograms"+args.oFile+".root",
         histDirName = 'tthbb13',
-        fwkJobReport=True,
+        #fwkJobReport=True,
         maxEntries=args.numEvents,
         prefetch=args.local,
         longTermCache=args.local,
