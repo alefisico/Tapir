@@ -46,9 +46,9 @@ def setSelection( listSel, xMin=0.65, yMax=0.65, align='right' ):
         yMax = yMax -0.05
 
 
-
 ######################################################
 ### mass decorrelation functions
+### This was just a test, but maybe needed later
 ######################################################
 def computeDDTMap(working_point,deepboosted_rho_pt):
     """docstring for computeDDTMap based on https://gitlab.cern.ch/abenecke/scripts/blob/master/diboson/taggerstudies/create_2D_decorrelation.py"""
@@ -84,6 +84,7 @@ def computeDDTMap(working_point,deepboosted_rho_pt):
 
 
 ######################################################
+### This was just a test, but maybe needed later
 def massDecorrelation( name  ):
     """docstring for massDecorrelation based on https://gitlab.cern.ch/abenecke/scripts/blob/master/diboson/taggerstudies/create_2D_decorrelation.py"""
 
@@ -555,250 +556,9 @@ def BkgEstimation( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
         #getattr(pass_workspace, 'import')(pass_rparh, RooFit.RecycleConflictNodes(), r.RooFit.RenameAllVariablesExcept(self._suffix.replace('_',''),'x'))
         #getattr(pass_workspace, 'import')(pass_norm, r.RooFit.RecycleConflictNodes(), r.RooFit.RenameAllVariablesExcept(self._suffix.replace('_',''),'x'))
 
-
-        '''
-        #### Making the ratio pass/fail
-        bkgHistos[ 'RhoPt'+ptbin ] = TGraphAsymmErrors()
-        tmpPass = bkgHistos[ 'RhoPtPass'+ptbin ].Clone()
-        tmpFail = bkgHistos[ 'RhoPtFail'+ptbin ].Clone()
-        binWidth = int(tmpPass.GetBinWidth(1))
-
-        tmpPass.Scale( 1/tmpPass.Integral() )
-        tmpFail.Scale( 1/tmpFail.Integral() )
-        bkgHistos[ 'RhoPt'+ptbin ].Divide( tmpPass, tmpFail, 'pois')
-
-        ### simple root fit
-        bkgHistos[ 'FitRhoPt'+ptbin ] = TF1( 'fitRhoPt', 'pol1', -6, -1)
-        bkgHistos[ 'RhoPt'+ptbin ].Fit( 'fitRhoPt', 'MIR' )
-        bkgHistos[ 'RhoPt'+ptbin ].Fit( 'fitRhoPt', 'MIR' )
-        #### bkg fail x fit
-        BkgEst = tmpFail.Clone()
-        BkgEst.Multiply(bkgHistos[ 'FitRhoPt'+ptbin ])
-
-        #### simple plots
-        legend=TLegend(0.65,0.65,0.90,0.83)
-        legend.SetFillStyle(0)
-        legend.SetTextSize(0.03)
-
-        legend.AddEntry( tmpPass, 'Bkg pass ptbin('+ptbin+')', 'p'  )
-        legend.AddEntry( tmpFail, 'Bkg fail ptbin('+ptbin+')', 'l'  )
-        legend.AddEntry( BkgEst, 'Bkg fail x polynomial', 'l'  )
-
-        tdrStyle.SetPadRightMargin(0.05)
-        tdrStyle.SetPadLeftMargin(0.15)
-        canvas['bkgEst'+ptbin] = TCanvas('c1bkgEst'+ptbin, 'c1bkgEst'+ptbin,  10, 10, 750, 750 )
-        pad1 = TPad("pad1"+ptbin, "Fit"+ptbin, 0,0.207,1.00,1.00,-1)
-        pad2 = TPad("pad2"+ptbin, "Pull"+ptbin, 0,0.00,1.00,0.30,-1);
-        pad1.Draw()
-        pad2.Draw()
-
-        pad1.cd()
-        tmpPass.SetMarkerStyle(8)
-        tmpPass.GetXaxis().SetRangeUser( -10, 2 )
-        tmpPass.GetYaxis().SetTitle( 'Normalized/'+str(binWidth)+' [GeV]' )
-        tmpFail.SetLineColor(kBlue)
-        BkgEst.SetLineColor(kRed)
-        tmpPass.Draw()
-        tmpFail.Draw("hist same")
-        BkgEst.Draw("hist same")
-        legend.Draw()
-
-        CMS_lumi.cmsTextOffset = 0.0
-        CMS_lumi.relPosX = 0.13
-        CMS_lumi.CMS_lumi(pad1, 4, 0)
-
-        pad2.cd()
-        gStyle.SetOptFit(1)
-        pad2.SetGrid()
-        pad2.SetTopMargin(0)
-        pad2.SetBottomMargin(0.3)
-        tmpPad2= pad2.DrawFrame(-10, 0, 2, 2)
-
-        tmpPad2.GetXaxis().SetTitle( 'Higgs candidate #rho' )
-        tmpPad2.GetYaxis().SetTitle( "Pass/Fail" )
-        tmpPad2.GetYaxis().SetTitleOffset( 0.5 )
-        tmpPad2.GetYaxis().CenterTitle()
-        tmpPad2.SetLabelSize(0.12, 'x')
-        tmpPad2.SetTitleSize(0.12, 'x')
-        tmpPad2.SetLabelSize(0.12, 'y')
-        tmpPad2.SetTitleSize(0.12, 'y')
-        tmpPad2.SetNdivisions(505, 'x')
-        tmpPad2.SetNdivisions(505, 'y')
-        pad2.Modified()
-        bkgHistos[ 'RhoPt'+ptbin ].SetMarkerStyle(8)
-        bkgHistos[ 'RhoPt'+ptbin ].Draw('P')
-        bkgHistos[ 'FitRhoPt'+ptbin ].Draw("same")
-        pad2.Update()
-        st1 = bkgHistos[ 'RhoPt'+ptbin ].GetListOfFunctions().FindObject("stats")
-        st1.SetX1NDC(.75)
-        st1.SetX2NDC(.95)
-        st1.SetY1NDC(.75)
-        st1.SetY2NDC(.95)
-        pad2.Modified()
-
-        outputFileName = name.replace('__', '_RhoPt'+ptbin+'_')+'_PassFailPlots_'+args.version+'.'+args.ext
-        if args.log: outputFileName = outputFileName.replace('Plots','Plots_Log')
-        print('Processing.......', outputFileName)
-        canvas['bkgEst'+ptbin].SaveAs( 'Plots/'+ outputFileName )
-
-        #### Making the ratio pass/fail
-        bkgHistos[ 'MassPt'+ptbin ] = TGraphAsymmErrors()
-        tmpPass = bkgHistos[ 'MassPtPass'+ptbin ].Clone()
-        tmpFail = bkgHistos[ 'MassPtFail'+ptbin ].Clone()
-        for i in range(12,15):
-            tmpPass.SetBinContent( i, 0 )
-            tmpPass.SetBinError( i, 0 )
-            tmpFail.SetBinContent( i, 0 )
-            tmpFail.SetBinError( i, 0 )
-        binWidth = int(tmpPass.GetBinWidth(1))
-
-        #tmpPass.Scale( 1/tmpPass.Integral() )
-        #tmpFail.Scale( 1/tmpFail.Integral() )
-        bkgHistos[ 'MassPt'+ptbin ].Divide( tmpPass, tmpFail, 'pois')
-
-        #### simple root fit
-        fitLine = TF1( 'fitLine', 'pol4', xmin, 300)
-        bkgHistos[ 'MassPt'+ptbin ].Fit( 'fitLine', 'MIR' )
-        bkgHistos[ 'MassPt'+ptbin ].Fit( 'fitLine', 'MIR' )
-        #### bkg fail x fit
-        BkgEst = tmpFail.Clone()
-        BkgEst.Multiply(fitLine)
-
-        #### simple plots
-        legend=TLegend(0.65,0.65,0.90,0.83)
-        legend.SetFillStyle(0)
-        legend.SetTextSize(0.03)
-
-        legend.AddEntry( tmpPass, 'Bkg pass ptbin('+ptbin+')', 'p'  )
-        legend.AddEntry( tmpFail, 'Bkg fail ptbin('+ptbin+')', 'l'  )
-        legend.AddEntry( BkgEst, 'Bkg fail x polynomial', 'l'  )
-
-        tdrStyle.SetPadRightMargin(0.05)
-        tdrStyle.SetPadLeftMargin(0.15)
-        canvas['bkgEstMassPt'+ptbin] = TCanvas('c1bkgEstMassPt'+ptbin, 'c1bkgEstMassPt'+ptbin,  10, 10, 750, 750 )
-        pad1 = TPad("pad1"+ptbin, "Fit"+ptbin, 0,0.207,1.00,1.00,-1)
-        pad2 = TPad("pad2"+ptbin, "Pull"+ptbin, 0,0.00,1.00,0.30,-1);
-        pad1.Draw()
-        pad2.Draw()
-
-        pad1.cd()
-        tmpPass.SetMarkerStyle(8)
-        tmpPass.GetXaxis().SetRangeUser( xmin, xmax )
-        tmpPass.SetMaximum( 1.1*max(tmpPass.GetMaximum(), tmpFail.GetMaximum()) )
-        #tmpPass.GetYaxis().SetTitle( 'Normalized/'+str(binWidth)+' [GeV]' )
-        tmpPass.GetYaxis().SetTitle( 'Events/'+str(binWidth)+' [GeV]' )
-        tmpFail.SetLineColor(kBlue)
-        BkgEst.SetLineColor(kRed)
-        tmpPass.Draw()
-        tmpFail.Draw("hist same")
-        BkgEst.Draw("hist same")
-        legend.Draw()
-
-        CMS_lumi.cmsTextOffset = 0.0
-        CMS_lumi.relPosX = 0.13
-        CMS_lumi.CMS_lumi(pad1, 4, 0)
-
-        pad2.cd()
-        gStyle.SetOptFit(1)
-        pad2.SetGrid()
-        pad2.SetTopMargin(0)
-        pad2.SetBottomMargin(0.3)
-        tmpPad2= pad2.DrawFrame(xmin, 0, xmax, .2)
-
-        tmpPad2.GetXaxis().SetTitle( 'Higgs candidate softdrop mass [GeV]' )
-        tmpPad2.GetYaxis().SetTitle( "Pass/Fail" )
-        tmpPad2.GetYaxis().SetTitleOffset( 0.5 )
-        tmpPad2.GetYaxis().CenterTitle()
-        tmpPad2.SetLabelSize(0.12, 'x')
-        tmpPad2.SetTitleSize(0.12, 'x')
-        tmpPad2.SetLabelSize(0.12, 'y')
-        tmpPad2.SetTitleSize(0.12, 'y')
-        tmpPad2.SetNdivisions(505, 'x')
-        tmpPad2.SetNdivisions(505, 'y')
-        pad2.Modified()
-        bkgHistos[ 'MassPt'+ptbin ].SetMarkerStyle(8)
-        bkgHistos[ 'MassPt'+ptbin ].Draw('P')
-        fitLine.Draw("same")
-        pad2.Update()
-        st1 = bkgHistos[ 'MassPt'+ptbin ].GetListOfFunctions().FindObject("stats")
-        st1.SetX1NDC(.75)
-        st1.SetX2NDC(.95)
-        st1.SetY1NDC(.75)
-        st1.SetY2NDC(.95)
-        pad2.Modified()
-
-        outputFileName = name.replace('__', '_Pt'+ptbin+'_')+'_PassFailPlots_'+args.version+'.'+args.ext
-        if args.log: outputFileName = outputFileName.replace('Plots','Plots_Log')
-        print('Processing.......', outputFileName)
-        canvas['bkgEstMassPt'+ptbin].SaveAs( 'Plots/'+ outputFileName )
-        ##############################################
-
-        ############# TEST
-        #### bkg fail x fit
-        BkgEst = bkgHistos[ 'MassPtFail'+ptbin ].Clone()
-        #BkgEst.Multiply(bkgHistos[ 'FitRhoPt'+ptbin ])
-        BkgEst.Multiply(fitLine)
-        MCPass = bkgHistos[ 'MassPtPass'+ptbin ].Clone()
-        Ratio = TGraphAsymmErrors()
-        Ratio.Divide(MCPass.Clone(), BkgEst, 'pois')
-
-        #### simple plots
-        legend=TLegend(0.65,0.65,0.90,0.83)
-        legend.SetFillStyle(0)
-        legend.SetTextSize(0.03)
-
-        legend.AddEntry( MCPass, 'Bkg pass ptbin('+ptbin+')', 'p'  )
-        legend.AddEntry( BkgEst, 'Bkg fail x polynomial', 'l'  )
-
-        tdrStyle.SetPadRightMargin(0.05)
-        tdrStyle.SetPadLeftMargin(0.15)
-        canvas['bkgEst'+ptbin] = TCanvas('c1bkgEst'+ptbin, 'c1bkgEst'+ptbin,  10, 10, 750, 750 )
-        pad1 = TPad("pad1"+ptbin, "Fit"+ptbin, 0,0.207,1.00,1.00,-1)
-        finalPad2 = TPad("finalPad2"+ptbin, "Pull"+ptbin, 0,0.00,1.00,0.30,-1);
-        pad1.Draw()
-        finalPad2.Draw()
-
-        pad1.cd()
-        MCPass.SetMarkerStyle(8)
-        MCPass.GetXaxis().SetRangeUser( xmin, xmax )
-        MCPass.GetYaxis().SetTitle( 'Events/'+str(binWidth)+' [GeV]' )
-        BkgEst.SetLineColor(kRed)
-        MCPass.Draw()
-        BkgEst.Draw("histe same")
-        legend.Draw()
-
-        CMS_lumi.cmsTextOffset = 0.0
-        CMS_lumi.relPosX = 0.13
-        CMS_lumi.CMS_lumi(pad1, 4, 0)
-
-        finalPad2.cd()
-        finalPad2.SetGrid()
-        finalPad2.SetTopMargin(0)
-        finalPad2.SetBottomMargin(0.3)
-        tmpfinalPad2= finalPad2.DrawFrame(xmin, 0, xmax, 2)
-
-        tmpfinalPad2.GetXaxis().SetTitle( 'Higgs candidate softdrop mass [GeV]' )
-        tmpfinalPad2.GetYaxis().SetTitle( "Pass/Fail" )
-        tmpfinalPad2.GetYaxis().SetTitleOffset( 0.5 )
-        tmpfinalPad2.GetYaxis().CenterTitle()
-        tmpfinalPad2.SetLabelSize(0.12, 'x')
-        tmpfinalPad2.SetTitleSize(0.12, 'x')
-        tmpfinalPad2.SetLabelSize(0.12, 'y')
-        tmpfinalPad2.SetTitleSize(0.12, 'y')
-        tmpfinalPad2.SetNdivisions(505, 'x')
-        tmpfinalPad2.SetNdivisions(505, 'y')
-        finalPad2.Modified()
-        Ratio.SetMarkerStyle(8)
-        Ratio.Draw('P')
-        finalPad2.Update()
-
-        outputFileName = name.replace('__', '_Final'+ptbin+'_')+'_PassFailPlots_'+args.version+'.'+args.ext
-        if args.log: outputFileName = outputFileName.replace('Plots','Plots_Log')
-        print('Processing.......', outputFileName)
-        canvas['bkgEst'+ptbin].SaveAs( 'Plots/'+ outputFileName )
-
-        '''
-        ######################
+    print '-'*10
+    print 'To make it run: (dont forget to set the combine environment)'
+    print "combine -M FitDiagnostics datacard.txt  --robustFit 1 --setRobustFitAlgo Minuit2,Migrad --saveNormalizations --plot --saveShapes --saveWorkspace"
 
 
 if __name__ == '__main__':
@@ -828,6 +588,6 @@ if __name__ == '__main__':
             [ 'leadAK8Jet___2J2WdeltaRTau21__', 'Higgs candidate mass [GeV]', 100, 160, 1, False ],
             ]
 
-    #massDecorrelation( 'leadAK8JetRhoPtHbb_2JdeltaR2WTau21DDT_boostedHiggs' )
+    #massDecorrelation( 'leadAK8JetRhoPtHbb_2JdeltaR2WTau21DDT_boostedHiggs' )  ### this was just a test, but maybe needed later
     for i in plotList:
         BkgEstimation( i[0], i[2], i[3], i[4], axisX=i[1])
