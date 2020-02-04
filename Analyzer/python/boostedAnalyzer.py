@@ -437,7 +437,7 @@ class boostedAnalyzer(Module):
         #################################### Boosted
         if trigger and metcut and nlepcut and (len(goodFatJets)>0):
 
-            print( 'basic', event.run, event.luminosityBlock, int(event.event) )
+            #print( 'basic', event.run, event.luminosityBlock, int(event.event) )
             getattr( self, 'cutFlow' ).Fill( 2 )
             getattr( self, 'cutFlow_weight' ).Fill( 2, weight )
             if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 2, event.genWeight )
@@ -524,7 +524,7 @@ class boostedAnalyzer(Module):
             #### At least 2 jets for hadronic W
             if len(goodJets_Hcand)>1:
                 #print event.event, ( 'Muon' if isSLmu else 'Ele'), 'nleptons ', len(goodLeptons), ' nAK4jets ', len(goodJetsNoLep), ' nAK8jets ', len(goodFatJets), '  good nAK4jets ', len(goodJets_Hcand), ' pt/mass/msoftdrop/eta AK8jet ', goodFatJets[0].pt, goodFatJets[0].mass, goodFatJets[0].msoftdrop, goodFatJets[0].eta,' pt/eta lepton ', goodLeptons[0].pt, goodLeptons[0].eta, ' MET ', MET.pt, ' weights ', event.puWeight, np.prod(leptonWeights), leptonWeights, weight
-                print( '2J', event.run, event.luminosityBlock, int(event.event) )
+                #print( '2J', event.run, event.luminosityBlock, int(event.event) )
                 getattr( self, 'cutFlow' ).Fill( 3 )
                 getattr( self, 'cutFlow_weight' ).Fill( 3, weight )
                 if isMC: getattr( self, 'cutFlow_genWeight' ).Fill( 3, event.genWeight )
