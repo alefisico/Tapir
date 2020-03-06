@@ -1,4 +1,6 @@
-# My analyzer
+# Tapir analyzer
+
+![Happy Tapir](https://i.imgur.com/HYxDFdQ.jpg)
 
 ## Code main recipe
 
@@ -13,10 +15,36 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 
 ### adding all the packages needed
 git clone git@github.com:alefisico/Tapir.git TTH --branch 10_6_5
+git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_102X_v2
+git clone https://github.com/druini/hepaccelerate.git TTH/Analyzer/hepaccelerate
+pip install --user https://github.com/nsmith-/rhalphalib/archive/master.zip
+cmsenv 
+scram b -j 8
+```
+
+## For Combine environment
+
+[Combine](https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/) is needed for the statistical analysis. To set up the environment
+
+```bash
+export SCRAM_ARCH=slc7_amd64_gcc700
+cmsrel CMSSW_10_2_13
+cd CMSSW_10_2_13/src
+cmsenv
+git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
+cd HiggsAnalysis/CombinedLimit
+git fetch origin
+git checkout v8.0.1
+scramv1 b clean; scramv1 b
+```
+
+## To include MEM 
+
+In case one want to run the MEM discriminator, follow the instructions below (this is not needed for boosted version):
+```bash
 git clone https://gitlab.cern.ch/Zurich_ttH/MEIntegratorStandalone.git -b 10_2_X TTH/MEIntegratorStandalone
 git clone ssh://git@gitlab.cern.ch:7999/ttH/CommonClassifier.git TTH/CommonClassifier -b 10_2X_MVAvars
 git clone https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git TTH/RecoLikelihoodReconstruction
-git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_102X_v2
 
 
 mkdir -p $CMSSW_BASE/lib/$SCRAM_ARCH/
@@ -42,22 +70,6 @@ scram setup TTH/MEIntegratorStandalone/deps/gsl.xml
 
 cmsenv
 scram b -j 8
-```
-
-## For Combine environment
-
-[Combine](https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/) is needed for the statistical analysis. To set up the environment
-
-```bash
-export SCRAM_ARCH=slc7_amd64_gcc700
-cmsrel CMSSW_10_2_13
-cd CMSSW_10_2_13/src
-cmsenv
-git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
-cd HiggsAnalysis/CombinedLimit
-git fetch origin
-git checkout v8.0.1
-scramv1 b clean; scramv1 b
 ```
 
 ## More information

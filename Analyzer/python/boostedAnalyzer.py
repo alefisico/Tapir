@@ -389,7 +389,7 @@ class boostedAnalyzer(Module):
         goodLeptons.sort(key=lambda x:x.pt, reverse=True)
 
         if isMC:
-            print(self.leptonSFhelper)
+            #print(self.leptonSFhelper)
             if len(goodMuons)>0 and len(goodElectrons)==0 and isSLmu: leptonWeights= self.leptonSF( "muon", goodMuons[0] )
             elif len(goodMuons)==0 and len(goodElectrons)>0 and not isSLmu: leptonWeights = self.leptonSF( "electron", goodElectrons[0] )
             else: leptonWeights = [0, 0, 0]
