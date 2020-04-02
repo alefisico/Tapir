@@ -419,8 +419,8 @@ class boostedAnalyzer(Module):
         nbjetscut = (len(goodBjetsDeepFlav)>1)
 
         #### Weight
-        #if isMC: weight = event.puWeight * np.sign(event.genWeight) * np.prod(leptonWeights)
-        if isMC: weight = event.puWeight * np.prod(leptonWeights) ## no genWeight, it is taken into account in the normalization after
+        if isMC: weight = event.puWeight * event.genWeight * np.prod(leptonWeights)
+        #if isMC: weight = event.puWeight * np.prod(leptonWeights) ## no genWeight, it is taken into account in the normalization after
         else: weight = 1
         #self.out.fillBranch('totalWeight', weight)
 

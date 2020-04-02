@@ -7,6 +7,7 @@
 import argparse, os, shutil, sys
 import numpy as np
 import ROOT
+import uproot
 from root_numpy import root2array, tree2array
 from datasets import dictSamples, checkDict
 from dbs.apis.dbsClient import DbsApi  ## talk to DBS to get list of files in this dataset
@@ -18,39 +19,56 @@ dbsPhys03 = DbsApi('https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader')
 def computeGenWeights( inputFiles, outputName ):
     """docstring for computeGenWeights"""
 
-    ### Open root files
-    intree = ROOT.TChain("Runs")
-    intree2 = ROOT.TChain("Events")
-    if isinstance(inputFiles, list):
-        for iFile in inputFiles:
-            intree.Add(iFile)
-            intree2.Add(iFile)
-    else:
-        intree.Add(inputFiles)
-        intree2.Add(inputFiles)
-    print intree.GetEntries()
+#    ### Open root files
+#    intree = ROOT.TChain("Runs")
+#    intree2 = ROOT.TChain("Events")
+#    if isinstance(inputFiles, list):
+#        for iFile in inputFiles:
+#            intree.Add(iFile)
+#            intree2.Add(iFile)
+#    else:
+#        intree.Add(inputFiles)
+#        intree2.Add(inputFiles)
+#    print intree.GetEntries()
+#
+#    ### Convert root tree to numpy array, applying cuts
+#    arrays = tree2array( intree,
+#                            branches=['genEventCount_', 'genEventSumw_', 'genEventSumw2_'],
+#                            selection='',
+#                            #stop=1000,  #### to test only, run only 1000 events
+#                            )
+#    arrays2 = tree2array( intree2,
+#                            branches=['genWeight'],
+#                            selection='',
+#                            #stop=1000,  #### to test only, run only 1000 events
+#                            )
+#
+#    #tmp = arrays['genWeight']/arrays['genWeight'][0]
+#    #print 'Total number of events in sample: ', intree.GetEntries()
+#    #print 'Event weights per file: ', arrays['genEventSumw']
+#    print 'Total number of genEventCount in sample: ', sum(arrays['genEventCount_'])
+#    print 'Total number of genEventSumw in sample: ', sum(arrays['genEventSumw_'])
+#    print 'Total number of genEventSumw2 in sample: ', sum(arrays['genEventSumw2_'])
+#    print 'Total sum of genWeights in sample: ', sum(arrays2['genWeight'])
+#    print 'Total sum of sign(genWeights) in sample: ', sum(np.sign(arrays2['genWeight']))
 
-    ### Convert root tree to numpy array, applying cuts
-    arrays = tree2array( intree,
-                            branches=['genEventCount', 'genEventSumw', 'genEventSumw2'],
-                            selection='',
-                            #stop=1000,  #### to test only, run only 1000 events
-                            )
-    arrays2 = tree2array( intree2,
-                            branches=['genWeight'],
-                            selection='',
-                            #stop=1000,  #### to test only, run only 1000 events
-                            )
+    genEventSumw = 0
+    genEventSumw2 = 0
+    genEventCount = 0
+    genWeight = 0
+    for fi in inputFiles:
+        ff = uproot.open(fi)
+        bl = ff.get("Runs")
+        genEventSumw += bl.array("genEventSumw_").sum()
+        genEventSumw2 += bl.array("genEventSumw2_").sum()
+        genEventCount += bl.array("genEventCount_").sum()
+        bl = ff.get("Events")
+        genWeight += bl.array("genWeight").sum()
 
-    #tmp = arrays['genWeight']/arrays['genWeight'][0]
-    #print 'Total number of events in sample: ', intree.GetEntries()
-    #print 'Event weights per file: ', arrays['genEventSumw']
-    print 'Total number of genEventCount in sample: ', sum(arrays['genEventCount'])
-    print 'Total number of genEventSumw in sample: ', sum(arrays['genEventSumw'])
-    print 'Total number of genEventSumw2 in sample: ', sum(arrays['genEventSumw2'])
-    print 'Total sum of genWeights in sample: ', sum(arrays2['genWeight'])
-    print 'Total sum of sign(genWeights) in sample: ', sum(np.sign(arrays2['genWeight']))
-
+    print 'Total number of genEventCount in sample: ', genEventCount
+    print 'Total number of genEventSumw in sample: ', genEventSumw
+    print 'Total number of genEventSumw2 in sample: ', genEventSumw2
+    print 'Total sum of genWeights in sample: ', genWeight
 
 
 #####################################
@@ -80,10 +98,19 @@ if __name__ == '__main__':
     for isample, jsample  in processingSamples.items():
 
         ### Create a list from the dataset
-        fileDictList = ( dbsPhys03 if jsample.endswith('USER') else dbsGlobal).listFiles(dataset=jsample,validFileOnly=1)
-        print ("dataset %s has %d files" % (jsample, len(fileDictList)))
-        # DBS client returns a list of dictionaries, but we want a list of Logical File Names
-        #allfiles = [ "root://cms-xrd-global.cern.ch/"+dic['logical_file_name'] for dic in fileDictList ]
-        allfiles = [ "root://xrootd-cms.infn.it/"+dic['logical_file_name'] for dic in fileDictList ]
+        if isinstance( jsample, list ):
+            allfiles = []
+            for jsam in jsample:
+                fileDictList = ( dbsPhys03 if jsam.endswith('USER') else dbsGlobal).listFiles(dataset=jsam,validFileOnly=1)
+                tmpfiles = [ "root://xrootd-cms.infn.it/"+dic['logical_file_name'] for dic in fileDictList ]
+                #print tmpfiles
+                allfiles = allfiles + tmpfiles
+            #print allfiles
+        else:
+            fileDictList = ( dbsPhys03 if jsample.endswith('USER') else dbsGlobal).listFiles(dataset=jsample,validFileOnly=1)
+            # DBS client returns a list of dictionaries, but we want a list of Logical File Names
+            #allfiles = [ "root://cms-xrd-global.cern.ch/"+dic['logical_file_name'] for dic in fileDictList ]
+            allfiles = [ "root://xrootd-cms.infn.it/"+dic['logical_file_name'] for dic in fileDictList ]
+        print ("dataset %s has %d files" % (jsample, len(allfiles)))
 
         computeGenWeights( allfiles, isample )

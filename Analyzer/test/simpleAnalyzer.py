@@ -88,9 +88,15 @@ PV = "(PV_npvsGood>0)"
 METFilters = "( (Flag_goodVertices==1) && (Flag_globalSuperTightHalo2016Filter==1) && (Flag_HBHENoiseFilter==1) && (Flag_HBHENoiseIsoFilter==1) && (Flag_EcalDeadCellTriggerPrimitiveFilter==1) && (Flag_BadPFMuonFilter==1) )"
 if not isMC: METFilters = METFilters + ' && (Flag_eeBadScFilter==1)'
 
-if args.year.startswith('2016'): Triggers = "( (HLT_Ele27_WPTight_Gsf==1) || (HLT_IsoMu24==1) || (HLT_IsoTkMu24==1) )"
-elif args.year.startswith('2017'): Triggers = "( (HLT_Ele35_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) )"
-elif args.year.startswith('2018'): Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24==1) )"
+if args.year.startswith('2016'):
+    Triggers = "( (HLT_Ele27_WPTight_Gsf==1) || (HLT_IsoMu24==1) || (HLT_IsoTkMu24==1) )"
+    JSONFile = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/       Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt'
+elif args.year.startswith('2017'):
+    Triggers = "( (HLT_Ele35_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24_eta2p1==1) || (HLT_IsoMu27==1) )"
+    JSONFile = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
+elif args.year.startswith('2018'):
+    Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24==1) )"
+    JSONFile = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'
 
 cuts = PV + " && " + METFilters + " && " + Triggers
 #cuts= precuts+' && ( (event==1550290) || (event==1550342) || (event==1550361) || (event==1550387) || (event==1550467) || (event==1550502) || (event==1550607) || (event==1550660) )'
@@ -163,6 +169,7 @@ if args.process.startswith( ('both', 'resolved') ):
         #haddFileName = "nano_postprocessed"+args.oFile+".root",
         histFileName = "histograms"+args.oFile+".root",
         histDirName = 'tthbb13',
+        jsonInput=(None if isMC else JSONFile),
         #fwkJobReport=True,
         maxEntries=args.numEvents,
         prefetch=args.local,
@@ -176,6 +183,7 @@ else:
         provenance=True, ### copy MetaData and ParametersSets
         histFileName = "histograms"+args.oFile+".root",
         histDirName = 'tthbb13',
+        jsonInput=(None if isMC else JSONFile),
         maxEntries=args.numEvents,
         prefetch=args.local,
         longTermCache=args.local,
