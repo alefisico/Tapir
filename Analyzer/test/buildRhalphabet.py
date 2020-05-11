@@ -145,12 +145,13 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
     #import pdb
     #pdb.set_trace()
     rho_start = -6
-    rho_stop  = -.55#-1.6
+    rho_stop  = -1.6 #2
     rhoscaled = (rhopts - rho_start) / (rho_stop - rho_start)
     validbins = (rhoscaled >= 0) & (rhoscaled <= 1)
     rhoscaled[~validbins] = 1  # we will mask these out later
 
     # Build qcd MC pass+fail model and fit to polynomial
+    ### This model is for the prefit but helps to compute the ratio pass/fail
     qcdmodel = rl.Model("qcdmodel")
     qcdpass, qcdfail = 0., 0.
     for ptbin in range(npt):
@@ -169,46 +170,50 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
         qcdpass += passCh.getObservation().sum()
 
     qcdeff = qcdpass / qcdfail
-    tf_MCtempl = rl.BernsteinPoly("tf_MCtempl", (polyDeg, polyDeg), ['pt', 'rho'], limits=(-50, 50))
-    tf_MCtempl_params = qcdeff * tf_MCtempl(ptscaled, rhoscaled)
-    for ptbin in range(npt):
-        failCh = qcdmodel['ptbin%dfail' % ptbin]
-        passCh = qcdmodel['ptbin%dpass' % ptbin]
-        failObs = failCh.getObservation()
-        qcdparams = np.array([rl.IndependentParameter('qcdparam_ptbin%d_msdbin%d' % (ptbin, i), 0) for i in range(msd.nbins)])
-        sigmascale = 10.
-        scaledparams = failObs * (1 + sigmascale/np.maximum(1., np.sqrt(failObs)))**qcdparams
-        fail_qcd = rl.ParametericSample('ptbin%dfail_qcd' % ptbin, rl.Sample.BACKGROUND, msd, scaledparams)
-        failCh.addSample(fail_qcd)
-        pass_qcd = rl.TransferFactorSample('ptbin%dpass_qcd' % ptbin, rl.Sample.BACKGROUND, tf_MCtempl_params[ptbin, :], fail_qcd)
-        passCh.addSample(pass_qcd)
 
-        failCh.mask = validbins[ptbin]
-        passCh.mask = validbins[ptbin]
+    if args.runPrefit:
+        tf_MCtempl = rl.BernsteinPoly("tf_MCtempl", (polyDeg, polyDeg), ['pt', 'rho'], limits=(-50, 50))
+        tf_MCtempl_params = qcdeff * tf_MCtempl(ptscaled, rhoscaled)
+        for ptbin in range(npt):
+            failCh = qcdmodel['ptbin%dfail' % ptbin]
+            passCh = qcdmodel['ptbin%dpass' % ptbin]
+            failObs = failCh.getObservation()
+            qcdparams = np.array([rl.IndependentParameter('qcdparam_ptbin%d_msdbin%d' % (ptbin, i), 0) for i in range(msd.nbins)])
+            sigmascale = 10.
+            scaledparams = failObs * (1 + sigmascale/np.maximum(1., np.sqrt(failObs)))**qcdparams
+            fail_qcd = rl.ParametericSample('ptbin%dfail_qcd' % ptbin, rl.Sample.BACKGROUND, msd, scaledparams)
+            failCh.addSample(fail_qcd)
+            pass_qcd = rl.TransferFactorSample('ptbin%dpass_qcd' % ptbin, rl.Sample.BACKGROUND, tf_MCtempl_params[ptbin, :], fail_qcd)
+            passCh.addSample(pass_qcd)
 
-    qcdfit_ws = ROOT.RooWorkspace('qcdfit_ws')
-    simpdf, obs = qcdmodel.renderRoofit(qcdfit_ws)
-    qcdfit = simpdf.fitTo(obs,
-                          ROOT.RooFit.Extended(True),       ### Extended: because the TF is an extended pdf (always True)
-                          ROOT.RooFit.SumW2Error(True),     ### SumW2Error: improved error calculation for weighted unbinned likelihood fits.
-                          ROOT.RooFit.Strategy(2),
-                          ROOT.RooFit.Save(),
-                          ROOT.RooFit.Minimizer('Minuit2', 'migrad'),
-                          #ROOT.RooFit.PrintLevel(-1),
-                          )
-    qcdfit_ws.add(qcdfit)
-    if "pytest" not in sys.modules:
-         qcdfit_ws.writeToFile(os.path.join(str(tmpdir), 'ttHbb_qcdfit.root'))
-    if qcdfit.status() != 0:
-        raise RuntimeError('Could not fit qcd')
+            failCh.mask = validbins[ptbin]
+            passCh.mask = validbins[ptbin]
 
-    param_names = [p.name for p in tf_MCtempl.parameters.reshape(-1)]
-    decoVector = rl.DecorrelatedNuisanceVector.fromRooFitResult(tf_MCtempl.name + '_deco', qcdfit, param_names)
-    tf_MCtempl.parameters = decoVector.correlated_params.reshape(tf_MCtempl.parameters.shape)
-    tf_MCtempl_params_final = tf_MCtempl(ptscaled, rhoscaled)
-    tf_dataResidual = rl.BernsteinPoly("tf_dataResidual", (2, 2), ['pt', 'rho'], limits=(-20, 20))
+        qcdfit_ws = ROOT.RooWorkspace('qcdfit_ws')
+        simpdf, obs = qcdmodel.renderRoofit(qcdfit_ws)
+        qcdfit = simpdf.fitTo(obs,
+                              ROOT.RooFit.Extended(True),       ### Extended: because the TF is an extended pdf (always True)
+                              ROOT.RooFit.SumW2Error(True),     ### SumW2Error: improved error calculation for weighted unbinned likelihood fits.
+                              ROOT.RooFit.Strategy(2),
+                              ROOT.RooFit.Save(),
+                              ROOT.RooFit.Minimizer('Minuit2', 'migrad'),
+                              #ROOT.RooFit.PrintLevel(-1),
+                              )
+        qcdfit_ws.add(qcdfit)
+        if "pytest" not in sys.modules:
+             qcdfit_ws.writeToFile(os.path.join(str(tmpdir), 'ttHbb_qcdfit.root'))
+        if qcdfit.status() != 0:
+            raise RuntimeError('Could not fit qcd')
+
+        param_names = [p.name for p in tf_MCtempl.parameters.reshape(-1)]
+        decoVector = rl.DecorrelatedNuisanceVector.fromRooFitResult(tf_MCtempl.name + '_deco', qcdfit, param_names)
+        tf_MCtempl.parameters = decoVector.correlated_params.reshape(tf_MCtempl.parameters.shape)
+        tf_MCtempl_params_final = tf_MCtempl(ptscaled, rhoscaled)
+
+    #### Actual transfer function for combine
+    tf_dataResidual = rl.BernsteinPoly("tf_dataResidual", (polyDeg, polyDeg), ['pt', 'rho'], limits=(-50, 50))
     tf_dataResidual_params = tf_dataResidual(ptscaled, rhoscaled)
-    tf_params = qcdeff * tf_MCtempl_params_final * tf_dataResidual_params
+    tf_params = qcdeff * (tf_MCtempl_params_final * tf_dataResidual_params if args.runPrefit else tf_dataResidual_params )
 
     # build actual fit model now
     model = rl.Model("ttHbb")
@@ -287,6 +292,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--proc', action='store', default='1D', dest='process', help='Process to draw, example: 1D, 2D, MC.' )
     parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
     parser.add_argument('-y', '--year', action='store', default='2017', help='Year: 2016, 2017, 2018.' )
+    parser.add_argument('-f', '--runPrefit', action='store_true', help='Run prefit on MC.' )
     parser.add_argument('-c', '--cut', action='store', nargs='+', default='2J2WdeltaR', help='cut, example: "2J 2J2W"' )
     parser.add_argument('-l', '--lumi', action='store', type=float, default=41530., help='Luminosity, example: 1.' )
     parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
