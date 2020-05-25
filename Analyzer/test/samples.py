@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys,os,time
 import argparse, shutil
+import CRABClient
 from dbs.apis.dbsClient import DbsApi
 #from computeGenWeights import dictSamples as allSamples
 from datasets import dictSamples, checkDict

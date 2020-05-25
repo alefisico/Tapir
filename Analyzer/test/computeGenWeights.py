@@ -8,6 +8,7 @@ import argparse, os, shutil, sys
 import numpy as np
 import ROOT
 import uproot
+import CRABClient
 from root_numpy import root2array, tree2array
 from datasets import dictSamples, checkDict
 from dbs.apis.dbsClient import DbsApi  ## talk to DBS to get list of files in this dataset
