@@ -60,9 +60,9 @@ def computeGenWeights( inputFiles, outputName ):
     for fi in inputFiles:
         ff = uproot.open(fi)
         bl = ff.get("Runs")
-        genEventSumw += bl.array("genEventSumw_").sum()
-        genEventSumw2 += bl.array("genEventSumw2_").sum()
-        genEventCount += bl.array("genEventCount_").sum()
+        genEventSumw += bl.array("genEventSumw").sum()
+        genEventSumw2 += bl.array("genEventSumw2").sum()
+        genEventCount += bl.array("genEventCount").sum()
         bl = ff.get("Events")
         genWeight += bl.array("genWeight").sum()
 

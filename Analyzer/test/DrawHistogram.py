@@ -71,8 +71,8 @@ def rootHistograms( version, lumi, year):
     bkgFiles["QCD_HT1000to1500"] = [ TFile('Rootfiles/'+version+'/histograms_QCD_HT1000to1500'+extra+'.root'), kMagenta+3 , 'QCD' ]
     bkgFiles["QCD_HT1500to2000"] = [ TFile('Rootfiles/'+version+'/histograms_QCD_HT1500to2000'+extra+'.root'), kMagenta+3 , 'QCD' ]
     bkgFiles["QCD_HT2000toInf"] = [ TFile('Rootfiles/'+version+'/histograms_QCD_HT2000toInf'+extra+'.root'), kMagenta+3 , 'QCD' ]
-    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+version+'/histograms_TTTo2L2Nu'+extra+'.root'), kBlack, 'Non-SL t#bar{t}' ]
-    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToHadronic'+extra+'.root'), kBlack, 'Non-SL t#bar{t}' ]
+    bkgFiles["TTTo2L2Nu"] = [ TFile('Rootfiles/'+version+'/histograms_TTTo2L2Nu'+extra+'.root'), kBlack, 'Non-SL tbar{t}' ]
+    bkgFiles["TTToHadronic"] = [ TFile('Rootfiles/'+version+'/histograms_TTToHadronic'+extra+'.root'), kBlack, 'Non-SL tbar{t}' ]
     bkgFiles["ST_s-channel_4f_leptonDecays"] = [ TFile('Rootfiles/'+version+'/histograms_ST_s-channel_4f_leptonDecays'+extra+'.root'),  40, 'Single top' ]
     bkgFiles["ST_t-channel_top"] = [ TFile('Rootfiles/'+version+'/histograms_ST_t-channel_top'+extra+'.root'),  kCyan+1, 'Single top' ]
     bkgFiles["ST_t-channel_antitop"] = [ TFile('Rootfiles/'+version+'/histograms_ST_t-channel_antitop'+extra+'.root'),  kCyan+1, 'Single antitop' ]
@@ -165,8 +165,9 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
     histos = {}
     for idataLabel in dataFiles:
         if args.json:
-            for iSamData in glob.glob(folder+'/*'+idataLabel+'*'):
-                histos[ iSamData.split('out_')[1].split('.json')[0] ] = jsonToTH1( iSamData, [nameInRoot] )
+            #for iSamData in glob.glob(folder+'/*'+idataLabel+'*'):
+            #    histos[ iSamData.split('out_')[1].split('.json')[0] ] = jsonToTH1( iSamData, [nameInRoot] )
+            histos[ 'tmp' ] = jsonToTH1( folder+'out_data_merged.json', [nameInRoot] )
         else: histos[ idataLabel ] = dataFiles[idataLabel].Get( 'tthbb13/'+nameInRoot )
     for ihdata in histos.keys():
         try: histos[ 'AllData' ].Add( histos[ ihdata ].Clone() )
@@ -178,7 +179,7 @@ def plotQuality( nameInRoot, label, xmin, xmax, rebinX, labX, labY, log, moveCMS
     histos[ 'Bkg' ].Reset()
     for isamLabel in bkgFiles:
         if args.json:
-            try: histos[ isamLabel ] = jsonToTH1( folder+'/out_'+isamLabel+'.json', [nameInRoot] )
+            try: histos[ isamLabel ] = jsonToTH1( folder+'/out_'+isamLabel+'_merged.json', [nameInRoot] )
             except IOError:
                 print 'Sample missing: ', isamLabel
                 bkgFiles.pop( isamLabel )
@@ -356,8 +357,9 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
     if args.process.endswith('Data'):
         for idata in dataFiles:
             if args.json:
-                for iSamData in glob.glob(folder+'/*'+idata+'*'):
-                    dataHistos[ iSamData.split('out_')[1].split('.json')[0] ] = jsonToTH1( iSamData, [name] )
+                #for iSamData in glob.glob(folder+'/*'+idata+'*'):
+                #    dataHistos[ iSamData.split('out_')[1].split('.json')[0] ] = jsonToTH1( iSamData, [name] )
+                dataHistos[ 'tmp' ] = jsonToTH1( folder+'out_data_merged.json', [name] )
             else: dataHistos[ idata ] = dataFiles[idata].Get( 'tthbb13/'+name )
         for ihdata in dataHistos.keys():
             try: dataHistos[ 'AllData' ].Add( dataHistos[ ihdata ].Clone() )
@@ -375,7 +377,8 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
     if len(bkgFiles) > 0:
         for bkgSamples in bkgFiles:
             if args.json:
-                try: bkgHistos[ bkgSamples ] = jsonToTH1( folder+'/out_'+bkgSamples+'.json', [name] )
+                try:
+                    bkgHistos[ bkgSamples ] = jsonToTH1( folder+'/out_'+bkgSamples+'_merged.json', [name])
                 except IOError:
                     print 'Sample missing: ', bkgSamples
                     bkgFiles.pop( bkgSamples )
@@ -388,7 +391,7 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
                     print 'Sample missing :', bkgSamples
                 bkgHistos[ bkgSamples ].Scale( tmpScale )
             bkgHistos[ bkgSamples ].SetTitle(bkgSamples)
-            print(bkgSamples, round(bkgHistos[ bkgSamples ].Integral(), 2) )
+            #print(bkgSamples, round(bkgHistos[ bkgSamples ].Integral(), 2) )
             if rebinX > 1: bkgHistos[ bkgSamples ] = bkgHistos[ bkgSamples ].Rebin( rebinX )
 
             if Norm:
@@ -406,7 +409,7 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
         dummySig=0
         for sigSamples in signalFiles:
             if args.json:
-                try: signalHistos[ sigSamples ] = jsonToTH1( folder+'/out_'+sigSamples+'.json', [name] )
+                try: signalHistos[ sigSamples ] = jsonToTH1( folder+'/out_'+sigSamples+'_merged.json', [name] )
                 except IOError:
                     print 'Sample missing: ', sigSamples
                     signalFiles.pop( sigSamples )
@@ -467,6 +470,8 @@ def plotSignalBkg( name, xmin, xmax, rebinX, axisX='', axisY='', labX=0.92, labY
 
     hBkg = bkgHistos[next(iter(bkgHistos))].Clone()
     hBkg.Reset()
+    for bkgSamples in bkgHistos:
+        print bkgSamples, round(bkgHistos[ bkgSamples ].Integral(), 2)
 
     if not Norm:
 
@@ -698,19 +703,23 @@ if __name__ == '__main__':
             [ 'signalBkg', 'lepton_pt', 'Lepton pT [GeV]', 0, 500, 2,  0.85, 0.70, True, False],
             [ 'signalBkg', 'lepton_eta', 'Lepton #eta', -3, 3, 2,  0.85, 0.70, False, False],
             [ 'signalBkg', 'njets', 'Number of AK4 jets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'btags', 'Number of AK4 b-tagged jets', 0, 10, 1,  0.85, 0.70, False, False],
             [ 'signalBkg', 'leading_jet_pt', 'Leading AK4 jet pT [GeV]', 0, 500, 1,  0.85, 0.70, True, False],
             [ 'signalBkg', 'leading_jet_eta', 'Leading AK4 jets #eta', -3, 3, 2,  0.85, 0.70, False, False],
-            #[ 'signalBkg', 'nBjets', 'Number of AK4 bjets', 0, 10, 1,  0.85, 0.70, False, False],
-            #[ 'signalBkg', 'nAK8jets', 'Number of AK8 jets', 0, 10, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'nfatjets', 'Number of AK8 jets', 0, 10, 1,  0.85, 0.70, False, False],
             [ 'signalBkg', 'met', 'MET [GeV]', 0, 800, 2,  0.85, 0.70, True, False],
-            [ 'signalBkg', 'lepWMass', 'Leptonic W mass [GeV]', 50, 250, 1,  0.85, 0.70, True, False],
+            [ 'signalBkg', 'lepWMass', 'Leptonic W mass [GeV]', 50, 150, 1,  0.85, 0.70, True, False],
             [ 'signalBkg', 'lepWPt', 'Leptonic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
-            [ 'signalBkg', 'hadWMass', 'Hadronic W mass [GeV]', 0, 200, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'hadWMass', 'Hadronic W mass [GeV]', 50, 150, 1,  0.85, 0.70, False, False],
             [ 'signalBkg', 'hadWPt', 'Hadronic W pT [GeV]', 0, 300, 2,  0.85, 0.70, True, False],
             [ 'signalBkg', 'leadAK8JetPt', 'Leading AK8 jet pT [GeV]', 100, 1500, 5, 0.85, 0.70, True, False],
-            [ 'signalBkg', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, 0.85, 0.70, True, False ],
+            [ 'signalBkg', 'leadAK8JetEta', 'Leading AK8 jet #eta', -3, 3, 2,  0.85, 0.70, False, False],
+            #[ 'signalBkg', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 60, 200, 5, 0.85, 0.70, True, False ],
+            [ 'signalBkg', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 90, 160, 5, 0.85, 0.70, True, False ],
             [ 'signalBkg', 'leadAK8JetTau21', 'Leading AK8 jet #tau_{21}', 0, 1, 2, 0.85, 0.70, True, False ],
             [ 'signalBkg', 'leadAK8JetHbb', 'Leading AK8 jet Hbb', 0, 1, 2, 0.85, 0.70, True, False ],
+            [ 'signalBkg', 'deltaRlepWHiggs', '#Delta R(W_{lep}, AK8 jet)', 0, 5, 1,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'deltaRhadWHiggs', '#Delta R(W_{had}, AK8 jet)', 0, 5, 1,  0.85, 0.70, False, False],
 
             [ 'stack', 'leadAK8JetMass', 'Leading AK8 jet mass [GeV]', 30, 250, 2, 0.85, 0.70, True, False ],
 
@@ -744,8 +753,8 @@ if __name__ == '__main__':
 
     VER = args.version.split('_')[1] if '_' in args.version else args.version
     bkgFiles, signalFiles, dataFiles = rootHistograms( VER, args.lumi, args.year )
-    folder = '/eos/home-a/algomez/tmpFiles/hepacc/results/'+args.version+'/'+args.year+'/'
-    #folder = '/eos/home-a/algomez/tmpFiles/hepacc/results/v02/2017_noLepWeight/2017/'
+    #folder = '/afs/cern.ch/work/a/algomez/ttH/CMSSW_10_6_5/src/TTH/Analyzer/hepaccelerate/results/v04/'+args.year+"/"
+    folder = '/afs/cern.ch/work/d/druini/public/hepaccelerate/results/'+args.year+'/v07/'+args.version+"/"
     if args.json:
         print '|-----> Ignore errors above this.'
         args.version='hepacc_'+args.version

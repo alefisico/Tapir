@@ -1,4 +1,4 @@
-drop Photon
-drop Tau
+drop Photon*
+drop Tau*
 drop L1*
 drop Soft*
