@@ -101,8 +101,8 @@ def submitJobs( job, lnfList, unitJobs ):
     #config.Data.publishDBS = 'phys03'
 
     config.section_("Site")
-    #config.Site.storageSite = options.storageSite
-    config.Site.storageSite = 'T2_CH_CERNBOX'
+    config.Site.storageSite = options.storageSite
+    #config.Site.storageSite = 'T2_CH_CERNBOX'
     #config.Site.whitelist = [ 'T2_CH_CSCS' ]
     #config.Site.blacklist = ['T2_US_Florida','T3_TW_*','T2_BR_*','T2_GR_Ioannina','T2_BR_SPRACE','T2_RU_IHEP','T2_PL_Swierk','T2_KR_KNU','T3_TW_NTU_HEP']
 
