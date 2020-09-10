@@ -66,10 +66,10 @@ def computeGenWeights( inputFiles, outputName ):
         bl = ff.get("Events")
         genWeight += bl.array("genWeight").sum()
 
-    print 'Total number of genEventCount in sample: ', genEventCount
-    print 'Total number of genEventSumw in sample: ', genEventSumw
-    print 'Total number of genEventSumw2 in sample: ', genEventSumw2
-    print 'Total sum of genWeights in sample: ', genWeight
+    print ('Total number of genEventCount in sample: ', genEventCount )
+    print ('Total number of genEventSumw in sample: ', genEventSumw )
+    print ('Total number of genEventSumw2 in sample: ', genEventSumw2 )
+    print ('Total sum of genWeights in sample: ', genWeight )
 
 
 #####################################
@@ -80,6 +80,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--datasets", action='store', dest="datasets", default="ttHTobb", help="Name of dataset to process" )
     parser.add_argument("-v", "--version", action='store', dest="version", default="v00", help="Version" )
     parser.add_argument("-y", "--year", action='store', choices=[ '2016', '2017', '2018' ],  default="2017", help="Version" )
+    parser.add_argument("-n", "--nano", action='store', choices=[ 'nanoAOD', 'nanoAODPost' ],  default="nanoAODPost", help="nanoAOD or nanoAODPost" )
 
     try: args = parser.parse_args()
     except:
@@ -90,10 +91,10 @@ if __name__ == '__main__':
     processingSamples = {}
     for sam in dictSamples:
         if 'all' in args.datasets:
-            processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][0]
+            processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][args.nano][0]
         elif sam.startswith( args.datasets ):
-            processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][0]
-    if len(processingSamples)==0: print 'No sample found. \n Have a nice day :)'
+            processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][args.nano][0]
+    if len(processingSamples)==0: print ('No sample found. \n Have a nice day :)')
 
     print(processingSamples)
     for isample, jsample  in processingSamples.items():
@@ -112,6 +113,7 @@ if __name__ == '__main__':
             # DBS client returns a list of dictionaries, but we want a list of Logical File Names
             #allfiles = [ "root://cms-xrd-global.cern.ch/"+dic['logical_file_name'] for dic in fileDictList ]
             allfiles = [ "root://xrootd-cms.infn.it/"+dic['logical_file_name'] for dic in fileDictList ]
+            #allfiles = [ "root://t3dcachedb.psi.ch:1094//pnfs/psi.ch/cms/trivcat/"+dic['logical_file_name'] for dic in fileDictList ]
         print ("dataset %s has %d files" % (jsample, len(allfiles)))
 
         computeGenWeights( allfiles, isample )
