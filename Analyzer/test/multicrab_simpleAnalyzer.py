@@ -92,16 +92,17 @@ def submitJobs( job, lnfList, unitJobs ):
     config.section_("JobType")
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'PSet.py'
-    config.JobType.maxMemoryMB = 5000
+    #config.JobType.maxMemoryMB = 5000
     #config.JobType.maxJobRuntimeMin = 2750
 
     config.section_("Data")
     #config.Data.ignoreLocality = True
-    #config.Data.publication = True
+    config.Data.publication = True
     #config.Data.publishDBS = 'phys03'
 
     config.section_("Site")
     config.Site.storageSite = options.storageSite
+    #config.Site.ignoreGlobalBlacklist = True
     #config.Site.storageSite = 'T2_CH_CERNBOX'
     #config.Site.whitelist = [ 'T2_CH_CSCS' ]
     #config.Site.blacklist = ['T2_US_Florida','T3_TW_*','T2_BR_*','T2_GR_Ioannina','T2_BR_SPRACE','T2_RU_IHEP','T2_PL_Swierk','T2_KR_KNU','T3_TW_NTU_HEP']
@@ -115,15 +116,18 @@ def submitJobs( job, lnfList, unitJobs ):
     if options.textFile:
         config.Data.userInputFiles = lfnList
         config.Data.splitting = 'FileBased'
+        config.Data.unitsPerJob = unitJobs
         config.Data.outputPrimaryDataset = job
     else:
         config.Data.inputDataset = lfnList ### it is the dataset name
         config.Data.splitting = 'FileBased'
         config.Data.unitsPerJob = unitJobs
+        #config.Data.splitting = 'LumiBased'
+        #config.Data.unitsPerJob = 1000
 
     config.JobType.outputFiles = [ 'nano_postprocessed.root' ]#, 'histograms.root' ]
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/tmpFiles/ttH/'
-    ##config.Data.inputDBS = 'phys03'
+    #config.Data.inputDBS = 'phys03'
 
     outputTag = 'nanoAODPostProcessor'
     requestname = job + '_' +outputTag + '_' + options.year + '_' + options.version
@@ -229,10 +233,12 @@ if __name__ == '__main__':
         else:
             for sam in dictSamples:
                 if 'all' in options.datasets:
-                    for sam in dictSamples: processingSamples[ sam ] = checkDict( sam, dictSamples )[options.year][0]
+                    for sam in dictSamples: processingSamples[ sam ] = checkDict( sam, dictSamples )[options.year]['nanoAOD'][0]
                 else:
                     for sam in dictSamples:
-                        if sam.startswith( options.datasets ): processingSamples[ sam ] = checkDict( sam, dictSamples )[options.year][0]
+                        if sam.startswith( options.datasets ):
+                            try: processingSamples[ sam ] = checkDict( sam, dictSamples )[options.year]['nanoAOD'][0]
+                            except KeyError: continue
                 if len(processingSamples)==0: print 'No sample found. \n Have a nice day :)'
 
 #        #dictSamples[ 'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8' ] = [ '/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_new_pmx_102X_mc2017_realistic_v7-v1/NANOAODSIM' ]
@@ -258,7 +264,8 @@ if __name__ == '__main__':
 
         if options.textFile:
             rootLines = open( processingSamples[isam][0] ).readlines()
-            lfnList = [ lfnList.append( str(iroot[:-1] ) ) for iroot in rootLines ]
+            #lfnList = [ lfnList.append( str(iroot[:-1] ) ) for iroot in rootLines ]
+            lfnList = [ str(iroot[:-1]) for iroot in rootLines ]
         else:
             lfnList = processingSamples[isam]
         #    # DBS client returns a list of dictionaries, but we want a list of Logical File Names

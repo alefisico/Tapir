@@ -81,7 +81,10 @@ parser.add_argument(
 )
 args = parser.parse_args(sys.argv[1:])
 
-if args.sample.startswith( ('EGamma', 'Single', 'Double', 'MuonEG') ): isMC = False
+if args.sample.startswith( ('EGamma', 'Single', 'Double', 'MuonEG') ):
+    isMC = False
+    dataPeriod= args.sample.split(args.year)[1][0]
+    print('Running on data')
 else: isMC = True
 
 ### General selections:
@@ -99,7 +102,7 @@ elif args.year.startswith('2018'):
     Triggers = "( (HLT_Ele32_WPTight_Gsf==1) || (HLT_Ele28_eta2p1_WPTight_Gsf_HT150==1) || (HLT_IsoMu24==1) )"
     JSONFile = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'
 
-cuts = PV + " && " + METFilters + " && " + Triggers
+cuts = PV + " && " + METFilters + " && " + Triggers # + ' && ((event==98691416) || (event==114742201))'
 #cuts= precuts+' && ( (event==1550290) || (event==1550342) || (event==1550361) || (event==1550387) || (event==1550467) || (event==1550502) || (event==1550607) || (event==1550660) )'
 
 ### lepton scale factors files. This assumes that the files are stored in TTH/Analyzer/data/
@@ -148,15 +151,15 @@ if isMC:
     if args.year.startswith('2016'): listOfModules.append( puAutoWeight_2016() )
     elif args.year.startswith('2017'): listOfModules.append( puAutoWeight_2017() )
     elif args.year.startswith('2018'): listOfModules.append( puAutoWeight_2018() )
-jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert="All", redojec=True, metBranchName=('METFixEE2017' if args.year.startswith('2017') else 'MET'))
+jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert=("Merged" if isMC else 'Merged'), runPeriod=('' if isMC else dataPeriod), metBranchName=('METFixEE2017' if args.year.startswith('2017') else 'MET'),applyHEMfix=True)
 listOfModules.append( jetmetCorrector() )
-listOfModules.append( btagSFProducer( ( 'Legacy2016' if args.year.startswith('2016') else args.year), algo='deepjet', selectedWPs=[ 'L', 'M', 'T'] ) )
+if isMC: listOfModules.append( btagSFProducer( ( 'Legacy2016' if args.year.startswith('2016') else args.year), algo='deepjet', selectedWPs=[ 'L', 'M', 'T'] ) )
 if args.process.startswith( ('both', 'resolved') ):
     print "|----------> RUNNING RESOLVED"
     #listOfModules.append( resolvedAnalyzer( args.sample ) )
 if args.process.startswith( ('both', 'boosted') ):
     print "|----------> RUNNING BOOSTED"
-    fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert="All", redojec=True, jetType = "AK8PFPuppi")
+    fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert=("Merged" if isMC else 'Total'), runPeriod=('' if isMC else dataPeriod), jetType='AK8PFPuppi')
     listOfModules.append( fatJetCorrector() )
     #listOfModules.append( boostedAnalyzer( args.sample, LeptonSF[args.year], args.year ) )
 
@@ -182,13 +185,13 @@ else:
         '.', (inputFiles() if not args.iFile else [args.iFile]),
         cut=cuts,
         modules=listOfModules,
-        outputbranchsel="keep_and_drop.txt",
+        #outputbranchsel="",
         provenance=True, ### copy MetaData and ParametersSets
         haddFileName = "nano_postprocessed"+args.oFile+".root" if args.local else 'nano_postprocessed.root',
         #histFileName = "histograms"+args.oFile+".root",
         #histDirName = 'tthbb13',
         fwkJobReport=True,
-        jsonInput=(None if isMC else JSONFile),
+        jsonInput= None, #(None if isMC else JSONFile),
         maxEntries=args.numEvents,
         prefetch=args.local,
         longTermCache=args.local,

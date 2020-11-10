@@ -91,7 +91,9 @@ if __name__ == '__main__':
     processingSamples = {}
     for sam in dictSamples:
         if 'all' in args.datasets:
-            processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][args.nano][0]
+            if not sam.startswith('Single'):
+                try: processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][args.nano][0]
+                except KeyError: pass
         elif sam.startswith( args.datasets ):
             processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][args.nano][0]
     if len(processingSamples)==0: print ('No sample found. \n Have a nice day :)')
@@ -116,4 +118,4 @@ if __name__ == '__main__':
             #allfiles = [ "root://t3dcachedb.psi.ch:1094//pnfs/psi.ch/cms/trivcat/"+dic['logical_file_name'] for dic in fileDictList ]
         print ("dataset %s has %d files" % (jsample, len(allfiles)))
 
-        computeGenWeights( allfiles, isample )
+        #computeGenWeights( allfiles, isample )

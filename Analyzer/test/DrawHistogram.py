@@ -698,7 +698,7 @@ if __name__ == '__main__':
             [ 'qual', 'leadAK8JetTau21', 'Leading AK8 jet #tau_{21}', 0, 1, 2, 0.85, 0.70, True, False ],
             [ 'qual', 'leadAK8JetHbb', 'Leading AK8 jet Hbb', 0, 1, 2, 0.85, 0.70, True, False ],
 
-            #[ 'signalBkg', 'nPVs', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
+            [ 'signalBkg', 'PV_npvsGood', 'Number of PV', 0, 100, 2,  0.85, 0.70, False, False],
             [ 'signalBkg', 'nleps', 'Number of leptons', 0, 5, 1,  0.85, 0.70, False, False],
             [ 'signalBkg', 'lepton_pt', 'Lepton pT [GeV]', 0, 500, 2,  0.85, 0.70, True, False],
             [ 'signalBkg', 'lepton_eta', 'Lepton #eta', -3, 3, 2,  0.85, 0.70, False, False],

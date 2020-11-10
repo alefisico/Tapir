@@ -7,47 +7,21 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(),
 )
 
 process.source.fileNames = [
-            #"root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/102X_upgrade2018_realistic_v15-v1/40000/6801F357-BF95-2E41-BA2D-ABD083577275.root"
-            #'root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv5/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano1June2019_new_pmx_102X_mc2017_realistic_v7-v1/110000/4C93C46E-A48C-3344-BA8F-48D92CE4BAB3.root'
-            #'root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv5/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano1June2019_new_pmx_102X_mc2017_realistic_v7-v1/110000/F6A79C6E-E63D-4A4E-A611-473C6C5A99B8.root'
-            #'root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv5/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano1June2019_102X_mc2017_realistic_v7-v1/120000/EB7998BC-1D8B-4545-BF96-857741C0B086.root',
+        #'root://xrootd-cms.infn.it//store/data/Run2018A/EGamma/NANOAOD/02Apr2020-v1/250000/A84D4B35-BC46-2C40-BB68-1072C82FCE35.root'
+        #'root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv7/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_new_pmx_102X_mc2017_realistic_v8-v1/120000/7BDFF01C-6519-5847-B1CF-348604D57531.root'
+        'root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv7/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/022107FA-F567-1B44-B139-A18ADC996FCF.root'
+        #'root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv7/THW_ctcvcp_5f_Hincl_13TeV_madgraph_pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/260000/DA365B0B-8DC6-B44D-92AA-97E81DD46210.root'
+        #'root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv7/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21_ext1-v1/130000/9373FB4D-EE86-DC40-ABF5-00BE8B1C84AF.root'
+    #'root://xrootd-cms.infn.it//store/data/Run2017B/SingleMuon/NANOAOD/Nano1June2019-v1/40000/50AE97C4-272A-2B42-88E0-787EE5943156.root'
+    #'root://xrootd-cms.infn.it//store/data/Run2017F/SingleMuon/NANOAOD/Nano1June2019-v1/30000/713368EF-14E8-6345-BCFB-8D177C90971A.root',
+    #'BDAE7388-AA56-804E-B89F-08919D5ED75D.root'
 
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_115.root',
-
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_174.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_112.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_152.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_35.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_102.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_142.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_60.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_45.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_136.root',
-            #'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_61.root',
-            #'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_24.root',
-            #'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_ttToSemiLep_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02p1/190723_080112/0000/modifiedNanoAOD_MC_2017_123.root',
-
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_487.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_4.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_816.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_501.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_162.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_156.root',
-#            'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190720_142525/0000/modifiedNanoAOD_MC_2017_703.root',
-
-	'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190901_212040/0000/modifiedNanoAOD_MC_2017_88.root',
-	'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190901_212040/0000/modifiedNanoAOD_MC_2017_68.root',
-	#'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190901_212040/0000/modifiedNanoAOD_MC_2017_59.root',
-	#'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/ttHTobb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAOD_v02/190901_212040/0000/modifiedNanoAOD_MC_2017_108.root',
-
-#        'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/SingleMuon/Run2017B-31Mar2018-v1NANOAOD_v02/191010_145729/0000/modifiedNanoAOD_DATA_2017_177.root',
-#        'root://xrootd-cms.infn.it//store/user/algomez/ttH/nanoAOD/SingleMuon/Run2017B-31Mar2018-v1NANOAOD_v02/191010_145729/0000/modifiedNanoAOD_DATA_2017_181.root'
 ]
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.output = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string('nano_postprocessed.root'),
-    #fakeNameForCrab = cms.untracked.bool(True),
+    fakeNameForCrab = cms.untracked.bool(True),
 )
 process.out = cms.EndPath(process.output)
 

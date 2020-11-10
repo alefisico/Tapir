@@ -13,6 +13,7 @@ usage = 'usage: %prog [options]'
 parser = argparse.ArgumentParser()
 parser.add_argument( '-d', '--dataset', action='store', dest='dataset', default='ttHTobb', help='Type of sample' )
 parser.add_argument("-y", "--year", action='store', choices=[ '2016', '2017', '2018' ],  default="2017", help="Version" )
+parser.add_argument("-n", "--nano", action='store', choices=[ 'nanoAOD', 'nanoAODPost' ],  default="nanoAODPost", help="nanoAOD or nanoAODPost" )
 try: args = parser.parse_args()
 except:
     parser.print_help()
@@ -58,37 +59,41 @@ allSamples['SingleElectron_Run2018D']  = '/EGamma/Run2018D-02Apr2020-v1/NANOAOD'
 
 ## trick to run only in specific samples
 processingSamples = {}
-if args.dataset.startswith('Single'):
-    for sam in allSamples:
-        if sam.startswith( args.dataset ) and sam.startswith('Single') and sam.split('Run')[1].startswith(args.year): processingSamples[ sam ] = allSamples[ sam ]
+#if args.dataset.startswith('Single'):
+#    for sam in allSamples:
+#        if sam.startswith( args.dataset ) and sam.startswith('Single') and sam.split('Run')[1].startswith(args.year): processingSamples[ sam ] = allSamples[ sam ]
 
-elif args.dataset.startswith('all'):
+if args.dataset.startswith('all'):
     for sam in dictSamples:
-        try: processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][0]
+        try: processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][args.nano][0]
         except KeyError: continue
 else:
     for sam in dictSamples:
         if sam.startswith(args.dataset):
-            try: processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][0]
+            try: processingSamples[ sam ] = checkDict( sam, dictSamples )[args.year][args.nano][0]
             except KeyError: continue
 
 print processingSamples
 for sample, jsample in processingSamples.items():
 
     ### Create a list from the dataset
+    lfnList = []
     if isinstance( jsample, list ):
-        lfnList = []
         for jsam in jsample:
             fileDictList = ( dbsPhys03 if jsam.endswith('USER') else dbsglobal).listFiles(dataset=jsam,validFileOnly=1)
             tmpfiles = [ "root://xrootd-cms.infn.it/"+dic['logical_file_name'] for dic in fileDictList ]
             lfnList = lfnList + tmpfiles
     else:
-        fileDictList = ( dbsPhys03 if jsample.endswith('USER') else dbsglobal).listFiles(dataset=jsample,validFileOnly=1)
-        # DBS client returns a list of dictionaries, but we want a list of Logical File Names
-        #lfnList = [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
-        lfnList = [ 'root://xrootd-cms.infn.it/'+dic['logical_file_name'] for dic in fileDictList ]
-    print "dataset %s has %d files" % (jsample, len(lfnList))
+        if jsample:
+            print jsample
+            fileDictList = ( dbsPhys03 if jsample.endswith('USER') else dbsglobal).listFiles(dataset=jsample,validFileOnly=1)
+            # DBS client returns a list of dictionaries, but we want a list of Logical File Names
+            #lfnList = [ 'root://cms-xrd-global.cern.ch/'+dic['logical_file_name'] for dic in fileDictList ]
+            lfnList = [ 'root://xrootd-cms.infn.it/'+dic['logical_file_name'] for dic in fileDictList ]
 
-    textFile = open( 'condorlogs/'+sample+'_'+args.year+'.txt', 'w')
-    textFile.write("\n".join(lfnList))
+    if len(lfnList)>0:
+        print "dataset %s has %d files" % (jsample, len(lfnList))
+        textFile = open( 'txtFiles/'+sample+'_'+args.year+'.txt', 'w')
+        textFile.write("\n".join(lfnList))
+    else: print( sample, 'does not exist')
 
