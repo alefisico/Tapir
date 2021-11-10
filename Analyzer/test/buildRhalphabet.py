@@ -31,8 +31,8 @@ def load_from_json(sample, ptStart, ptStop, msd_start_idx, msd_stop_idx, region,
   return(np.array(data['contents'])[msd_start_idx:msd_stop_idx], obs.binning, obs.name)
 
 ########################################
-def mergeJsons( bkgFiles, signalFiles, folder, minMass, maxMass, histos, rebinX, ptBins ):
-    """docstring for mergeJsons"""
+def readHistos( bkgFiles, signalFiles, folder, minMass, maxMass, histos, rebinX, ptBins, mergeJSON ):
+    """docstring for readHistos"""
 
     dataHistos = {}
     bkgHistos = {}
@@ -41,32 +41,42 @@ def mergeJsons( bkgFiles, signalFiles, folder, minMass, maxMass, histos, rebinX,
     print('|----> Reading json files and merging')
     for ih in histos:
         tmpDataHistos = {}
-        for iSamData in glob.glob(folder+'/*Single*'):
-            tmpDataHistos[ iSamData.split('out_')[1].split('.json')[0] ] = jsonToTH1( iSamData, [ih] )
+        if mergeJSON:
+            for iSamData in glob.glob(folder+'/*Single*'):
+                tmpDataHistos[ iSamData.split('out_')[1].split('.json')[0] ] = jsonToTH1( iSamData, [ih] )
+        else:
+            tmpDataHistos[ 'data' ] = jsonToTH1( folder+'/out_data_merged.json', [ih] )
         for ihdata in tmpDataHistos.keys():
             try: dataHistos[ ih ].Add( tmpDataHistos[ ihdata ].Clone() )
             except (KeyError, AttributeError) as e:
                 dataHistos[ ih ] = tmpDataHistos[ ihdata ].Clone()
 
         tmpBkgHistos = {}
-        for bkgSamples in bkgFiles:
-            try: tmpBkgHistos[ bkgSamples+ih ] = jsonToTH1( folder+'/out_'+bkgSamples+'.json', [ih] )
-            except IOError:
-                print('Sample missing: ', bkgSamples)
-                bkgFiles.remove( bkgSamples )
-                continue
+        if mergeJSON:
+            for bkgSamples in bkgFiles:
+                try: tmpBkgHistos[ bkgSamples+ih ] = jsonToTH1( folder+'/out_'+bkgSamples+'.json', [ih] )
+                except IOError:
+                    print('Sample missing: ', bkgSamples)
+                    bkgFiles.remove( bkgSamples )
+                    continue
+        else:
+            tmpBkgHistos[ 'bkg'+ih ] = jsonToTH1( folder+'/out_background_merged.json', [ih] )
+
         for ihbkg in tmpBkgHistos.keys():
             try: bkgHistos[ ih ].Add( tmpBkgHistos[ ihbkg ].Clone() )
             except (KeyError, AttributeError) as e:
                 bkgHistos[ ih ] = tmpBkgHistos[ ihbkg ].Clone()
 
         tmpSignalHistos = {}
-        for sigSamples in signalFiles:
-            try: tmpSignalHistos[ sigSamples+ih ] = jsonToTH1( folder+'/out_'+sigSamples+'.json', [ih] )
-            except IOError:
-                print('Sample missing: ', sigSamples)
-                signalFiles.remove( sigSamples )
-                continue
+        if mergeJSON:
+            for sigSamples in signalFiles:
+                try: tmpSignalHistos[ sigSamples+ih ] = jsonToTH1( folder+'/out_'+sigSamples+'.json', [ih] )
+                except IOError:
+                    print('Sample missing: ', sigSamples)
+                    signalFiles.remove( sigSamples )
+                    continue
+        else:
+            tmpSignalHistos[ 'signal'+ih ] = jsonToTH1( folder+'/out_signal_merged.json', [ih] )
         for ihsig in tmpSignalHistos.keys():
             try: signalHistos[ ih ].Add( tmpSignalHistos[ ihsig ].Clone() )
             except (KeyError, AttributeError) as e:
@@ -79,11 +89,12 @@ def mergePtBinsAndCreateArrays( dictHistos, ptBins, reBin, minMass, maxMass ):
     """helper to merge pt bins and create arrays"""
 
     print('|----> Merging ptbins, rebinning, making new histos with different ranges')
-    for pts in ptBins:
-        for ih in dictHistos.keys():
-            if ih.endswith(tuple(pts[1:])):
-                dictHistos[ ih.split('_pt')[0]+'_pt'+pts[0] ].Add( dictHistos[ih].Clone() )
-                dictHistos.pop( ih, None )
+    if len(ptBins)>0:
+        for pts in ptBins:
+            for ih in dictHistos.keys():
+                if ih.endswith(tuple(pts[1:])):
+                    dictHistos[ ih.split('_pt')[0]+'_pt'+pts[0] ].Add( dictHistos[ih].Clone() )
+                    dictHistos.pop( ih, None )
 
     finalDictHistos = {}
     for ih in dictHistos.keys():
@@ -102,7 +113,7 @@ def mergePtBinsAndCreateArrays( dictHistos, ptBins, reBin, minMass, maxMass ):
         for ibin in range(1,dictHistos['New_'+ih].GetNbinsX()):
             binCont.append( dictHistos['New_'+ih].GetBinContent(ibin) )
             binErr.append( dictHistos['New_'+ih].GetBinError(ibin) )
-        finalDictHistos[ ih.split('21_')[1].split('to')[0] ] = [ dictHistos['New_'+ih], binCont, binErr ]
+        finalDictHistos[ ih.split('deltaR_')[1].split('to')[0] ] = [ dictHistos['New_'+ih], binCont, binErr ]
 
     return finalDictHistos
 
@@ -116,7 +127,7 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
     for ihbkg in bkgHistos:
         can = ROOT.TCanvas('can'+ihbkg, 'can'+ihbkg, 750, 500)
         bkgHistos[ihbkg][0].Draw()
-        can.SaveAs('Plots/Rhalphabet_checks_'+ihbkg+'.png')
+        can.SaveAs('Plots/Rhalphabet_checks_'+ihbkg+'_'+('MCasDATA' if args.isMC else 'DATA')+'.png')
 
 
     throwPoisson = False
@@ -126,10 +137,8 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
     tqqeffSF = rl.IndependentParameter('tqqeffSF', 1., 0, 10)
     tqqnormSF = rl.IndependentParameter('tqqnormSF', 1., 0, 10)
 
-    #ptbins = np.array([450, 500, 550, 600, 675, 800, 1200])
-    #ptbins = np.append( np.arange(250,600,50), [600, 675, 800, 1200] )
-    #ptbins = np.array([250,300,450,1200])
-    ptbins = np.array(ptBins+[1500])
+    ptbins = np.array([250,300,2000])
+    #ptbins = np.array(ptBins+[1500])
     npt = len(ptbins) - 1
     #msdbins = np.linspace(0,300,21)
     msdbins = np.linspace( dataHistos[ next(iter(dataHistos)) ][0].GetBinLowEdge(1), dataHistos[ next(iter(dataHistos)) ][0].GetXaxis().GetXmax(), dataHistos[ next(iter(dataHistos)) ][0].GetNbinsX()+1 )
@@ -142,56 +151,54 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
     ptpts, msdpts = np.meshgrid(ptbins[:-1] + 0.3 * np.diff(ptbins), msdbins[:-1] + 0.5 * np.diff(msdbins), indexing='ij')
     rhopts = 2*np.log(msdpts/ptpts)
     ptscaled = (ptpts - ptbins[0]) / (ptbins[-1] - ptbins[0])
-    #import pdb
-    #pdb.set_trace()
     rho_start = -6
-    rho_stop  = -1.6 #2
+    rho_stop  = -1.2
     rhoscaled = (rhopts - rho_start) / (rho_stop - rho_start)
     validbins = (rhoscaled >= 0) & (rhoscaled <= 1)
     rhoscaled[~validbins] = 1  # we will mask these out later
 
-    # Build qcd MC pass+fail model and fit to polynomial
+    # Build bkg MC pass+fail model and fit to polynomial
     ### This model is for the prefit but helps to compute the ratio pass/fail
-    qcdmodel = rl.Model("qcdmodel")
-    qcdpass, qcdfail = 0., 0.
+    bkgmodel = rl.Model("bkgmodel")
+    bkgpass, bkgfail = 0., 0.
     for ptbin in range(npt):
 
         failCh = rl.Channel("ptbin%d%s" % (ptbin, 'fail'))
         passCh = rl.Channel("ptbin%d%s" % (ptbin, 'pass'))
-        qcdmodel.addChannel(failCh)
-        qcdmodel.addChannel(passCh)
+        bkgmodel.addChannel(failCh)
+        bkgmodel.addChannel(passCh)
         #failTempl = load_from_json('background', ptbins[ptbin], ptbins[ptbin+1], msd_start_idx, msd_stop_idx, 'Fail', msd)
         #passTempl = load_from_json('background', ptbins[ptbin], ptbins[ptbin+1], msd_start_idx, msd_stop_idx, 'Pass', msd)
-        failTempl = bkgHistos['Fail_pt'+str(ptbins[ptbin])][0] #[1][msd_start_idx:msd_stop_idx]
-        passTempl = bkgHistos['Pass_pt'+str(ptbins[ptbin])][0] #[1][msd_start_idx:msd_stop_idx]
+        failTempl = bkgHistos['Fail_pt'+str(ptbins[ptbin])][0] if args.isMC else dataHistos['Fail_pt'+str(ptbins[ptbin])][0]
+        passTempl = bkgHistos['Pass_pt'+str(ptbins[ptbin])][0] if args.isMC else dataHistos['Pass_pt'+str(ptbins[ptbin])][0]
         failCh.setObservation(failTempl)
         passCh.setObservation(passTempl)
-        qcdfail += failCh.getObservation().sum()
-        qcdpass += passCh.getObservation().sum()
+        bkgfail += failCh.getObservation().sum()
+        bkgpass += passCh.getObservation().sum()
 
-    qcdeff = qcdpass / qcdfail
+    bkgeff = bkgpass / bkgfail
 
     if args.runPrefit:
         tf_MCtempl = rl.BernsteinPoly("tf_MCtempl", (polyDeg, polyDeg), ['pt', 'rho'], limits=(-50, 50))
-        tf_MCtempl_params = qcdeff * tf_MCtempl(ptscaled, rhoscaled)
+        tf_MCtempl_params = bkgeff * tf_MCtempl(ptscaled, rhoscaled)
         for ptbin in range(npt):
-            failCh = qcdmodel['ptbin%dfail' % ptbin]
-            passCh = qcdmodel['ptbin%dpass' % ptbin]
+            failCh = bkgmodel['ptbin%dfail' % ptbin]
+            passCh = bkgmodel['ptbin%dpass' % ptbin]
             failObs = failCh.getObservation()
-            qcdparams = np.array([rl.IndependentParameter('qcdparam_ptbin%d_msdbin%d' % (ptbin, i), 0) for i in range(msd.nbins)])
+            bkgparams = np.array([rl.IndependentParameter('bkgparam_ptbin%d_msdbin%d' % (ptbin, i), 0) for i in range(msd.nbins)])
             sigmascale = 10.
-            scaledparams = failObs * (1 + sigmascale/np.maximum(1., np.sqrt(failObs)))**qcdparams
-            fail_qcd = rl.ParametericSample('ptbin%dfail_qcd' % ptbin, rl.Sample.BACKGROUND, msd, scaledparams)
-            failCh.addSample(fail_qcd)
-            pass_qcd = rl.TransferFactorSample('ptbin%dpass_qcd' % ptbin, rl.Sample.BACKGROUND, tf_MCtempl_params[ptbin, :], fail_qcd)
-            passCh.addSample(pass_qcd)
+            scaledparams = failObs * (1 + sigmascale/np.maximum(1., np.sqrt(failObs)))**bkgparams
+            fail_bkg = rl.ParametericSample('ptbin%dfail_bkg' % ptbin, rl.Sample.BACKGROUND, msd, scaledparams)
+            failCh.addSample(fail_bkg)
+            pass_bkg = rl.TransferFactorSample('ptbin%dpass_bkg' % ptbin, rl.Sample.BACKGROUND, tf_MCtempl_params[ptbin, :], fail_bkg)
+            passCh.addSample(pass_bkg)
 
             failCh.mask = validbins[ptbin]
             passCh.mask = validbins[ptbin]
 
-        qcdfit_ws = ROOT.RooWorkspace('qcdfit_ws')
-        simpdf, obs = qcdmodel.renderRoofit(qcdfit_ws)
-        qcdfit = simpdf.fitTo(obs,
+        bkgfit_ws = ROOT.RooWorkspace('bkgfit_ws')
+        simpdf, obs = bkgmodel.renderRoofit(bkgfit_ws)
+        bkgfit = simpdf.fitTo(obs,
                               ROOT.RooFit.Extended(True),       ### Extended: because the TF is an extended pdf (always True)
                               ROOT.RooFit.SumW2Error(True),     ### SumW2Error: improved error calculation for weighted unbinned likelihood fits.
                               ROOT.RooFit.Strategy(2),
@@ -199,21 +206,21 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
                               ROOT.RooFit.Minimizer('Minuit2', 'migrad'),
                               #ROOT.RooFit.PrintLevel(-1),
                               )
-        qcdfit_ws.add(qcdfit)
+        bkgfit_ws.add(bkgfit)
         if "pytest" not in sys.modules:
-             qcdfit_ws.writeToFile(os.path.join(str(tmpdir), 'ttHbb_qcdfit.root'))
-        if qcdfit.status() != 0:
-            raise RuntimeError('Could not fit qcd')
+             bkgfit_ws.writeToFile(os.path.join(str(tmpdir), 'ttHbb_bkgfit_'+('MCasDATA' if args.isMC else 'DATA')+'.root'))
+        if bkgfit.status() != 0:
+            raise RuntimeError('Could not fit bkg')
 
         param_names = [p.name for p in tf_MCtempl.parameters.reshape(-1)]
-        decoVector = rl.DecorrelatedNuisanceVector.fromRooFitResult(tf_MCtempl.name + '_deco', qcdfit, param_names)
+        decoVector = rl.DecorrelatedNuisanceVector.fromRooFitResult(tf_MCtempl.name + '_deco', bkgfit, param_names)
         tf_MCtempl.parameters = decoVector.correlated_params.reshape(tf_MCtempl.parameters.shape)
         tf_MCtempl_params_final = tf_MCtempl(ptscaled, rhoscaled)
 
     #### Actual transfer function for combine
-    tf_dataResidual = rl.BernsteinPoly("tf_dataResidual", (polyDeg, polyDeg), ['pt', 'rho'], limits=(-50, 50))
+    tf_dataResidual = rl.BernsteinPoly("tf_dataResidual", (polyDeg, polyDeg), ['pt', 'rho'], limits=(-10, 10), coefficient_transform=np.exp )
     tf_dataResidual_params = tf_dataResidual(ptscaled, rhoscaled)
-    tf_params = qcdeff * (tf_MCtempl_params_final * tf_dataResidual_params if args.runPrefit else tf_dataResidual_params )
+    tf_params = bkgeff * (tf_MCtempl_params_final * tf_dataResidual_params if args.runPrefit else tf_dataResidual_params )
 
     # build actual fit model now
     model = rl.Model("ttHbb")
@@ -247,31 +254,31 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
 
             #yields = sum(tpl[0] for tpl in templates.values())
             #data_obs = (yields, msd.binning, msd.name)
-            data_obs = bkgHistos[region+'_pt'+str(ptbins[ptbin])][0]
+            data_obs = bkgHistos[region+'_pt'+str(ptbins[ptbin])][0] if args.isMC else dataHistos[region+'_pt'+str(ptbins[ptbin])][0]
             ch.setObservation(data_obs)
 
             # drop bins outside rho validity
             mask = validbins[ptbin]
             # blind bins 11, 12, 13
-            # mask[11:14] = False
+            if not args.isMC: mask[4:9] = False
             ch.mask = mask
 
     for ptbin in range(npt):
         failCh = model['ptbin%dFail' % ptbin]
         passCh = model['ptbin%dPass' % ptbin]
 
-        qcdparams = np.array([rl.IndependentParameter('qcdparam_ptbin%d_msdbin%d' % (ptbin, i), 0) for i in range(msd.nbins)])
-        initial_qcd = failCh.getObservation().astype(float)  # was integer, and numpy complained about subtracting float from it
+        bkgparams = np.array([rl.IndependentParameter('bkgparam_ptbin%d_msdbin%d' % (ptbin, i), 0) for i in range(msd.nbins)])
+        initial_bkg = failCh.getObservation().astype(float)  # was integer, and numpy complained about subtracting float from it
         for sample in failCh:
-            initial_qcd -= sample.getExpectation(nominal=True)
-        if np.any(initial_qcd < 0.):
-            raise ValueError("initial_qcd negative for some bins..", initial_qcd)
+            initial_bkg -= sample.getExpectation(nominal=True)
+        if np.any(initial_bkg < 0.):
+            raise ValueError("initial_bkg negative for some bins..", initial_bkg)
         sigmascale = 10  # to scale the deviation from initial
-        scaledparams = initial_qcd * (1 + sigmascale/np.maximum(1., np.sqrt(initial_qcd)))**qcdparams
-        fail_qcd = rl.ParametericSample('ptbin%dFail_qcd' % ptbin, rl.Sample.BACKGROUND, msd, scaledparams)
-        failCh.addSample(fail_qcd)
-        pass_qcd = rl.TransferFactorSample('ptbin%dPass_qcd' % ptbin, rl.Sample.BACKGROUND, tf_params[ptbin, :], fail_qcd)
-        passCh.addSample(pass_qcd)
+        scaledparams = initial_bkg * (1 + sigmascale/np.maximum(1., np.sqrt(initial_bkg)))**bkgparams
+        fail_bkg = rl.ParametericSample('ptbin%dFail_bkg' % ptbin, rl.Sample.BACKGROUND, msd, scaledparams)
+        failCh.addSample(fail_bkg)
+        pass_bkg = rl.TransferFactorSample('ptbin%dPass_bkg' % ptbin, rl.Sample.BACKGROUND, tf_params[ptbin, :], fail_bkg)
+        passCh.addSample(pass_bkg)
 
         #tqqpass = passCh['tqq']
         #tqqfail = failCh['tqq']
@@ -281,10 +288,10 @@ def buildRhalphabet( dataHistos, bkgHistos, signalHistos, tmpdir, polyDeg, msd_s
         #tqqpass.setParamEffect(tqqnormSF, 1*tqqnormSF)
         #tqqfail.setParamEffect(tqqnormSF, 1*tqqnormSF)
 
-    with open(os.path.join(str(tmpdir), 'RhalphabetResults/ttHbb.pkl'), "wb") as fout:
+    with open(os.path.join(str(tmpdir), 'RhalphabetResults/Bias/ttHbb_'+('MCasDATA' if args.isMC else 'DATA')+'.pkl'), "wb") as fout:
         pickle.dump(model, fout)
 
-    model.renderCombine(os.path.join(str(tmpdir), 'RhalphabetResults/'))
+    model.renderCombine(os.path.join(str(tmpdir), 'RhalphabetResults/Bias/'))
 
 if __name__ == '__main__':
 
@@ -293,6 +300,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--version', action='store', default='v0', help='Version: v01, v02.' )
     parser.add_argument('-y', '--year', action='store', default='2017', help='Year: 2016, 2017, 2018.' )
     parser.add_argument('-f', '--runPrefit', action='store_true', help='Run prefit on MC.' )
+    parser.add_argument('-d', '--isMC', action='store_true', help='Run MC as data.' )
     parser.add_argument('-c', '--cut', action='store', nargs='+', default='2J2WdeltaR', help='cut, example: "2J 2J2W"' )
     parser.add_argument('-l', '--lumi', action='store', type=float, default=41530., help='Luminosity, example: 1.' )
     parser.add_argument('-e', '--ext', action='store', default='png', help='Extension of plots.' )
@@ -302,6 +310,7 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(0)
 
+    print(args.isMC)
     if not os.path.exists('Plots/'): os.makedirs('Plots/')
     if args.year.endswith('2016'): args.lumi = 35920.
     elif args.year.endswith('2017'): args.lumi = 41530.
@@ -314,16 +323,14 @@ if __name__ == '__main__':
     bkgSamples.remove( 'ttHTobb' )
     bkgSamples.remove( 'THW' )
     sigSamples = [ 'ttHTobb', 'THW' ]
-    folder = '/eos/home-a/algomez/tmpFiles/hepacc/results/'+args.version+'/'+args.year+'/'
-    histos = [ 'hist_leadAK8JetMass_2J2WdeltaRTau21_'+region+'_pt'+pt for region in ['Pass', 'Fail'] for pt in [ '250to300', '300to350', '350to400', '400to450', '450to500', '550to600', '600to675', '675to800', '800to1200' ] ]
-    ptBins = [ ['250to300'], [ '300to350', '350to400', '400to450' ], [ '450to500', '550to600',  '600to675', '675to800', '800to1200' ]  ]
-    #ptBins = [ ['250to300'], [ '300to350', '350to400', '400to450', '450to500', '550to600',  '600to675', '675to800', '800to1200' ]  ]
-    #ptBins = [ [  '250to300', '300to350', '350to400', '400to450', '450to500', '550to600',  '600to675', '675to800', '800to1200' ]  ]
+    folder = '/afs/cern.ch/work/d/druini/public/hepaccelerate/results/'+args.year+'/'+args.version+'/met20_deepTagMD_bbvsLight08695/'
+    histos = [ 'hist_leadAK8JetMass_2J2WdeltaR_'+region+'_pt'+pt for region in ['Pass', 'Fail'] for pt in [ '250to300', '300to5000' ] ]
+    ptBins = [ ['250to300'], [ '300to5000' ]  ]
 
-    msd_start = 100
-    msd_stop  = 160
+    msd_start = 90
+    msd_stop  = 170
     polyDeg   = 2
-    dataHistos, bkgHistos, signalHistos = mergeJsons( bkgSamples, sigSamples, folder, msd_start, msd_stop, histos, 1, ptBins )
+    dataHistos, bkgHistos, signalHistos = readHistos( bkgSamples, sigSamples, folder, msd_start, msd_stop, histos, 5, ptBins, False )
     buildRhalphabet( dataHistos, bkgHistos, signalHistos, os.getcwd(), polyDeg, msd_start, msd_stop, [ int(x[0].split('to')[0]) for x in ptBins  ])
 
     ''' from Daniele

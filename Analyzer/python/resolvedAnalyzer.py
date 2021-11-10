@@ -62,11 +62,8 @@ def vec_from_list(vec_type, src):
 
 #### List of jet corrections for MEM
 jet_corrections = [
-        "jesAbsoluteStat",
-        "jesAbsoluteScale",
-        "jesAbsoluteFlavMap",
-        "jesAbsoluteMPFBias",
-        "jer"
+        "jesTotal",
+#        "jer"
 ]
 
 
@@ -80,10 +77,11 @@ ttCls['ttbb'] = '(event.genTtbarId>52) && (event.genTtbarId<57)'
 
 
 class resolvedAnalyzer(Module):
-    def __init__(self, sample="None"):
+    def __init__(self, sample="None", year='2017'):
     #def __init__(self, sample="None", parameters={}):
 	self.writeHistFile=True
         self.sample= sample
+        self.year = year
         #self.parameters = parameters
 
     def beginJob(self,histFile=None,histDirName=None):
@@ -163,21 +161,21 @@ class resolvedAnalyzer(Module):
         for unc in jet_corrections:
             for ud in ["Up","Down"]:
                 self.out.branch('MEM'+'_'+unc+ud, 'F' )
-#        self.out.branch("LeptonSFTrigger",  "F");
-#        self.out.branch("LeptonSFISO",  "F");
-#        self.out.branch("LeptonSFID",  "F");
-#        self.out.branch("nGoodLep",  "I");
-#        self.out.branch("GoodLep_pt",  "F", lenVar="nGoodLep");
-#        self.out.branch("GoodLep_eta",  "F", lenVar="nGoodLep");
-#        self.out.branch("GoodLep_phi",  "F", lenVar="nGoodLep");
-#        self.out.branch("GoodLep_mass",  "F", lenVar="nGoodLep");
-#        self.out.branch("nGoodJet",  "I");
-#        self.out.branch("GoodJet_pt",  "F", lenVar="nGoodJet");
-#        self.out.branch("GoodJet_eta",  "F", lenVar="nGoodJet");
-#        self.out.branch("GoodJet_phi",  "F", lenVar="nGoodJet");
-#        self.out.branch("GoodJet_mass",  "F", lenVar="nGoodJet");
-#        self.out.branch("GoodJet_btagDeepCSV",  "F", lenVar="nGoodJet");
-#        self.out.branch("GoodJet_btagDeepFlav",  "F", lenVar="nGoodJet");
+        self.out.branch("LeptonSFTrigger",  "F");
+        self.out.branch("LeptonSFISO",  "F");
+        self.out.branch("LeptonSFID",  "F");
+        self.out.branch("nGoodLep",  "I");
+        self.out.branch("GoodLep_pt",  "F", lenVar="nGoodLep");
+        self.out.branch("GoodLep_eta",  "F", lenVar="nGoodLep");
+        self.out.branch("GoodLep_phi",  "F", lenVar="nGoodLep");
+        self.out.branch("GoodLep_mass",  "F", lenVar="nGoodLep");
+        self.out.branch("nGoodJet",  "I");
+        self.out.branch("GoodJet_pt",  "F", lenVar="nGoodJet");
+        self.out.branch("GoodJet_eta",  "F", lenVar="nGoodJet");
+        self.out.branch("GoodJet_phi",  "F", lenVar="nGoodJet");
+        self.out.branch("GoodJet_mass",  "F", lenVar="nGoodJet");
+        self.out.branch("GoodJet_btagDeepCSV",  "F", lenVar="nGoodJet");
+        self.out.branch("GoodJet_btagDeepFlav",  "F", lenVar="nGoodJet");
 
     def analyze(self, event):
 
@@ -309,7 +307,8 @@ class resolvedAnalyzer(Module):
 
 	    ### create the MEM classifier, specifying the verbosity and b-tagger type
             ### verbosity (debug code) 1=output,2=input,4=init,8=init_more,16=event,32=integration
-	    cls_mem = ROOT.MEMClassifier(0, 'btagDeepFlavB_', '2017')
+	    cls_mem = ROOT.MEMClassifier(0, 'btagDeepFlavB_', self.year, len(goodJetsNoLep))
+	    #cls_mem = ROOT.MEMClassifier(0, 'btagDeepFlavB_', '2017')
 
             try:
                 ret = cls_mem.GetOutput(
@@ -382,24 +381,24 @@ class resolvedAnalyzer(Module):
 	    getattr( self, 'jet3_mass_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].mass, weight )
 	    getattr( self, 'jet3_bDeepCSV_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].btagDeepB, weight )
 	    getattr( self, 'jet3_bDeepFlav_bDeepFlavWeighted' ).Fill( goodJetsNoLep[3].btagDeepFlavB, weight )
+            '''
 
         #### FIlling trees
-#        self.out.fillBranch('LeptonSFTrigger', leptonWeights[0])
-#        self.out.fillBranch('LeptonSFID', leptonWeights[1])
-#        self.out.fillBranch('LeptonSFISO', leptonWeights[2])
-#        self.out.fillBranch('nGoodLep', len(goodLeptons))
-#        self.out.fillBranch('GoodLep_pt', [l.pt for l in goodLeptons] )
-#        self.out.fillBranch('GoodLep_eta', [l.eta for l in goodLeptons] )
-#        self.out.fillBranch('GoodLep_phi', [l.phi for l in goodLeptons] )
-#        self.out.fillBranch('GoodLep_mass', [l.mass for l in goodLeptons] )
-#        self.out.fillBranch('nGoodLep', len(goodLeptons))
-#        self.out.fillBranch('GoodJet_pt', [j.pt for j in goodJetsNoLep] )
-#        self.out.fillBranch('GoodJet_eta', [j.eta for j in goodJetsNoLep] )
-#        self.out.fillBranch('GoodJet_phi', [j.phi for j in goodJetsNoLep] )
-#        self.out.fillBranch('GoodJet_mass', [j.mass for j in goodJetsNoLep] )
-#        self.out.fillBranch('GoodJet_btagDeepCSV', [j.btagDeepB for j in goodJetsNoLep] )
-#        self.out.fillBranch('GoodJet_btagDeepFlav', [j.btagDeepFlavB for j in goodJetsNoLep] )
-            '''
+        self.out.fillBranch('LeptonSFTrigger', leptonWeights[0])
+        self.out.fillBranch('LeptonSFID', leptonWeights[1])
+        self.out.fillBranch('LeptonSFISO', leptonWeights[2])
+        self.out.fillBranch('nGoodLep', len(goodLeptons))
+        self.out.fillBranch('GoodLep_pt', [l.pt for l in goodLeptons] )
+        self.out.fillBranch('GoodLep_eta', [l.eta for l in goodLeptons] )
+        self.out.fillBranch('GoodLep_phi', [l.phi for l in goodLeptons] )
+        self.out.fillBranch('GoodLep_mass', [l.mass for l in goodLeptons] )
+        self.out.fillBranch('nGoodLep', len(goodLeptons))
+        self.out.fillBranch('GoodJet_pt', [j.pt for j in goodJetsNoLep] )
+        self.out.fillBranch('GoodJet_eta', [j.eta for j in goodJetsNoLep] )
+        self.out.fillBranch('GoodJet_phi', [j.phi for j in goodJetsNoLep] )
+        self.out.fillBranch('GoodJet_mass', [j.mass for j in goodJetsNoLep] )
+        self.out.fillBranch('GoodJet_btagDeepCSV', [j.btagDeepB for j in goodJetsNoLep] )
+        self.out.fillBranch('GoodJet_btagDeepFlav', [j.btagDeepFlavB for j in goodJetsNoLep] )
 
 
         '''

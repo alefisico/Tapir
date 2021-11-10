@@ -20,7 +20,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 impor
 from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import btagSFProducer
 ### other modules
 from TTH.Analyzer.boostedAnalyzer import boostedAnalyzer
-#from TTH.Analyzer.resolvedAnalyzer import resolvedAnalyzer
+from TTH.Analyzer.resolvedAnalyzer import resolvedAnalyzer
 #from selection import parameters
 import argparse
 
@@ -153,10 +153,10 @@ if isMC:
     elif args.year.startswith('2018'): listOfModules.append( puAutoWeight_2018() )
 jetmetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert=("Merged" if isMC else 'Merged'), runPeriod=('' if isMC else dataPeriod), metBranchName=('METFixEE2017' if args.year.startswith('2017') else 'MET'),applyHEMfix=True)
 listOfModules.append( jetmetCorrector() )
-if isMC: listOfModules.append( btagSFProducer( ( 'Legacy2016' if args.year.startswith('2016') else args.year), algo='deepjet', selectedWPs=[ 'L', 'M', 'T'] ) )
+#if isMC: listOfModules.append( btagSFProducer( ( 'Legacy2016' if args.year.startswith('2016') else args.year), algo='deepjet', selectedWPs=[ 'L', 'M', 'T'] ) )
 if args.process.startswith( ('both', 'resolved') ):
     print "|----------> RUNNING RESOLVED"
-    #listOfModules.append( resolvedAnalyzer( args.sample ) )
+    listOfModules.append( resolvedAnalyzer( args.sample, args.year ) )
 if args.process.startswith( ('both', 'boosted') ):
     print "|----------> RUNNING BOOSTED"
     fatJetCorrector = createJMECorrector(isMC=isMC, dataYear=args.year, jesUncert=("Merged" if isMC else 'Total'), runPeriod=('' if isMC else dataPeriod), jetType='AK8PFPuppi')
@@ -170,11 +170,11 @@ if args.process.startswith( ('both', 'resolved') ):
         branchsel="keep_and_drop.txt",
         modules=listOfModules,
         provenance=True, ### copy MetaData and ParametersSets
-        #haddFileName = "nano_postprocessed"+args.oFile+".root",
+        haddFileName = "nano_postprocessed"+args.oFile+".root" if args.local else 'nano_postprocessed.root',
         histFileName = "histograms"+args.oFile+".root",
         histDirName = 'tthbb13',
         jsonInput=(None if isMC else JSONFile),
-        #fwkJobReport=True,
+        fwkJobReport=True,
         maxEntries=args.numEvents,
         prefetch=args.local,
         longTermCache=args.local,

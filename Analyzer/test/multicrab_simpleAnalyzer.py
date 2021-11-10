@@ -42,35 +42,36 @@ mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
 echo "Running: python simpleAnalyzer.py --sample {datasets} --process boosted"
-python simpleAnalyzer.py --sample {datasets} --process boosted --year {year}
+#python simpleAnalyzer.py --sample {datasets} --process boosted --year {year}
+python simpleAnalyzer.py --sample {datasets} --process resolved --year {year}
 fi
     '''
     open('runPostProcSimplerJob_'+options.datasets+'.sh', 'w').write(BASH_SCRIPT.format(**options.__dict__))     ### create file and replace arguments with {THIS}
 
 ##########################################
-def createPSet():
-    """docstring for createPSet: create the PSet.py file needed for postprocessing"""
-
-    PYTHON_SCRIPT = '''import FWCore.ParameterSet.Config as cms
-
-process = cms.Process("NANO")
-
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(),
-#	lumisToProcess=cms.untracked.VLuminosityBlockRange("254231:1-254231:24")
-)
-
-process.source.fileNames = [
-            "root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/102X_upgrade2018_realistic_v15-v1/40000/6801F357-BF95-2E41-BA2D-ABD083577275.root"
-]
-
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
-process.output = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('nano_postprocessed.root'),
-    fakeNameForCrab = cms.untracked.bool(True),
-)
-process.out = cms.EndPath(process.output)
-    '''
-    open('PSet.py', 'w').write(PYTHON_SCRIPT)
+#def createPSet():
+#    """docstring for createPSet: create the PSet.py file needed for postprocessing"""
+#
+#    PYTHON_SCRIPT = '''import FWCore.ParameterSet.Config as cms
+#
+#process = cms.Process("NANO")
+#
+#process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(),
+##	lumisToProcess=cms.untracked.VLuminosityBlockRange("254231:1-254231:24")
+#)
+#
+#process.source.fileNames = [
+#            "root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/102X_upgrade2018_realistic_v15-v1/40000/6801F357-BF95-2E41-BA2D-ABD083577275.root"
+#]
+#
+#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+#process.output = cms.OutputModule("PoolOutputModule",
+#    fileName = cms.untracked.string('nano_postprocessed.root'),
+#    fakeNameForCrab = cms.untracked.bool(True),
+#)
+#process.out = cms.EndPath(process.output)
+#    '''
+#    open('PSet.py', 'w').write(PYTHON_SCRIPT)
 
 
 ##########################################
@@ -92,8 +93,8 @@ def submitJobs( job, lnfList, unitJobs ):
     config.section_("JobType")
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = 'PSet.py'
-    #config.JobType.maxMemoryMB = 5000
-    #config.JobType.maxJobRuntimeMin = 2750
+    config.JobType.maxMemoryMB = 5000
+    config.JobType.maxJobRuntimeMin = 3600
 
     config.section_("Data")
     #config.Data.ignoreLocality = True
@@ -120,10 +121,10 @@ def submitJobs( job, lnfList, unitJobs ):
         config.Data.outputPrimaryDataset = job
     else:
         config.Data.inputDataset = lfnList ### it is the dataset name
-        config.Data.splitting = 'FileBased'
-        config.Data.unitsPerJob = unitJobs
-        #config.Data.splitting = 'LumiBased'
-        #config.Data.unitsPerJob = 1000
+        #config.Data.splitting = 'FileBased'
+        #config.Data.unitsPerJob = unitJobs
+        config.Data.splitting = 'EventAwareLumiBased'
+        config.Data.unitsPerJob = 5000
 
     config.JobType.outputFiles = [ 'nano_postprocessed.root' ]#, 'histograms.root' ]
     config.Data.outLFNDirBase = '/store/user/'+os.environ['USER']+'/tmpFiles/ttH/'
